@@ -16,7 +16,9 @@ import EmployeeManagement from './pages/EmployeeManagement/EmployeeManagement';
 import EmployeeDetail from './pages/EmployeeDetail/EmployeeDetail';
 import DepartmentManagement from './pages/DepartmentManagement/DepartmentManagement';
 import DepartmentDetail from './pages/DepartmentDetail/DepartmentDetail';
-import LeaveApply from './pages/EmployeeSchedule/LeaveApply'; // ✅ 휴가 신청 import
+import LeaveApply from './pages/EmployeeSchedule/LeaveApply';
+import LeaveApproval from './pages/EmployeeSchedule/LeaveApproval';
+import EmployeeSchedule from './pages/EmployeeSchedule/EmployeeSchedule';
 
 // 레이아웃 컴포넌트 Import
 import MainLayout from './layout/MainLayout';
@@ -53,9 +55,9 @@ function App() {
           <Route path="/dept-manage/detail" element={<DepartmentDetail />} />
           
           {/* 근태 관리 */}
-          <Route path="/attendance" element={<div>근태 현황 페이지 (준비중)</div>} />
-          <Route path="/vacation" element={<LeaveApply />} /> {/* ✅ 휴가 신청 연결 */}
-          <Route path="/approval" element={<div>승인 관리 페이지 (준비중)</div>} />
+          <Route path="/attendance" element={<EmployeeSchedule />} />
+          <Route path="/vacation" element={<LeaveApply />} />
+          <Route path="/approval" element={<LeaveApproval />} />
           
           {/* 기타 */}
           <Route path="/health-status" element={<div>건강 현황 페이지 (준비중)</div>} />

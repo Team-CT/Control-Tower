@@ -1,21 +1,8 @@
 import React, { useState } from 'react';
 import {
-  PageLayout,
   MainContentArea,
   PageHeader,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbSeparator,
   PageTitle,
-  HeaderActions,
-  SearchButton,
-  NotificationButton,
-  NotificationBadge,
-  UserProfile,
-  UserAvatar,
-  UserInfo,
-  UserName,
-  UserDepartment,
   StatsCardGrid,
   StatCard,
   StatLabel,
@@ -181,38 +168,13 @@ const EmployeeSchedule = () => {
   };
 
   return (
-    <PageLayout>
-      <MainContentArea>
-        {/* Page Header */}
-        <PageHeader>
-          <div>
-            <Breadcrumb>
-              <BreadcrumbItem>홈</BreadcrumbItem>
-              <BreadcrumbSeparator>›</BreadcrumbSeparator>
-              <BreadcrumbItem>인사 관리</BreadcrumbItem>
-              <BreadcrumbSeparator>›</BreadcrumbSeparator>
-              <BreadcrumbItem $active>직원 스케줄 관리</BreadcrumbItem>
-            </Breadcrumb>
-            <PageTitle>직원 스케줄 관리</PageTitle>
-          </div>
-
-          <HeaderActions>
-            <SearchButton aria-label="검색">
-              🔍
-            </SearchButton>
-            <NotificationButton aria-label="알림">
-              🔔
-              <NotificationBadge>1</NotificationBadge>
-            </NotificationButton>
-            <UserProfile>
-              <UserAvatar>👤</UserAvatar>
-              <UserInfo>
-                <UserName>관리자</UserName>
-                <UserDepartment>인사팀</UserDepartment>
-              </UserInfo>
-            </UserProfile>
-          </HeaderActions>
-        </PageHeader>
+    <MainContentArea>
+      {/* Page Header */}
+      <PageHeader>
+        <div>
+          <PageTitle>직원 스케줄 관리</PageTitle>
+        </div>
+      </PageHeader>
 
         {/* Statistics Cards */}
         <StatsCardGrid>
@@ -324,8 +286,7 @@ const EmployeeSchedule = () => {
             </TableBody>
           </ScheduleTable>
         </ScheduleTableWrapper>
-      </MainContentArea>
-    </PageLayout>
+    </MainContentArea>
   );
 };
 
