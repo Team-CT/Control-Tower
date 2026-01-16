@@ -131,13 +131,6 @@ const LeaveApply = () => {
       <MainContentArea>
         <PageHeader>
           <div>
-            <Breadcrumb>
-              <BreadcrumbItem>홈</BreadcrumbItem>
-              <BreadcrumbSeparator>›</BreadcrumbSeparator>
-              <BreadcrumbItem>근태 관리</BreadcrumbItem>
-              <BreadcrumbSeparator>›</BreadcrumbSeparator>
-              <BreadcrumbItem $active>휴가 신청</BreadcrumbItem>
-            </Breadcrumb>
             <PageTitle>휴가 신청</PageTitle>
             <PageDescription>
               원하는 휴가 유형을 선택한 후 신청을 제출하세요

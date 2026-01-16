@@ -2,17 +2,13 @@ import styled from 'styled-components';
 
 export const FooterContainer = styled.footer`
   width: 100%;
-  padding: 40px 48px;
-  background-color: #f8f9fa; /* 본문보다 살짝 밝거나 어두운 회색 */
-  border-top: 1px solid #e9ecef;
+  padding: 40px;
+  background-color: #ffffff;
+  border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: center;
   box-sizing: border-box;
-  margin-top: auto; /* 콘텐츠가 짧아도 하단에 위치하도록 설정 */
-
-  @media (max-width: 768px) {
-    padding: 32px 24px;
-  }
+  margin-top: auto;
 `;
 
 export const FooterContent = styled.div`
@@ -37,7 +33,7 @@ export const LeftSection = styled.div`
 export const CompanyName = styled.h2`
   font-size: 16px;
   font-weight: 700;
-  color: #343a40;
+  color: var(--text-main);
   margin: 0;
 `;
 
@@ -93,7 +89,7 @@ export const LinkItem = styled.a`
   font-weight: ${props => props.$bold ? '700' : '400'};
 
   &:hover {
-    color: #0055aa; /* 대한항공 블루 */
+    color: var(--primary-color);
     text-decoration: underline;
   }
 `;

@@ -8,9 +8,9 @@ import Footer from './footer/footer'; // ✅ 푸터 import
 // 전체 레이아웃 (화면 꽉 채움, 스크롤 없음)
 const LayoutContainer = styled.div`
   display: flex;
-  width: 100vw;
+  width: 100%;
   height: 100vh;
-  background-color: #f5f7fa;
+  background-color: var(--bg-main);
   overflow: hidden;
 `;
 
