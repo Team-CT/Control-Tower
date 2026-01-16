@@ -1,11 +1,23 @@
 import React, { useState } from 'react';
+<<<<<<< HEAD
 import * as S from './board.styled';
 import { Search, MessageSquare, Eye, MessageCircle, Heart } from 'lucide-react';
+=======
+import * as S from './styled';
+import { Search, MessageSquare, Eye, MessageCircle, Heart, X, Send } from 'lucide-react';
+>>>>>>> f485e06c272eb06257ecc35094b3df5af18d31ed
 
 const Board = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('전체');
   const [selectedFilter, setSelectedFilter] = useState('최신순');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    category: '',
+    title: '',
+    content: '',
+    attachments: ''
+  });
 
   const boardTabs = ['전체', '공지사항', '사건사고'];
   
@@ -109,6 +121,35 @@ const Board = () => {
     setActiveTab(tab);
   };
 
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setFormData({
+      category: '',
+      title: '',
+      content: '',
+      attachments: ''
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // TODO: Submit post with Zustand
+    console.log('Form submitted:', formData);
+    handleCloseModal();
+  };
+
   return (
     <S.PageContainer>
       <S.MainContent>
@@ -118,7 +159,7 @@ const Board = () => {
               <MessageSquare size={28} />
               게시판
             </S.PageTitle>
-            <S.CreateButton>+ 글쓰기</S.CreateButton>
+            <S.CreateButton onClick={handleOpenModal}>+ 글쓰기</S.CreateButton>
           </S.PageHeader>
 
           <S.TabSection>
@@ -206,6 +247,89 @@ const Board = () => {
           </S.Pagination>
         </S.ContentWrapper>
       </S.MainContent>
+
+      {/* 글쓰기 모달 */}
+      {isModalOpen && (
+        <S.ModalOverlay onClick={handleCloseModal}>
+          <S.ModalContainer onClick={(e) => e.stopPropagation()}>
+            <S.ModalHeader>
+              <S.ModalTitle>
+                <Send size={24} />
+                새 글 작성
+              </S.ModalTitle>
+              <S.CloseButton onClick={handleCloseModal}>
+                <X size={24} />
+              </S.CloseButton>
+            </S.ModalHeader>
+
+            <S.ModalBody>
+              <S.PostForm onSubmit={handleSubmit}>
+                <S.FormGroup>
+                  <S.FormLabel>카테고리</S.FormLabel>
+                  <S.FormSelect
+                    name="category"
+                    value={formData.category}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    <option value="">카테고리 선택</option>
+                    <option value="공지">공지</option>
+                    <option value="일반">일반</option>
+                    <option value="이벤트">이벤트</option>
+                  </S.FormSelect>
+                </S.FormGroup>
+
+                <S.FormGroup>
+                  <S.FormLabel>제목</S.FormLabel>
+                  <S.FormInput
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    placeholder="제목을 입력하세요"
+                    required
+                  />
+                </S.FormGroup>
+
+                <S.FormGroup>
+                  <S.FormLabel>내용</S.FormLabel>
+                  <S.FormTextarea
+                    name="content"
+                    value={formData.content}
+                    onChange={handleInputChange}
+                    placeholder="내용을 입력하세요"
+                    rows={12}
+                    required
+                  />
+                </S.FormGroup>
+
+                <S.FormGroup>
+                  <S.FormLabel>첨부파일</S.FormLabel>
+                  <S.FormInput
+                    type="text"
+                    name="attachments"
+                    value={formData.attachments}
+                    onChange={handleInputChange}
+                    placeholder="파일을 첨부할 수 있습니다 (최대 10MB 이하)"
+                  />
+                  <S.FormHint>파일 5개 이하, 각 10MB 이하</S.FormHint>
+                </S.FormGroup>
+
+                <S.ModalFooter>
+                  <S.CancelButton type="button" onClick={handleCloseModal}>
+                    <X size={18} />
+                    취소
+                  </S.CancelButton>
+                  <S.SubmitButton type="submit">
+                    <Send size={18} />
+                    등록하기
+                  </S.SubmitButton>
+                </S.ModalFooter>
+              </S.PostForm>
+            </S.ModalBody>
+          </S.ModalContainer>
+        </S.ModalOverlay>
+      )}
     </S.PageContainer>
   );
 };
