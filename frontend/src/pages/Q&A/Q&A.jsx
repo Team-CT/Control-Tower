@@ -6,7 +6,6 @@ const QnA = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('최신순');
 
-  // TODO: Zustand state mapping
   const qnaList = [
     {
       id: 1,
@@ -111,111 +110,12 @@ const QnA = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // TODO: Implement search logic with Zustand
     console.log('Searching for:', searchQuery);
   };
 
   return (
     <S.PageContainer>
-      <S.Sidebar>
-        <S.Logo>
-          <S.LogoIcon>✈️</S.LogoIcon>
-          <S.LogoText>
-            <div>SkyHR</div>
-            <S.LogoSubtext>Airline HR SaaS System</S.LogoSubtext>
-          </S.LogoText>
-        </S.Logo>
-
-        <S.NavSection>
-          <S.NavItem>
-            <S.NavIcon>🏠</S.NavIcon>
-            <span>대시보드</span>
-          </S.NavItem>
-        </S.NavSection>
-
-        <S.NavDivider>직원 관리</S.NavDivider>
-        <S.NavSection>
-          <S.NavItem>
-            <S.NavIcon>👥</S.NavIcon>
-            <span>직원 목록</span>
-          </S.NavItem>
-          <S.NavItem>
-            <S.NavIcon>👤</S.NavIcon>
-            <span>부서 관리</span>
-          </S.NavItem>
-        </S.NavSection>
-
-        <S.NavDivider>근태 관리</S.NavDivider>
-        <S.NavSection>
-          <S.NavItem>
-            <S.NavIcon>📋</S.NavIcon>
-            <span>근태 현황</span>
-          </S.NavItem>
-          <S.NavItem>
-            <S.NavIcon>📅</S.NavIcon>
-            <span>휴가 신청</span>
-          </S.NavItem>
-          <S.NavItem>
-            <S.NavIcon>⏰</S.NavIcon>
-            <span>승인 관리</span>
-          </S.NavItem>
-        </S.NavSection>
-
-        <S.NavDivider>지원 센터</S.NavDivider>
-        <S.NavSection>
-          <S.NavItem>
-            <S.NavIcon>💬</S.NavIcon>
-            <span>건강 현황</span>
-          </S.NavItem>
-          <S.NavItem>
-            <S.NavIcon>🏥</S.NavIcon>
-            <span>스트레스 설문</span>
-          </S.NavItem>
-          <S.NavItem>
-            <S.NavIcon>📊</S.NavIcon>
-            <span>건강 프로그램</span>
-          </S.NavItem>
-          <S.NavItem>
-            <S.NavIcon>💼</S.NavIcon>
-            <span>게시판</span>
-          </S.NavItem>
-          <S.NavItem active>
-            <S.NavIcon>❓</S.NavIcon>
-            <span>Q&A</span>
-          </S.NavItem>
-          <S.NavItem>
-            <S.NavIcon>⚙️</S.NavIcon>
-            <span>설정</span>
-          </S.NavItem>
-        </S.NavSection>
-      </S.Sidebar>
-
       <S.MainContent>
-        <S.Header>
-          <S.Breadcrumb>
-            <S.BreadcrumbItem>홈</S.BreadcrumbItem>
-            <S.BreadcrumbSeparator>›</S.BreadcrumbSeparator>
-            <S.BreadcrumbItem active>게시판</S.BreadcrumbItem>
-          </S.Breadcrumb>
-
-          <S.HeaderRight>
-            <S.SearchIconButton>
-              <Search size={20} />
-            </S.SearchIconButton>
-            <S.NotificationBadge>
-              <S.NotificationIcon>🔔</S.NotificationIcon>
-              <S.Badge>1</S.Badge>
-            </S.NotificationBadge>
-            <S.UserProfile>
-              <S.UserAvatar>김</S.UserAvatar>
-              <S.UserInfo>
-                <S.UserName>김민수</S.UserName>
-                <S.UserRole>직원 관리자</S.UserRole>
-              </S.UserInfo>
-            </S.UserProfile>
-          </S.HeaderRight>
-        </S.Header>
-
         <S.ContentWrapper>
           <S.PageHeader>
             <S.PageTitle>
