@@ -19,7 +19,8 @@ import DepartmentDetail from './pages/DepartmentDetail/DepartmentDetail';
 import LeaveApply from './pages/EmployeeSchedule/LeaveApply';
 import LeaveApproval from './pages/EmployeeSchedule/LeaveApproval';
 import EmployeeSchedule from './pages/EmployeeSchedule/EmployeeSchedule';
-
+import Dashboard from './pages/health_dashboard/health_dashboard.jsx';
+import Stress from './pages/stress_survey/stress_survey.jsx';
 // 레이아웃 컴포넌트 Import
 import MainLayout from './layout/MainLayout';
 
@@ -60,8 +61,8 @@ function App() {
           <Route path="/approval" element={<LeaveApproval />} />
           
           {/* 기타 */}
-          <Route path="/health-status" element={<div>건강 현황 페이지 (준비중)</div>} />
-          <Route path="/stress" element={<div>스트레스 설문 페이지 (준비중)</div>} />
+          <Route path="/health-dashboard" element={<Dashboard />} />
+          <Route path="/stress" element={<Stress/>} />
           <Route path="/health-program" element={<div>건강 프로그램 페이지 (준비중)</div>} />
           <Route path="/settings" element={<div>설정 페이지 (준비중)</div>} />
         </Route>
