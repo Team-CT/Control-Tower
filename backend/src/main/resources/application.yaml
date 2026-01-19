@@ -21,6 +21,8 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update  # 테이블을 자동으로 수정해줌 (편함)
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
     show-sql: true      # 실행되는 SQL을 콘솔에 보여줌
     properties:
       hibernate:
