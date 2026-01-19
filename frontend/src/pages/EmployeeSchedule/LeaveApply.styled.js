@@ -4,20 +4,16 @@ import styled from 'styled-components';
 
 export const PageLayout = styled.div`
   display: flex;
-  min-height: 100vh;
+  min-height: 100%;
   width: 100%;
-  background: linear-gradient(
-    0deg,
-    rgba(249, 250, 251, 1) 0%,
-    rgba(249, 250, 251, 1) 100%
-  );
+  background: var(--bg-main);
 `;
 
-export const MainContentArea = styled.main`
+export const MainContentArea = styled.div`
   flex: 1;
-  margin-left: 260px;
   padding: 32px 48px;
-  max-width: calc(1920px - 260px);
+  max-width: 1600px;
+  margin: 0 auto;
 
   @media (max-width: 1440px) {
     padding: 24px 32px;
@@ -145,18 +141,18 @@ export const LeaveTypeButton = styled.button`
   align-items: center;
   gap: 16px;
   padding: 20px;
-  background: ${(props) => (props.$active ? '#eff6ff' : '#f9fafb')};
-  border: 2px solid ${(props) => (props.$active ? '#0284c7' : '#e5e7eb')};
+  background: ${(props) => (props.$active ? 'var(--primary-light)' : '#ffffff')};
+  border: 2px solid ${(props) => (props.$active ? 'var(--primary-color)' : 'var(--border-color)')};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
 
   &:hover {
-    background: #eff6ff;
-    border-color: #0284c7;
+    background: var(--primary-light);
+    border-color: var(--primary-color);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 85, 170, 0.1);
   }
 
   &:active {
@@ -354,20 +350,20 @@ export const CancelButton = styled.button`
 
 export const SubmitButton = styled.button`
   padding: 12px 32px;
-  font-family: 'Noto Sans KR', sans-serif;
+  font-family: inherit;
   font-size: 15px;
   font-weight: 600;
   color: #ffffff;
-  background: #0284c7;
+  background: var(--primary-color);
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #0369a1;
+    background: var(--primary-hover);
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(2, 132, 199, 0.3);
+    box-shadow: 0 8px 16px rgba(0, 85, 170, 0.2);
   }
 
   &:active {

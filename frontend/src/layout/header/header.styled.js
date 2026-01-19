@@ -2,16 +2,17 @@ import styled from 'styled-components';
 
 export const HeaderContainer = styled.header`
   background: white;
-  padding: 20px 48px;
+  padding: 16px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
   z-index: 100;
   width: 100%;
   box-sizing: border-box;
+  border-bottom: 1px solid var(--border-color);
 `;
 
 export const Breadcrumb = styled.div`
@@ -22,12 +23,12 @@ export const Breadcrumb = styled.div`
 `;
 
 export const BreadcrumbItem = styled.span`
-  color: ${props => props.$active ? '#333' : '#999'};
+  color: ${props => props.$active ? 'var(--text-main)' : 'var(--text-sub)'};
   font-weight: ${props => props.$active ? '600' : '400'};
 `;
 
 export const BreadcrumbSeparator = styled.span`
-  color: #ccc;
+  color: #d1d5db;
 `;
 
 export const HeaderRight = styled.div`
@@ -39,16 +40,17 @@ export const HeaderRight = styled.div`
 export const SearchIconButton = styled.button`
   background: none;
   border: none;
-  color: #666;
+  color: var(--text-sub);
   cursor: pointer;
   padding: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s;
+  border-radius: 8px;
 
   &:hover {
-    color: #4A90E2;
+    color: var(--primary-color);
+    background-color: #f3f4f6;
   }
 `;
 

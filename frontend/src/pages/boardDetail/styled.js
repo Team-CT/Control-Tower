@@ -7,209 +7,10 @@ export const PageContainer = styled.div`
   width: 100%;
 `;
 
-export const Sidebar = styled.aside`
-  width: 280px;
-  background: linear-gradient(180deg, #4A90E2 0%, #357ABD 100%);
-  color: white;
-  padding: 32px 0;
-  position: fixed;
-  height: 100vh;
-  overflow-y: auto;
-  box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
-
-  @media (max-width: 1024px) {
-    width: 240px;
-  }
-`;
-
-export const Logo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0 24px;
-  margin-bottom: 48px;
-`;
-
-export const LogoIcon = styled.div`
-  font-size: 32px;
-`;
-
-export const LogoText = styled.div`
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.2;
-`;
-
-export const LogoSubtext = styled.div`
-  font-size: 11px;
-  font-weight: 400;
-  opacity: 0.85;
-  margin-top: 2px;
-`;
-
-export const NavDivider = styled.div`
-  font-size: 12px;
-  font-weight: 600;
-  opacity: 0.7;
-  padding: 16px 24px 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-`;
-
-export const NavSection = styled.nav`
-  margin-bottom: 24px;
-`;
-
-export const NavItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 24px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 15px;
-  font-weight: 500;
-  background: ${props => props.active ? 'rgba(255, 255, 255, 0.15)' : 'transparent'};
-  border-left: 4px solid ${props => props.active ? '#fff' : 'transparent'};
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-`;
-
-export const NavIcon = styled.span`
-  font-size: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-`;
-
 export const MainContent = styled.main`
-  margin-left: 280px;
+  width: 100%;
   flex: 1;
-  width: calc(100% - 280px);
   min-height: 100vh;
-
-  @media (max-width: 1024px) {
-    margin-left: 240px;
-    width: calc(100% - 240px);
-  }
-`;
-
-export const Header = styled.header`
-  background: white;
-  padding: 20px 48px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-`;
-
-export const Breadcrumb = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  max-width: 600px;
-`;
-
-export const BreadcrumbItem = styled.span`
-  color: ${props => props.active ? '#333' : '#999'};
-  font-weight: ${props => props.active ? '600' : '400'};
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 200px;
-`;
-
-export const BreadcrumbSeparator = styled.span`
-  color: #ccc;
-  flex-shrink: 0;
-`;
-
-export const HeaderRight = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 24px;
-`;
-
-export const SearchIconButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-
-export const SearchIcon = styled.span`
-  font-size: 20px;
-`;
-
-export const NotificationBadge = styled.div`
-  position: relative;
-  cursor: pointer;
-`;
-
-export const NotificationIcon = styled.div`
-  font-size: 24px;
-`;
-
-export const Badge = styled.span`
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #FF4757;
-  color: white;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 600;
-`;
-
-export const UserProfile = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-`;
-
-export const UserAvatar = styled.div`
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-`;
-
-export const UserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-export const UserName = styled.div`
-  font-size: 15px;
-  font-weight: 600;
-  color: #333;
-`;
-
-export const UserRole = styled.div`
-  font-size: 13px;
-  color: #999;
 `;
 
 export const ContentWrapper = styled.div`
@@ -524,18 +325,18 @@ export const StatButton = styled.button`
   align-items: center;
   gap: 8px;
   background: white;
-  border: 2px solid ${props => props.active ? '#FF4757' : '#E5E8EB'};
+  border: 2px solid ${props => props.$active ? '#FF4757' : '#E5E8EB'};
   padding: 12px 24px;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
   font-size: 14px;
   font-weight: 600;
-  color: ${props => props.active ? '#FF4757' : '#666'};
+  color: ${props => props.$active ? '#FF4757' : '#666'};
 
   &:hover {
-    border-color: ${props => props.active ? '#FF4757' : '#4A90E2'};
-    color: ${props => props.active ? '#FF4757' : '#4A90E2'};
+    border-color: ${props => props.$active ? '#FF4757' : '#4A90E2'};
+    color: ${props => props.$active ? '#FF4757' : '#4A90E2'};
   }
 `;
 

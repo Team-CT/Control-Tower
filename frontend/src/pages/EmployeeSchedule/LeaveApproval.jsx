@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import {
-  PageLayout,
   MainContentArea,
   PageHeader,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbSeparator,
   PageTitle,
   PageDescription,
   ActionHeader,
@@ -82,23 +78,15 @@ const LeaveApproval = () => {
   });
 
   return (
-    <PageLayout>
-      <MainContentArea>
-        {/* Page Header */}
-        <PageHeader>
-          <div>
-            <Breadcrumb>
-              <BreadcrumbItem>홈</BreadcrumbItem>
-              <BreadcrumbSeparator>›</BreadcrumbSeparator>
-              <BreadcrumbItem>근태 관리</BreadcrumbItem>
-              <BreadcrumbSeparator>›</BreadcrumbSeparator>
-              <BreadcrumbItem $active>승인 관리</BreadcrumbItem>
-            </Breadcrumb>
-            <PageTitle>승인 관리</PageTitle>
-            <PageDescription>
-              팀원들의 휴가 신청을 검토하고 승인하세요 ✈ 승인하기
-            </PageDescription>
-          </div>
+    <MainContentArea>
+      {/* Page Header */}
+      <PageHeader>
+        <div>
+          <PageTitle>승인 관리</PageTitle>
+          <PageDescription>
+            팀원들의 휴가 신청을 검토하고 승인하세요 ✈ 승인하기
+          </PageDescription>
+        </div>
 
           <ActionHeader>
             <CreateButton onClick={handleCreateRequest}>✈ 전체 승인</CreateButton>
@@ -175,8 +163,7 @@ const LeaveApproval = () => {
             ))}
           </ApprovalList>
         </ApprovalListSection>
-      </MainContentArea>
-    </PageLayout>
+    </MainContentArea>
   );
 };
 

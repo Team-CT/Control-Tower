@@ -9,7 +9,16 @@ import SelectId from './pages/select_id/select_id';
 import SelectPwd from './pages/select_pwd/select_pwd';
 import WorkLogin from './pages/worklogin/worklogin';
 import Board from './pages/board/board';
-import QnA from './pages/Q&A/Q&A'; // 폴더명 대소문자 주의
+import BoardDetail from './pages/boardDetail/boardDetail';
+import QnA from './pages/Q&A/Q&A';
+import EmployeeDashboard from './pages/EmployeeDashboard/EmployeeDashboard';
+import EmployeeManagement from './pages/EmployeeManagement/EmployeeManagement';
+import EmployeeDetail from './pages/EmployeeDetail/EmployeeDetail';
+import DepartmentManagement from './pages/DepartmentManagement/DepartmentManagement';
+import DepartmentDetail from './pages/DepartmentDetail/DepartmentDetail';
+import LeaveApply from './pages/EmployeeSchedule/LeaveApply';
+import LeaveApproval from './pages/EmployeeSchedule/LeaveApproval';
+import EmployeeSchedule from './pages/EmployeeSchedule/EmployeeSchedule';
 
 // 레이아웃 컴포넌트 Import
 import MainLayout from './layout/MainLayout';
@@ -21,31 +30,36 @@ function App() {
       <GlobalStyle />
       
       <Routes>
-        {/* 1. 사이드바가 없는 페이지 (로그인, 회원가입 등) */}
+        {/* 1. 사이드바가 없는 페이지 */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/find-employee-id" element={<SelectId />} />
         <Route path="/find-password" element={<SelectPwd />} />
         <Route path="/work-login" element={<WorkLogin />} />
 
-        {/* 2. 사이드바가 있는 페이지 (MainLayout 내부) */}
+        {/* 2. 사이드바/헤더/푸터가 있는 페이지 (MainLayout) */}
         <Route element={<MainLayout />}>
-          {/* 기본 경로 접속 시 대시보드나 게시판으로 리다이렉트 */}
           <Route path="/" element={<Navigate to="/board" replace />} />
           
-          {/* 각 메뉴별 페이지 연결 */}
-          <Route path="/dashboard" element={<div>대시보드 페이지 (준비중)</div>} />
+          <Route path="/dashboard" element={<EmployeeDashboard />} />
+          
+          {/* 게시판 */}
           <Route path="/board" element={<Board />} />
+          <Route path="/board/detail" element={<BoardDetail />} />
           <Route path="/qna" element={<QnA />} />
           
-          {/* 관리자 전용 페이지 */}
-          <Route path="/employee-list" element={<div>직원 목록 페이지 (준비중)</div>} />
-          <Route path="/dept-manage" element={<div>부서 관리 페이지 (준비중)</div>} />
+          {/* 인사 관리 */}
+          <Route path="/employee-list" element={<EmployeeManagement />} />
+          <Route path="/employee-list/detail" element={<EmployeeDetail />} />
+          <Route path="/dept-manage" element={<DepartmentManagement />} />
+          <Route path="/dept-manage/detail" element={<DepartmentDetail />} />
           
-          {/* 나머지 메뉴들에 대한 라우트도 여기에 추가하면 됩니다 */}
-          <Route path="/attendance" element={<div>근태 현황 페이지 (준비중)</div>} />
-          <Route path="/vacation" element={<div>휴가 신청 페이지 (준비중)</div>} />
-          <Route path="/approval" element={<div>승인 관리 페이지 (준비중)</div>} />
+          {/* 근태 관리 */}
+          <Route path="/attendance" element={<EmployeeSchedule />} />
+          <Route path="/vacation" element={<LeaveApply />} />
+          <Route path="/approval" element={<LeaveApproval />} />
+          
+          {/* 기타 */}
           <Route path="/health-status" element={<div>건강 현황 페이지 (준비중)</div>} />
           <Route path="/stress" element={<div>스트레스 설문 페이지 (준비중)</div>} />
           <Route path="/health-program" element={<div>건강 프로그램 페이지 (준비중)</div>} />

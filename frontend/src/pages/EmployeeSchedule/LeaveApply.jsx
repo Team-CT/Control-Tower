@@ -1,11 +1,7 @@
 import React, { useState } from 'react';
 import {
-  PageLayout,
   MainContentArea,
   PageHeader,
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbSeparator,
   PageTitle,
   PageDescription,
   ContentGrid,
@@ -127,23 +123,15 @@ const LeaveApply = () => {
   };
 
   return (
-    <PageLayout>
-      <MainContentArea>
-        <PageHeader>
-          <div>
-            <Breadcrumb>
-              <BreadcrumbItem>홈</BreadcrumbItem>
-              <BreadcrumbSeparator>›</BreadcrumbSeparator>
-              <BreadcrumbItem>근태 관리</BreadcrumbItem>
-              <BreadcrumbSeparator>›</BreadcrumbSeparator>
-              <BreadcrumbItem $active>휴가 신청</BreadcrumbItem>
-            </Breadcrumb>
-            <PageTitle>휴가 신청</PageTitle>
-            <PageDescription>
-              원하는 휴가 유형을 선택한 후 신청을 제출하세요
-            </PageDescription>
-          </div>
-        </PageHeader>
+    <MainContentArea>
+      <PageHeader>
+        <div>
+          <PageTitle>휴가 신청</PageTitle>
+          <PageDescription>
+            원하는 휴가 유형을 선택한 후 신청을 제출하세요
+          </PageDescription>
+        </div>
+      </PageHeader>
 
         <ContentGrid>
           {/* 왼쪽: 신청 폼 */}
@@ -250,52 +238,26 @@ const LeaveApply = () => {
               </UsageProgressBar>
             </RemainingLeaveCard>
 
-            <SectionCard>
-              <SectionTitle>
-                대기 중인 신청
-                <span style={{ fontSize: '14px', color: '#6b7280', marginLeft: '8px' }}>
-                  (미승인)
-                </span>
-              </SectionTitle>
-
-              {quotas.map((quota, index) => (
-                <QuotaCard key={index}>
-                  <div>
-                    <QuotaBadge $type={quota.type}>
-                      {quota.type}
-                    </QuotaBadge>
-                    <QuotaType>{quota.type}</QuotaType>
-                    <QuotaValue>{quota.value}</QuotaValue>
-                    <QuotaDetail>{quota.detail}</QuotaDetail>
-                  </div>
-                  <HistoryStatus $status="approved">
-                    ✓ {quota.badge}
-                  </HistoryStatus>
-                </QuotaCard>
-              ))}
-            </SectionCard>
-
             <HistoryCard>
-              <SectionTitle>최근 신청 내역</SectionTitle>
-              {quotas.slice(0, 4).map((item, index) => (
-                <HistoryItem key={index}>
-                  <div>
-                    <HistoryType $type={item.type}>
-                      {item.type}
-                    </HistoryType>
-                    <HistoryDate>{item.detail}</HistoryDate>
-                    <HistoryDuration>{item.value}</HistoryDuration>
-                  </div>
-                  <HistoryStatus $status="approved">
-                    ✓ {item.badge}
-                  </HistoryStatus>
-                </HistoryItem>
-              ))}
-            </HistoryCard>
-          </RightColumn>
-        </ContentGrid>
-      </MainContentArea>
-    </PageLayout>
+            <SectionTitle>최근 신청 내역</SectionTitle>
+            {quotas.slice(0, 2).map((item, index) => (
+              <HistoryItem key={index}>
+                <div>
+                  <HistoryType $type={item.type}>
+                    {item.type}
+                  </HistoryType>
+                  <HistoryDate>{item.detail}</HistoryDate>
+                  <HistoryDuration>{item.value}</HistoryDuration>
+                </div>
+                <HistoryStatus $status="approved">
+                  ✓ {item.badge}
+                </HistoryStatus>
+              </HistoryItem>
+            ))}
+          </HistoryCard>
+        </RightColumn>
+      </ContentGrid>
+    </MainContentArea>
   );
 };
 

@@ -3,21 +3,17 @@ import styled from 'styled-components';
 // 전체 페이지 레이아웃 (사이드바 260px 제외한 영역)
 export const PageLayout = styled.div`
   display: flex;
-  min-height: 100vh;
+  min-height: 100%;
   width: 100%;
-  background: linear-gradient(
-    0deg,
-    rgba(240, 247, 255, 1) 0%,
-    rgba(240, 247, 255, 1) 100%
-  );
+  background: var(--bg-main);
 `;
 
 // 메인 콘텐츠 영역 (사이드바 우측)
-export const MainContentArea = styled.main`
+export const MainContentArea = styled.div`
   flex: 1;
-  margin-left: 260px;
   padding: 32px 48px;
-  max-width: calc(1920px - 260px);
+  max-width: 1600px;
+  margin: 0 auto;
 
   @media (max-width: 1440px) {
     padding: 24px 32px;

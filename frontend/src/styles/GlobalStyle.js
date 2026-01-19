@@ -1,6 +1,17 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
+  :root {
+    --primary-color: #0055aa;
+    --primary-hover: #004488;
+    --primary-light: #e0f2fe;
+    --secondary-color: #357abd;
+    --text-main: #111827;
+    --text-sub: #6b7280;
+    --bg-main: #f5f7fa;
+    --border-color: #e5e7eb;
+  }
+
   /* CSS Reset */
   * {
     margin: 0;
@@ -13,14 +24,16 @@ const GlobalStyle = createGlobalStyle`
     font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    color: #333;
+    color: var(--text-main);
     line-height: 1.5;
+    background-color: var(--bg-main);
   }
 
   /* 링크 스타일 초기화 */
   a {
     color: inherit;
     text-decoration: none;
+    transition: color 0.2s ease;
   }
 
   /* 버튼 스타일 초기화 */
@@ -29,6 +42,7 @@ const GlobalStyle = createGlobalStyle`
     background: none;
     cursor: pointer;
     font: inherit;
+    transition: all 0.2s ease;
   }
 
   /* 리스트 스타일 초기화 */
@@ -58,38 +72,33 @@ const GlobalStyle = createGlobalStyle`
 
   /* 스크롤바 스타일링 */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: transparent;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+    background: #d1d5db;
+    border-radius: 10px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: #9ca3af;
   }
 
   /* 선택 영역 스타일링 */
   ::selection {
-    background: #007bff;
-    color: white;
+    background: var(--primary-light);
+    color: var(--primary-color);
   }
 
   /* 기본 포커스 스타일 */
-  :focus {
-    outline: 2px solid #007bff;
+  :focus-visible {
+    outline: 2px solid var(--primary-color);
     outline-offset: 2px;
-  }
-
-  /* 기본 애니메이션 */
-  * {
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
 `;
 
