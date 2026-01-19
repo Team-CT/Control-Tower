@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { S } from './worklogin_styled';
+import { S } from './WorkLogin.styled';
 
 const AttendanceLogin = () => {
   const [formData, setFormData] = useState({

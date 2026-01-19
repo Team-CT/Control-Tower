@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { S } from './select_id_styled';
+import { S } from './SelectId.styled';
 import { useNavigate } from 'react-router-dom';
 
 const FindEmployeeId = () => {

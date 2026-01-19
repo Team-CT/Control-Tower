@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import * as S from './health_dashboard_styled';
+import * as S from './HealthDashboard.styled';
 
 const HealthDashboard = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('7일');

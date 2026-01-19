@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import * as S from './styled';
+import * as S from './EmployeeDashboard.styled';
 
 const EmployeeDashboard = () => {
   // TODO: Zustand state mapping

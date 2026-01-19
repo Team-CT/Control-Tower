@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as S from './styled';
+import * as S from './BoardDetail.styled';
 import { ArrowLeft, Calendar, Eye, MessageCircle, Heart, Phone, AlertTriangle } from 'lucide-react';
 
 const BoardDetail = () => {

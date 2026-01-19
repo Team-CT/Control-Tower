@@ -47,7 +47,6 @@ const LeaveApproval = () => {
     { icon: '📋', label: '대기 중', value: 8, subtext: '신규 요청 +2건', color: '#fef3c7', iconColor: '#f59e0b' },
     { icon: '✓', label: '승인', value: 24, subtext: '승인율 96%', color: '#d1fae5', iconColor: '#10b981' },
     { icon: '⚠', label: '반려', value: 1, subtext: '이번달 반려 2건', color: '#fee2e2', iconColor: '#ef4444' },
-    { icon: 'ℹ', label: '최장 대기시간', value: '1.2일', subtext: '평균 8시간', color: '#dbeafe', iconColor: '#0284c7' },
   ];
 
   const filterTabs = [
@@ -87,10 +86,6 @@ const LeaveApproval = () => {
             팀원들의 휴가 신청을 검토하고 승인하세요 ✈ 승인하기
           </PageDescription>
         </div>
-
-          <ActionHeader>
-            <CreateButton onClick={handleCreateRequest}>✈ 전체 승인</CreateButton>
-          </ActionHeader>
         </PageHeader>
 
         {/* Statistics Cards */}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { S } from './register_styled';
+import { S } from './Register.styled';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
