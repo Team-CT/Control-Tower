@@ -37,13 +37,13 @@ const MENU_ITEMS = [
         icon: Activity,
         id: "/health-dashboard",
         subItems: [
-          { label: "건강 상세정보", id: "/health-dashboard/detail" },
-          { label: "건강 정보 제출", id: "/health-dashboard/submit" },
-          { label: "건강 정보 제출 이력", id: "/health-dashboard/history" },
+          { label: "건강 상세정보", id: "/employeehealthdetail" },
+          { label: "건강 정보 제출", id: "/healthinfosubmission" },
+          { label: "건강 정보 제출 이력", id: "/healthsubmissionhistory" },
         ],
       },
       { label: "스트레스 설문", icon: BarChart2, id: "/stress" },
-      { label: "건강 프로그램", icon: Leaf, id: "/health-program" }
+      { label: "건강 프로그램", icon: Leaf, id: "/healthprogrammanagement" }
     ]
   },
   {

@@ -24,7 +24,11 @@ import Dashboard from './pages/HealthDashboard/HealthDashboard.jsx';
 import Stress from './pages/StressSurvey/StressSurvey.jsx';
 // 레이아웃 컴포넌트 Import
 import MainLayout from './layout/MainLayout';
-
+import EmployeeHealthManagement from './pages/EmployeeHealthManagement/EmployeeHealthManagement.jsx';
+import EmployeeHealthDetail from './pages/EmployeeHealthDetail/EmployeeHealthDetail.jsx';
+import HealthInfoSubmission from './pages/HealthInfoSubmission/HealthInfoSubmission.jsx';
+import HealthSubmissionHistory from './pages/HealthSubmissionHistory/HealthSubmissionHistory.jsx';
+import HealthProgramManagement from './pages/HealthProgramManagement/HealthProgramManagement.jsx';
 function App() {
   return (
     <BrowserRouter>
@@ -65,7 +69,11 @@ function App() {
           {/* 기타 */}
           <Route path="/health-dashboard" element={<Dashboard />} />
           <Route path="/stress" element={<Stress/>} />
-          <Route path="/health-program" element={<div>건강 프로그램 페이지 (준비중)</div>} />
+          <Route path="/employeehealthmanagement" element={<EmployeeHealthManagement/>} />
+          <Route path="/employeehealthdetail" element={<EmployeeHealthDetail/>} />
+          <Route path="/healthinfosubmission" element={<HealthInfoSubmission/>} />
+          <Route path="/healthsubmissionhistory" element={<HealthSubmissionHistory/>} />
+          <Route path="/healthprogrammanagement" element={<HealthProgramManagement/>} />   
           <Route path="/settings" element={<div>설정 페이지 (준비중)</div>} />
         </Route>
       </Routes>
