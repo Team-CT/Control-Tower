@@ -5,7 +5,7 @@ import {
   Megaphone, FileText, Settings 
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import * as S from './sidebar.styled'; 
+import * as S from './Sidebar.styled'; 
 import React, { useState } from 'react';
 const MENU_ITEMS = [
   {

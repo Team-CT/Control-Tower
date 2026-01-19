@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search } from 'lucide-react';
-import * as S from './header.styled';
+import * as S from './Header.styled';
 
 const Header = () => {
   const location = useLocation();

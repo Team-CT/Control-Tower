@@ -3,14 +3,15 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import GlobalStyle from './styles/GlobalStyle';
 
 // 페이지 컴포넌트 Import
-import Login from './pages/login/login';
-import Register from './pages/register/register';
-import SelectId from './pages/select_id/select_id';
-import SelectPwd from './pages/select_pwd/select_pwd';
-import WorkLogin from './pages/worklogin/worklogin';
-import Board from './pages/board/board';
-import BoardDetail from './pages/boardDetail/boardDetail';
-import QnA from './pages/Q&A/Q&A';
+import LandingPage from './pages/Landing/LandingPage'
+import Login from './pages/Login/Login';
+import Register from './pages/Register/Register';
+import SelectId from './pages/SelectId/SelectId';
+import SelectPwd from './pages/SelectPwd/SelectPwd';
+import WorkLogin from './pages/WorkLogin/WorkLogin';
+import Board from './pages/Board/Board';
+import BoardDetail from './pages/BoardDetail/BoardDetail';
+import QnA from './pages/QnA/QnA';
 import EmployeeDashboard from './pages/EmployeeDashboard/EmployeeDashboard';
 import EmployeeManagement from './pages/EmployeeManagement/EmployeeManagement';
 import EmployeeDetail from './pages/EmployeeDetail/EmployeeDetail';
@@ -19,8 +20,8 @@ import DepartmentDetail from './pages/DepartmentDetail/DepartmentDetail';
 import LeaveApply from './pages/EmployeeSchedule/LeaveApply';
 import LeaveApproval from './pages/EmployeeSchedule/LeaveApproval';
 import EmployeeSchedule from './pages/EmployeeSchedule/EmployeeSchedule';
-import Dashboard from './pages/health_dashboard/health_dashboard.jsx';
-import Stress from './pages/stress_survey/stress_survey.jsx';
+import Dashboard from './pages/HealthDashboard/HealthDashboard.jsx';
+import Stress from './pages/StressSurvey/StressSurvey.jsx';
 // 레이아웃 컴포넌트 Import
 import MainLayout from './layout/MainLayout';
 
@@ -32,12 +33,13 @@ function App() {
       
       <Routes>
         {/* 1. 사이드바가 없는 페이지 */}
+        <Route path="/" element={<LandingPage />} /> 
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/find-employee-id" element={<SelectId />} />
         <Route path="/find-password" element={<SelectPwd />} />
         <Route path="/work-login" element={<WorkLogin />} />
-
         {/* 2. 사이드바/헤더/푸터가 있는 페이지 (MainLayout) */}
         <Route element={<MainLayout />}>
           <Route path="/" element={<Navigate to="/board" replace />} />

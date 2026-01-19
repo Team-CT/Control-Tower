@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import * as S from './styled';
+import * as S from './QnA.styled';
 import { Search, MessageSquare, Eye, MessageCircle, Heart } from 'lucide-react';
 
 const QnA = () => {

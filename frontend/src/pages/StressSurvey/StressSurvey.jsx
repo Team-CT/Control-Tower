@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import * as S from './stress_survey_styled';
+import * as S from './StressSurvey.styled';
 
 const StressSurvey = () => {
   const [currentStep, setCurrentStep] = useState(1);

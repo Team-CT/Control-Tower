@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // ✅ useNavigate 추가
-import * as S from './board.styled';
+import * as S from './Board.styled';
 import { Search, MessageSquare, Eye, MessageCircle, Heart, Send, X } from 'lucide-react';
 
 const Board = () => {

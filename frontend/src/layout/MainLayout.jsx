@@ -1,9 +1,9 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
-import Sidebar from './sidebar/sidebar';
-import Header from './header/Header';
-import Footer from './footer/footer'; // ✅ 푸터 import
+import Sidebar from './Sidebar/Sidebar';
+import Header from './Header/Header';
+import Footer from './Footer/Footer'; // ✅ 푸터 import
 
 // 전체 레이아웃 (화면 꽉 채움, 스크롤 없음)
 const LayoutContainer = styled.div`

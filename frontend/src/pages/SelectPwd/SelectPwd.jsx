@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { S } from './select_pwd_styled';
+import { S } from './SelectPwd.styled';
 import { useNavigate } from 'react-router-dom';
 
 const FindPassword = () => {
