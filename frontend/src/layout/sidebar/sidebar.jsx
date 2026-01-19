@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { 
   Plane, Home, Users, Network, Clock, Calendar, 
   ClipboardCheck, Activity, BarChart2, Leaf, 
@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import * as S from './sidebar.styled'; 
-
+import React, { useState } from 'react';
 const MENU_ITEMS = [
   {
     category: "메인",
@@ -32,8 +32,16 @@ const MENU_ITEMS = [
   },
   {
     category: "건강 관리",
-    items: [
-      { label: "건강 현황", icon: Activity, id: "/health-status" },
+    items: [  {
+        label: "건강 현황",
+        icon: Activity,
+        id: "/health-dashboard",
+        subItems: [
+          { label: "건강 상세정보", id: "/health-dashboard/detail" },
+          { label: "건강 정보 제출", id: "/health-dashboard/submit" },
+          { label: "건강 정보 제출 이력", id: "/health-dashboard/history" },
+        ],
+      },
       { label: "스트레스 설문", icon: BarChart2, id: "/stress" },
       { label: "건강 프로그램", icon: Leaf, id: "/health-program" }
     ]
@@ -51,7 +59,11 @@ const MENU_ITEMS = [
 const Sidebar = ({ isAdmin }) => {
   const navigate = useNavigate();
   const location = useLocation(); // 현재 URL 경로 가져오기
+const [openSubMenu, setOpenSubMenu] = useState(null);
 
+  const toggleSubMenu = (id) => {
+    setOpenSubMenu(openSubMenu === id ? null : id);
+  };
   // ✅ 권한에 따라 메뉴 필터링
   const filteredMenuItems = MENU_ITEMS.filter(section => {
     // 관리자 전용(adminOnly) 메뉴인데, 현재 사용자가 관리자(isAdmin)가 아니면 숨김
@@ -85,15 +97,40 @@ const Sidebar = ({ isAdmin }) => {
               // 현재 경로가 메뉴 ID(경로)와 일치하면 활성화
               const isActive = location.pathname === item.id;
 
-              return (
-                <S.MenuButton
-                  key={item.id}
-                  onClick={() => navigate(item.id)} // 클릭 시 해당 페이지로 이동
-                  $isActive={isActive}
-                >
-                  <IconComponent size={20} />
-                  <span>{item.label}</span>
-                </S.MenuButton>
+                    return (
+                <div key={item.id}>
+                  {/* 메인 메뉴 버튼 */}
+                  <S.MenuButton
+                    onClick={() => {
+                      if (item.subItems) {
+                        toggleSubMenu(item.id);
+                        navigate(item.id);
+                      } else {
+                        navigate(item.id);
+                      }
+                    }}
+                    $isActive={isActive}
+                  >
+                    {IconComponent && <IconComponent size={20} />}
+                    <span>{item.label}</span>
+                  </S.MenuButton>
+
+                  {/* 하위 메뉴 */}
+                  {item.subItems && openSubMenu === item.id && (
+                    <div style={{ marginLeft: 28, marginTop: 5 }}>
+                      {item.subItems.map((sub) => (
+                        <S.MenuButton
+                          key={sub.id}
+                          onClick={() => navigate(sub.id)}
+                          $isActive={location.pathname === sub.id}
+                          style={{ fontSize: 14, padding: "4px 0" }}
+                        >
+                          <span>{sub.label}</span>
+                        </S.MenuButton>
+                      ))}
+                    </div>
+                  )}
+                </div>
               );
             })}
           </S.CategorySection>
