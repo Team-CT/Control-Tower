@@ -30,6 +30,7 @@ import HealthInfoSubmission from './pages/HealthInfoSubmission/HealthInfoSubmiss
 import HealthSubmissionHistory from './pages/HealthSubmissionHistory/HealthSubmissionHistory.jsx';
 import HealthProgramManagement from './pages/HealthProgramManagement/HealthProgramManagement.jsx';
 import Settings from './pages/Settings/Settings.jsx';
+import NotFound from './pages/NotFound/NotFound.jsx';
 function App() {
   return (
     <BrowserRouter>
@@ -76,6 +77,9 @@ function App() {
           <Route path="/healthsubmissionhistory" element={<HealthSubmissionHistory/>} />
           <Route path="/healthprogrammanagement" element={<HealthProgramManagement/>} />   
           <Route path="/settings" element={<Settings/>} />
+
+            {/*테스트 */}
+          <Route path="/notfound" element={<NotFound />} />
         </Route>
       </Routes>
     </BrowserRouter>
