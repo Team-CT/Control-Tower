@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   MainContainer,
   ContentWrapper,
@@ -37,9 +38,9 @@ import {
 } from './EmployeeHealthManagement.styled';
 
 const EmployeeHealthManagement = () => {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('전체');
   
-  {/* TODO: Zustand state mapping */}
   const employees = [
     {
       id: 'EMP-2024-0547',
@@ -122,7 +123,10 @@ const EmployeeHealthManagement = () => {
 
   const handleFilterClick = (filter) => {
     setActiveFilter(filter);
-    {/* TODO: Implement filter logic with Zustand */}
+  };
+
+  const handleDetailClick = () => {
+    navigate('/employeehealthdetail');
   };
 
   return (
@@ -179,7 +183,11 @@ const EmployeeHealthManagement = () => {
 
           <TableBody>
             {employees.map((employee) => (
-              <TableRow key={employee.id}>
+              <TableRow 
+                key={employee.id}
+                onClick={handleDetailClick}
+                style={{ cursor: 'pointer' }}
+              >
                 <td>
                   <EmployeeInfo>
                     <EmployeeAvatar color={employee.avatar === '김' ? '#4A90E2' : employee.avatar === '박' ? '#E85D75' : employee.avatar === '이' ? '#52C41A' : employee.avatar === '최' ? '#9C27B0' : employee.avatar === '정' ? '#FF6B35' : '#EC4899'}>
@@ -210,8 +218,16 @@ const EmployeeHealthManagement = () => {
                 </td>
                 <td>
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                    <IconButton title="상세보기">👁️</IconButton>
-                    <IconButton title="편집">✏️</IconButton>
+                    <IconButton 
+                      title="상세보기"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDetailClick();
+                      }}
+                    >
+                      👁️
+                    </IconButton>
+                    <IconButton title="편집" onClick={(e) => e.stopPropagation()}>✏️</IconButton>
                   </div>
                 </td>
               </TableRow>

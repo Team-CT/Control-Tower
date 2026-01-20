@@ -19,6 +19,11 @@ const AttendanceLogin = () => {
     e.preventDefault();
     // TODO: Zustand store action - validateAttendanceLogin(formData)
     console.log('Attendance login attempt:', formData);
+    
+    // [QA Mock] 백엔드 연동 전 라우팅 테스트를 위한 임시 네비게이션
+    // 실제 로직: 출근 처리 후 결과 모달 -> 닫기 후 랜딩으로 이동
+    alert(`[테스트] ${formData.userId}님 출근(또는 퇴근) 처리가 완료되었습니다.`);
+    window.location.href = '/'; 
   };
 
   return (

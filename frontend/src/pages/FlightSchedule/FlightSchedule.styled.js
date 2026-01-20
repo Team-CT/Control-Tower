@@ -96,15 +96,16 @@ export const FilterButton = styled.button`
   padding: 10px 18px;
   font-size: 14px;
   font-weight: 600;
-  border: 1px solid ${(props) => (props.$active ? "#3b82f6" : "#d1d5db")};
-  background-color: ${(props) => (props.$active ? "#eff6ff" : "#ffffff")};
-  color: ${(props) => (props.$active ? "#2563eb" : "#6b7280")};
+  border: 1px solid ${(props) => (props.$active ? props.theme.primary : "#d1d5db")};
+  background-color: ${(props) => (props.$active ? props.theme.hover : "#ffffff")};
+  color: ${(props) => (props.$active ? props.theme.primary : "#6b7280")};
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: ${(props) => (props.$active ? "#dbeafe" : "#f9fafb")};
+    background-color: ${(props) => (props.$active ? props.theme.primaryHover : props.theme.backgroundHover)};
+    filter: brightness(0.95);
   }
 `;
 
@@ -118,8 +119,8 @@ export const DateInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    border-color: ${props => props.theme.primary};
+    box-shadow: 0 0 0 3px ${props => props.theme.primary}20;
   }
 `;
 
@@ -133,8 +134,8 @@ export const CitySelect = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    border-color: ${props => props.theme.primary};
+    box-shadow: 0 0 0 3px ${props => props.theme.primary}20;
   }
 `;
 
@@ -143,7 +144,7 @@ export const SearchButton = styled.button`
   padding: 10px 28px;
   font-size: 15px;
   font-weight: 700;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: ${props => `linear-gradient(135deg, ${props.theme.primary} 0%, ${props.theme.secondary} 100%)`};
   color: #ffffff;
   border: none;
   border-radius: 10px;
@@ -152,7 +153,7 @@ export const SearchButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(59, 130, 246, 0.22);
+    box-shadow: 0 8px 16px ${props => props.theme.primary}38;
   }
 
   &:active {
@@ -202,7 +203,7 @@ export const FlightBadge = styled.div`
 export const AirlineIcon = styled.div`
   width: 46px;
   height: 46px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: ${props => `linear-gradient(135deg, ${props.theme.primary} 0%, ${props.theme.secondary} 100%)`};
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -235,8 +236,8 @@ export const StatusBadge = styled.span`
   font-weight: 700;
   border-radius: 999px;
 
-  background-color: ${(props) => (props.$status === "normal" ? "#dbeafe" : "#d1fae5")};
-  color: ${(props) => (props.$status === "normal" ? "#1e40af" : "#065f46")};
+  background-color: ${(props) => (props.$status === "normal" ? props.theme.hover : "#d1fae5")};
+  color: ${(props) => (props.$status === "normal" ? props.theme.primary : "#065f46")};
 `;
 
 export const FlightRoute = styled.div`
@@ -268,7 +269,7 @@ export const RouteTime = styled.p`
 export const RouteCode = styled.p`
   font-size: 16px;
   font-weight: 800;
-  color: #2563eb;
+  color: ${props => props.theme.primary};
   margin: 0;
 `;
 
@@ -291,8 +292,8 @@ export const AirplaneIcon = styled.div`
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  background: #eff6ff;
-  color: #2563eb;
+  background: ${props => props.theme.hover};
+  color: ${props => props.theme.primary};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -302,7 +303,7 @@ export const AirplaneIcon = styled.div`
 export const RouteLine = styled.div`
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+  background: ${props => `linear-gradient(90deg, ${props.theme.primary} 0%, ${props.theme.secondary} 100%)`};
   border-radius: 2px;
 `;
 

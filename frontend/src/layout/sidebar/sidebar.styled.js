@@ -124,3 +124,41 @@ export const MenuButton = styled.button`
     flex: 1;
   }
 `;
+
+export const SubMenuContainer = styled.div`
+  margin-left: 12px;
+  margin-top: 4px;
+  padding-left: 12px;
+  border-left: 2px solid #f0f0f0;
+`;
+
+export const SubMenuButton = styled(MenuButton)`
+  font-size: 14px;
+  padding: 10px 12px;
+`;
+
+export const ThemeToggleWrapper = styled.div`
+  margin-top: auto;
+  padding: 12px 0;
+`;
+
+export const ThemeToggleButton = styled.button`
+  width: 100%;
+  padding: 12px;
+  background-color: #f5f5f5;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #666;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #eeeeee;
+  }
+`;
