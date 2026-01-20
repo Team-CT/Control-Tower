@@ -1,12 +1,29 @@
-import React, { useState } from 'react';
-import { S } from './login_styled';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAirlineTheme } from '../../context/AirlineThemeContext';
+import * as S from './Login.styled'; 
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { theme } = useAirlineTheme();
+
   const [formData, setFormData] = useState({
     userId: '',
     password: '',
     rememberMe: false
   });
+
+  // 1. 컴포넌트 마운트 시 저장된 아이디 불러오기
+  useEffect(() => {
+    const savedId = localStorage.getItem('savedId');
+    if (savedId) {
+      setFormData(prev => ({
+        ...prev,
+        userId: savedId,
+        rememberMe: true 
+      }));
+    }
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -18,11 +35,27 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Zustand store action - authenticateUser(formData)
+
+    // 2. 아이디 저장/삭제 로직
+    if (formData.rememberMe) {
+      localStorage.setItem('savedId', formData.userId);
+    } else {
+      localStorage.removeItem('savedId');
+    }
+
     console.log('Login attempt:', formData);
+
+    // [수정 포인트] 로그인 성공 시 직책(Role) 저장
+    if (formData.userId === 'admin') {
+      localStorage.setItem('userRole', 'ADMIN');
+    } else {
+      localStorage.setItem('userRole', 'EMP'); // 일반 직원
+    }
+
+    // 대시보드로 이동
+    navigate('/dashboard'); 
   };
 
-  // TODO: Zustand state mapping
   const features = [
     '간편한 근태 관리 및 일정 조회',
     '효율적 급여 관리 프로그램',
@@ -36,7 +69,7 @@ const Login = () => {
         <S.BrandSection>
           <S.BrandHeader>
             <S.LogoIcon />
-            <S.BrandName>KOREAN AIR</S.BrandName>
+            <S.BrandName>{theme.name}</S.BrandName>
           </S.BrandHeader>
 
           <S.ServiceInfo>
@@ -46,7 +79,7 @@ const Login = () => {
             </S.ServiceTitle>
             <S.ServiceSubtitle>통합 HR 시스템</S.ServiceSubtitle>
             <S.ServiceDescription>
-              대한항공 임직원을 위한 통합 HR 관리 시스템 입니다. 근태 관리, 전자 결재, 휴가 신청 등 모든 HR 서비스를 한 곳에서 관리하세요.
+              {theme.name} 임직원을 위한 통합 HR 관리 시스템 입니다. 근태 관리, 전자 결재, 휴가 신청 등 모든 HR 서비스를 한 곳에서 관리하세요.
             </S.ServiceDescription>
           </S.ServiceInfo>
 
@@ -64,19 +97,20 @@ const Login = () => {
           <S.LoginCard>
             <S.LoginHeader>
               <S.LoginTitle>로그인</S.LoginTitle>
-              <S.LoginSubtitle>사번과 비밀번호를 입력하여 로그인해주세요</S.LoginSubtitle>
+              <S.LoginSubtitle>아이디와 비밀번호를 입력하여 로그인해주세요</S.LoginSubtitle>
             </S.LoginHeader>
 
+            {/* [Form 시작] 입력 필드와 로그인 버튼만 감쌉니다 */}
             <S.LoginForm onSubmit={handleSubmit}>
               <S.InputGroup>
                 <S.InputLabel>
                   <S.UserIcon />
-                  사번
+                  아이디
                 </S.InputLabel>
                 <S.Input
                   type="text"
                   name="userId"
-                  placeholder="사번을 입력하세요"
+                  placeholder="아이디를 입력하세요"
                   value={formData.userId}
                   onChange={handleInputChange}
                   required
@@ -108,31 +142,36 @@ const Login = () => {
                     onChange={handleInputChange}
                   />
                   <S.CheckboxLabel htmlFor="rememberMe">
-                    로그인 상태 유지
+                    아이디 저장
                   </S.CheckboxLabel>
                 </S.CheckboxWrapper>
-                <S.ForgotPasswordLink>
-                  비밀번호 찾기
-                </S.ForgotPasswordLink>
               </S.RememberMeRow>
 
               <S.SubmitButton type="submit">
                 로그인
                 <S.ArrowIcon />
               </S.SubmitButton>
+            </S.LoginForm> 
+            {/* [Form 종료] 여기서 닫아주어야 아래 링크들이 submit 영향을 받지 않습니다 */}
 
-              <S.FooterLinks>
-                <S.FooterLink>
-                  <S.HelpIcon />
-                  회원가입
-                </S.FooterLink>
-                <S.FooterDivider />
-                <S.FooterLink>
-                  <S.InfoIcon />
-                  사번 찾기
-                </S.FooterLink>
-              </S.FooterLinks>
-            </S.LoginForm>
+            {/* [Form 바깥으로 이동됨] */}
+            <S.FooterLinks>
+              <S.FooterLink onClick={() => navigate('/register')}>
+                <S.HelpIcon />
+                회원가입
+              </S.FooterLink>
+              <S.FooterDivider />
+              <S.FooterLink onClick={() => navigate('/find-employee-id')}>
+                <S.InfoIcon />
+                아이디 찾기
+              </S.FooterLink>
+              <S.FooterDivider />
+              <S.FooterLink onClick={() => navigate('/find-password')}>
+                <S.InfoIcon />
+                비밀번호 찾기
+              </S.FooterLink>
+            </S.FooterLinks>
+
           </S.LoginCard>
         </S.LoginSection>
       </S.ContentWrapper>

@@ -1,10 +1,12 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search } from 'lucide-react';
+import { useAirlineTheme } from '../../context/AirlineThemeContext';
 import * as S from './Header.styled';
 
 const Header = () => {
   const location = useLocation();
+  const { theme } = useAirlineTheme();
 
   // 현재 경로(pathname)에 따라 보여줄 페이지 제목 설정
   const getPageTitle = (pathname) => {
@@ -51,7 +53,7 @@ const Header = () => {
           <S.UserAvatar>김</S.UserAvatar>
           <S.UserInfo>
             <S.UserName>김민수</S.UserName>
-            <S.UserRole>직원 관리자</S.UserRole>
+            <S.UserRole>{theme.name} 관리자</S.UserRole>
           </S.UserInfo>
         </S.UserProfile>
       </S.HeaderRight>

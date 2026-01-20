@@ -40,8 +40,9 @@ export const PageTitle = styled.h1`
   gap: 12px;
 `;
 
+// [테마 적용] 메인 버튼: 배경 primary, 호버 시 secondary 사용
 export const CreateButton = styled.button`
-  background: #4A90E2;
+  background: ${props => props.theme.primary};
   color: white;
   border: none;
   padding: 12px 28px;
@@ -50,12 +51,13 @@ export const CreateButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  /* 그림자 색상은 테마 색상과 충돌하지 않도록 중립적인 색으로 변경 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
   &:hover {
-    background: #357ABD;
+    background: ${props => props.theme.secondary};
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
   }
 `;
 
@@ -67,21 +69,22 @@ export const TabSection = styled.div`
   padding-bottom: 0;
 `;
 
+// [테마 적용] 탭: 활성 상태는 primary, 비활성 탭 호버 시 secondary 사용
 export const Tab = styled.button`
   background: none;
   border: none;
   padding: 14px 28px;
   font-size: 15px;
   font-weight: 600;
-  color: ${props => props.active ? '#4A90E2' : '#666'};
+  color: ${props => props.active ? props.theme.primary : '#666'};
   cursor: pointer;
   position: relative;
   transition: all 0.2s;
-  border-bottom: 3px solid ${props => props.active ? '#4A90E2' : 'transparent'};
+  border-bottom: 3px solid ${props => props.active ? props.theme.primary : 'transparent'};
   margin-bottom: -2px;
 
   &:hover {
-    color: #4A90E2;
+    color: ${props => props.active ? props.theme.primary : props.theme.secondary};
   }
 `;
 
@@ -98,6 +101,7 @@ export const SearchForm = styled.form`
   max-width: 600px;
 `;
 
+// [테마 적용] 검색창: 포커스 시 테두리 primary
 export const SearchInput = styled.input`
   flex: 1;
   padding: 14px 20px;
@@ -109,7 +113,7 @@ export const SearchInput = styled.input`
   transition: border-color 0.2s;
 
   &:focus {
-    border-color: #4A90E2;
+    border-color: ${props => props.theme.primary};
   }
 
   &::placeholder {
@@ -117,8 +121,9 @@ export const SearchInput = styled.input`
   }
 `;
 
+// [테마 적용] 검색 버튼: 배경 primary, 호버 시 secondary
 export const SearchButton = styled.button`
-  background: #4A90E2;
+  background: ${props => props.theme.primary};
   color: white;
   border: none;
   padding: 14px 24px;
@@ -130,14 +135,15 @@ export const SearchButton = styled.button`
   transition: background 0.2s;
 
   &:hover {
-    background: #357ABD;
+    background: ${props => props.theme.secondary};
   }
 `;
 
+// [테마 적용] 필터 버튼: 활성 상태 primary, 호버 시 secondary (테두리/글자)
 export const FilterButton = styled.button`
   padding: 12px 24px;
-  border: 2px solid ${props => props.active ? '#4A90E2' : '#E5E8EB'};
-  background: ${props => props.active ? '#4A90E2' : 'white'};
+  border: 2px solid ${props => props.active ? props.theme.primary : '#E5E8EB'};
+  background: ${props => props.active ? props.theme.primary : 'white'};
   color: ${props => props.active ? 'white' : '#666'};
   border-radius: 8px;
   font-size: 14px;
@@ -146,8 +152,8 @@ export const FilterButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    border-color: #4A90E2;
-    color: ${props => props.active ? 'white' : '#4A90E2'};
+    border-color: ${props => props.active ? props.theme.primary : props.theme.secondary};
+    color: ${props => props.active ? 'white' : props.theme.secondary};
   }
 `;
 
@@ -175,12 +181,13 @@ export const BoardItem = styled.div`
   }
 `;
 
+// [테마 적용] 카테고리 뱃지: 기본 배경을 테마의 hover 색상으로, 글자를 primary로 설정
 export const CategoryBadge = styled.div`
-  background: ${props => props.bgColor || '#E5F3FF'};
+  background: ${props => props.bgColor || props.theme.hover};
   color: ${props => {
-    if (props.bgColor === '#FFE5E5') return '#D32F2F';
+    if (props.bgColor === '#FFE5E5') return '#D32F2F'; // 긴급/에러 등은 고정색 유지
     if (props.bgColor === '#FFF9E5') return '#F57C00';
-    return '#1976D2';
+    return props.theme.primary; // 기본값은 테마 메인 컬러
   }};
   padding: 8px 16px;
   border-radius: 6px;
@@ -253,6 +260,7 @@ export const Pagination = styled.div`
   margin-top: 48px;
 `;
 
+// [테마 적용] 페이지네이션 버튼: 호버 시 primary 사용
 export const PaginationButton = styled.button`
   width: 40px;
   height: 40px;
@@ -265,8 +273,8 @@ export const PaginationButton = styled.button`
   transition: all 0.2s;
 
   &:hover:not(:disabled) {
-    border-color: #4A90E2;
-    color: #4A90E2;
+    border-color: ${props => props.theme.primary};
+    color: ${props => props.theme.primary};
   }
 
   &:disabled {
@@ -275,11 +283,12 @@ export const PaginationButton = styled.button`
   }
 `;
 
+// [테마 적용] 페이지 번호: 활성 상태 primary 사용
 export const PageNumber = styled.button`
   width: 40px;
   height: 40px;
-  border: 1px solid ${props => props.active ? '#4A90E2' : '#E5E8EB'};
-  background: ${props => props.active ? '#4A90E2' : 'white'};
+  border: 1px solid ${props => props.active ? props.theme.primary : '#E5E8EB'};
+  background: ${props => props.active ? props.theme.primary : 'white'};
   color: ${props => props.active ? 'white' : '#666'};
   border-radius: 6px;
   cursor: pointer;
@@ -288,7 +297,7 @@ export const PageNumber = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    border-color: #4A90E2;
-    color: ${props => props.active ? 'white' : '#4A90E2'};
+    border-color: ${props => props.theme.primary};
+    color: ${props => props.active ? 'white' : props.theme.primary};
   }
 `;

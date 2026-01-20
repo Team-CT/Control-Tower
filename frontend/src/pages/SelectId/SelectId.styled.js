@@ -7,7 +7,7 @@ export const S = {
     justify-content: center;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(117deg, #EFF6FF 0%, #E0E7FF 100%);
+    background: linear-gradient(117deg, ${props => props.theme.hover} 0%, #FFFFFF 100%);
     padding: 0;
     margin: 0;
     overflow: hidden;
@@ -103,9 +103,9 @@ export const S = {
 
     &:focus {
       outline: none;
-      border-color: #0284C7;
+      border-color: ${props => props.theme.primary};
       background: #FFFFFF;
-      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+      box-shadow: 0 0 0 3px ${props => props.theme.primary}20;
     }
 
     &:hover:not(:focus) {
@@ -120,7 +120,7 @@ export const S = {
   SubmitButton: styled.button`
     width: 100%;
     padding: 12px 20px;
-    background: #0284C7;
+    background: ${props => props.theme.primary};
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
@@ -131,9 +131,9 @@ export const S = {
     margin-top: 8px;
 
     &:hover {
-      background: #0369A1;
+      background: ${props => props.theme.secondary};
       transform: translateY(-1px);
-      box-shadow: 0 4px 16px rgba(2, 132, 199, 0.3);
+      box-shadow: 0 4px 16px ${props => props.theme.primary}50;
     }
 
     &:active {
@@ -156,8 +156,8 @@ export const S = {
     flex-direction: column;
     gap: 12px;
     padding: 20px;
-    background: #F0F9FF;
-    border: 1px solid #0284C7;
+    background: ${props => props.theme.hover};
+    border: 1px solid ${props => props.theme.primary};
     border-radius: 8px;
     text-align: center;
   `,
@@ -171,7 +171,7 @@ export const S = {
   ResultValue: styled.span`
     font-size: 20px;
     font-weight: 700;
-    color: #0284C7;
+    color: ${props => props.theme.primary};
     letter-spacing: 0.05em;
   `,
 
@@ -186,7 +186,7 @@ export const S = {
   FooterLink: styled.button`
     background: none;
     border: none;
-    color: #0284C7;
+    color: ${props => props.theme.primary};
     font-size: 16px;
     font-weight: 400;
     cursor: pointer;
@@ -195,7 +195,7 @@ export const S = {
     white-space: nowrap;
 
     &:hover {
-      color: #0369A1;
+      color: ${props => props.theme.secondary};
       text-decoration: underline;
     }
 
