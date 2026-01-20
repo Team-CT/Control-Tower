@@ -33,7 +33,10 @@ import HealthProgramManagement from './pages/HealthProgramManagement/HealthProgr
 import Settings from './pages/Settings/Settings';
 import NotFound from './pages/NotFound/NotFound';
 import CommonCodeManagement from './pages/CommonCodeManagement/CommonCodeManagement';
-import HealthProgramApply from './pages/HealthProgramApply/HealthProgramApply.jsx'
+import HealthProgramApply from './pages/HealthProgramApply/HealthProgramApply.jsx';
+import FlightSchedule from './pages/FlightSchedule/FlightSchedule.jsx';
+import FlightScheduleDetail from './pages/FlightSchedule/FlightScheduleDetail.jsx'
+import CrewMemberDetail from './pages/FlightSchedule/CrewMemberDetail.jsx'
 
 function App() {
   return (
@@ -68,6 +71,11 @@ function App() {
             <Route path="/dept-manage" element={<DepartmentManagement />} />
             <Route path="/dept-manage/detail" element={<DepartmentDetail />} />
             
+            {/* 항공편 관리 */}
+            <Route path="/flightschedule" element={<FlightSchedule />} />
+           <Route path="/flightschedule/:flightId" element={<FlightScheduleDetail />} />
+<Route path="/crew/:crewId" element={<CrewMemberDetail />} />
+
             {/* 근태 관리 */}
             <Route path="/attendance" element={<EmployeeSchedule />} />
             <Route path="/vacation" element={<LeaveApply />} />
