@@ -3,13 +3,16 @@ import {
   Plane, Home, Users, Network, Clock, Calendar, 
   ClipboardCheck, Activity, BarChart2, Leaf, 
   Megaphone, FileText, Settings, RefreshCcw,
-  Database // [추가] 공통 코드 관리용 아이콘
+  List, Smile // 아이콘 추가
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAirlineTheme } from '../../context/AirlineThemeContext';
 import * as S from './Sidebar.styled'; 
 
-const MENU_ITEMS = [
+// =================================================================
+// [1] 직원용 메뉴 구조 정의
+// =================================================================
+const USER_MENU = [
   {
     category: "메인",
     items: [
@@ -17,54 +20,33 @@ const MENU_ITEMS = [
     ]
   },
   {
-    category: "직원 관리",
-    adminOnly: true, // 관리자 전용
+    category: "근태 관리",
     items: [
-      { label: "직원 목록", icon: Users, id: "/employee-list" },
-      { label: "부서 관리", icon: Network, id: "/dept-manage" }
+      { label: "근태 현황", icon: Clock, id: "/attendance" }, // Route: /attendance
+      { label: "휴가 신청", icon: Calendar, id: "/vacation" } // Route: /vacation
     ]
   },
   {
-    category: "근태 관리",
+    category: "운항 관리",
     items: [
-      { label: "근태 현황", icon: Clock, id: "/attendance" },
-      { label: "휴가 신청", icon: Calendar, id: "/vacation" },
-      { label: "승인 관리", icon: ClipboardCheck, id: "/approval", adminOnly: true }
+      { label: "비행편 크루 관리", icon: Plane, id: "/flightschedule" }
     ]
   },
   {
     category: "건강 관리",
     items: [
-      // 1. 관리자만 보는 전체 현황판
-      { 
-        label: "직원 건강 현황", 
-        icon: Activity, 
-        id: "/employeehealthmanagement", 
-        adminOnly: true 
-      },
-
-      // 2. 일반 직원용 메뉴
       {
-        label: "나의 건강 관리",
+        label: "건강 현황",
         icon: Activity, 
-        id: "/health-dashboard",
+        id: "/health-dashboard", // Route: /health-dashboard
         subItems: [
-          { label: "건강 상세정보", id: "/employeehealthdetail" },
-          { label: "건강 정보 제출", id: "/healthinfosubmission" },
-          { label: "건강 정보 제출 이력", id: "/healthsubmissionhistory" },
+          { label: "건강 상세정보", id: "/employeehealthdetail" }, // Route: /employeehealthdetail (App.jsx 라인 80 확인)
+          { label: "건강 정보 제출", id: "/healthinfosubmission" }, // Route: /healthinfosubmission
+          { label: "건강 정보 제출 이력", id: "/healthsubmissionhistory" }, // Route: /healthsubmissionhistory
         ],
       },
-      
-      { label: "스트레스 설문", icon: BarChart2, id: "/stress" },
-      { label: "건강 프로그램", icon: Leaf, id: "/healthprogrammanagement" } 
-    ]
-  },
-  // [추가] 시스템 관리 카테고리 (관리자 전용)
-  {
-    category: "시스템 관리",
-    adminOnly: true,
-    items: [
-      { label: "공통 코드 관리", icon: Database, id: "/common-code" }
+      { label: "스트레스 설문", icon: Smile, id: "/stress" }, // Route: /stress
+      { label: "건강 프로그램", icon: Leaf, id: "/healthprogramapply" } // Route: /healthprogramapply
     ]
   },
   {
@@ -73,6 +55,73 @@ const MENU_ITEMS = [
       { label: "게시판", icon: Megaphone, id: "/board" },
       { label: "Q&A", icon: FileText, id: "/qna" },
       { label: "설정", icon: Settings, id: "/settings" }
+    ]
+  },
+  {
+      category: "관리",
+      items: [
+           { label: "시스템 코드 관리", icon: List, id: "/common-code" } 
+      ]
+  }
+];
+
+// =================================================================
+// [2] 관리자용 메뉴 구조 정의
+// =================================================================
+const ADMIN_MENU = [
+  {
+    category: "메인",
+    items: [
+      { label: "대시보드", icon: Home, id: "/dashboard" } // 관리자도 같은 대시보드 사용 가정 (또는 /admin/dashboard 분기 필요 시 수정)
+    ]
+  },
+  {
+    category: "관리 목록",
+    items: [
+      { 
+        label: "직원 관리", 
+        icon: Users, 
+        id: "/employee-list", // Route: /employee-list
+        subItems: [
+            { label: "직원 목록", id: "/employee-list" },
+            { label: "직원 상세", id: "/employee-list/detail" } // 예시
+        ]
+      },
+      { label: "부서 관리", icon: Network, id: "/dept-manage" } // Route: /dept-manage
+    ]
+  },
+  {
+    category: "근태 관리",
+    items: [
+      // 관리자용 근태 메뉴 (필요 시 수정)
+      { label: "휴가 승인 관리", icon: ClipboardCheck, id: "/approval" } // Route: /approval
+    ]
+  },
+  {
+    category: "운항 관리",
+    items: [
+      { label: "비행편 크루 관리", icon: Plane, id: "/flightschedule" }
+    ]
+  },
+  {
+    category: "건강 관리",
+    items: [
+      { label: "직원 건강 관리", icon: Activity, id: "/employeehealthmanagement" }, // Route: /employeehealthmanagement
+      { label: "건강 프로그램 관리", icon: Leaf, id: "/healthprogrammanagement" } // Route: /healthprogrammanagement
+    ]
+  },
+  {
+    category: "기타",
+    items: [
+      { label: "게시판", icon: Megaphone, id: "/board" },
+      { label: "Q&A", icon: FileText, id: "/qna" },
+      { label: "설정", icon: Settings, id: "/settings" }
+    ]
+  },
+  {
+    category: "시스템 관리",
+    items: [
+        { label: "공통 코드 관리", icon: List, id: "/common-code" }
     ]
   }
 ];
@@ -83,9 +132,12 @@ const Sidebar = ({ isAdmin }) => {
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const { theme, toggleAirline, currentAirline } = useAirlineTheme();
 
+  // 권한에 따라 보여줄 메뉴 리스트 결정
+  const currentMenuItems = isAdmin ? ADMIN_MENU : USER_MENU;
+
   // 현재 경로가 변경될 때, 해당 경로가 속한 서브메뉴를 자동으로 열기
   useEffect(() => {
-    MENU_ITEMS.forEach(section => {
+    currentMenuItems.forEach(section => {
       section.items.forEach(item => {
         if (item.subItems) {
           const isSubActive = item.subItems.some(sub => sub.id === location.pathname);
@@ -95,20 +147,19 @@ const Sidebar = ({ isAdmin }) => {
         }
       });
     });
-  }, [location.pathname]);
+  }, [location.pathname, isAdmin]); // isAdmin이 바뀌면 메뉴구조도 바뀌므로 의존성 추가
 
   const toggleSubMenu = (id) => {
     setOpenSubMenu(openSubMenu === id ? null : id);
   };
 
   const handleToggleAirline = () => {
-    // KE <-> LJ 토글
     toggleAirline(currentAirline === 'KE' ? 'LJ' : 'KE');
   };
 
   return (
     <S.Container>
-      {/* 1. 헤더 (로고 배경색이 테마 메인컬러로 자동 적용됨) */}
+      {/* 1. 헤더 */}
       <S.Header>
         <S.LogoWrapper>
           <S.LogoIcon>
@@ -116,102 +167,61 @@ const Sidebar = ({ isAdmin }) => {
           </S.LogoIcon>
           <S.Title>{theme.name}</S.Title>
         </S.LogoWrapper>
-        <S.SubTitle>Airline HR System</S.SubTitle>
+        <S.SubTitle>Airline HR System ({isAdmin ? '관리자' : '직원'})</S.SubTitle>
       </S.Header>
 
       {/* 2. 네비게이션 메뉴 */}
       <S.Nav>
-        {MENU_ITEMS.map((section, index) => {
-          // 카테고리 권한 체크
-          if (section.adminOnly && !isAdmin) return null;
-
-          // 아이템 권한 체크
-          const visibleItems = section.items.filter(item => {
-            if (item.adminOnly && !isAdmin) return false;
-            return true;
-          });
-
-          if (visibleItems.length === 0) return null;
-
-          return (
-            <S.CategorySection key={index}>
-              <S.CategoryTitle>{section.category}</S.CategoryTitle>
+        {currentMenuItems.map((section, index) => (
+          <S.CategorySection key={index}>
+            <S.CategoryTitle>{section.category}</S.CategoryTitle>
+            
+            {section.items.map((item) => {
+              const IconComponent = item.icon;
               
-              {visibleItems.map((item) => {
-                const IconComponent = item.icon;
-                
-                // 활성화 로직: 현재 경로가 메뉴 ID와 같거나, 서브메뉴 중 하나와 같을 때
-                const isSelfActive = location.pathname === item.id;
-                const isSubActive = item.subItems && item.subItems.some(sub => sub.id === location.pathname);
-                const isActive = isSelfActive || isSubActive;
+              // 활성화 로직
+              const isSelfActive = location.pathname === item.id;
+              const isSubActive = item.subItems && item.subItems.some(sub => sub.id === location.pathname);
+              const isActive = isSelfActive || isSubActive;
 
-                return (
-                  <div key={item.id}>
-                    <S.MenuButton
-                      onClick={() => {
-                        if (item.subItems) {
-                          toggleSubMenu(item.id);
-                          navigate(item.id); 
-                        } else {
-                          navigate(item.id);
-                        }
-                      }}
-                      $isActive={isActive} // 스타일 컴포넌트에 상태 전달
-                    >
-                      {IconComponent && <IconComponent size={20} />}
-                      <span>{item.label}</span>
-                    </S.MenuButton>
+              return (
+                <div key={item.id}>
+                  <S.MenuButton
+                    onClick={() => {
+                      if (item.subItems) {
+                        toggleSubMenu(item.id);
+                        // 서브메뉴가 있으면 부모 클릭 시 첫번째 서브메뉴로 이동시킬지, 
+                        // 아니면 그냥 열기만 할지 결정 (여기선 열기만 함)
+                      } else {
+                        navigate(item.id);
+                      }
+                    }}
+                    $isActive={isActive}
+                  >
+                    {IconComponent && <IconComponent size={20} />}
+                    <span>{item.label}</span>
+                  </S.MenuButton>
 
-                    {/* 하위 메뉴 */}
-                    {item.subItems && openSubMenu === item.id && (
-                      <div style={{ marginLeft: 12, marginTop: 4, paddingLeft: 12, borderLeft: '2px solid #f0f0f0' }}>
-                        {item.subItems.map((sub) => (
-                          <S.MenuButton
-                            key={sub.id}
-                            onClick={() => navigate(sub.id)}
-                            $isActive={location.pathname === sub.id}
-                            style={{ fontSize: 14, padding: "10px 12px" }}
-                          >
-                            <span>{sub.label}</span>
-                          </S.MenuButton>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </S.CategorySection>
-          );
-        })}
+                  {/* 하위 메뉴 렌더링 */}
+                  {item.subItems && openSubMenu === item.id && (
+                    <S.SubMenuContainer>
+                      {item.subItems.map((sub) => (
+                        <S.SubMenuButton
+                          key={sub.id}
+                          onClick={() => navigate(sub.id)}
+                          $isActive={location.pathname === sub.id}
+                        >
+                          <span>{sub.label}</span>
+                        </S.SubMenuButton>
+                      ))}
+                    </S.SubMenuContainer>
+                  )}
+                </div>
+              );
+            })}
+          </S.CategorySection>
+        ))}
       </S.Nav>
-      
-      {/* 3. 테스트용 항공사 전환 버튼 (하단 고정) */}
-      <div style={{ marginTop: 'auto', padding: '12px 0' }}>
-        <button 
-          onClick={handleToggleAirline}
-          style={{
-            width: '100%',
-            padding: '12px',
-            backgroundColor: '#f5f5f5',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '8px',
-            color: '#666',
-            fontSize: '13px',
-            fontWeight: '600',
-            transition: 'background-color 0.2s'
-          }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#eeeeee'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-        >
-          <RefreshCcw size={14} />
-          {theme.name === '대한항공' ? '진에어로 전환' : '대한항공으로 전환'}
-        </button>
-      </div>
     </S.Container>
   );
 };

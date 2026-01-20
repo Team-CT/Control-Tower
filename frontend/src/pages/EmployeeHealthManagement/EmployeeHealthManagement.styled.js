@@ -47,7 +47,7 @@ export const ActionButton = styled.button`
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background-color: #1E88E5;
+  background-color: ${props => props.theme.primary};
   color: white;
   border: none;
   border-radius: 8px;
@@ -57,7 +57,7 @@ export const ActionButton = styled.button`
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #1565C0;
+    filter: brightness(0.9);
   }
 
   span {
@@ -97,7 +97,7 @@ export const SearchInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #1E88E5;
+    border-color: ${props => props.theme.primary};
   }
 
   &::placeholder {
@@ -114,7 +114,7 @@ export const FilterGroup = styled.div`
 
 export const FilterButton = styled.button`
   padding: 10px 20px;
-  background-color: ${props => props.active ? '#1E88E5' : '#F3F4F6'};
+  background-color: ${props => props.active ? props.theme.primary : '#F3F4F6'};
   color: ${props => props.active ? 'white' : '#4B5563'};
   border: none;
   border-radius: 8px;
@@ -124,7 +124,8 @@ export const FilterButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background-color: ${props => props.active ? '#1565C0' : '#E5E7EB'};
+    background-color: ${props => props.active ? props.theme.primary : '#E5E7EB'};
+    filter: brightness(props.active ? 0.9 : 1);
   }
 `;
 
@@ -143,7 +144,7 @@ export const EmployeeCount = styled.div`
   color: #4B5563;
 
   strong {
-    color: #1E88E5;
+    color: ${props => props.theme.primary};
     font-weight: 700;
   }
 `;
@@ -151,7 +152,7 @@ export const EmployeeCount = styled.div`
 export const FilterToggle = styled.button`
   background: none;
   border: none;
-  color: #1E88E5;
+  color: ${props => props.theme.primary};
   font-size: 14px;
   cursor: pointer;
   display: flex;
@@ -332,8 +333,8 @@ export const PageButton = styled.button`
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  border: 1px solid ${props => props.active ? '#1E88E5' : '#E5E7EB'};
-  background-color: ${props => props.active ? '#1E88E5' : 'white'};
+  border: 1px solid ${props => props.active ? props.theme.primary : '#E5E7EB'};
+  background-color: ${props => props.active ? props.theme.primary : 'white'};
   color: ${props => props.active ? 'white' : '#4B5563'};
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   opacity: ${props => props.disabled ? 0.5 : 1};
@@ -342,6 +343,7 @@ export const PageButton = styled.button`
   transition: all 0.2s;
 
   &:hover:not(:disabled) {
-    background-color: ${props => props.active ? '#1565C0' : '#F3F4F6'};
+    background-color: ${props => props.active ? props.theme.primary : '#F3F4F6'};
+    filter: brightness(props.active ? 0.9 : 1);
   }
 `;
