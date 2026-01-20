@@ -29,6 +29,7 @@ import EmployeeHealthDetail from './pages/EmployeeHealthDetail/EmployeeHealthDet
 import HealthInfoSubmission from './pages/HealthInfoSubmission/HealthInfoSubmission.jsx';
 import HealthSubmissionHistory from './pages/HealthSubmissionHistory/HealthSubmissionHistory.jsx';
 import HealthProgramManagement from './pages/HealthProgramManagement/HealthProgramManagement.jsx';
+import Settings from './pages/Settings/Settings.jsx';
 function App() {
   return (
     <BrowserRouter>
@@ -74,7 +75,7 @@ function App() {
           <Route path="/healthinfosubmission" element={<HealthInfoSubmission/>} />
           <Route path="/healthsubmissionhistory" element={<HealthSubmissionHistory/>} />
           <Route path="/healthprogrammanagement" element={<HealthProgramManagement/>} />   
-          <Route path="/settings" element={<div>설정 페이지 (준비중)</div>} />
+          <Route path="/settings" element={<Settings/>} />
         </Route>
       </Routes>
     </BrowserRouter>
