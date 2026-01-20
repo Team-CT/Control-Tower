@@ -1,0 +1,35 @@
+package com.kh.ct.Member.entity;
+
+import com.kh.ct.Common.entity.BaseTimeEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class AirlineApply extends BaseTimeEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long airlineApplyId;
+
+    @Column(length = 100)
+    private String airlineName;
+
+    @Column(length = 100)
+    private String theme;
+
+    @Column(length = 50)
+    private String mainNumber;
+
+    @Column(length = 255)
+    private String airlineAddress;
+
+    @Column(length = 500)
+    private String airlineDesc;
+
+    @Column(length = 150)
+    private String airlineApplyEmail;
+}
