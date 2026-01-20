@@ -18,12 +18,14 @@ public class LeaveApply extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long leaveApplyId;
 
-    @Column(length = 50)
+    @Column(nullable = false, length = 50)
     private String leaveApplyCode;
 
+    @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp applicant;
+    private Emp leaveApplyApplicant;
 
+    @Column(nullable = false)
     private LocalDateTime leaveStartDate;
 
     @Lob
@@ -31,12 +33,17 @@ public class LeaveApply extends BaseTimeEntity {
 
     private LocalDateTime leaveEndDate;
 
+    @JoinColumn(nullable = false)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp approver;
+    private Emp leaveApplyApprover;
 
     @Column(length = 30)
     private String leaveApplyStatus;
 
     @Lob
     private String leaveApplyCancelReason;
+
+    public enum Status {
+        PRESENT,LATE,EARLY_LEAVE,HALF_DAY,VACATION,ABSENT
+    }
 }

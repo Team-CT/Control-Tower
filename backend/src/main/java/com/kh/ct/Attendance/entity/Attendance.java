@@ -6,7 +6,9 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -19,14 +21,22 @@ public class Attendance extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long attendanceId;
 
-    private LocalDateTime attendanceDate;
+    @Column(nullable = false)
+    private LocalDate attendanceDate;
 
     private LocalTime inTime;
+
     private LocalTime outTime;
 
-    @Column(length = 30)
-    private String attendanceStatus;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status attendanceStatus;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp emp;
+    private Emp empId;
+
+    public enum Status {
+        PRESENT,LATE,EARLY_LEAVE,HALF_DAY,VACATION,ABSENT
+    }
 }
