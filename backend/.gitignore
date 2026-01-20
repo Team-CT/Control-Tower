@@ -56,3 +56,8 @@ node_modules/
 .mtj.tmp/
 
 application_secret.yaml
+
+# Gradle
+.gradle/
+**/.gradle/
+build/
