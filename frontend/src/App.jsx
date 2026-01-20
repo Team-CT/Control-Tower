@@ -33,6 +33,7 @@ import HealthProgramManagement from './pages/HealthProgramManagement/HealthProgr
 import Settings from './pages/Settings/Settings';
 import NotFound from './pages/NotFound/NotFound';
 import CommonCodeManagement from './pages/CommonCodeManagement/CommonCodeManagement';
+import HealthProgramApply from './pages/HealthProgramApply/HealthProgramApply.jsx'
 
 function App() {
   return (
@@ -80,6 +81,7 @@ function App() {
             <Route path="/healthinfosubmission" element={<HealthInfoSubmission/>} />
             <Route path="/healthsubmissionhistory" element={<HealthSubmissionHistory/>} />
             <Route path="/healthprogrammanagement" element={<HealthProgramManagement/>} />   
+            <Route path="/healthprogramapply" element={<HealthProgramApply/>} />  
             
             {/* 시스템 관리 */}
             <Route path="/common-code" element={<CommonCodeManagement />} />
