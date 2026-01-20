@@ -28,19 +28,19 @@ const AttendanceLogin = () => {
         <S.LoginCard>
           <S.CardHeader>
             <S.Title>출/퇴근 로그인</S.Title>
-            <S.Subtitle>사번과 비밀번호를 입력하여 로그인해주세요</S.Subtitle>
+            <S.Subtitle>아이디과 비밀번호를 입력하여 로그인해주세요</S.Subtitle>
           </S.CardHeader>
 
           <S.LoginForm onSubmit={handleSubmit}>
             <S.InputGroup>
               <S.InputLabel>
                 <S.UserIdIcon />
-                사번
+                아이디
               </S.InputLabel>
               <S.Input
                 type="text"
                 name="userId"
-                placeholder="사번을 입력하세요"
+                placeholder="아이디를 입력하세요"
                 value={formData.userId}
                 onChange={handleInputChange}
                 required

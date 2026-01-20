@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Header/Header';
-import Footer from './Footer/Footer'; // ✅ 푸터 import
+import Footer from './Footer/Footer';
 
 // 전체 레이아웃 (화면 꽉 채움, 스크롤 없음)
 const LayoutContainer = styled.div`
@@ -41,12 +41,16 @@ const PageContent = styled.div`
 `;
 
 const MainLayout = () => {
-  // 실제로는 로그인 정보 등을 받아와서 처리
-  const isAdmin = true; 
+  // [수정 포인트] 로컬 스토리지에서 저장된 직책(Role) 가져오기
+  const userRole = localStorage.getItem('userRole');
+
+  // 관리자 여부 동적 판단
+  // userRole이 'ADMIN'이거나 'HR_MANAGER'인 경우에만 true
+  const isAdmin = userRole === 'ADMIN' || userRole === 'HR_MANAGER';
 
   return (
     <LayoutContainer>
-      {/* 1. 좌측 사이드바 */}
+      {/* 1. 좌측 사이드바 (isAdmin 값 전달) */}
       <Sidebar isAdmin={isAdmin} />
       
       <ContentArea>

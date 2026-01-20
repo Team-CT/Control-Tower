@@ -106,7 +106,7 @@ const EmployeeHealthDetail = () => {
   const tabs = ['건강 개요', '검진 이력', '예방접종 기록'];
 
   const handleBack = () => {
-    navigate('/health-management');
+    navigate('/employeehealthmanagement');
   };
 
   return (

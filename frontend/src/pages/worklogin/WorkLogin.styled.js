@@ -8,7 +8,7 @@ export const S = {
     width: 100%;
     height: 100%;
    
-    background: linear-gradient(135deg, #5B9BD5 0%, #70A9DD 100%);
+    background: linear-gradient(135deg, ${props => props.theme.primary} 0%, ${props => props.theme.secondary} 100%);
     padding: 40px 20px;
   `,
 
@@ -105,7 +105,7 @@ export const S = {
   UserIdIcon: styled.span`
     width: 18px;
     height: 18px;
-    background: #5B9BD5;
+    background: ${props => props.theme.primary};
     border-radius: 3px;
     display: inline-block;
     flex-shrink: 0;
@@ -120,7 +120,7 @@ export const S = {
   PasswordIcon: styled.span`
     width: 18px;
     height: 18px;
-    background: #5B9BD5;
+    background: ${props => props.theme.primary};
     border-radius: 3px;
     display: inline-block;
     position: relative;
@@ -167,8 +167,8 @@ export const S = {
 
     &:focus {
       outline: none;
-      border-color: #5B9BD5;
-      box-shadow: 0 0 0 4px rgba(91, 155, 213, 0.12);
+      border-color: ${props => props.theme.primary};
+      box-shadow: 0 0 0 4px ${props => props.theme.primary}20;
     }
 
     &:hover:not(:focus) {
@@ -190,7 +190,7 @@ export const S = {
     gap: 10px;
     width: 100%;
     padding: 16px 20px;
-    background: #5B9BD5;
+    background: ${props => props.theme.primary};
     color: #FFFFFF;
     font-size: 17px;
     font-weight: 600;
@@ -201,9 +201,9 @@ export const S = {
     margin-top: 12px;
 
     &:hover {
-      background: #4A8AC4;
+      background: ${props => props.theme.secondary};
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(91, 155, 213, 0.35);
+      box-shadow: 0 6px 20px ${props => props.theme.primary}50;
     }
 
     &:active {

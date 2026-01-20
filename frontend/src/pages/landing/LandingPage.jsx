@@ -1,102 +1,82 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // [수정 1] 페이지 이동 기능 추가
-import { Settings, LogIn, Clock, Plane, Users, Shield, TrendingUp } from 'lucide-react';
-
-// ===== React State로 대체된 Store =====
-const AirlineContext = React.createContext();
-
-const AirlineProvider = ({ children }) => {
-  const [config, setConfig] = useState(() => {
-    const saved = localStorage.getItem('airline-config');
-    return saved ? JSON.parse(saved) : {
-      airlineName: 'Sky Airlines',
-      primaryColor: '#0066CC',
-      secondaryColor: '#FF6B35',
-      isConfigured: false,
-    };
-  });
-
-  useEffect(() => {
-    localStorage.setItem('airline-config', JSON.stringify(config));
-  }, [config]);
-
-  const setAirlineConfig = (newConfig) => {
-    setConfig({ ...newConfig, isConfigured: true });
-  };
-
-  return (
-    <AirlineContext.Provider value={{ ...config, setAirlineConfig }}>
-      {children}
-    </AirlineContext.Provider>
-  );
-};
-
-const useAirline = () => {
-  const context = React.useContext(AirlineContext);
-  if (!context) throw new Error('useAirline must be used within AirlineProvider');
-  return context;
-};
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Settings, LogIn, Clock, Plane, Users, Shield, TrendingUp, CheckCircle, ArrowRight } from 'lucide-react';
+import { useAirlineTheme } from '../../context/AirlineThemeContext';
+import AirlineRegisterModal from './AirlineRegisterModal';
 
 // ===== Styled Components =====
-const PageWrapper = ({ children, primaryColor }) => (
+const PageWrapper = ({ children, theme }) => (
   <div style={{
     minHeight: '100vh',
-    background: `linear-gradient(135deg, ${primaryColor}15 0%, #ffffff 100%)`,
+    background: `linear-gradient(135deg, ${theme.primary}15 0%, #ffffff 100%)`,
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
   }}>
     {children}
   </div>
 );
 
-const Header = ({ primaryColor, airlineName, onSettingsClick }) => (
-  <header style={{
-    padding: '24px 80px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    backdropFilter: 'blur(10px)',
-    boxShadow: '0 2px 20px rgba(0,0,0,0.05)',
-    position: 'sticky',
-    top: 0,
-    zIndex: 100,
-  }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-      <Plane size={32} color={primaryColor} strokeWidth={2.5} />
-      <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#1a1a1a', margin: 0 }}>
-        {airlineName}
-      </h1>
-    </div>
-    <button
-      onClick={onSettingsClick}
-      style={{
-        padding: '12px 24px',
-        backgroundColor: 'transparent',
-        border: `2px solid ${primaryColor}`,
-        borderRadius: '8px',
-        color: primaryColor,
-        fontSize: '15px',
-        fontWeight: '600',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        transition: 'all 0.3s ease',
-      }}
-      onMouseEnter={(e) => {
-        e.target.style.backgroundColor = primaryColor;
-        e.target.style.color = 'white';
-      }}
-      onMouseLeave={(e) => {
-        e.target.style.backgroundColor = 'transparent';
-        e.target.style.color = primaryColor;
-      }}
-    >
-      <Settings size={18} />
-      항공사 설정
-    </button>
-  </header>
-);
+const Header = ({ theme, onOpenRegister }) => {
+  const navigate = useNavigate();
+  
+  return (
+    <header style={{
+      padding: '24px 80px',
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      backdropFilter: 'blur(10px)',
+      boxShadow: '0 2px 20px rgba(0,0,0,0.05)',
+      position: 'sticky',
+      top: 0,
+      zIndex: 100,
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{
+          backgroundColor: theme.primary,
+          padding: '8px',
+          borderRadius: '8px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <Plane size={24} color="white" strokeWidth={2.5} style={{ transform: 'rotate(-45deg)' }} />
+        </div>
+        <h1 style={{ fontSize: '24px', fontWeight: '800', color: '#1a1a1a', margin: 0 }}>
+          {theme.name} <span style={{ fontWeight: '400', color: '#888', fontSize: '18px' }}>HR System</span>
+        </h1>
+      </div>
+      <button
+        onClick={onOpenRegister}
+        style={{
+          padding: '12px 24px',
+          backgroundColor: 'transparent',
+          border: `2px solid ${theme.primary}`,
+          borderRadius: '8px',
+          color: theme.primary,
+          fontSize: '15px',
+          fontWeight: '600',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          transition: 'all 0.3s ease',
+        }}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = theme.primary;
+          e.target.style.color = 'white';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = 'transparent';
+          e.target.style.color = theme.primary;
+        }}
+      >
+        <Settings size={18} />
+        항공사 등록
+      </button>
+    </header>
+  );
+};
 
 const MainContainer = ({ children }) => (
   <main style={{
@@ -112,9 +92,21 @@ const MainContainer = ({ children }) => (
   </main>
 );
 
-const HeroSection = ({ primaryColor, secondaryColor }) => (
+const HeroSection = ({ theme }) => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
     <div>
+      <div style={{ 
+        display: 'inline-block', 
+        padding: '8px 16px', 
+        backgroundColor: `${theme.primary}15`, 
+        color: theme.primary, 
+        borderRadius: '30px',
+        fontWeight: '600',
+        fontSize: '14px',
+        marginBottom: '24px'
+      }}>
+        Next Gen HR Solution
+      </div>
       <h2 style={{
         fontSize: '56px',
         fontWeight: '800',
@@ -122,9 +114,9 @@ const HeroSection = ({ primaryColor, secondaryColor }) => (
         lineHeight: '1.2',
         marginBottom: '24px',
       }}>
-        항공사 인사관리의
+        {theme.name}의
         <br />
-        <span style={{ color: primaryColor }}>새로운 기준</span>
+        <span style={{ color: theme.primary }}>스마트한 인사관리</span>
       </h2>
       <p style={{
         fontSize: '20px',
@@ -141,7 +133,7 @@ const HeroSection = ({ primaryColor, secondaryColor }) => (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px' }}>
       {[
         { icon: Users, label: '승무원 관리', value: '99.9%', desc: '출근율' },
-        { icon: Shield, label: '보안 시스템', value: 'ISO 27001', desc: '인증' },
+        { icon: Shield, label: '보안 시스템', value: 'ISO', desc: '인증' },
         { icon: TrendingUp, label: '업무 효율', value: '+45%', desc: '향상' },
       ].map((item, idx) => (
         <div key={idx} style={{
@@ -150,9 +142,14 @@ const HeroSection = ({ primaryColor, secondaryColor }) => (
           borderRadius: '12px',
           boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
           textAlign: 'center',
-        }}>
-          <item.icon size={32} color={secondaryColor} style={{ margin: '0 auto 12px' }} />
-          <div style={{ fontSize: '24px', fontWeight: '700', color: primaryColor, marginBottom: '4px' }}>
+          transition: 'transform 0.3s ease',
+          cursor: 'default'
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
+        onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+        >
+          <item.icon size={32} color={theme.secondary} style={{ margin: '0 auto 12px' }} />
+          <div style={{ fontSize: '24px', fontWeight: '700', color: theme.primary, marginBottom: '4px' }}>
             {item.value}
           </div>
           <div style={{ fontSize: '14px', color: '#666' }}>{item.desc}</div>
@@ -162,63 +159,102 @@ const HeroSection = ({ primaryColor, secondaryColor }) => (
   </div>
 );
 
-// [수정 2] ActionCard 컴포넌트에 useNavigate 적용
-const ActionCard = ({ primaryColor, secondaryColor }) => {
-  const navigate = useNavigate(); // 페이지 이동 훅 사용
+const ActionCard = ({ theme, onOpenRegister }) => {
+  const navigate = useNavigate();
 
   return (
     <div style={{
       backgroundColor: 'white',
-      borderRadius: '24px',
+      borderRadius: '32px',
       padding: '48px',
-      boxShadow: '0 10px 60px rgba(0,0,0,0.12)',
+      boxShadow: '0 20px 80px rgba(0,0,0,0.08)',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
-      <h3 style={{
-        fontSize: '32px',
-        fontWeight: '700',
-        color: '#1a1a1a',
-        marginBottom: '32px',
-        textAlign: 'center',
-      }}>
-        시작하기
-      </h3>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        <ActionButton
-          icon={Clock}
-          label="출근 로그인"
-          description="QR 코드 또는 생체인증으로 빠른 출근"
-          color={primaryColor}
-          onClick={() => navigate('/work-login')} // [수정] 출근 페이지로 이동
-        />
-        <ActionButton
-          icon={LogIn}
-          label="일반 로그인"
-          description="관리자 및 직원 포털 접속"
-          color={secondaryColor}
-          onClick={() => navigate('/login')} // [수정] 일반 로그인 페이지로 이동
-          variant="outline"
-        />
-      </div>
-
+      {/* 장식용 배경 원 */}
       <div style={{
-        marginTop: '32px',
-        padding: '20px',
-        backgroundColor: `${primaryColor}10`,
-        borderRadius: '12px',
-        textAlign: 'center',
-        fontSize: '14px',
-        color: '#666',
-      }}>
-        <strong style={{ color: primaryColor }}>처음 방문하셨나요?</strong>
-        <br />
-        관리자에게 초대 코드를 요청하세요
+        position: 'absolute',
+        top: '-10%',
+        right: '-10%',
+        width: '300px',
+        height: '300px',
+        borderRadius: '50%',
+        background: `radial-gradient(circle, ${theme.primary}10 0%, transparent 70%)`,
+        zIndex: 0
+      }} />
+
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <h3 style={{
+          fontSize: '32px',
+          fontWeight: '700',
+          color: '#1a1a1a',
+          marginBottom: '12px',
+          textAlign: 'center',
+        }}>
+          시작하기
+        </h3>
+        <p style={{ textAlign: 'center', color: '#666', marginBottom: '40px' }}>
+          관리자 또는 직원 계정으로 로그인하세요
+        </p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <ActionButton
+            icon={Clock}
+            label="출근 로그인"
+            color={theme.primary}
+            onClick={() => navigate('/work-login')}
+            subText="사번으로 간편 출근"
+          />
+          <ActionButton
+            icon={LogIn}
+            label="일반 로그인"
+            description="관리자 및 직원 포털 접속"
+            color={theme.secondary}
+            onClick={() => navigate('/login')}
+            variant="outline"
+            subText="아이디/비밀번호 로그인"
+          />
+        </div>
+
+        <div style={{
+          marginTop: '32px',
+          padding: '24px',
+          backgroundColor: '#f8f9fa',
+          borderRadius: '16px',
+          textAlign: 'center',
+          fontSize: '14px',
+          color: '#666',
+          border: '1px solid #eee'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
+             <CheckCircle size={20} color={theme.primary} />
+          </div>
+          <strong style={{ color: '#333', display: 'block', marginBottom: '4px' }}>아직 계정이 없으신가요?</strong>
+           인사팀에 문의하여 계정을 생성하세요.
+           <br/>
+           <button 
+             onClick={onOpenRegister}
+             style={{
+               marginTop: '12px',
+               background: 'none',
+               border: 'none',
+               color: theme.primary,
+               fontWeight: '600',
+               cursor: 'pointer',
+               display: 'inline-flex',
+               alignItems: 'center',
+               gap: '4px'
+             }}
+           >
+             새 항공사 등록하기 <ArrowRight size={14} />
+           </button>
+        </div>
       </div>
     </div>
   );
 };
 
-const ActionButton = ({ icon: Icon, label, description, color, onClick, variant = 'solid' }) => {
+const ActionButton = ({ icon: Icon, label, subText, color, onClick, variant = 'solid' }) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -228,248 +264,95 @@ const ActionButton = ({ icon: Icon, label, description, color, onClick, variant 
       onMouseLeave={() => setIsHovered(false)}
       style={{
         padding: '24px',
-        backgroundColor: variant === 'solid' ? (isHovered ? color : `${color}15`) : 'white',
-        border: `2px solid ${color}`,
-        borderRadius: '16px',
+        backgroundColor: variant === 'solid' 
+          ? (isHovered ? color : `${color}10`) 
+          : (isHovered ? `${color}10` : 'white'),
+        border: variant === 'solid' ? 'none' : `2px solid ${color}`,
+        borderRadius: '20px',
         cursor: 'pointer',
-        transition: 'all 0.3s ease',
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         display: 'flex',
         alignItems: 'center',
-        gap: '16px',
-        transform: isHovered ? 'translateY(-4px)' : 'translateY(0)',
-        boxShadow: isHovered ? `0 8px 30px ${color}40` : '0 2px 10px rgba(0,0,0,0.05)',
+        gap: '20px',
+        transform: isHovered ? 'translateY(-2px)' : 'translateY(0)',
+        boxShadow: isHovered ? `0 10px 30px ${color}20` : 'none',
+        width: '100%',
+        textAlign: 'left'
       }}
     >
       <div style={{
         width: '56px',
         height: '56px',
-        borderRadius: '12px',
+        borderRadius: '16px',
         backgroundColor: variant === 'solid' ? (isHovered ? 'white' : color) : `${color}15`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
+        boxShadow: variant === 'solid' && !isHovered ? `0 8px 16px ${color}40` : 'none',
+        transition: 'all 0.3s'
       }}>
-        <Icon size={28} color={variant === 'solid' ? (isHovered ? color : 'white') : color} />
+        <Icon size={28} color={variant === 'solid' ? (isHovered ? color : 'white') : color} strokeWidth={2.5} />
       </div>
-      <div style={{ textAlign: 'left', flex: 1 }}>
+      <div style={{ flex: 1 }}>
         <div style={{
           fontSize: '18px',
           fontWeight: '700',
-          color: variant === 'solid' ? (isHovered ? 'white' : color) : color,
+          color: variant === 'solid' ? (isHovered ? 'white' : color) : '#333',
           marginBottom: '4px',
+          transition: 'color 0.3s'
         }}>
           {label}
         </div>
         <div style={{
           fontSize: '14px',
-          color: variant === 'solid' ? (isHovered ? 'rgba(255,255,255,0.9)' : '#666') : '#666',
+          color: variant === 'solid' ? (isHovered ? 'rgba(255,255,255,0.9)' : '#666') : '#888',
+          fontWeight: '500'
         }}>
-          {description}
+          {subText}
         </div>
+      </div>
+      <div style={{
+        opacity: isHovered ? 1 : 0,
+        transform: isHovered ? 'translateX(0)' : 'translateX(-10px)',
+        transition: 'all 0.3s',
+        color: variant === 'solid' ? 'white' : color
+      }}>
+        <ArrowRight size={20} />
       </div>
     </button>
   );
 };
 
-const Modal = ({ isOpen, onClose, children }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.6)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      backdropFilter: 'blur(4px)',
-    }} onClick={onClose}>
-      <div onClick={(e) => e.stopPropagation()} style={{
-        backgroundColor: 'white',
-        borderRadius: '24px',
-        padding: '48px',
-        maxWidth: '600px',
-        width: '90%',
-        boxShadow: '0 20px 80px rgba(0,0,0,0.3)',
-      }}>
-        {children}
-      </div>
-    </div>
-  );
-};
-
-const SettingsModal = ({ isOpen, onClose, onSave, currentConfig }) => {
-  const [name, setName] = useState(currentConfig.airlineName);
-  const [primary, setPrimary] = useState(currentConfig.primaryColor);
-  const [secondary, setSecondary] = useState(currentConfig.secondaryColor);
-
-  const handleSave = () => {
-    onSave({ airlineName: name, primaryColor: primary, secondaryColor: secondary });
-    onClose();
-  };
-
-  return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <h3 style={{ fontSize: '28px', fontWeight: '700', marginBottom: '32px', color: '#1a1a1a' }}>
-        항공사 설정
-      </h3>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        <div>
-          <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#666' }}>
-            항공사 이름
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="예: Sky Airlines"
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              fontSize: '16px',
-              border: '2px solid #e0e0e0',
-              borderRadius: '8px',
-              outline: 'none',
-              transition: 'border-color 0.3s',
-            }}
-            onFocus={(e) => e.target.style.borderColor = primary}
-            onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
-          />
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#666' }}>
-              주요 컬러
-            </label>
-            <input
-              type="color"
-              value={primary}
-              onChange={(e) => setPrimary(e.target.value)}
-              style={{
-                width: '100%',
-                height: '56px',
-                border: '2px solid #e0e0e0',
-                borderRadius: '8px',
-                cursor: 'pointer',
-              }}
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px', color: '#666' }}>
-              보조 컬러
-            </label>
-            <input
-              type="color"
-              value={secondary}
-              onChange={(e) => setSecondary(e.target.value)}
-              style={{
-                width: '100%',
-                height: '56px',
-                border: '2px solid #e0e0e0',
-                borderRadius: '8px',
-                cursor: 'pointer',
-              }}
-            />
-          </div>
-        </div>
-
-        <div style={{
-          padding: '20px',
-          backgroundColor: '#f8f9fa',
-          borderRadius: '12px',
-          border: `2px dashed ${primary}`,
-        }}>
-          <div style={{ fontSize: '14px', fontWeight: '600', marginBottom: '12px', color: '#666' }}>
-            미리보기
-          </div>
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <Plane size={32} color={primary} />
-            <span style={{ fontSize: '20px', fontWeight: '700', color: primary }}>{name || 'Airlines'}</span>
-          </div>
-          <div style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
-            <div style={{ width: '60px', height: '40px', backgroundColor: primary, borderRadius: '6px' }} />
-            <div style={{ width: '60px', height: '40px', backgroundColor: secondary, borderRadius: '6px' }} />
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '12px', marginTop: '16px' }}>
-          <button
-            onClick={onClose}
-            style={{
-              flex: 1,
-              padding: '14px',
-              backgroundColor: '#f0f0f0',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              color: '#666',
-            }}
-          >
-            취소
-          </button>
-          <button
-            onClick={handleSave}
-            style={{
-              flex: 1,
-              padding: '14px',
-              backgroundColor: primary,
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              color: 'white',
-            }}
-          >
-            저장하기
-          </button>
-        </div>
-      </div>
-    </Modal>
-  );
-};
-
 // ===== Main Component =====
 const LandingPageContent = () => {
-  const { airlineName, primaryColor, secondaryColor, setAirlineConfig } = useAirline();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const { theme } = useAirlineTheme();
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+
+  const openRegisterModal = () => setIsRegisterModalOpen(true);
+  const closeRegisterModal = () => setIsRegisterModalOpen(false);
 
   return (
-    <PageWrapper primaryColor={primaryColor}>
-      <Header
-        primaryColor={primaryColor}
-        airlineName={airlineName}
-        onSettingsClick={() => setIsSettingsOpen(true)}
-      />
-      
-      <MainContainer>
-        <HeroSection primaryColor={primaryColor} secondaryColor={secondaryColor} />
-        <ActionCard primaryColor={primaryColor} secondaryColor={secondaryColor} />
-      </MainContainer>
+    <>
+      <PageWrapper theme={theme}>
+        <Header theme={theme} onOpenRegister={openRegisterModal} />
+        
+        <MainContainer>
+          <HeroSection theme={theme} />
+          <ActionCard theme={theme} onOpenRegister={openRegisterModal} />
+        </MainContainer>
+      </PageWrapper>
 
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-        onSave={setAirlineConfig}
-        currentConfig={{ airlineName, primaryColor, secondaryColor }}
+      <AirlineRegisterModal 
+        isOpen={isRegisterModalOpen} 
+        onClose={closeRegisterModal} 
       />
-    </PageWrapper>
+    </>
   );
 };
 
 export default function AirlineLandingPage() {
   return (
-    <AirlineProvider>
-      <LandingPageContent />
-    </AirlineProvider>
+    <LandingPageContent />
   );
 }

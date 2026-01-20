@@ -67,7 +67,7 @@ export const Badge = styled.span`
   position: absolute;
   top: -4px;
   right: -4px;
-  background: #FF4757;
+  background: ${props => props.theme.primary};
   color: white;
   border-radius: 50%;
   width: 20px;

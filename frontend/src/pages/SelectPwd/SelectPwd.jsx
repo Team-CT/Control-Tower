@@ -52,11 +52,11 @@ const FindPassword = () => {
 
         <S.FindForm onSubmit={verificationSent ? handleVerifyAndReset : handleSendVerification}>
           <S.InputGroup>
-            <S.Label>사번</S.Label>
+            <S.Label>아이디</S.Label>
             <S.Input
               type="text"
               name="employeeId"
-              placeholder="사번을 입력하세요"
+              placeholder="아이디를 입력하세요"
               value={formData.employeeId}
               onChange={handleInputChange}
               disabled={verificationSent}
@@ -108,7 +108,7 @@ const FindPassword = () => {
           </S.FooterLink>
           <S.Divider>|</S.Divider>
           <S.FooterLink onClick={() => handleNavigation('/find-employee-id')}>
-            사번 찾기
+            아이디 찾기
           </S.FooterLink>
           <S.Divider>|</S.Divider>
           <S.FooterLink onClick={() => handleNavigation('/register')}>

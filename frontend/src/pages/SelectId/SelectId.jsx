@@ -66,13 +66,13 @@ const FindEmployeeId = () => {
           </S.InputGroup>
 
           <S.SubmitButton type="submit">
-            사번 찾기
+            아이디 찾기
           </S.SubmitButton>
         </S.FindForm>
 
         {foundEmployeeId && (
           <S.ResultSection>
-            <S.ResultLabel>찾은 사번</S.ResultLabel>
+            <S.ResultLabel>찾은 아이디</S.ResultLabel>
             <S.ResultValue>{foundEmployeeId}</S.ResultValue>
           </S.ResultSection>
         )}
@@ -82,8 +82,8 @@ const FindEmployeeId = () => {
             로그인
           </S.FooterLink>
           <S.Divider>|</S.Divider>
-          <S.FooterLink onClick={() => handleNavigation('/find-employee-id')}>
-            사번 찾기
+          <S.FooterLink onClick={() => handleNavigation('/find-password')}>
+            비밀번호 찾기
           </S.FooterLink>
           <S.Divider>|</S.Divider>
           <S.FooterLink onClick={() => handleNavigation('/register')}>
