@@ -1,18 +1,26 @@
-import React, { useState, useEffect } from 'react';
+
 import { 
   Plane, Home, Users, Network, Clock, Calendar, 
   ClipboardCheck, Activity, BarChart2, Leaf, 
+<<<<<<< HEAD
   Megaphone, FileText, Settings, RefreshCcw,
   List, Smile // 아이콘 추가
+=======
+  Megaphone, FileText, Settings 
+>>>>>>> a5de2da (ui-관리자용 대시보드)
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useAirlineTheme } from '../../context/AirlineThemeContext';
 import * as S from './Sidebar.styled'; 
+<<<<<<< HEAD
 
 // =================================================================
 // [1] 직원용 메뉴 구조 정의
 // =================================================================
 const USER_MENU = [
+=======
+import React, { useState } from 'react';
+const MENU_ITEMS = [
+>>>>>>> a5de2da (ui-관리자용 대시보드)
   {
     category: "메인",
     items: [
@@ -20,7 +28,12 @@ const USER_MENU = [
     ]
   },
   {
+<<<<<<< HEAD
     category: "근태 관리",
+=======
+    category: "직원 관리",
+    adminOnly: true, // ✅ 관리자 전용 메뉴 표시
+>>>>>>> a5de2da (ui-관리자용 대시보드)
     items: [
       { label: "근태 현황", icon: Clock, id: "/attendance" }, // Route: /attendance
       { label: "휴가 신청", icon: Calendar, id: "/vacation" } // Route: /vacation
@@ -29,24 +42,42 @@ const USER_MENU = [
   {
     category: "운항 관리",
     items: [
+<<<<<<< HEAD
       { label: "비행편 크루 관리", icon: Plane, id: "/flightschedule" }
+=======
+      { label: "근태 현황", icon: Clock, id: "/attendance" },
+      { label: "휴가 신청", icon: Calendar, id: "/vacation" },
+      { label: "승인 관리", icon: ClipboardCheck, id: "/approval" }
+>>>>>>> a5de2da (ui-관리자용 대시보드)
     ]
   },
   {
     category: "건강 관리",
+<<<<<<< HEAD
     items: [
       {
         label: "건강 현황",
         icon: Activity, 
         id: "/health-dashboard", // Route: /health-dashboard
+=======
+    items: [  {
+        label: "건강 현황",
+        icon: Activity,
+        id: "/health-dashboard",
+>>>>>>> a5de2da (ui-관리자용 대시보드)
         subItems: [
           { label: "건강 상세정보", id: "/employeehealthdetail" }, // Route: /employeehealthdetail (App.jsx 라인 80 확인)
           { label: "건강 정보 제출", id: "/healthinfosubmission" }, // Route: /healthinfosubmission
           { label: "건강 정보 제출 이력", id: "/healthsubmissionhistory" }, // Route: /healthsubmissionhistory
         ],
       },
+<<<<<<< HEAD
       { label: "스트레스 설문", icon: Smile, id: "/stress" }, // Route: /stress
       { label: "건강 프로그램", icon: Leaf, id: "/healthprogramapply" } // Route: /healthprogramapply
+=======
+      { label: "스트레스 설문", icon: BarChart2, id: "/stress" },
+      { label: "건강 프로그램", icon: Leaf, id: "/healthprogrammanagement" }
+>>>>>>> a5de2da (ui-관리자용 대시보드)
     ]
   },
   {
@@ -163,9 +194,9 @@ const Sidebar = ({ isAdmin }) => {
       <S.Header>
         <S.LogoWrapper>
           <S.LogoIcon>
-            <Plane size={24} style={{ transform: 'rotate(-45deg)' }} />
+            <Plane size={22} style={{ transform: 'rotate(-45deg)', marginLeft: '2px' }} />
           </S.LogoIcon>
-          <S.Title>{theme.name}</S.Title>
+          <S.Title>SkyHR</S.Title>
         </S.LogoWrapper>
         <S.SubTitle>Airline HR System ({isAdmin ? '관리자' : '직원'})</S.SubTitle>
       </S.Header>
