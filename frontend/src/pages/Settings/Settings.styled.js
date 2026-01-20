@@ -77,6 +77,12 @@ export const ProfileAvatar = styled.div`
   display: flex;
   justify-content: center;
   margin: 20px 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
 
 export const AvatarCircle = styled.div`

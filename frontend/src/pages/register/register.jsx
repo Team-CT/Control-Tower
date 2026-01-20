@@ -19,9 +19,16 @@ const Register = () => {
     password: '',
     confirmPassword: '',
     name: '',
+    age: '',
+    phone: '',
+    address: '',
     department: '',
-    position: ''
+    position: '',
+    profileImage: null
   });
+
+  // 프로필 이미지 미리보기 URL
+  const [profilePreview, setProfilePreview] = useState(null);
 
   // 각 단계별 인증 완료 여부 (실제 구현 시 활용)
   const [verified, setVerified] = useState({
@@ -32,6 +39,20 @@ const Register = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  // 프로필 이미지 업로드 핸들러
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData(prev => ({ ...prev, profileImage: file }));
+      // 미리보기 생성
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // [Step 1] 이메일 인증 로직
@@ -185,10 +206,46 @@ const Register = () => {
                   </p>
                 </S.InputGroup>
 
+                {/* 프로필 이미지 업로드 */}
+                <S.InputGroup>
+                  <S.InputLabel>프로필 이미지 (선택)</S.InputLabel>
+                  <S.ProfileImageSection>
+                    <S.ProfileImagePreview>
+                      {profilePreview ? (
+                        <img src={profilePreview} alt="프로필 미리보기" />
+                      ) : (
+                        <S.ProfilePlaceholder>👤</S.ProfilePlaceholder>
+                      )}
+                    </S.ProfileImagePreview>
+                    <S.ImageUploadButton type="button" onClick={() => document.getElementById('profileImageInput').click()}>
+                      이미지 선택
+                    </S.ImageUploadButton>
+                    <input
+                      id="profileImageInput"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      style={{ display: 'none' }}
+                    />
+                  </S.ProfileImageSection>
+                  <S.HelperText>JPG, PNG 형식 (최대 5MB)</S.HelperText>
+                </S.InputGroup>
+
                 <S.RowGroup>
                   <S.InputGroup>
                     <S.InputLabel>이름</S.InputLabel>
                     <S.Input name="name" onChange={handleInputChange} placeholder="실명 입력" required />
+                  </S.InputGroup>
+                  <S.InputGroup>
+                    <S.InputLabel>나이</S.InputLabel>
+                    <S.Input name="age" type="number" onChange={handleInputChange} placeholder="나이" required />
+                  </S.InputGroup>
+                </S.RowGroup>
+
+                <S.RowGroup>
+                  <S.InputGroup>
+                    <S.InputLabel>전화번호</S.InputLabel>
+                    <S.Input name="phone" type="tel" onChange={handleInputChange} placeholder="010-1234-5678" required />
                   </S.InputGroup>
                   <S.InputGroup>
                     <S.InputLabel>직급</S.InputLabel>
@@ -196,10 +253,16 @@ const Register = () => {
                   </S.InputGroup>
                 </S.RowGroup>
 
-                 <S.InputGroup>
-                    <S.InputLabel>아이디</S.InputLabel>
-                    <S.Input name="userId" onChange={handleInputChange} placeholder="아이디 입력" required />
-                  </S.InputGroup>
+                <S.InputGroup>
+                  <S.InputLabel>주소</S.InputLabel>
+                  <S.Input name="address" onChange={handleInputChange} placeholder="주소 입력" required />
+                </S.InputGroup>
+
+                <S.InputGroup>
+                  <S.InputLabel>부서</S.InputLabel>
+                  <S.Input name="department" onChange={handleInputChange} placeholder="부서명 입력" required />
+                </S.InputGroup>
+
                 <S.InputGroup>
                   <S.InputLabel>비밀번호</S.InputLabel>
                   <S.Input type="password" name="password" onChange={handleInputChange} placeholder="비밀번호" required />

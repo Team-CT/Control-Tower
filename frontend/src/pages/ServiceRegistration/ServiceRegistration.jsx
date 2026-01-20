@@ -6,6 +6,12 @@ const ServiceRegistration = () => {
     airlineName: '',
     country: '',
     companyDomain: '',
+    airlineAddress: '',
+    mainNumber: '',
+    theme: {
+      mainColor: '#0066CC',
+      subColor: '#004C99'
+    },
     managerName: '',
     managerPhone: '',
     managerEmail: '',
@@ -93,6 +99,92 @@ const ServiceRegistration = () => {
                   />
                 </S.DomainInputWrapper>
                 <S.HelperText>이메일 도메인 검증에 사용됩니다</S.HelperText>
+              </S.FormField>
+
+              <S.FormField $fullWidth>
+                <S.Label>
+                  항공사 주소 <S.Required>*</S.Required>
+                </S.Label>
+                <S.Input
+                  type="text"
+                  placeholder="예: 서울시 강서구 하늘길 112"
+                  value={formData.airlineAddress}
+                  onChange={(e) => handleInputChange('airlineAddress', e.target.value)}
+                />
+              </S.FormField>
+
+              <S.FormField>
+                <S.Label>
+                  <S.PhoneIcon />
+                  대표번호 <S.Required>*</S.Required>
+                </S.Label>
+                <S.Input
+                  type="tel"
+                  placeholder="1588-0000"
+                  value={formData.mainNumber}
+                  onChange={(e) => handleInputChange('mainNumber', e.target.value)}
+                />
+              </S.FormField>
+            </S.FormGrid>
+          </S.FormCard>
+
+          {/* Step 1.5: 테마 컬러 선택 */}
+          <S.FormCard>
+            <S.StepHeader>
+              <S.StepNumber>1.5</S.StepNumber>
+              <S.StepTitle>테마 컬러 선택</S.StepTitle>
+            </S.StepHeader>
+            <S.DocumentDescription>
+              항공사 브랜드 색상을 선택하세요
+            </S.DocumentDescription>
+
+            <S.FormGrid>
+              <S.FormField>
+                <S.Label>
+                  메인 컬러 <S.Required>*</S.Required>
+                </S.Label>
+                <S.ColorPickerWrapper>
+                  <S.ColorInput
+                    type="color"
+                    value={formData.theme.mainColor}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      theme: { ...prev.theme, mainColor: e.target.value }
+                    }))}
+                  />
+                  <S.ColorValue>{formData.theme.mainColor}</S.ColorValue>
+                </S.ColorPickerWrapper>
+              </S.FormField>
+
+              <S.FormField>
+                <S.Label>
+                  보조 컬러 <S.Required>*</S.Required>
+                </S.Label>
+                <S.ColorPickerWrapper>
+                  <S.ColorInput
+                    type="color"
+                    value={formData.theme.subColor}
+                    onChange={(e) => setFormData(prev => ({
+                      ...prev,
+                      theme: { ...prev.theme, subColor: e.target.value }
+                    }))}
+                  />
+                  <S.ColorValue>{formData.theme.subColor}</S.ColorValue>
+                </S.ColorPickerWrapper>
+              </S.FormField>
+
+              <S.FormField $fullWidth>
+                <S.Label>테마 미리보기</S.Label>
+                <S.ThemePreview>
+                  <S.PreviewCard $mainColor={formData.theme.mainColor} $subColor={formData.theme.subColor}>
+                    <S.PreviewHeader $mainColor={formData.theme.mainColor}>
+                      {formData.airlineName || '항공사명'}
+                    </S.PreviewHeader>
+                    <S.PreviewButton $subColor={formData.theme.subColor}>
+                      버튼 미리보기
+                    </S.PreviewButton>
+                  </S.PreviewCard>
+                </S.ThemePreview>
               </S.FormField>
             </S.FormGrid>
           </S.FormCard>

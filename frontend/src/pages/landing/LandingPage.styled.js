@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const PageWrapper = styled.div`
   min-height: 100vh;
-  background: ${props => `linear-gradient(135deg, ${props.theme.primary}15 0%, #ffffff 100%)`};
+  background: ${props => `linear-gradient(135deg, ${props.theme.colors.primary}15 0%, #ffffff 100%)`};
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 `;
 
@@ -26,7 +26,7 @@ export const HeaderLogoSection = styled.div`
 `;
 
 export const HeaderLogoWrapper = styled.div`
-  background-color: ${props => props.theme.primary};
+  background-color: ${props => props.theme.colors.primary};
   padding: 8px;
   border-radius: 8px;
   display: flex;
@@ -34,15 +34,22 @@ export const HeaderLogoWrapper = styled.div`
   justify-content: center;
 `;
 
+export const RotatedIconWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-45deg);
+`;
+
 export const HeaderTitle = styled.h1`
   font-size: 24px;
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--text-primary);
   margin: 0;
   
   span {
     font-weight: 400;
-    color: #888;
+    color: var(--text-tertiary);
     font-size: 18px;
   }
 `;
@@ -50,9 +57,9 @@ export const HeaderTitle = styled.h1`
 export const HeaderRegisterButton = styled.button`
   padding: 12px 24px;
   background-color: transparent;
-  border: 2px solid ${props => props.theme.primary};
+  border: 2px solid ${props => props.theme.colors.primary};
   border-radius: 8px;
-  color: ${props => props.theme.primary};
+  color: ${props => props.theme.colors.primary};
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
@@ -62,7 +69,7 @@ export const HeaderRegisterButton = styled.button`
   transition: all 0.3s ease;
 
   &:hover {
-    background-color: ${props => props.theme.primary};
+    background-color: ${props => props.theme.colors.primary};
     color: white;
   }
 `;
@@ -86,8 +93,8 @@ export const HeroContainer = styled.div`
 export const HeroBadge = styled.div`
   display: inline-block;
   padding: 8px 16px;
-  background-color: ${props => `${props.theme.primary}15`};
-  color: ${props => props.theme.primary};
+  background-color: ${props => `${props.theme.colors.primary}15`};
+  color: ${props => props.theme.colors.primary};
   border-radius: 30px;
   font-weight: 600;
   font-size: 14px;
@@ -97,18 +104,18 @@ export const HeroBadge = styled.div`
 export const HeroTitle = styled.h2`
   font-size: 56px;
   font-weight: 800;
-  color: #1a1a1a;
+  color: var(--text-primary);
   line-height: 1.2;
   margin-bottom: 24px;
 
   span {
-    color: ${props => props.theme.primary};
+    color: ${props => props.theme.colors.primary};
   }
 `;
 
 export const HeroDescription = styled.p`
   font-size: 20px;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.8;
   margin-bottom: 40px;
 `;
@@ -121,7 +128,7 @@ export const HeroStatsGrid = styled.div`
 
 export const HeroStatCard = styled.div`
   padding: 24px;
-  background-color: white;
+  background-color: var(--bg-main);
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.08);
   text-align: center;
@@ -133,16 +140,22 @@ export const HeroStatCard = styled.div`
   }
 `;
 
+export const CenteredIconWrapper = styled.div`
+  margin: 0 auto 12px;
+  display: flex;
+  justify-content: center;
+`;
+
 export const StatValue = styled.div`
   font-size: 24px;
   font-weight: 700;
-  color: ${props => props.theme.primary};
+  color: ${props => props.theme.colors.primary};
   margin-bottom: 4px;
 `;
 
 export const StatDesc = styled.div`
   font-size: 14px;
-  color: #666;
+  color: var(--text-secondary);
 `;
 
 export const ActionCardContainer = styled.div`
@@ -161,7 +174,7 @@ export const ActionCardBackgroundCircle = styled.div`
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: ${props => `radial-gradient(circle, ${props.theme.primary}10 0%, transparent 70%)`};
+  background: ${props => `radial-gradient(circle, ${props.theme.colors.primary}10 0%, transparent 70%)`};
   z-index: 0;
 `;
 
@@ -201,6 +214,12 @@ export const ActionRegisterWrapper = styled.div`
   border: 1px solid #eee;
 `;
 
+export const CheckIconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+`;
+
 export const ActionRegisterTitle = styled.strong`
   color: #333;
   display: block;
@@ -211,7 +230,7 @@ export const ActionRegisterButton = styled.button`
   margin-top: 12px;
   background: none;
   border: none;
-  color: ${props => props.theme.primary};
+  color: ${props => props.theme.colors.primary};
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
@@ -252,7 +271,7 @@ export const ActionIconWrapper = styled.div`
 
 export const ActionTextWrapper = styled.div`
   flex: 1;
-`;
+  `;
 
 export const ActionLabel = styled.div`
   font-size: 18px;

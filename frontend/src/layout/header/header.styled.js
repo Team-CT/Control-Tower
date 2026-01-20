@@ -1,12 +1,12 @@
 import styled from 'styled-components';
 
 export const HeaderContainer = styled.header`
-  background: white;
+  background: var(--bg-main);
   padding: 16px 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px var(--shadow-color);
   position: sticky;
   top: 0;
   z-index: 100;

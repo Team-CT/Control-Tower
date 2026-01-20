@@ -38,13 +38,46 @@ import {
   ThemeRadio,
   ThemeLabel,
   LanguageSelect,
+  ToggleSwitch,
+  ToggleSlider,
 
 } from './Settings.styled';
+import { useAirlineTheme } from '../../context/AirlineThemeContext';
+import { airlines } from '../../styles/theme';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('profile');
-  const [selectedTheme, setSelectedTheme] = useState('light');
   const [selectedLanguage, setSelectedLanguage] = useState('ko');
+  
+  // 테마 시스템
+  const { 
+    theme, 
+    isDarkMode, 
+    toggleDarkMode, 
+    currentAirline,
+    approvalStatus,
+    changeAirline,
+    updateApprovalStatus,
+    airlineName
+  } = useAirlineTheme();
+  
+  // 프로필 이미지 업로드 관리
+  const [profileImage, setProfileImage] = useState(null);
+  const [profilePreview, setProfilePreview] = useState(null);
+
+  // 프로필 이미지 업로드 핸들러
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImage(file);
+      // 미리보기 생성
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // TODO: Zustand state mapping
   const userProfile = {
@@ -82,11 +115,22 @@ const Settings = () => {
                 <h2>프로필 정보</h2>
               </ProfileHeader>
 
-              <ProfileAvatar>
+              <ProfileAvatar onClick={() => document.getElementById('settingsProfileImageInput').click()}>
                 <AvatarCircle>
-                  <AvatarInitial>김</AvatarInitial>
+                  {profilePreview ? (
+                    <img src={profilePreview} alt="프로필" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                  ) : (
+                    <AvatarInitial>김</AvatarInitial>
+                  )}
                   <CameraIcon>📷</CameraIcon>
                 </AvatarCircle>
+                <input
+                  id="settingsProfileImageInput"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  style={{ display: 'none' }}
+                />
               </ProfileAvatar>
 
               <InfoGrid>
@@ -251,44 +295,21 @@ const Settings = () => {
                 <SecurityCardBody>
                   <SecurityItem>
                     <SecurityItemLeft>
-                      <SecurityItemTitle>화면 테마 선택</SecurityItemTitle>
+                      <SecurityItemTitle>다크 모드</SecurityItemTitle>
                       <SecurityItemDescription>
-                        원하는 테마를 선택하세요
+                        어두운 테마로 전환하여 눈의 피로를 줄이세요
                       </SecurityItemDescription>
                     </SecurityItemLeft>
                     <SecurityItemRight>
-                      <ThemeSelector>
-                        <ThemeOption>
-                          <ThemeRadio
-                            type="radio"
-                            name="theme"
-                            value="light"
-                            checked={selectedTheme === 'light'}
-                            onChange={(e) => setSelectedTheme(e.target.value)}
-                          />
-                          <ThemeLabel>라이트 모드</ThemeLabel>
-                        </ThemeOption>
-                        <ThemeOption>
-                          <ThemeRadio
-                            type="radio"
-                            name="theme"
-                            value="dark"
-                            checked={selectedTheme === 'dark'}
-                            onChange={(e) => setSelectedTheme(e.target.value)}
-                          />
-                          <ThemeLabel>다크 모드</ThemeLabel>
-                        </ThemeOption>
-                        <ThemeOption>
-                          <ThemeRadio
-                            type="radio"
-                            name="theme"
-                            value="auto"
-                            checked={selectedTheme === 'auto'}
-                            onChange={(e) => setSelectedTheme(e.target.value)}
-                          />
-                          <ThemeLabel>시스템 설정</ThemeLabel>
-                        </ThemeOption>
-                      </ThemeSelector>
+                      <ToggleSwitch>
+                        <input
+                          type="checkbox"
+                          checked={isDarkMode}
+                          onChange={toggleDarkMode}
+                          style={{ display: 'none' }}
+                        />
+                        <ToggleSlider checked={isDarkMode} onClick={toggleDarkMode} />
+                      </ToggleSwitch>
                     </SecurityItemRight>
                   </SecurityItem>
 

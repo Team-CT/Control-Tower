@@ -289,6 +289,59 @@ export const LoginLink = styled.span`
   }
 `;
 
+// 프로필 이미지 업로드 관련 스타일
+export const ProfileImageSection = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+export const ProfileImagePreview = styled.div`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+export const ProfilePlaceholder = styled.div`
+  font-size: 32px;
+  color: #9ca3af;
+`;
+
+export const ImageUploadButton = styled.button`
+  padding: 10px 20px;
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: #e5e7eb;
+    color: #1f2937;
+  }
+`;
+
+export const HelperText = styled.p`
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+`;
+
 // Unused but kept for compatibility if needed elsewhere or strictly following older file
 export const FormSection = styled.div``;
 export const FormCard = styled.div``;
