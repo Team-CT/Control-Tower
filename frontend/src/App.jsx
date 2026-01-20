@@ -60,6 +60,7 @@ function App() {
             <Route path="/" element={<Navigate to="/board" replace />} />
             
             <Route path="/dashboard" element={<EmployeeDashboard />} />
+            <Route path="/admin-dashboard" element={<AdmDashboard />} />
             
             {/* 게시판 */}
             <Route path="/board" element={<Board />} />
@@ -79,6 +80,7 @@ function App() {
 
             {/* 근태 관리 */}
             <Route path="/attendance" element={<EmployeeSchedule />} />
+            <Route path="/employee-schedule" element={<EmployeeSchedule />} />
             <Route path="/vacation" element={<LeaveApply />} />
             <Route path="/approval" element={<LeaveApproval />} />
             
@@ -102,8 +104,7 @@ function App() {
           {/* 404 페이지 */}
           <Route path="*" element={<NotFound />} />
             
-          {/* test */}
-          <Route path="/admdashboard" element={<AdmDashboard />} />
+
 
 
         </Routes>
