@@ -37,6 +37,7 @@ import HealthProgramApply from './pages/HealthProgramApply/HealthProgramApply.js
 import FlightSchedule from './pages/FlightSchedule/FlightSchedule.jsx';
 import FlightScheduleDetail from './pages/FlightSchedule/FlightScheduleDetail.jsx'
 import CrewMemberDetail from './pages/FlightSchedule/CrewMemberDetail.jsx'
+import AdmDashboard from './pages/AdmDashboard/AdmDashboard.jsx';
 
 function App() {
   return (
@@ -100,6 +101,11 @@ function App() {
 
           {/* 404 페이지 */}
           <Route path="*" element={<NotFound />} />
+            
+          {/* test */}
+          <Route path="/admdashboard" element={<AdmDashboard />} />
+
+
         </Routes>
       </BrowserRouter>
     </AirlineThemeProvider>
