@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { createTheme } from '../styles/theme';
 
 const AirlineThemeContext = createContext();
@@ -11,9 +12,35 @@ export const useAirlineTheme = () => {
   return context;
 };
 
+// Control Tower 테마를 사용해야 하는 경로 판별 함수
+const shouldUseControlTowerTheme = (pathname) => {
+  // Condition A: Control Tower 테마 적용 경로
+  const controlTowerPaths = [
+    '/super-admin',           // 슈퍼 관리자 모든 페이지
+    '/service-registration',  // 서비스 가입 신청
+    '/register',              // 회원가입
+    '/login',                 // 로그인
+    '/find-employee-id',      // 사번 찾기
+    '/find-password',         // 비밀번호 찾기
+    '/work-login',            // 출근 로그인
+    '/',                      // 랜딩 페이지 (정확히 루트만)
+    '/account-activation'     // 계정 활성화
+  ];
+  
+  // 정확히 루트 경로인 경우
+  if (pathname === '/') {
+    return true;
+  }
+  
+  // URL이 Control Tower 경로로 시작하는지 확인
+  return controlTowerPaths.some(path => path !== '/' && pathname.startsWith(path));
+};
+
 export const AirlineThemeProvider = ({ children }) => {
+  const location = useLocation();
+  
   // [State 1] 현재 선택된 항공사 (기본: CONTROL_TOWER)
-  const [currentAirline, setCurrentAirline] = useState(() => {
+  const [savedAirlineCode, setSavedAirlineCode] = useState(() => {
     return localStorage.getItem('airlineCode') || 'CONTROL_TOWER';
   });
 
@@ -28,13 +55,26 @@ export const AirlineThemeProvider = ({ children }) => {
     return saved === 'true';
   });
 
+  // 경로 기반으로 실제 사용할 항공사 코드 결정
+  const getEffectiveAirlineCode = () => {
+    if (shouldUseControlTowerTheme(location.pathname)) {
+      return 'CONTROL_TOWER';
+    }
+    
+    // Airline 테마 적용: LocalStorage에서 가져오기
+    return savedAirlineCode;
+  };
+
+  // 현재 경로에 따라 결정된 항공사 코드
+  const currentAirline = getEffectiveAirlineCode();
+
   // 테마 객체 생성 (항공사 코드 + 다크모드 여부 조합)
   const theme = createTheme(currentAirline, isDarkMode);
 
   // --- Effects (LocalStorage 동기화) ---
   useEffect(() => {
-    localStorage.setItem('airlineCode', currentAirline);
-  }, [currentAirline]);
+    localStorage.setItem('airlineCode', savedAirlineCode);
+  }, [savedAirlineCode]);
 
   useEffect(() => {
     localStorage.setItem('approvalStatus', approvalStatus);
@@ -46,6 +86,11 @@ export const AirlineThemeProvider = ({ children }) => {
     // CSS Variables 업데이트
     updateCSSVariables(theme);
   }, [isDarkMode, theme]);
+
+  // 경로 변경 시 CSS Variables 업데이트
+  useEffect(() => {
+    updateCSSVariables(theme);
+  }, [location.pathname, theme]);
 
   // CSS Variables 업데이트 함수
   const updateCSSVariables = (currentTheme) => {
@@ -83,7 +128,7 @@ export const AirlineThemeProvider = ({ children }) => {
 
   // 1. 항공사 변경 (승인 시뮬레이션 포함)
   const changeAirline = (airlineCode) => {
-    setCurrentAirline(airlineCode);
+    setSavedAirlineCode(airlineCode);
     setApprovalStatus('approved'); // 항공사를 선택하면 승인된 것으로 간주 (시나리오상)
   };
 
@@ -93,7 +138,7 @@ export const AirlineThemeProvider = ({ children }) => {
     
     // 승인이 취소되거나 대기 상태가 되면 Control Tower로 복귀
     if (status !== 'approved') {
-      setCurrentAirline('CONTROL_TOWER');
+      setSavedAirlineCode('CONTROL_TOWER');
     }
   };
 
@@ -104,7 +149,7 @@ export const AirlineThemeProvider = ({ children }) => {
 
   // 4. 레거시 호환용 (단순 토글) - 필요에 따라 유지
   const toggleAirline = (code) => {
-    const nextCode = code || (currentAirline === 'KE' ? 'LJ' : 'KE');
+    const nextCode = code || (savedAirlineCode === 'KE' ? 'LJ' : 'KE');
     changeAirline(nextCode);
   };
 
