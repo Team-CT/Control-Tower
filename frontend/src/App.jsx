@@ -42,11 +42,17 @@ import AccountActivation from './pages/AccountActivation/AccountActivation.jsx';
 import ServiceRegistration from './pages/ServiceRegistration/ServiceRegistration.jsx';
 import AdminAttendance from './pages/AdminAttendance/AdminAttendance.jsx';
 import EmployeeAttendance from './pages/EmployeeAttendance/EmployeeAttendance.jsx';
+<<<<<<< HEAD
 import TenantManagement from './pages/SuperAdmin/Tenant/TenantManagement.jsx';
 import TenantDetail from './pages/SuperAdmin/Tenant/TenantDetail.jsx';
 import CompanyRegistrationManagement from './pages/SuperAdmin/CompanyRegistrationManagement/CompanyRegistrationManagement.jsx';
 // SuperAdminDashboard는 CompanyRegistrationManagement를 사용
 const SuperAdminDashboard = CompanyRegistrationManagement;
+=======
+import TenantManagement from './pages/SuperAdmin/Tenant/TenantManagement.jsx'; // [임시 테스트용]
+import TenantDetail from './pages/SuperAdmin/Tenant/TenantDetail.jsx'; // [임시 테스트용]
+import CompanyRegistrationManagement from './pages/SuperAdmin/CompanyRegistrationManagement/CompanyRegistrationManagement.jsx';
+>>>>>>> e793b09f94c0ad00b32443ede0e29e9db52b901a
 
 // [2] 레이아웃 컴포넌트 Import
 // sidebar -> Sidebar는 MainLayout 내부에서 사용되겠지만, 여기서는 MainLayout만 import
@@ -106,6 +112,7 @@ const ThemedApp = () => {
           <Route path="/flightschedule/:flightId" element={<FlightScheduleDetail />} />
           <Route path="/crew/:crewId" element={<CrewMemberDetail />} />
 
+<<<<<<< HEAD
           {/* [근태 관리] */}
           <Route path="/attendance" element={<EmployeeAttendance />} />
           <Route path="/my-attendance" element={<EmployeeAttendance />} />
@@ -130,6 +137,40 @@ const ThemedApp = () => {
           {/* [기타] */}
           <Route path="/settings" element={<Settings/>} />
         </Route>
+=======
+          {/* 2. 사이드바/헤더/푸터가 있는 페이지 (MainLayout) */}
+          {/* 실제로는 MainLayout 내부에서 권한에 따라 Sidebar의 메뉴가 달라지거나 접근 제한을 처리해야 함 */}
+          <Route element={<MainLayout />}>
+            {/* 기본 리다이렉트 */}
+            <Route path="/dashboard" element={<EmployeeDashboard />} />
+            
+            {/* 관리자/슈퍼관리자 대시보드 */}
+            <Route path="/admin-dashboard" element={<AdmDashboard />} />
+            <Route path="/super-admin-dashboard" element={<SuperAdminDashboard />} />
+            
+            {/* [슈퍼 관리자 전용] */}
+            <Route path="/airline-approval" element={<AirlineApprovalManagement />} />
+            <Route path="/company-registration-management" element={<CompanyRegistrationManagement />} />
+            <Route path="/tenant-management" element={<TenantManagement />} /> {/* [임시 테스트용] */}
+            <Route path="/tenant-detail/:tenantId" element={<TenantDetail />} /> {/* [임시 테스트용] */}
+            <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} /> {/* 별칭 경로 */}
+            
+            {/* [게시판] */}
+            <Route path="/board" element={<Board />} />
+            <Route path="/board/detail" element={<BoardDetail />} />
+            <Route path="/qna" element={<QnA />} />
+            
+            {/* [인사 관리] */}
+            <Route path="/employee-list" element={<EmployeeManagement />} />
+            <Route path="/employee-list/detail" element={<EmployeeDetail />} />
+            <Route path="/dept-manage" element={<DepartmentManagement />} />
+            <Route path="/dept-manage/detail" element={<DepartmentDetail />} />
+            
+            {/* [운항 관리] */}
+            <Route path="/flightschedule" element={<FlightSchedule />} />
+            <Route path="/flightschedule/:flightId" element={<FlightScheduleDetail />} />
+            <Route path="/crew/:crewId" element={<CrewMemberDetail />} />
+>>>>>>> e793b09f94c0ad00b32443ede0e29e9db52b901a
 
         {/* 404 페이지 */}
         <Route path="*" element={<NotFound />} />

@@ -1,6 +1,7 @@
 package com.kh.ct.Schedule.entity;
 
 import com.kh.ct.Common.entity.BaseTimeEntity;
+import com.kh.ct.Common.entity.CommonEnums;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,11 +15,13 @@ import java.time.LocalDateTime;
 public class FlySchedule extends BaseTimeEntity {
 
     @Id
-    private Long scheduleId;
+    @Column(name = "fly_schedule_id")
+    private Long flyScheduleId;
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    private AllSchedule allSchedule;
+    @JoinColumn(name = "fly_schedule_id")
+    private AllSchedule scheduleId;
 
     @Column(length = 20)
     private String flightNumber;
@@ -40,4 +43,8 @@ public class FlySchedule extends BaseTimeEntity {
     private String gate;
 
     private Integer crewCount;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.flightStatus flightStatus;
 }

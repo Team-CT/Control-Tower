@@ -1,6 +1,7 @@
 package com.kh.ct.Member.entity;
 
 import com.kh.ct.Common.entity.BaseTimeEntity;
+import com.kh.ct.Common.entity.CommonEnums;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,4 +33,11 @@ public class AirlineApply extends BaseTimeEntity {
 
     @Column(length = 150)
     private String airlineApplyEmail;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.ApplyStatus airlineApplyStatus;
+
+    @Lob
+    private String airlineApplyCancelReason;
 }

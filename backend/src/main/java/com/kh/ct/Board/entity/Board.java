@@ -24,9 +24,11 @@ public class Board extends BaseTimeEntity {
     private String boardTitle;
 
     @Lob
-    @Column(nullable = false)
     private String boardContent;
 
+    @JoinColumn(nullable = false, name = "board_writer")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp writer;
+    private Emp boardWriter;
+
+    private Integer boardCount;
 }

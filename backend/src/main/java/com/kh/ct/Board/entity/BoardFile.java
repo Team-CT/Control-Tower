@@ -15,9 +15,11 @@ public class BoardFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long boardFileId;
 
+    @JoinColumn(name = "board_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Board board;
+    private Board boardId;
 
+    @JoinColumn(name = "file_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private File file;
+    private File fileId;
 }

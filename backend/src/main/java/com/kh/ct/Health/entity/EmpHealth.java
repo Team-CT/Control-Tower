@@ -13,14 +13,17 @@ import lombok.NoArgsConstructor;
 public class EmpHealth extends BaseTimeEntity {
 
     @Id
-    private String empId;
+    private String empHealthId;
 
-    @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp emp;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "emp_id", nullable = false)
+    private Emp empId;
 
     private Integer healthPoint;
+
     private Integer stressPoint;
+
     private Integer fatiguePoint;
+
     private Integer physicalPoint;
 }

@@ -1,6 +1,7 @@
 package com.kh.ct.Attendance.entity;
 
 import com.kh.ct.Common.entity.BaseTimeEntity;
+import com.kh.ct.Common.entity.CommonEnums;
 import com.kh.ct.Member.entity.Emp;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -18,12 +19,14 @@ public class LeaveApply extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long leaveApplyId;
 
-    @Column(length = 50)
+    @Column(nullable = false, length = 50)
     private String leaveApplyCode;
 
+    @JoinColumn(nullable = false, name = "leave_apply_applicant")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp applicant;
+    private Emp leaveApplyApplicant;
 
+    @Column(nullable = false)
     private LocalDateTime leaveStartDate;
 
     @Lob
@@ -31,12 +34,16 @@ public class LeaveApply extends BaseTimeEntity {
 
     private LocalDateTime leaveEndDate;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp approver;
+    @JoinColumn(name = "leave_apply_approver")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    private Emp leaveApplyApprover;
 
-    @Column(length = 30)
-    private String leaveApplyStatus;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.ApplyStatus leaveApplyStatus;
 
     @Lob
     private String leaveApplyCancelReason;
+
+
 }

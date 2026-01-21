@@ -15,9 +15,11 @@ public class ProtestApplyFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long protestApplyFileId;
 
+    @JoinColumn(name = "protest_apply_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private ProtestApply protestApply;
+    private ProtestApply protestApplyId;
 
+    @JoinColumn(name = "file_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private File file;
+    private File fileId;
 }

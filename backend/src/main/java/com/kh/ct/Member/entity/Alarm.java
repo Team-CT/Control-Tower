@@ -2,6 +2,7 @@ package com.kh.ct.Member.entity;
 
 
 import com.kh.ct.Common.entity.BaseTimeEntity;
+import com.kh.ct.Common.entity.CommonEnums;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -19,15 +20,11 @@ public class Alarm extends BaseTimeEntity{
     @Column(nullable = false)
     private String alarmContent;
 
+    @JoinColumn(name = "receiver")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Emp receiver;
 
     @Column(length = 1)
     @Enumerated(EnumType.STRING)
-    private  Status alarmStatus;
-
-
-    public enum Status {
-        Y, N
-    }
+    private CommonEnums.CommonStatus alarmStatus;
 }
