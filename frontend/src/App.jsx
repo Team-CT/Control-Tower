@@ -45,6 +45,7 @@ import AdminAttendance from './pages/AdminAttendance/AdminAttendance.jsx';
 import EmployeeAttendance from './pages/EmployeeAttendance/EmployeeAttendance.jsx';
 import TenantManagement from './pages/SuperAdmin/Tenant/TenantManagement.jsx'; // [임시 테스트용]
 import TenantDetail from './pages/SuperAdmin/Tenant/TenantDetail.jsx'; // [임시 테스트용]
+import CompanyRegistrationManagement from './pages/SuperAdmin/CompanyRegistrationManagement/CompanyRegistrationManagement.jsx';
 
 // [2] 레이아웃 컴포넌트 Import
 // sidebar -> Sidebar는 MainLayout 내부에서 사용되겠지만, 여기서는 MainLayout만 import
@@ -95,6 +96,7 @@ const ThemedApp = () => {
             
             {/* [슈퍼 관리자 전용] */}
             <Route path="/airline-approval" element={<AirlineApprovalManagement />} />
+            <Route path="/company-registration-management" element={<CompanyRegistrationManagement />} />
             <Route path="/tenant-management" element={<TenantManagement />} /> {/* [임시 테스트용] */}
             <Route path="/tenant-detail/:tenantId" element={<TenantDetail />} /> {/* [임시 테스트용] */}
             <Route path="/super-admin/dashboard" element={<SuperAdminDashboard />} /> {/* 별칭 경로 */}
