@@ -5,16 +5,23 @@ export const MainContainer = styled.div`
   min-height: 100vh;
   background-color: #f5f7fa;
   padding: 32px;
+  box-sizing: border-box;
+  overflow-x: hidden;
 
   @media (max-width: 1024px) {
     padding: 20px;
   }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
 `;
 
 export const ContentWrapper = styled.div`
-  max-width: 1600px;
+  max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  box-sizing: border-box;
 `;
 
 export const PageHeader = styled.div`
@@ -132,10 +139,15 @@ export const TenantCard = styled.div`
   padding: 24px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.2s;
+  box-sizing: border-box;
 
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px;
   }
 `;
 
@@ -284,7 +296,8 @@ export const TableContainer = styled.div`
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  overflow-x: auto;
+  box-sizing: border-box;
 `;
 
 export const Table = styled.table`

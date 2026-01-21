@@ -4,7 +4,7 @@ import * as S from './TenantManagement.styled';
 
 const TenantManagement = () => {
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
+  const [viewMode, setViewMode] = useState('list');
   const [searchQuery, setSearchQuery] = useState('');
 
   // TODO: Zustand state mapping
@@ -59,8 +59,9 @@ const TenantManagement = () => {
     }
   ];
 
+  // 🔥 수정: navigate 함수
   const handleViewDetail = (tenantId) => {
-    navigate(`/tenant/${tenantId}`);
+    navigate(`/tenant-detail/${tenantId}`);
   };
 
   const getStatusText = (status) => {
@@ -145,6 +146,7 @@ const TenantManagement = () => {
                     <S.StatusIcon>{getStatusIcon(tenant.status)}</S.StatusIcon>
                     {getStatusText(tenant.status)}
                   </S.StatusBadge>
+                  {/* 🔥 onClick에 tenant.id 전달 */}
                   <S.ViewDetailButton onClick={() => handleViewDetail(tenant.id)}>
                     👁 상세보기
                   </S.ViewDetailButton>
@@ -191,6 +193,7 @@ const TenantManagement = () => {
                       </S.StatusBadge>
                     </S.TableCell>
                     <S.TableCell>
+                      {/* 🔥 onClick에 tenant.id 전달 */}
                       <S.ViewDetailButtonSmall onClick={() => handleViewDetail(tenant.id)}>
                         👁 상세보기
                       </S.ViewDetailButtonSmall>

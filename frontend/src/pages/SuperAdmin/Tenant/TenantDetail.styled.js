@@ -5,16 +5,23 @@ export const MainContainer = styled.div`
   min-height: 100vh;
   background-color: #f5f7fa;
   padding: 32px;
+  box-sizing: border-box;
+  overflow-x: hidden;
 
   @media (max-width: 1024px) {
     padding: 20px;
   }
+
+  @media (max-width: 768px) {
+    padding: 16px;
+  }
 `;
 
 export const ContentWrapper = styled.div`
-  max-width: 1600px;
+  max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+  box-sizing: border-box;
 `;
 
 export const BackButton = styled.button`
@@ -47,11 +54,17 @@ export const TenantHeader = styled.div`
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   margin-bottom: 24px;
+  box-sizing: border-box;
+
+  @media (max-width: 1024px) {
+    padding: 24px;
+  }
 
   @media (max-width: 768px) {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+    padding: 20px;
   }
 `;
 
@@ -152,10 +165,16 @@ export const QuickActionButton = styled.button`
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  box-sizing: border-box;
 
   &:hover {
     background-color: #4c6fff;
     color: #ffffff;
+  }
+
+  @media (max-width: 768px) {
+    padding: 12px;
+    font-size: 14px;
   }
 `;
 
@@ -185,9 +204,14 @@ export const StatCard = styled.div`
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: all 0.2s;
+  box-sizing: border-box;
 
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    padding: 20px;
   }
 `;
 
@@ -250,6 +274,11 @@ export const InfoSection = styled.div`
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+
+  @media (max-width: 768px) {
+    padding: 20px;
+  }
 `;
 
 export const SectionHeader = styled.div`
@@ -312,6 +341,11 @@ export const InfoLabel = styled.div`
   color: #6f767e;
   min-width: 140px;
   flex-shrink: 0;
+
+  @media (max-width: 768px) {
+    min-width: 100px;
+    font-size: 13px;
+  }
 `;
 
 export const InfoValue = styled.div`

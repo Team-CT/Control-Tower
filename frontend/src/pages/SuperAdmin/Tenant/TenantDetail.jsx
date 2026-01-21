@@ -65,7 +65,7 @@ const TenantDetail = () => {
   };
 
   const handleGoBack = () => {
-    navigate('/tenant');
+    navigate('/tenant-management');
   };
 
   const quickActions = [
