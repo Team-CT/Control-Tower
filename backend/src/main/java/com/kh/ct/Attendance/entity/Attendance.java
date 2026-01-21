@@ -1,6 +1,7 @@
 package com.kh.ct.Attendance.entity;
 
 import com.kh.ct.Common.entity.BaseTimeEntity;
+import com.kh.ct.Common.entity.CommonEnums;
 import com.kh.ct.Member.entity.Emp;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -31,12 +32,10 @@ public class Attendance extends BaseTimeEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Status attendanceStatus;
+    private CommonEnums.AttendanceStatus attendanceStatus;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "emp_id")
     private Emp empId;
 
-    public enum Status {
-        PRESENT,LATE,EARLY_LEAVE,HALF_DAY,VACATION,ABSENT
-    }
 }

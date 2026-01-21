@@ -18,12 +18,13 @@ public class EmpHistory extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long empHistoryId;
 
+    @JoinColumn(name = "emp_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Emp empId;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String job;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String historyDepartment;
 }

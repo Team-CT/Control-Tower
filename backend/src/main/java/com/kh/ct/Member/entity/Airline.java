@@ -31,6 +31,7 @@ public class Airline extends BaseTimeEntity {
     @Column(length = 500)
     private String airlineDesc;
 
+    @JoinColumn(name = "airline_apply_id")
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     private AirlineApply airlineApplyId;
 }

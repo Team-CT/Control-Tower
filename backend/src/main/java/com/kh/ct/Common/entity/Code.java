@@ -17,9 +17,10 @@ public class Code extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long codeId;
 
+    @Column(nullable = false, length = 100)
     private String codeName;
 
-    @OneToMany(mappedBy = "code", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "codeId", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CodeDetail> codeDetails = new ArrayList<>();
 }
