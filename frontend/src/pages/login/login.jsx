@@ -45,15 +45,22 @@ const Login = () => {
 
     console.log('Login attempt:', formData);
 
-    // [수정 포인트] 로그인 성공 시 직책(Role) 저장
-    if (formData.userId === 'admin') {
+    // [수정 포인트] 로그인 성공 시 직책(Role) 저장 및 대시보드 리다이렉션
+    let dashboardPath = '/dashboard'; // 기본값: 직원 대시보드
+    
+    if (formData.userId === 'superadmin') {
+      localStorage.setItem('userRole', 'SUPER_ADMIN');
+      dashboardPath = '/super-admin-dashboard';
+    } else if (formData.userId === 'admin') {
       localStorage.setItem('userRole', 'ADMIN');
+      dashboardPath = '/admin-dashboard';
     } else {
       localStorage.setItem('userRole', 'EMP'); // 일반 직원
+      dashboardPath = '/dashboard';
     }
 
-    // 대시보드로 이동
-    navigate('/dashboard'); 
+    // 역할에 맞는 대시보드로 이동
+    navigate(dashboardPath); 
   };
 
   const features = [

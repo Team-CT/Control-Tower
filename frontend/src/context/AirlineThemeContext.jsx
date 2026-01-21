@@ -1,42 +1,134 @@
-import React, { createContext, useState, useContext } from 'react';
-import { ThemeProvider } from 'styled-components';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createTheme } from '../styles/theme';
 
 const AirlineThemeContext = createContext();
 
-// 항공사별 테마 색상 정의
-const AIRLINE_THEMES = {
-  KE: { // 대한항공
-    primary: '#0066CC',     // 메인 파랑
-    secondary: '#87CEEB',   // 보조 하늘색
-    hover: '#E6F0FA',       // 연한 배경 (사이드바 hover 등)
-    name: '대한항공'
-  },
-  LJ: { // 진에어
-    primary: '#9ACD32',     // 메인 연두
-    secondary: '#6B8E23',   // 보조 올리브
-    hover: '#F4F9E6',       // 연한 배경
-    name: '진에어'
+export const useAirlineTheme = () => {
+  const context = useContext(AirlineThemeContext);
+  if (!context) {
+    throw new Error('useAirlineTheme must be used within AirlineThemeProvider');
   }
+  return context;
 };
 
 export const AirlineThemeProvider = ({ children }) => {
-  // 기본값은 대한항공(KE)
-  const [currentAirline, setCurrentAirline] = useState('KE');
+  // [State 1] 현재 선택된 항공사 (기본: CONTROL_TOWER)
+  const [currentAirline, setCurrentAirline] = useState(() => {
+    return localStorage.getItem('airlineCode') || 'CONTROL_TOWER';
+  });
 
-  const toggleAirline = (code) => {
-    setCurrentAirline(code);
+  // [State 2] 승인 상태 (pending | approved | rejected)
+  const [approvalStatus, setApprovalStatus] = useState(() => {
+    return localStorage.getItem('approvalStatus') || 'pending';
+  });
+
+  // [State 3] 다크 모드
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved === 'true';
+  });
+
+  // 테마 객체 생성 (항공사 코드 + 다크모드 여부 조합)
+  const theme = createTheme(currentAirline, isDarkMode);
+
+  // --- Effects (LocalStorage 동기화) ---
+  useEffect(() => {
+    localStorage.setItem('airlineCode', currentAirline);
+  }, [currentAirline]);
+
+  useEffect(() => {
+    localStorage.setItem('approvalStatus', approvalStatus);
+  }, [approvalStatus]);
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', isDarkMode);
+    
+    // CSS Variables 업데이트
+    updateCSSVariables(theme);
+  }, [isDarkMode, theme]);
+
+  // CSS Variables 업데이트 함수
+  const updateCSSVariables = (currentTheme) => {
+    const root = document.documentElement;
+    
+    // 브랜드 컬러
+    root.style.setProperty('--color-primary', currentTheme.colors.primary);
+    root.style.setProperty('--color-secondary', currentTheme.colors.secondary);
+    root.style.setProperty('--color-accent', currentTheme.colors.accent);
+    root.style.setProperty('--color-hover', currentTheme.colors.hover);
+    root.style.setProperty('--color-danger', currentTheme.colors.danger);
+    
+    // 배경 색상
+    root.style.setProperty('--bg-main', currentTheme.background.main);
+    root.style.setProperty('--bg-secondary', currentTheme.background.secondary);
+    root.style.setProperty('--bg-tertiary', currentTheme.background.tertiary);
+    root.style.setProperty('--bg-hover', currentTheme.background.hover);
+    root.style.setProperty('--bg-modal', currentTheme.background.modal);
+    root.style.setProperty('--bg-input', currentTheme.background.input);
+    
+    // 텍스트 색상
+    root.style.setProperty('--text-primary', currentTheme.text.primary);
+    root.style.setProperty('--text-secondary', currentTheme.text.secondary);
+    root.style.setProperty('--text-tertiary', currentTheme.text.tertiary);
+    root.style.setProperty('--text-disabled', currentTheme.text.disabled);
+    root.style.setProperty('--text-inverse', currentTheme.text.inverse);
+    
+    // 기타
+    root.style.setProperty('--border-color', currentTheme.border);
+    root.style.setProperty('--shadow-color', currentTheme.shadow);
+    root.style.setProperty('--overlay-color', currentTheme.overlay);
   };
 
-  const theme = AIRLINE_THEMES[currentAirline];
+  // --- Actions ---
+
+  // 1. 항공사 변경 (승인 시뮬레이션 포함)
+  const changeAirline = (airlineCode) => {
+    setCurrentAirline(airlineCode);
+    setApprovalStatus('approved'); // 항공사를 선택하면 승인된 것으로 간주 (시나리오상)
+  };
+
+  // 2. 승인 상태 변경
+  const updateApprovalStatus = (status) => {
+    setApprovalStatus(status);
+    
+    // 승인이 취소되거나 대기 상태가 되면 Control Tower로 복귀
+    if (status !== 'approved') {
+      setCurrentAirline('CONTROL_TOWER');
+    }
+  };
+
+  // 3. 다크 모드 토글
+  const toggleDarkMode = () => {
+    setIsDarkMode(prev => !prev);
+  };
+
+  // 4. 레거시 호환용 (단순 토글) - 필요에 따라 유지
+  const toggleAirline = (code) => {
+    const nextCode = code || (currentAirline === 'KE' ? 'LJ' : 'KE');
+    changeAirline(nextCode);
+  };
+
+  const value = {
+    theme,
+    currentAirline,
+    approvalStatus,
+    isDarkMode,
+    changeAirline,
+    updateApprovalStatus,
+    toggleDarkMode,
+    toggleAirline,
+    
+    // Helper Properties
+    airlineName: theme.airline.name,
+    isApproved: approvalStatus === 'approved',
+    isControlTower: currentAirline === 'CONTROL_TOWER'
+  };
 
   return (
-    <AirlineThemeContext.Provider value={{ currentAirline, toggleAirline, theme }}>
-      {/* styled-components의 ThemeProvider에 전달하여 모든 스타일 파일에서 props.theme로 접근 가능 */}
-      <ThemeProvider theme={theme}>
-        {children}
-      </ThemeProvider>
+    <AirlineThemeContext.Provider value={value}>
+      {children}
     </AirlineThemeContext.Provider>
   );
 };
 
-export const useAirlineTheme = () => useContext(AirlineThemeContext);
+export default AirlineThemeContext;

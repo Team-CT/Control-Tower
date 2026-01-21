@@ -404,3 +404,87 @@ export const EmailIcon = styled(BuildingSmallIcon)`
 export const DocumentIcon = styled(BuildingSmallIcon)`
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%234A90E2' viewBox='0 0 24 24'%3E%3Cpath d='M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'/%3E%3C/svg%3E");
 `;
+
+// 테마 컬러 선택 관련 스타일
+export const ColorPickerWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: white;
+  transition: all 0.2s ease;
+
+  &:focus-within {
+    border-color: #4A90E2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+  }
+`;
+
+export const ColorInput = styled.input`
+  width: 60px;
+  height: 40px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+  
+  &::-webkit-color-swatch {
+    border: 2px solid #e2e8f0;
+    border-radius: 6px;
+  }
+`;
+
+export const ColorValue = styled.span`
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  font-family: 'Courier New', monospace;
+`;
+
+export const ThemePreview = styled.div`
+  width: 100%;
+  padding: 24px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+`;
+
+export const PreviewCard = styled.div`
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+`;
+
+export const PreviewHeader = styled.div`
+  font-size: 24px;
+  font-weight: 700;
+  color: ${props => props.$mainColor};
+  text-align: center;
+`;
+
+export const PreviewButton = styled.button`
+  padding: 12px 32px;
+  background: ${props => props.$subColor};
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+`;

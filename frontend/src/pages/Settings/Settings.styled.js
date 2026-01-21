@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: #f5f7fa;
+  background: var(--bg-secondary);
   padding: 40px 60px;
 
   @media (max-width: 1024px) {
@@ -14,9 +14,9 @@ export const MainContainer = styled.div`
 export const ContentWrapper = styled.div`
   max-width: 1440px;
   margin: 0 auto;
-  background: #ffffff;
+  background: var(--bg-main);
   border-radius: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px var(--shadow-color);
   overflow: hidden;
 `;
 
@@ -31,17 +31,17 @@ export const Tab = styled.button`
   padding: 20px 32px;
   font-size: 16px;
   font-weight: ${(props) => (props.active ? '600' : '400')};
-  color: ${(props) => (props.active ? '#2563eb' : '#64748b')};
-  background: ${(props) => (props.active ? '#ffffff' : 'transparent')};
+  color: ${(props) => (props.active ? 'var(--color-primary)' : 'var(--text-secondary)')};
+  background: ${(props) => (props.active ? 'var(--bg-main)' : 'transparent')};
   border: none;
   border-bottom: ${(props) =>
-    props.active ? '3px solid #2563eb' : '3px solid transparent'};
+    props.active ? '3px solid var(--color-primary)' : '3px solid transparent'};
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${(props) => (props.active ? '#ffffff' : '#f1f5f9')};
-    color: #2563eb;
+    background: ${(props) => (props.active ? 'var(--bg-main)' : 'var(--bg-hover)')};
+    color: var(--color-primary);
   }
 
   @media (max-width: 768px) {
@@ -77,6 +77,12 @@ export const ProfileAvatar = styled.div`
   display: flex;
   justify-content: center;
   margin: 20px 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
 
 export const AvatarCircle = styled.div`
@@ -150,17 +156,17 @@ export const FormInput = styled.input`
   width: 100%;
   padding: 12px 16px;
   font-size: 15px;
-  color: #1e293b;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  color: var(--text-primary);
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: var(--color-primary);
+    background: var(--bg-main);
+    box-shadow: 0 0 0 3px var(--shadow-color);
   }
 
   &::placeholder {
@@ -229,17 +235,18 @@ export const SaveButton = styled.button`
   padding: 12px 32px;
   font-size: 15px;
   font-weight: 600;
-  color: #ffffff;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: var(--text-inverse);
+  background: var(--color-primary);
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px var(--shadow-color);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    filter: brightness(1.1);
   }
 
   @media (max-width: 768px) {
@@ -367,17 +374,18 @@ export const ChangePasswordButton = styled.button`
   padding: 12px 32px;
   font-size: 15px;
   font-weight: 600;
-  color: #ffffff;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: var(--text-inverse);
+  background: var(--color-primary);
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px var(--shadow-color);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+    box-shadow: 0 4px 12px var(--shadow-color);
+    filter: brightness(1.1);
   }
 `;
 
@@ -395,7 +403,7 @@ export const ToggleSlider = styled.span`
   left: 0;
   right: 0;
   bottom: 0;
-  background: ${(props) => (props.checked ? '#3b82f6' : '#cbd5e1')};
+  background: ${(props) => (props.checked ? 'var(--color-primary)' : 'var(--border-color)')};
   border-radius: 28px;
   transition: all 0.3s ease;
 

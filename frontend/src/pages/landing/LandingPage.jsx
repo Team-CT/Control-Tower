@@ -5,18 +5,20 @@ import { useAirlineTheme } from '../../context/AirlineThemeContext';
 import AirlineRegisterModal from './AirlineRegisterModal';
 import * as S from './LandingPage.styled';
 
-const Header = ({ theme, onOpenRegister }) => {
+const Header = ({ theme, navigate }) => {
   return (
     <S.HeaderContainer>
       <S.HeaderLogoSection>
         <S.HeaderLogoWrapper theme={theme}>
-          <Plane size={24} color="white" strokeWidth={2.5} style={{ transform: 'rotate(-45deg)' }} />
+          <S.RotatedIconWrapper>
+            <Plane size={24} color="white" strokeWidth={2.5} />
+          </S.RotatedIconWrapper>
         </S.HeaderLogoWrapper>
         <S.HeaderTitle>
-          {theme.name} <span>HR System</span>
+          {theme.airline.name} <span>HR System</span>
         </S.HeaderTitle>
       </S.HeaderLogoSection>
-      <S.HeaderRegisterButton theme={theme} onClick={onOpenRegister}>
+      <S.HeaderRegisterButton theme={theme} onClick={() => navigate('/service-registration')}>
         <Settings size={18} />
         항공사 등록
       </S.HeaderRegisterButton>
@@ -31,7 +33,7 @@ const HeroSection = ({ theme }) => (
         Next Gen HR Solution
       </S.HeroBadge>
       <S.HeroTitle theme={theme}>
-        {theme.name}의
+        {theme.airline.name}의
         <br />
         <span>스마트한 인사관리</span>
       </S.HeroTitle>
@@ -49,7 +51,9 @@ const HeroSection = ({ theme }) => (
         { icon: TrendingUp, label: '업무 효율', value: '+45%', desc: '향상' },
       ].map((item, idx) => (
         <S.HeroStatCard key={idx}>
-          <item.icon size={32} color={theme.secondary} style={{ margin: '0 auto 12px', display: 'block' }} />
+          <S.CenteredIconWrapper>
+            <item.icon size={32} color={theme.colors.secondary} />
+          </S.CenteredIconWrapper>
           <S.StatValue theme={theme}>
             {item.value}
           </S.StatValue>
@@ -76,7 +80,7 @@ const ActionCard = ({ theme, onOpenRegister }) => {
           <ActionButton
             icon={Clock}
             label="출근 로그인"
-            color={theme.primary}
+            color={theme.colors.primary}
             onClick={() => navigate('/work-login')}
             subText="사번으로 간편 출근"
           />
@@ -84,7 +88,7 @@ const ActionCard = ({ theme, onOpenRegister }) => {
             icon={LogIn}
             label="일반 로그인"
             description="관리자 및 직원 포털 접속"
-            color={theme.secondary}
+            color={theme.colors.secondary}
             onClick={() => navigate('/login')}
             variant="outline"
             subText="아이디/비밀번호 로그인"
@@ -92,13 +96,13 @@ const ActionCard = ({ theme, onOpenRegister }) => {
         </S.ActionButtonsWrapper>
 
         <S.ActionRegisterWrapper>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
-             <CheckCircle size={20} color={theme.primary} />
-          </div>
-          <S.ActionRegisterTitle>아직 계정이 없으신가요?</S.ActionRegisterTitle>
-           인사팀에 문의하여 계정을 생성하세요.
+          <S.CheckIconWrapper>
+             <CheckCircle size={20} color={theme.colors.primary} />
+          </S.CheckIconWrapper>
+          <S.ActionRegisterTitle>효율적인 HR 관리를 하고싶나요?</S.ActionRegisterTitle>
+           항공사 인사담당팀을 위한 SkyHR 서비스에 가입하세요.
            <br/>
-           <S.ActionRegisterButton theme={theme} onClick={onOpenRegister}>
+           <S.ActionRegisterButton theme={theme} onClick={() => navigate('/service-registration')}>
              새 항공사 등록하기 <ArrowRight size={14} />
            </S.ActionRegisterButton>
         </S.ActionRegisterWrapper>
@@ -140,6 +144,7 @@ const ActionButton = ({ icon: Icon, label, subText, color, onClick, variant = 's
 // ===== Main Component =====
 const LandingPageContent = () => {
   const { theme } = useAirlineTheme();
+  const navigate = useNavigate();
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const openRegisterModal = () => setIsRegisterModalOpen(true);
@@ -148,7 +153,7 @@ const LandingPageContent = () => {
   return (
     <>
       <S.PageWrapper theme={theme}>
-        <Header theme={theme} onOpenRegister={openRegisterModal} />
+        <Header theme={theme} navigate={navigate} />
         
         <S.MainContainer>
           <HeroSection theme={theme} />

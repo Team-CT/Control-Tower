@@ -21,6 +21,7 @@ const ContentArea = styled.div`
   flex-direction: column;
   height: 100%;
   position: relative;
+  background-color: var(--bg-secondary);
 `;
 
 // 실제 스크롤이 발생하는 영역
@@ -42,16 +43,12 @@ const PageContent = styled.div`
 
 const MainLayout = () => {
   // [수정 포인트] 로컬 스토리지에서 저장된 직책(Role) 가져오기
-  const userRole = localStorage.getItem('userRole');
-
-  // 관리자 여부 동적 판단
-  // userRole이 'ADMIN'이거나 'HR_MANAGER'인 경우에만 true
-  const isAdmin = userRole === 'ADMIN' || userRole === 'HR_MANAGER';
+  const userRole = localStorage.getItem('userRole') || 'EMP';
 
   return (
     <LayoutContainer>
-      {/* 1. 좌측 사이드바 (isAdmin 값 전달) */}
-      <Sidebar isAdmin={isAdmin} />
+      {/* 1. 좌측 사이드바 (userRole 값 전달) */}
+      <Sidebar userRole={userRole} />
       
       <ContentArea>
         {/* 2. 상단 헤더 (고정) */}

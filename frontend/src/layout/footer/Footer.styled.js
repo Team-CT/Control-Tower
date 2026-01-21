@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const FooterContainer = styled.footer`
   width: 100%;
   padding: 40px;
-  background-color: #ffffff;
+  background-color: var(--bg-main);
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: center;
@@ -43,7 +43,7 @@ export const InfoRow = styled.div`
   gap: 8px;
   align-items: center;
   font-size: 13px;
-  color: #868e96;
+  color: var(--text-tertiary);
   line-height: 1.5;
 `;
 
@@ -55,7 +55,7 @@ export const InfoItem = styled.span`
     content: '|';
     display: inline-block;
     margin-left: 8px;
-    color: #ced4da;
+    color: var(--border-color);
     font-size: 11px;
     vertical-align: 1px;
   }
@@ -63,7 +63,7 @@ export const InfoItem = styled.span`
 
 export const Copyright = styled.p`
   font-size: 12px;
-  color: #adb5bd;
+  color: var(--text-disabled);
   margin: 12px 0 0 0;
   font-family: sans-serif;
 `;
@@ -80,7 +80,7 @@ export const RightSection = styled.div`
 
 export const LinkItem = styled.a`
   font-size: 13px;
-  color: #495057;
+  color: var(--text-secondary);
   text-decoration: none;
   cursor: pointer;
   transition: color 0.2s;

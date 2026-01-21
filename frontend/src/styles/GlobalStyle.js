@@ -2,105 +2,119 @@ import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
   :root {
-    --primary-color: #0055aa;
-    --primary-hover: #004488;
-    --primary-light: #e0f2fe;
-    --secondary-color: #357abd;
-    --text-main: #111827;
-    --text-sub: #6b7280;
-    --bg-main: #f5f7fa;
-    --border-color: #e5e7eb;
+    /* [Core] 항공사 브랜드 컬러 (동적) */
+    --primary-color: ${props => props.theme.colors.primary};
+    --secondary-color: ${props => props.theme.colors.secondary};
+    --accent-color: ${props => props.theme.colors.accent};
+    --danger-color: ${props => props.theme.colors.danger};
+
+    /* [Background] 배경 색상 */
+    --bg-main: ${props => props.theme.background.main};
+    --bg-secondary: ${props => props.theme.background.secondary};
+    --bg-tertiary: ${props => props.theme.background.tertiary};
+    --bg-hover: ${props => props.theme.background.hover};
+    --bg-modal: ${props => props.theme.background.modal};
+    --bg-input: ${props => props.theme.background.input};
+
+    /* [Text] 텍스트 색상 */
+    --text-primary: ${props => props.theme.text.primary};
+    --text-secondary: ${props => props.theme.text.secondary};
+    --text-tertiary: ${props => props.theme.text.tertiary};
+    --text-disabled: ${props => props.theme.text.disabled};
+    --text-inverse: ${props => props.theme.text.inverse};
+
+    /* [Common] 공통 UI 요소 */
+    --border-color: ${props => props.theme.border};
+    --shadow-color: ${props => props.theme.shadow};
+    --overlay-color: ${props => props.theme.overlay};
   }
 
-  /* CSS Reset */
   * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
   }
 
-  /* 기본 폰트 설정 */
   body {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    color: var(--text-main);
-    line-height: 1.5;
+    
+    /* 테마 배경 및 텍스트 적용 */
     background-color: var(--bg-main);
+    color: var(--text-primary);
+    
+    /* 부드러운 다크모드 전환 애니메이션 */
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* 링크 스타일 초기화 */
+  code {
+    font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+      monospace;
+  }
+
+  /* 링크 스타일 */
   a {
-    color: inherit;
+    color: var(--primary-color);
     text-decoration: none;
     transition: color 0.2s ease;
+
+    &:hover {
+      color: var(--secondary-color);
+    }
   }
 
-  /* 버튼 스타일 초기화 */
+  /* 버튼 기본 스타일 */
   button {
-    border: none;
-    background: none;
+    font-family: inherit;
     cursor: pointer;
-    font: inherit;
+  }
+
+  /* 입력 폼 스타일 */
+  input, textarea, select {
+    font-family: inherit;
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
     transition: all 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px var(--shadow-color);
+    }
+
+    &::placeholder {
+      color: var(--text-disabled);
+    }
   }
 
-  /* 리스트 스타일 초기화 */
-  ul, ol {
-    list-style: none;
-  }
-
-  /* 이미지 최적화 */
-  img {
-    max-width: 100%;
-    height: auto;
-    vertical-align: middle;
-  }
-
-  /* 입력 필드 스타일 초기화 */
-  input, textarea {
-    font: inherit;
-    border: none;
-    outline: none;
-  }
-
-  /* 테이블 스타일 초기화 */
-  table {
-    border-collapse: collapse;
-    border-spacing: 0;
-  }
-
-  /* 스크롤바 스타일링 */
+  /* 스크롤바 커스터마이징 */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 10px;
+    height: 10px;
   }
 
   ::-webkit-scrollbar-track {
-    background: transparent;
+    background: var(--bg-secondary);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 10px;
+    background: var(--border-color);
+    border-radius: 5px;
+    
+    &:hover {
+      background: var(--text-tertiary);
+    }
   }
 
-  ::-webkit-scrollbar-thumb:hover {
-    background: #9ca3af;
-  }
-
-  /* 선택 영역 스타일링 */
+  /* 선택 영역 스타일 */
   ::selection {
-    background: var(--primary-light);
-    color: var(--primary-color);
-  }
-
-  /* 기본 포커스 스타일 */
-  :focus-visible {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
+    background-color: var(--primary-color);
+    color: white;
   }
 `;
 
-export default GlobalStyle; 
-
+export default GlobalStyle;

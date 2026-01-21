@@ -1,13 +1,19 @@
 import React from 'react';
 import * as S from './Footer.styled';
+import { useAirlineTheme } from '../../context/AirlineThemeContext';
 
 const Footer = () => {
+  const { theme, isControlTower } = useAirlineTheme();
+  
+  // 회사명 표시 로직: Control Tower일 경우 시스템명 표시, 항공사일 경우 항공사명 표시
+  const displayCompanyName = isControlTower ? 'Control Tower System' : `(주)${theme.airline.name}`;
+
   return (
     <S.FooterContainer>
       <S.FooterContent>
         {/* 왼쪽: 회사 정보 영역 */}
         <S.LeftSection>
-          <S.CompanyName>(주)대한항공</S.CompanyName>
+          <S.CompanyName>{displayCompanyName}</S.CompanyName>
           
           <S.InfoRow>
             <S.InfoItem>대표이사 : 조원태, 우기홍</S.InfoItem>
@@ -22,7 +28,7 @@ const Footer = () => {
           </S.InfoRow>
 
           <S.Copyright>
-            © 1997-2026 KOREAN AIR. All Rights Reserved.
+            © 1997-2026 {theme.airline.name.toUpperCase()}. All Rights Reserved.
           </S.Copyright>
         </S.LeftSection>
 
