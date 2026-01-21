@@ -1,6 +1,7 @@
 package com.kh.ct.Attendance.entity;
 
 import com.kh.ct.Common.entity.BaseTimeEntity;
+import com.kh.ct.Common.entity.CommonEnums;
 import com.kh.ct.Member.entity.Emp;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -20,24 +21,29 @@ public class ProtestApply extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long protestApplyId;
 
+    @Column(nullable = false)
     private LocalDateTime protestApplyDate;
 
+    @JoinColumn(nullable = false, name = "protest_apply_applicant")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp applicant;
+    private Emp protestApplyApplicant;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp approver;
+    @JoinColumn(name = "protest_apply_approver")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    private Emp protestApplyApprover;
 
-    @Column(length = 30)
-    private String protestApplyStatus;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.ApplyStatus protestApplyStatus;
 
     @Lob
     private String protestApplyCancelReason;
 
-    @Column(length = 30)
-    private String protestAttendanceStatus;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.AttendanceStatus protestAttendanceStatus;
 
-    @OneToMany(mappedBy = "protestApply", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "protestApplyId", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProtestApplyFile> files = new ArrayList<>();
 }

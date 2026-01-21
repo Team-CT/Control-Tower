@@ -16,7 +16,7 @@ public class Question extends BaseTimeEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long questionId;
 
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "questioner",nullable = false)
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Emp questioner;
 
@@ -27,7 +27,8 @@ public class Question extends BaseTimeEntity{
     @Column(nullable = false)
     private String questionContent;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "answerer")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     private Emp answerer;
 
     @Lob

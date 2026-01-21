@@ -13,15 +13,17 @@ import lombok.NoArgsConstructor;
 public class Program extends BaseTimeEntity {
 
     @Id
-    @Column(length = 255)
+    @Column(name = "program_apply_id")
     private String programApplyId;
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "program_apply_id")
     private ProgramApply programApply;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private AllSchedule schedule;
+    @JoinColumn(name = "schedule_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    private AllSchedule scheduleId;
 
     @Lob
     private String programContent;

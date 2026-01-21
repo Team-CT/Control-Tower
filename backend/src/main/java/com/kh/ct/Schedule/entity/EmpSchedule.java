@@ -13,12 +13,15 @@ import lombok.NoArgsConstructor;
 public class EmpSchedule extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "emp_schedule_id")
     private Long empScheduleId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private AllSchedule schedule;
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "emp_schedule_id")
+    private AllSchedule scheduleId;
 
+    @JoinColumn(name = "emp_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp emp;
+    private Emp empId;
 }

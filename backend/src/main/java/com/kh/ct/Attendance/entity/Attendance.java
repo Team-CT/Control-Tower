@@ -1,12 +1,15 @@
 package com.kh.ct.Attendance.entity;
 
 import com.kh.ct.Common.entity.BaseTimeEntity;
+import com.kh.ct.Common.entity.CommonEnums;
 import com.kh.ct.Member.entity.Emp;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -19,14 +22,20 @@ public class Attendance extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long attendanceId;
 
-    private LocalDateTime attendanceDate;
+    @Column(nullable = false)
+    private LocalDate attendanceDate;
 
     private LocalTime inTime;
+
     private LocalTime outTime;
 
-    @Column(length = 30)
-    private String attendanceStatus;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.AttendanceStatus attendanceStatus;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp emp;
+    @JoinColumn(name = "emp_id")
+    private Emp empId;
+
 }

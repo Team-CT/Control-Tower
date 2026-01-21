@@ -1,6 +1,7 @@
 package com.kh.ct.Health.entity;
 
 import com.kh.ct.Common.entity.BaseTimeEntity;
+import com.kh.ct.Common.entity.CommonEnums;
 import com.kh.ct.Member.entity.Emp;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -22,16 +23,17 @@ public class Survey extends BaseTimeEntity {
 
     private LocalDateTime surveyFrom;
 
-    @Column(nullable = false)
     private LocalDateTime surveyTo;
 
-    @Column(nullable = false, length = 20) // PROGRESS, COMPLETE
-    private String surveyState;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.CommonStatus surveyState;
 
+    @JoinColumn(nullable = false, name = "survey_writer")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp writer;
+    private Emp surveyWriter;
 
-    @OneToMany(mappedBy = "survey", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "surveyId2", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EmpSurvey> empSurveys = new ArrayList<>();
 }

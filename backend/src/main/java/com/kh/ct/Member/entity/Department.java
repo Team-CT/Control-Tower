@@ -20,10 +20,10 @@ public class Department {
     @Column(length = 100)
     private String departmentName;
 
-    @Column(length = 50) // 숫자를 문자열로 들고 있길래 일단 짧게
-    private String empCount;
+    private Integer empCount;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "parent_department")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
     private Department parentDepartment;
 
     @OneToMany(mappedBy = "parentDepartment", fetch = FetchType.LAZY)
