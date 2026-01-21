@@ -42,7 +42,42 @@ export const AirlineThemeProvider = ({ children }) => {
 
   useEffect(() => {
     localStorage.setItem('darkMode', isDarkMode);
-  }, [isDarkMode]);
+    
+    // CSS Variables 업데이트
+    updateCSSVariables(theme);
+  }, [isDarkMode, theme]);
+
+  // CSS Variables 업데이트 함수
+  const updateCSSVariables = (currentTheme) => {
+    const root = document.documentElement;
+    
+    // 브랜드 컬러
+    root.style.setProperty('--color-primary', currentTheme.colors.primary);
+    root.style.setProperty('--color-secondary', currentTheme.colors.secondary);
+    root.style.setProperty('--color-accent', currentTheme.colors.accent);
+    root.style.setProperty('--color-hover', currentTheme.colors.hover);
+    root.style.setProperty('--color-danger', currentTheme.colors.danger);
+    
+    // 배경 색상
+    root.style.setProperty('--bg-main', currentTheme.background.main);
+    root.style.setProperty('--bg-secondary', currentTheme.background.secondary);
+    root.style.setProperty('--bg-tertiary', currentTheme.background.tertiary);
+    root.style.setProperty('--bg-hover', currentTheme.background.hover);
+    root.style.setProperty('--bg-modal', currentTheme.background.modal);
+    root.style.setProperty('--bg-input', currentTheme.background.input);
+    
+    // 텍스트 색상
+    root.style.setProperty('--text-primary', currentTheme.text.primary);
+    root.style.setProperty('--text-secondary', currentTheme.text.secondary);
+    root.style.setProperty('--text-tertiary', currentTheme.text.tertiary);
+    root.style.setProperty('--text-disabled', currentTheme.text.disabled);
+    root.style.setProperty('--text-inverse', currentTheme.text.inverse);
+    
+    // 기타
+    root.style.setProperty('--border-color', currentTheme.border);
+    root.style.setProperty('--shadow-color', currentTheme.shadow);
+    root.style.setProperty('--overlay-color', currentTheme.overlay);
+  };
 
   // --- Actions ---
 

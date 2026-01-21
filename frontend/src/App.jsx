@@ -50,7 +50,18 @@ import MainLayout from './layout/MainLayout';
 
 // [3] ThemeProvider 래퍼 컴포넌트
 const ThemedApp = () => {
-  const { theme } = useAirlineTheme();
+  const { theme, changeAirline } = useAirlineTheme();
+  
+  // 앱 초기화 시 사용자의 항공사 정보 로드 (Mock)
+  React.useEffect(() => {
+    // 실제 환경에서는 로그인 후 사용자 정보에서 항공사 코드를 가져옴
+    // 여기서는 LocalStorage에 저장된 정보를 사용
+    const savedAirline = localStorage.getItem('airlineCode');
+    if (savedAirline && savedAirline !== 'CONTROL_TOWER') {
+      // 이미 저장된 항공사가 있으면 해당 테마 적용
+      console.log(`[Theme] 저장된 항공사 테마 적용: ${savedAirline}`);
+    }
+  }, []);
   
   return (
     <ThemeProvider theme={theme}>

@@ -332,6 +332,25 @@ const Settings = () => {
                       </LanguageSelect>
                     </SecurityItemRight>
                   </SecurityItem>
+
+                  <SecurityItem>
+                    <SecurityItemLeft>
+                      <SecurityItemTitle>항공사 테마 (개발용)</SecurityItemTitle>
+                      <SecurityItemDescription>
+                        항공사별 브랜드 컬러를 테스트해보세요
+                      </SecurityItemDescription>
+                    </SecurityItemLeft>
+                    <SecurityItemRight>
+                      <LanguageSelect
+                        value={currentAirline}
+                        onChange={(e) => changeAirline(e.target.value)}
+                      >
+                        <option value="CONTROL_TOWER">Control Tower (기본)</option>
+                        <option value="KE">대한항공 (Korean Air)</option>
+                        <option value="LJ">진에어 (Jin Air)</option>
+                      </LanguageSelect>
+                    </SecurityItemRight>
+                  </SecurityItem>
                 </SecurityCardBody>
               </SecurityCard>
 
