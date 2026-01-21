@@ -1,22 +1,47 @@
 import React, { useState } from 'react';
-import * as S from './ServiceRegistration.styled';
+import {
+  MainContainer,
+  ContentWrapper,
+  PageHeader,
+  HeaderIcon,
+  PageTitle,
+  PageDescription,
+  FormSection,
+  SectionHeader,
+  SectionNumber,
+  SectionTitle,
+  FormGrid,
+  FormGroup,
+  Label,
+  RequiredMark,
+  Input,
+  Select,
+  HelpText,
+  FileUploadArea,
+  UploadIcon,
+  UploadText,
+  UploadHint,
+  TextArea,
+  InfoBox,
+  InfoTitle,
+  InfoList,
+  InfoItem,
+  SubmitButton,
+  Footer,
+  Copyright
+} from './ServiceRegistration.styled';
 
 const ServiceRegistration = () => {
+  // {/* TODO: Zustand state mapping */}
   const [formData, setFormData] = useState({
     airlineName: '',
     country: '',
     companyDomain: '',
-    airlineAddress: '',
-    mainNumber: '',
-    theme: {
-      mainColor: '#0066CC',
-      subColor: '#004C99'
-    },
     managerName: '',
     managerPhone: '',
     managerEmail: '',
     businessLicense: null,
-    registrationCert: null,
+    bankStatement: null,
     additionalInfo: ''
   });
 
@@ -29,317 +54,203 @@ const ServiceRegistration = () => {
   };
 
   const handleSubmit = () => {
-    // TODO: Zustand 액션으로 대체 (항공사 등록 신청 API 호출)
+    // {/* TODO: API call for service registration */}
     console.log('Form submitted:', formData);
   };
 
   return (
-    <S.MainContainer>
-      <S.PageHeader>
-        <S.HeaderIcon>
-          <S.BuildingIcon />
-        </S.HeaderIcon>
-        <S.PageTitle>서비스 가입 신청</S.PageTitle>
-        <S.PageSubtitle>항공사 인사담당팀 위한 SkyHR 서비스에 가입하세요</S.PageSubtitle>
-      </S.PageHeader>
+    <MainContainer>
+      <ContentWrapper>
+        <PageHeader>
+          <HeaderIcon>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <polyline points="9 22 9 12 15 12 15 22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </HeaderIcon>
+          <PageTitle>서비스 가입 신청</PageTitle>
+          <PageDescription>항공사 인사관리를 위한 SkyHR 서비스에 가입하세요</PageDescription>
+        </PageHeader>
 
-      <S.ContentWrapper>
-        {/* 좌측: 입력 폼 영역 */}
-        <S.FormSection>
-          {/* Step 1: 항공사 기본 정보 */}
-          <S.FormCard>
-            <S.StepHeader>
-              <S.StepNumber>1</S.StepNumber>
-              <S.StepTitle>항공사 기본 정보</S.StepTitle>
-            </S.StepHeader>
+        {/* Section 1: 항공사 기본 정보 */}
+        <FormSection>
+          <SectionHeader>
+            <SectionNumber>1</SectionNumber>
+            <SectionTitle>항공사 기본 정보</SectionTitle>
+          </SectionHeader>
 
-            <S.FormGrid>
-              <S.FormField>
-                <S.Label>
-                  <S.BuildingSmallIcon />
-                  항공사명 <S.Required>*</S.Required>
-                </S.Label>
-                <S.Input
-                  type="text"
-                  placeholder="예: 대한항공"
-                  value={formData.airlineName}
-                  onChange={(e) => handleInputChange('airlineName', e.target.value)}
-                />
-              </S.FormField>
-
-              <S.FormField>
-                <S.Label>
-                  <S.GlobeIcon />
-                  국가 <S.Required>*</S.Required>
-                </S.Label>
-                <S.Select
-                  value={formData.country}
-                  onChange={(e) => handleInputChange('country', e.target.value)}
-                >
-                  <option value="">국가를 선택하세요</option>
-                  <option value="KR">대한민국</option>
-                  <option value="US">미국</option>
-                  <option value="JP">일본</option>
-                  {/* TODO: Zustand에서 국가 목록 매핑 */}
-                </S.Select>
-              </S.FormField>
-
-              <S.FormField $fullWidth>
-                <S.Label>
-                  <S.DomainIcon />
-                  회사 도메인 <S.Required>*</S.Required>
-                </S.Label>
-                <S.DomainInputWrapper>
-                  <S.DomainPrefix>@</S.DomainPrefix>
-                  <S.Input
-                    type="text"
-                    placeholder="예: koreanair.com"
-                    value={formData.companyDomain}
-                    onChange={(e) => handleInputChange('companyDomain', e.target.value)}
-                  />
-                </S.DomainInputWrapper>
-                <S.HelperText>이메일 도메인 검증에 사용됩니다</S.HelperText>
-              </S.FormField>
-
-              <S.FormField $fullWidth>
-                <S.Label>
-                  항공사 주소 <S.Required>*</S.Required>
-                </S.Label>
-                <S.Input
-                  type="text"
-                  placeholder="예: 서울시 강서구 하늘길 112"
-                  value={formData.airlineAddress}
-                  onChange={(e) => handleInputChange('airlineAddress', e.target.value)}
-                />
-              </S.FormField>
-
-              <S.FormField>
-                <S.Label>
-                  <S.PhoneIcon />
-                  대표번호 <S.Required>*</S.Required>
-                </S.Label>
-                <S.Input
-                  type="tel"
-                  placeholder="1588-0000"
-                  value={formData.mainNumber}
-                  onChange={(e) => handleInputChange('mainNumber', e.target.value)}
-                />
-              </S.FormField>
-            </S.FormGrid>
-          </S.FormCard>
-
-          {/* Step 1.5: 테마 컬러 선택 */}
-          <S.FormCard>
-            <S.StepHeader>
-              <S.StepNumber>1.5</S.StepNumber>
-              <S.StepTitle>테마 컬러 선택</S.StepTitle>
-            </S.StepHeader>
-            <S.DocumentDescription>
-              항공사 브랜드 색상을 선택하세요
-            </S.DocumentDescription>
-
-            <S.FormGrid>
-              <S.FormField>
-                <S.Label>
-                  메인 컬러 <S.Required>*</S.Required>
-                </S.Label>
-                <S.ColorPickerWrapper>
-                  <S.ColorInput
-                    type="color"
-                    value={formData.theme.mainColor}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      theme: { ...prev.theme, mainColor: e.target.value }
-                    }))}
-                  />
-                  <S.ColorValue>{formData.theme.mainColor}</S.ColorValue>
-                </S.ColorPickerWrapper>
-              </S.FormField>
-
-              <S.FormField>
-                <S.Label>
-                  보조 컬러 <S.Required>*</S.Required>
-                </S.Label>
-                <S.ColorPickerWrapper>
-                  <S.ColorInput
-                    type="color"
-                    value={formData.theme.subColor}
-                    onChange={(e) => setFormData(prev => ({
-                      ...prev,
-                      theme: { ...prev.theme, subColor: e.target.value }
-                    }))}
-                  />
-                  <S.ColorValue>{formData.theme.subColor}</S.ColorValue>
-                </S.ColorPickerWrapper>
-              </S.FormField>
-
-              <S.FormField $fullWidth>
-                <S.Label>테마 미리보기</S.Label>
-                <S.ThemePreview>
-                  <S.PreviewCard $mainColor={formData.theme.mainColor} $subColor={formData.theme.subColor}>
-                    <S.PreviewHeader $mainColor={formData.theme.mainColor}>
-                      {formData.airlineName || '항공사명'}
-                    </S.PreviewHeader>
-                    <S.PreviewButton $subColor={formData.theme.subColor}>
-                      버튼 미리보기
-                    </S.PreviewButton>
-                  </S.PreviewCard>
-                </S.ThemePreview>
-              </S.FormField>
-            </S.FormGrid>
-          </S.FormCard>
-
-          {/* Step 2: 담당자 정보 */}
-          <S.FormCard>
-            <S.StepHeader>
-              <S.StepNumber>2</S.StepNumber>
-              <S.StepTitle>담당자 정보</S.StepTitle>
-            </S.StepHeader>
-
-            <S.FormGrid>
-              <S.FormField>
-                <S.Label>
-                  담당자 이름 <S.Required>*</S.Required>
-                </S.Label>
-                <S.Input
-                  type="text"
-                  placeholder="홍길동"
-                  value={formData.managerName}
-                  onChange={(e) => handleInputChange('managerName', e.target.value)}
-                />
-              </S.FormField>
-
-              <S.FormField>
-                <S.Label>
-                  <S.PhoneIcon />
-                  담당자 전화번호 <S.Required>*</S.Required>
-                </S.Label>
-                <S.Input
-                  type="tel"
-                  placeholder="010-1234-5678"
-                  value={formData.managerPhone}
-                  onChange={(e) => handleInputChange('managerPhone', e.target.value)}
-                />
-              </S.FormField>
-
-              <S.FormField $fullWidth>
-                <S.Label>
-                  <S.EmailIcon />
-                  담당자 이메일 <S.Required>*</S.Required>
-                </S.Label>
-                <S.Input
-                  type="email"
-                  placeholder="hr.manager@koreanair.com"
-                  value={formData.managerEmail}
-                  onChange={(e) => handleInputChange('managerEmail', e.target.value)}
-                />
-                <S.HelperText>설정 또는 계정 로그인 이메일로 사용됩니다</S.HelperText>
-              </S.FormField>
-            </S.FormGrid>
-          </S.FormCard>
-
-          {/* Step 3: 필수 서류 */}
-          <S.FormCard>
-            <S.StepHeader>
-              <S.StepNumber>3</S.StepNumber>
-              <S.StepTitle>필수 서류</S.StepTitle>
-            </S.StepHeader>
-            <S.DocumentDescription>
-              항공사 인증을 위해 아래 서류를 업로드해 주세요
-            </S.DocumentDescription>
-
-            <S.FormGrid>
-              <S.FormField $fullWidth>
-                <S.Label>
-                  <S.DocumentIcon />
-                  사업자등록증 <S.Required>*</S.Required>
-                </S.Label>
-                <S.FileUploadArea>
-                  <S.UploadIcon />
-                  <S.UploadText>파일 업로드</S.UploadText>
-                  <S.UploadSubtext>PDF, JPG, PNG (최대 10MB)</S.UploadSubtext>
-                  <input
-                    type="file"
-                    accept=".pdf,.jpg,.png"
-                    onChange={(e) => handleFileUpload('businessLicense', e.target.files[0])}
-                    style={{ display: 'none' }}
-                  />
-                </S.FileUploadArea>
-              </S.FormField>
-
-              <S.FormField $fullWidth>
-                <S.Label>
-                  <S.DocumentIcon />
-                  재직증명서 <S.Required>*</S.Required>
-                </S.Label>
-                <S.FileUploadArea>
-                  <S.UploadIcon />
-                  <S.UploadText>파일 업로드</S.UploadText>
-                  <S.UploadSubtext>PDF, JPG, PNG (최대 10MB)</S.UploadSubtext>
-                  <input
-                    type="file"
-                    accept=".pdf,.jpg,.png"
-                    onChange={(e) => handleFileUpload('registrationCert', e.target.files[0])}
-                    style={{ display: 'none' }}
-                  />
-                </S.FileUploadArea>
-              </S.FormField>
-            </S.FormGrid>
-          </S.FormCard>
-
-          {/* Step 4: 추가 정보 (선택) */}
-          <S.FormCard>
-            <S.StepHeader>
-              <S.StepNumber>4</S.StepNumber>
-              <S.StepTitle>추가 정보 (선택)</S.StepTitle>
-            </S.StepHeader>
-
-            <S.FormField $fullWidth>
-              <S.Label>기타 전달 사항</S.Label>
-              <S.Textarea
-                rows={4}
-                placeholder="서비스 이용 목적이나 기타 문의사항을 입력해 주세요"
-                value={formData.additionalInfo}
-                onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
+          <FormGrid>
+            <FormGroup>
+              <Label>
+                항공사명 <RequiredMark>*</RequiredMark>
+              </Label>
+              <Input
+                type="text"
+                placeholder="예: 대한항공"
+                value={formData.airlineName}
+                onChange={(e) => handleInputChange('airlineName', e.target.value)}
               />
-            </S.FormField>
-          </S.FormCard>
-        </S.FormSection>
+            </FormGroup>
 
-        {/* 우측: 신청 전 안내사항 */}
-        <S.InfoSection>
-          <S.InfoCard>
-            <S.InfoIcon>📋</S.InfoIcon>
-            <S.InfoTitle>신청 전 확인사항</S.InfoTitle>
-            <S.InfoList>
-              <S.InfoItem>
-                • 담당자 이메일은 회사 도메인[@company.com]과 일치해야 합니다
-              </S.InfoItem>
-              <S.InfoItem>
-                • 제출하신 서류는 항공사 인증 목적으로만 사용됩니다
-              </S.InfoItem>
-              <S.InfoItem>
-                • 신청 검토는 1-2 영업일 소요되며, 결과는 이메일로 안내됩니다
-              </S.InfoItem>
-              <S.InfoItem>
-                • 승인 후 계정 활성화 안내와 함께 초기 ID 및 임시비밀번호를 발송해 드립니다
-              </S.InfoItem>
-            </S.InfoList>
-          </S.InfoCard>
+            <FormGroup>
+              <Label>
+                국가 <RequiredMark>*</RequiredMark>
+              </Label>
+              <Select
+                value={formData.country}
+                onChange={(e) => handleInputChange('country', e.target.value)}
+              >
+                <option value="">국가를 선택하세요</option>
+                <option value="KR">대한민국</option>
+                <option value="US">미국</option>
+                <option value="JP">일본</option>
+                {/* TODO: Add more countries */}
+              </Select>
+            </FormGroup>
 
-          <S.SubmitButton onClick={handleSubmit}>
-            가입 신청하기
-          </S.SubmitButton>
-        </S.InfoSection>
-      </S.ContentWrapper>
+            <FormGroup fullWidth>
+              <Label>
+                회사 도메인 <RequiredMark>*</RequiredMark>
+              </Label>
+              <Input
+                type="text"
+                placeholder="예: koreanair.com"
+                value={formData.companyDomain}
+                onChange={(e) => handleInputChange('companyDomain', e.target.value)}
+              />
+              <HelpText>이메일 도메인 검증에 사용됩니다</HelpText>
+            </FormGroup>
+          </FormGrid>
+        </FormSection>
 
-      <S.Footer>
-        <S.Copyright>© 2026 SkyHR. All rights reserved.</S.Copyright>
-        <S.FooterLinks>
-          <S.FooterLink href="#">항공사 인사관리 특약 동의</S.FooterLink>
-        </S.FooterLinks>
-      </S.Footer>
-    </S.MainContainer>
+        {/* Section 2: 담당자 정보 */}
+        <FormSection>
+          <SectionHeader>
+            <SectionNumber>2</SectionNumber>
+            <SectionTitle>담당자 정보</SectionTitle>
+          </SectionHeader>
+
+          <FormGrid>
+            <FormGroup>
+              <Label>
+                담당자 이름 <RequiredMark>*</RequiredMark>
+              </Label>
+              <Input
+                type="text"
+                placeholder="홍길동"
+                value={formData.managerName}
+                onChange={(e) => handleInputChange('managerName', e.target.value)}
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <Label>
+                담당자 전화번호 <RequiredMark>*</RequiredMark>
+              </Label>
+              <Input
+                type="tel"
+                placeholder="010-1234-5678"
+                value={formData.managerPhone}
+                onChange={(e) => handleInputChange('managerPhone', e.target.value)}
+              />
+            </FormGroup>
+
+            <FormGroup fullWidth>
+              <Label>
+                담당자 이메일 <RequiredMark>*</RequiredMark>
+              </Label>
+              <Input
+                type="email"
+                placeholder="hr.manager@koreanair.com"
+                value={formData.managerEmail}
+                onChange={(e) => handleInputChange('managerEmail', e.target.value)}
+              />
+              <HelpText>실무 추가 문의시 필요한 연락처를 입력합니다</HelpText>
+            </FormGroup>
+          </FormGrid>
+        </FormSection>
+
+        {/* Section 3: 첨부 서류 */}
+        <FormSection>
+          <SectionHeader>
+            <SectionNumber>3</SectionNumber>
+            <SectionTitle>첨부 서류</SectionTitle>
+          </SectionHeader>
+
+          <FormGrid>
+            <FormGroup fullWidth>
+              <Label>
+                사업자등록증 <RequiredMark>*</RequiredMark>
+              </Label>
+              <FileUploadArea>
+                <UploadIcon>
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 22V10M16 10L11 15M16 10L21 15" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M28 20V26C28 27.1046 27.1046 28 26 28H6C4.89543 28 4 27.1046 4 26V20" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </UploadIcon>
+                <UploadText>파일 업로드</UploadText>
+                <UploadHint>PDF, JPG, PNG (최대 10MB)</UploadHint>
+              </FileUploadArea>
+            </FormGroup>
+
+            <FormGroup fullWidth>
+              <Label>
+                재직증명서 <RequiredMark>*</RequiredMark>
+              </Label>
+              <FileUploadArea>
+                <UploadIcon>
+                  <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                    <path d="M16 22V10M16 10L11 15M16 10L21 15" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M28 20V26C28 27.1046 27.1046 28 26 28H6C4.89543 28 4 27.1046 4 26V20" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </UploadIcon>
+                <UploadText>파일 업로드</UploadText>
+                <UploadHint>PDF, JPG, PNG (최대 10MB)</UploadHint>
+              </FileUploadArea>
+            </FormGroup>
+          </FormGrid>
+        </FormSection>
+
+        {/* Section 4: 추가 정보 (선택) */}
+        <FormSection>
+          <SectionHeader>
+            <SectionNumber>4</SectionNumber>
+            <SectionTitle>추가 정보 (선택)</SectionTitle>
+          </SectionHeader>
+
+          <FormGroup fullWidth>
+            <Label>기타 안내 사항</Label>
+            <TextArea
+              placeholder="서비스 이용 목적이나 기타 문의사항을 입력해 주세요"
+              value={formData.additionalInfo}
+              onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
+              rows={4}
+            />
+          </FormGroup>
+        </FormSection>
+
+        {/* 신청 전 확인사항 */}
+        <InfoBox>
+          <InfoTitle>📋 신청 전 확인사항</InfoTitle>
+          <InfoList>
+            <InfoItem>• 담당자 이메일로 회사 도메인[@company.com]과 일치하여야 합니다</InfoItem>
+            <InfoItem>• 제출하신 서류는 항공사 업종 확인용으로만 사용됩니다</InfoItem>
+            <InfoItem>• 신청 완료는 1-2 영업일 소요되며, 결과는 이메일로 안내됩니다</InfoItem>
+            <InfoItem>• 승인 후 계정 발급과 팀장과 팀 설정은 상세사항 안내와 함께 제공됩니다</InfoItem>
+          </InfoList>
+        </InfoBox>
+
+        <SubmitButton onClick={handleSubmit}>
+          가입 신청하기
+        </SubmitButton>
+
+        <Footer>
+          <Copyright>© 2025 SkyHR. All rights reserved.</Copyright>
+          <Copyright>항공사 인사관리 통합 플랫폼</Copyright>
+        </Footer>
+      </ContentWrapper>
+    </MainContainer>
   );
 };
 

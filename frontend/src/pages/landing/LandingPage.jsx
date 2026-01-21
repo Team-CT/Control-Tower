@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Settings, LogIn, Clock, Plane, Users, Shield, TrendingUp, CheckCircle, ArrowRight } from 'lucide-react';
 import { useAirlineTheme } from '../../context/AirlineThemeContext';
-import AirlineRegisterModal from './AirlineRegisterModal';
 import * as S from './LandingPage.styled';
 
 const Header = ({ theme, navigate }) => {
@@ -64,7 +63,7 @@ const HeroSection = ({ theme }) => (
   </S.HeroContainer>
 );
 
-const ActionCard = ({ theme, onOpenRegister }) => {
+const ActionCard = ({ theme }) => {
   const navigate = useNavigate();
 
   return (
@@ -145,27 +144,16 @@ const ActionButton = ({ icon: Icon, label, subText, color, onClick, variant = 's
 const LandingPageContent = () => {
   const { theme } = useAirlineTheme();
   const navigate = useNavigate();
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-
-  const openRegisterModal = () => setIsRegisterModalOpen(true);
-  const closeRegisterModal = () => setIsRegisterModalOpen(false);
 
   return (
-    <>
-      <S.PageWrapper theme={theme}>
-        <Header theme={theme} navigate={navigate} />
-        
-        <S.MainContainer>
-          <HeroSection theme={theme} />
-          <ActionCard theme={theme} onOpenRegister={openRegisterModal} />
-        </S.MainContainer>
-      </S.PageWrapper>
-
-      <AirlineRegisterModal 
-        isOpen={isRegisterModalOpen} 
-        onClose={closeRegisterModal} 
-      />
-    </>
+    <S.PageWrapper theme={theme}>
+      <Header theme={theme} navigate={navigate} />
+      
+      <S.MainContainer>
+        <HeroSection theme={theme} />
+        <ActionCard theme={theme} />
+      </S.MainContainer>
+    </S.PageWrapper>
   );
 };
 

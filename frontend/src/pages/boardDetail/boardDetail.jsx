@@ -135,21 +135,6 @@ const BoardDetail = () => {
 
               <S.ClosingText>감사합니다.</S.ClosingText>
             </S.PostBody>
-
-            <S.PostFooter>
-              <S.PostStats>
-                <S.StatButton>
-                  <MessageCircle size={20} />
-                  <span>댓글</span>
-                  <S.StatCount>{postData.comments}</S.StatCount>
-                </S.StatButton>
-                <S.StatButton onClick={handleLike} $active={liked}>
-                  <Heart size={20} fill={liked ? '#FF4757' : 'none'} />
-                  <span>좋아요</span>
-                  <S.StatCount>{postData.likes + (liked ? 1 : 0)}</S.StatCount>
-                </S.StatButton>
-              </S.PostStats>
-            </S.PostFooter>
           </S.PostCard>
 
           <S.ActionButtons>

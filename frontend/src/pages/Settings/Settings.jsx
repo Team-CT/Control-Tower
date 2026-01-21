@@ -351,6 +351,29 @@ const Settings = () => {
                       </LanguageSelect>
                     </SecurityItemRight>
                   </SecurityItem>
+
+                  <SecurityItem>
+                    <SecurityItemLeft>
+                      <SecurityItemTitle>사용자 권한 (개발용)</SecurityItemTitle>
+                      <SecurityItemDescription>
+                        개발 테스트를 위한 권한 전환 (페이지 새로고침 필요)
+                      </SecurityItemDescription>
+                    </SecurityItemLeft>
+                    <SecurityItemRight>
+                      <LanguageSelect
+                        value={localStorage.getItem('userRole') || 'EMP'}
+                        onChange={(e) => {
+                          localStorage.setItem('userRole', e.target.value);
+                          alert(`권한이 ${e.target.value}로 변경되었습니다. 페이지를 새로고침합니다.`);
+                          window.location.reload();
+                        }}
+                      >
+                        <option value="EMP">직원 (EMP)</option>
+                        <option value="ADMIN">관리자 (ADMIN)</option>
+                        <option value="SUPER_ADMIN">슈퍼 관리자 (SUPER_ADMIN)</option>
+                      </LanguageSelect>
+                    </SecurityItemRight>
+                  </SecurityItem>
                 </SecurityCardBody>
               </SecurityCard>
 
