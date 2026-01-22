@@ -48,5 +48,5 @@ public class FlySchedule extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private CommonEnums.flightStatus flightStatus;
 
-    private Integer airportCount;
+    private Integer seatCount;
 }
