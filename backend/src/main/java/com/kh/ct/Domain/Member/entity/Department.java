@@ -1,0 +1,31 @@
+package com.kh.ct.Domain.Member.entity;
+
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Department {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long departmentId;
+
+    @Column(length = 100)
+    private String departmentName;
+
+    private Integer empCount;
+
+    @JoinColumn(name = "parent_department")
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    private Department parentDepartment;
+
+    @OneToMany(mappedBy = "parentDepartment", fetch = FetchType.LAZY)
+    private List<Department> children = new ArrayList<>();
+}
