@@ -1,0 +1,27 @@
+package com.kh.ct.Domain.Member.entity;
+
+import com.kh.ct.Global.entity.BaseTimeEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class EmpHistory extends BaseTimeEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long empHistoryId;
+
+    @JoinColumn(name = "emp_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private Emp empId;
+
+    @Column(length = 50)
+    private String job;
+
+    @Column(length = 50)
+    private String historyDepartment;
+}
