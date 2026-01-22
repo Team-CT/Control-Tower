@@ -42,7 +42,7 @@ public class Emp extends BaseTimeEntity {
     private Integer age;
 
     @Column(nullable = false, length = 50) // 승무원/조종사/정비사 등
-    private BeanDefinitionDsl.Role role;
+    private CommonEnums.Role role;
 
     @Column(length = 30)
     private String phone;
