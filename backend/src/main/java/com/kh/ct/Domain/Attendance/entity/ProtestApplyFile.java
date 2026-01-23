@@ -2,13 +2,13 @@ package com.kh.ct.Domain.Attendance.entity;
 
 import com.kh.ct.Global.entity.File;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class ProtestApplyFile {
 
     @Id

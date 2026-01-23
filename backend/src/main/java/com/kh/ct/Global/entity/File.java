@@ -1,13 +1,13 @@
 package com.kh.ct.Global.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class File extends BaseTimeEntity {
 
     @Id

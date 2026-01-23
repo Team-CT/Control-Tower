@@ -3,13 +3,13 @@ package com.kh.ct.Domain.Schedule.entity;
 import com.kh.ct.Global.entity.BaseTimeEntity;
 import com.kh.ct.Domain.Member.entity.Emp;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class EmpSchedule extends BaseTimeEntity {
 
     @Id
