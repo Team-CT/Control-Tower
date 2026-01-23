@@ -1,5 +1,6 @@
 package com.kh.ct.Domain.Member.entity;
 
+import com.kh.ct.Global.common.CommonEnums;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -25,6 +26,12 @@ public class Department {
     @JoinColumn(name = "parent_department")
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     private Department parentDepartment;
+
+
+    @Column(nullable = false, length = 1)
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.CommonStatus departmentStatus;
+  
 
     @OneToMany(mappedBy = "parentDepartment", fetch = FetchType.LAZY)
     private List<Department> children = new ArrayList<>();
