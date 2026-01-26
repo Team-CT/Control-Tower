@@ -1,6 +1,6 @@
-package com.kh.ct.Domain.Board.entity;
+package com.kh.ct.domain.board.entity;
 
-import com.kh.ct.Global.entity.File;
+import com.kh.ct.global.entity.File;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +17,7 @@ public class BoardFile {
 
     @JoinColumn(name = "board_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Board boardId;
+    private com.kh.ct.domain.board.entity.Board boardId;
 
     @JoinColumn(name = "file_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

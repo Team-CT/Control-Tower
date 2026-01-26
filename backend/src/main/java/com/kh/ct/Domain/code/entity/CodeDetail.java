@@ -1,6 +1,6 @@
-package com.kh.ct.Domain.code.entity;
+package com.kh.ct.domain.code.entity;
 
-import com.kh.ct.Global.entity.BaseTimeEntity;
+import com.kh.ct.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

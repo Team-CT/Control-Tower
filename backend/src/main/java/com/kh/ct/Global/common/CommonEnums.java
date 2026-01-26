@@ -1,4 +1,4 @@
-package com.kh.ct.Global.common;
+package com.kh.ct.global.common;
 
 public class CommonEnums {
     public enum CommonStatus {

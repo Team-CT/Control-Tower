@@ -1,6 +1,6 @@
-package com.kh.ct.Domain.Member.entity;
+package com.kh.ct.domain.member.entity;
 
-import com.kh.ct.Global.entity.BaseTimeEntity;
+import com.kh.ct.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +17,7 @@ public class EmpHistory extends BaseTimeEntity {
 
     @JoinColumn(name = "emp_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp empId;
+    private com.kh.ct.domain.member.entity.Emp empId;
 
     @Column(length = 50)
     private String job;

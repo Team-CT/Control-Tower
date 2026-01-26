@@ -1,7 +1,7 @@
-package com.kh.ct.Domain.Health.entity;
+package com.kh.ct.domain.health.entity;
 
-import com.kh.ct.Global.entity.BaseTimeEntity;
-import com.kh.ct.Domain.Member.entity.Emp;
+import com.kh.ct.global.entity.BaseTimeEntity;
+import com.kh.ct.domain.member.entity.Emp;
 import jakarta.persistence.*;
 import lombok.*;
 

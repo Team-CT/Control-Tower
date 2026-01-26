@@ -1,4 +1,4 @@
-package com.kh.ct.Domain.code.controller;
+package com.kh.ct.domain.code.controller;
 
 public class CodeController {
 }

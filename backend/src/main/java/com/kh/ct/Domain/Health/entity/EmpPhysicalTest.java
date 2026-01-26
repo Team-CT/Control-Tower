@@ -1,18 +1,18 @@
-package com.kh.ct.Domain.Health.entity;
+package com.kh.ct.domain.health.entity;
 
-import com.kh.ct.Global.entity.BaseTimeEntity;
-import com.kh.ct.Global.entity.File;
-import com.kh.ct.Domain.Member.entity.Emp;
+import com.kh.ct.global.entity.BaseTimeEntity;
+import com.kh.ct.global.entity.File;
+import com.kh.ct.domain.member.entity.Emp;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class EmpPhysicalTest extends BaseTimeEntity {
 
     @Id
@@ -45,6 +45,6 @@ public class EmpPhysicalTest extends BaseTimeEntity {
     private Integer bodyFat;
 
     @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "flie_id")
+    @JoinColumn(name = "file_id")
     private File fileId;
 }

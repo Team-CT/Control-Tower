@@ -1,4 +1,4 @@
-package com.kh.ct.Domain.code.dto;
+package com.kh.ct.domain.code.dto;
 
 public class CodeDto {
 }

@@ -1,7 +1,7 @@
-package com.kh.ct.Domain.Schedule.entity;
+package com.kh.ct.domain.schedule.entity;
 
-import com.kh.ct.Global.entity.BaseTimeEntity;
-import com.kh.ct.Domain.Member.entity.Emp;
+import com.kh.ct.global.entity.BaseTimeEntity;
+import com.kh.ct.domain.member.entity.Emp;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,7 +19,7 @@ public class EmpSchedule extends BaseTimeEntity {
     @MapsId
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "emp_schedule_id")
-    private AllSchedule scheduleId;
+    private com.kh.ct.domain.schedule.entity.AllSchedule scheduleId;
 
     @JoinColumn(name = "emp_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

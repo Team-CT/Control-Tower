@@ -1,8 +1,7 @@
-package com.kh.ct.Domain.Member.entity;
+package com.kh.ct.global.entity;
 
 
-import com.kh.ct.Global.entity.BaseTimeEntity;
-import com.kh.ct.Global.common.CommonEnums;
+import com.kh.ct.global.common.CommonEnums;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,7 +21,7 @@ public class Alarm extends BaseTimeEntity{
 
     @JoinColumn(name = "receiver")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp receiver;
+    private com.kh.ct.domain.member.entity.Emp receiver;
 
     @Column(length = 1)
     @Enumerated(EnumType.STRING)

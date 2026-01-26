@@ -1,6 +1,6 @@
-package com.kh.ct.Domain.Attendance.entity;
+package com.kh.ct.domain.attendance.entity;
 
-import com.kh.ct.Global.entity.File;
+import com.kh.ct.global.entity.File;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +17,7 @@ public class ProtestApplyFile {
 
     @JoinColumn(name = "protest_apply_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private ProtestApply protestApplyId;
+    private com.kh.ct.domain.attendance.entity.ProtestApply protestApplyId;
 
     @JoinColumn(name = "file_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

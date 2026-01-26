@@ -1,8 +1,8 @@
-package com.kh.ct.Domain.Attendance.entity;
+package com.kh.ct.domain.attendance.entity;
 
-import com.kh.ct.Global.entity.BaseTimeEntity;
-import com.kh.ct.Global.common.CommonEnums;
-import com.kh.ct.Domain.Member.entity.Emp;
+import com.kh.ct.global.entity.BaseTimeEntity;
+import com.kh.ct.global.common.CommonEnums;
+import com.kh.ct.domain.member.entity.Emp;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -45,5 +45,5 @@ public class ProtestApply extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "protestApplyId", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProtestApplyFile> files = new ArrayList<>();
+    private List<com.kh.ct.domain.attendance.entity.ProtestApplyFile> files = new ArrayList<>();
 }

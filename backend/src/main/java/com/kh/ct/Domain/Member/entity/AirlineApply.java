@@ -1,7 +1,7 @@
-package com.kh.ct.Domain.Member.entity;
+package com.kh.ct.domain.member.entity;
 
-import com.kh.ct.Global.entity.BaseTimeEntity;
-import com.kh.ct.Global.common.CommonEnums;
+import com.kh.ct.global.entity.BaseTimeEntity;
+import com.kh.ct.global.common.CommonEnums;
 import jakarta.persistence.*;
 import lombok.*;
 

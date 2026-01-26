@@ -1,4 +1,4 @@
-package com.kh.ct.Domain.code.service;
+package com.kh.ct.domain.code.service;
 
 public class CodeServiceImpl {
 }
