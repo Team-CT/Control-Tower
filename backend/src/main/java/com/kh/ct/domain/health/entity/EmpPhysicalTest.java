@@ -26,9 +26,9 @@ public class EmpPhysicalTest extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalDateTime testDate;
 
-    private Integer length;
-
     private Integer height;
+
+    private Integer weight;
 
     private Integer bloodSugar;
 
