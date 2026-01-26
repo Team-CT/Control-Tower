@@ -1,6 +1,8 @@
-package com.kh.ct.Domain.Member.entity;
+package com.kh.ct.domain.member.entity;
 
-import com.kh.ct.Global.entity.BaseTimeEntity;
+import com.kh.ct.global.entity.BaseTimeEntity;
+import com.kh.ct.domain.member.entity.AirlineAirport;
+import com.kh.ct.domain.member.entity.AirlineApply;
 import jakarta.persistence.*;
 import lombok.*;
 

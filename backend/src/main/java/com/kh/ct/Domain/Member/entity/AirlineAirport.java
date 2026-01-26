@@ -1,8 +1,8 @@
-package com.kh.ct.Domain.Member.entity;
+package com.kh.ct.domain.member.entity;
 
-import com.kh.ct.Domain.Schedule.entity.Airport;
-import com.kh.ct.Global.common.CommonEnums;
-import com.kh.ct.Global.entity.BaseTimeEntity;
+import com.kh.ct.domain.schedule.entity.Airport;
+import com.kh.ct.global.common.CommonEnums;
+import com.kh.ct.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -23,7 +23,7 @@ public class AirlineAirport extends BaseTimeEntity {
 
     @JoinColumn(name = "airline_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Airline airlineId;
+    private com.kh.ct.domain.member.entity.Airline airlineId;
 
     @JoinColumn(name = "airport_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

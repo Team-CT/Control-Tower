@@ -1,13 +1,12 @@
-package com.kh.ct.Domain.Member.entity;
+package com.kh.ct.domain.member.entity;
 
-import com.kh.ct.Global.entity.BaseTimeEntity;
-import com.kh.ct.Global.common.CommonEnums;
-import com.kh.ct.Global.entity.File;
-import com.kh.ct.Domain.Health.entity.EmpHealth;
-import com.kh.ct.Domain.Health.entity.EmpPhysicalTest;
+import com.kh.ct.domain.health.entity.EmpHealth;
+import com.kh.ct.global.entity.BaseTimeEntity;
+import com.kh.ct.global.common.CommonEnums;
+import com.kh.ct.global.entity.File;
+import com.kh.ct.domain.health.entity.EmpPhysicalTest;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.context.support.BeanDefinitionDsl;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,11 +25,11 @@ public class Emp extends BaseTimeEntity {
 
     @JoinColumn(name = "airline_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    private Airline airlineId;
+    private com.kh.ct.domain.member.entity.Airline airlineId;
 
     @JoinColumn(name = "department_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    private Department departmentId;
+    private com.kh.ct.domain.member.entity.Department departmentId;
 
     @Column(nullable = false, length = 100)
     private String empName;

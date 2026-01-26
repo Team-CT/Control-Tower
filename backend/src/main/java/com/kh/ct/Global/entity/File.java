@@ -1,4 +1,4 @@
-package com.kh.ct.Global.entity;
+package com.kh.ct.global.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,7 +8,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class File extends BaseTimeEntity {
+public class File extends com.kh.ct.global.entity.BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

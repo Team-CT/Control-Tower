@@ -1,7 +1,7 @@
-package com.kh.ct.Domain.Schedule.entity;
+package com.kh.ct.domain.schedule.entity;
 
-import com.kh.ct.Global.entity.BaseTimeEntity;
-import com.kh.ct.Global.common.CommonEnums;
+import com.kh.ct.global.entity.BaseTimeEntity;
+import com.kh.ct.global.common.CommonEnums;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,7 +21,7 @@ public class FlySchedule extends BaseTimeEntity {
     @MapsId
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fly_schedule_id")
-    private AllSchedule scheduleId;
+    private com.kh.ct.domain.schedule.entity.AllSchedule scheduleId;
 
     @Column(length = 20)
     private String flightNumber;

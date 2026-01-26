@@ -1,4 +1,4 @@
-package com.kh.ct.Domain.code.repository;
+package com.kh.ct.domain.code.repository;
 
 public interface CodeRepository {
 }
