@@ -26,4 +26,14 @@ public class AuthDto
     public static class LoginResponse {
         private String token;
     }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class MeResponse {
+        private String empId;
+        private String empName;
+        private String role;
+        private Long airlineId;
+    }
 }
