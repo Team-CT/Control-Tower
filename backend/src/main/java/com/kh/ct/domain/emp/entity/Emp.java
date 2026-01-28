@@ -70,7 +70,7 @@ public class Emp extends BaseTimeEntity {
     private String empNo;
 
     @JoinColumn(name = "profile_Image")
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
     private File profileImage;
 
     @OneToMany(mappedBy = "empId", fetch = FetchType.LAZY,
