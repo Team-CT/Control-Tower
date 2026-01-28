@@ -1,63 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as S from './CompanyRegistrationManagement.styled';
+import { airlineApplyService } from '../../../api/airline-apply/services';
 
 const CompanyRegistrationManagement = () => {
   const [selectedApplication, setSelectedApplication] = useState(null);
-  const [modalType, setModalType] = useState(null); // 'pending', 'approved', 'rejected'
+  const [modalType, setModalType] = useState(null);
+  const [applications, setApplications] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchKeyword, setSearchKeyword] = useState('');
 
-  // TODO: Zustand state mapping
-  const applications = [
-    {
-      id: 1,
-      date: '2026-01-20 14:30',
-      airlineName: '대한항공',
-      country: '대한민국',
-      email: 'hr.manager@koreanair.com',
-      verificationStatus: '완치',
-      documentStatus: '대기',
-      status: 'pending'
-    },
-    {
-      id: 2,
-      date: '2026-01-19 09:15',
-      airlineName: '아시아나항공',
-      country: '대한민국',
-      email: 'contact@flyasiana.com',
-      verificationStatus: '완치',
-      documentStatus: '승인',
-      status: 'approved'
-    },
-    {
-      id: 3,
-      date: '2026-01-18 16:45',
-      airlineName: 'Singapore Airlines',
-      country: 'Singapore',
-      email: 'hr@singaporeair.com',
-      verificationStatus: '완치',
-      documentStatus: '대기',
-      status: 'pending'
-    },
-    {
-      id: 4,
-      date: '2026-01-17 11:20',
-      airlineName: 'Emirates',
-      country: 'UAE',
-      email: 'admin@gmail.com',
-      verificationStatus: '불일치',
-      documentStatus: '반려',
-      status: 'rejected'
-    },
-    {
-      id: 5,
-      date: '2026-01-16 13:55',
-      airlineName: '제주항공',
-      country: '대한민국',
-      email: 'hr@jejuair.net',
-      verificationStatus: '완치',
-      documentStatus: '승인',
-      status: 'approved'
+  // 데이터 로드
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  const fetchApplications = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await airlineApplyService.getApplications(searchKeyword);
+      
+      // 백엔드 데이터를 프론트엔드 형식으로 변환
+      const formattedData = response.data.map(app => ({
+        id: app.id,
+        date: formatDate(app.date),
+        airlineName: app.airlineName,
+        email: app.email,
+        verificationStatus: app.verificationStatus ? '완치' : '불일치',
+        documentStatus: formatDocumentStatus(app.documentStatus),
+        status: app.status
+      }));
+      
+      setApplications(formattedData);
+    } catch (err) {
+      console.error('데이터 로드 실패:', err);
+      setError('데이터를 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const handleSearch = (e) => {
+    setSearchKeyword(e.target.value);
+  };
+
+  const handleSearchSubmit = () => {
+    fetchApplications();
+  };
 
   const handleViewDetail = (application) => {
     setSelectedApplication(application);
@@ -69,17 +59,82 @@ const CompanyRegistrationManagement = () => {
     setModalType(null);
   };
 
-  const handleApprove = () => {
-    // TODO: Zustand action - approve application
-    console.log('Approved:', selectedApplication);
-    handleCloseModal();
+  const handleApprove = async () => {
+    try {
+      await airlineApplyService.approveApplication(selectedApplication.id);
+      alert('승인되었습니다.');
+      fetchApplications();
+      handleCloseModal();
+    } catch (err) {
+      console.error('승인 실패:', err);
+      alert('승인 처리에 실패했습니다.');
+    }
   };
 
-  const handleReject = () => {
-    // TODO: Zustand action - reject application
-    console.log('Rejected:', selectedApplication);
-    handleCloseModal();
+  const handleReject = async () => {
+    const reason = prompt('반려 사유를 입력해주세요:');
+    if (!reason) {
+      alert('반려 사유는 필수입니다.');
+      return;
+    }
+
+    try {
+      await airlineApplyService.rejectApplication(selectedApplication.id, reason);
+      alert('반려되었습니다.');
+      fetchApplications();
+      handleCloseModal();
+    } catch (err) {
+      console.error('반려 실패:', err);
+      alert('반려 처리에 실패했습니다.');
+    }
   };
+
+  // 날짜 포맷 변환 함수
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+  };
+
+  // 문서 상태 포맷 변환 함수
+  const formatDocumentStatus = (status) => {
+    if (status === 'PENDING') return '대기';
+    if (status === 'APPROVED') return '승인';
+    if (status === 'REJECTED') return '반려';
+    return status;
+  };
+
+  if (loading) {
+    return (
+      <S.MainContainer>
+        <S.ContentWrapper>
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            <p>데이터를 불러오는 중...</p>
+          </div>
+        </S.ContentWrapper>
+      </S.MainContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <S.MainContainer>
+        <S.ContentWrapper>
+          <div style={{ textAlign: 'center', padding: '50px', color: '#dc2626' }}>
+            <p>{error}</p>
+            <button onClick={fetchApplications} style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}>
+              다시 시도
+            </button>
+          </div>
+        </S.ContentWrapper>
+      </S.MainContainer>
+    );
+  }
 
   return (
     <S.MainContainer>
@@ -94,7 +149,12 @@ const CompanyRegistrationManagement = () => {
         <S.SearchSection>
           <S.SearchInputWrapper>
             <S.SearchIcon>🔍</S.SearchIcon>
-            <S.SearchInput placeholder="항공사명, 이메일, 국가 검색..." />
+            <S.SearchInput 
+              placeholder="항공사명, 이메일 검색..." 
+              value={searchKeyword}
+              onChange={handleSearch}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearchSubmit()}
+            />
           </S.SearchInputWrapper>
         </S.SearchSection>
 
@@ -104,7 +164,6 @@ const CompanyRegistrationManagement = () => {
               <S.TableRow>
                 <S.TableHeader>신청 일시</S.TableHeader>
                 <S.TableHeader>항공사명</S.TableHeader>
-                <S.TableHeader>국가</S.TableHeader>
                 <S.TableHeader>담당자 이메일</S.TableHeader>
                 <S.TableHeader>도메인 검증</S.TableHeader>
                 <S.TableHeader>상태</S.TableHeader>
@@ -112,33 +171,40 @@ const CompanyRegistrationManagement = () => {
               </S.TableRow>
             </S.TableHead>
             <S.TableBody>
-              {applications.map((app) => (
-                <S.TableRow key={app.id}>
-                  <S.TableCell>{app.date}</S.TableCell>
-                  <S.TableCell>
-                    <S.AirlineName>{app.airlineName}</S.AirlineName>
-                  </S.TableCell>
-                  <S.TableCell>{app.country}</S.TableCell>
-                  <S.TableCell>{app.email}</S.TableCell>
-                  <S.TableCell>
-                    <S.StatusBadge status={app.verificationStatus}>
-                      {app.verificationStatus === '완치' ? '✓ 일치' : '✗ 불일치'}
-                    </S.StatusBadge>
-                  </S.TableCell>
-                  <S.TableCell>
-                    <S.DocumentStatusBadge status={app.documentStatus}>
-                      {app.documentStatus === '대기' && '⏱ 대기'}
-                      {app.documentStatus === '승인' && '✓ 승인'}
-                      {app.documentStatus === '반려' && '✗ 반려'}
-                    </S.DocumentStatusBadge>
-                  </S.TableCell>
-                  <S.TableCell>
-                    <S.ViewDetailButton onClick={() => handleViewDetail(app)}>
-                      👁 상세보기
-                    </S.ViewDetailButton>
+              {applications.length === 0 ? (
+                <S.TableRow>
+                  <S.TableCell colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
+                    신청 내역이 없습니다.
                   </S.TableCell>
                 </S.TableRow>
-              ))}
+              ) : (
+                applications.map((app) => (
+                  <S.TableRow key={app.id}>
+                    <S.TableCell>{app.date}</S.TableCell>
+                    <S.TableCell>
+                      <S.AirlineName>{app.airlineName}</S.AirlineName>
+                    </S.TableCell>
+                    <S.TableCell>{app.email}</S.TableCell>
+                    <S.TableCell>
+                      <S.StatusBadge status={app.verificationStatus}>
+                        {app.verificationStatus === '완치' ? '✓ 일치' : '✗ 불일치'}
+                      </S.StatusBadge>
+                    </S.TableCell>
+                    <S.TableCell>
+                      <S.DocumentStatusBadge status={app.documentStatus}>
+                        {app.documentStatus === '대기' && '⏱ 대기'}
+                        {app.documentStatus === '승인' && '✓ 승인'}
+                        {app.documentStatus === '반려' && '✗ 반려'}
+                      </S.DocumentStatusBadge>
+                    </S.TableCell>
+                    <S.TableCell>
+                      <S.ViewDetailButton onClick={() => handleViewDetail(app)}>
+                        👁 상세보기
+                      </S.ViewDetailButton>
+                    </S.TableCell>
+                  </S.TableRow>
+                ))
+              )}
             </S.TableBody>
           </S.Table>
         </S.TableContainer>
@@ -216,16 +282,10 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
 
           {/* Company Information */}
           <S.InfoSection>
-            <S.InfoGrid>
-              <S.InfoItem>
-                <S.InfoLabel>항공사명</S.InfoLabel>
-                <S.InfoValue>🌐 {application.airlineName}</S.InfoValue>
-              </S.InfoItem>
-              <S.InfoItem>
-                <S.InfoLabel>국가</S.InfoLabel>
-                <S.InfoValue>{application.country}</S.InfoValue>
-              </S.InfoItem>
-            </S.InfoGrid>
+            <S.InfoItem>
+              <S.InfoLabel>항공사명</S.InfoLabel>
+              <S.InfoValue>🌐 {application.airlineName}</S.InfoValue>
+            </S.InfoItem>
 
             <S.InfoItem>
               <S.InfoLabel>담당자 이메일</S.InfoLabel>
@@ -296,16 +356,10 @@ const ApprovedModal = ({ application, onClose }) => {
 
         <S.ModalContent>
           <S.InfoSection>
-            <S.InfoGrid>
-              <S.InfoItem>
-                <S.InfoLabel>항공사명</S.InfoLabel>
-                <S.InfoValue>🌐 {application.airlineName}</S.InfoValue>
-              </S.InfoItem>
-              <S.InfoItem>
-                <S.InfoLabel>국가</S.InfoLabel>
-                <S.InfoValue>{application.country}</S.InfoValue>
-              </S.InfoItem>
-            </S.InfoGrid>
+            <S.InfoItem>
+              <S.InfoLabel>항공사명</S.InfoLabel>
+              <S.InfoValue>🌐 {application.airlineName}</S.InfoValue>
+            </S.InfoItem>
 
             <S.InfoItem>
               <S.InfoLabel>담당자 이메일</S.InfoLabel>
@@ -367,16 +421,10 @@ const RejectedModal = ({ application, onClose }) => {
 
         <S.ModalContent>
           <S.InfoSection>
-            <S.InfoGrid>
-              <S.InfoItem>
-                <S.InfoLabel>항공사명</S.InfoLabel>
-                <S.InfoValue>🌐 {application.airlineName}</S.InfoValue>
-              </S.InfoItem>
-              <S.InfoItem>
-                <S.InfoLabel>국가</S.InfoLabel>
-                <S.InfoValue>{application.country}</S.InfoValue>
-              </S.InfoItem>
-            </S.InfoGrid>
+            <S.InfoItem>
+              <S.InfoLabel>항공사명</S.InfoLabel>
+              <S.InfoValue>🌐 {application.airlineName}</S.InfoValue>
+            </S.InfoItem>
 
             <S.InfoItem>
               <S.InfoLabel>담당자 이메일</S.InfoLabel>
