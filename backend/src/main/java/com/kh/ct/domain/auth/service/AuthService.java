@@ -2,7 +2,7 @@ package com.kh.ct.domain.auth.service;
 
 import com.kh.ct.domain.auth.dto.AuthDto;
 import com.kh.ct.domain.emp.entity.Emp;
-import com.kh.ct.domain.emp.repository.EmpRepository;
+import com.kh.ct.domain.emp.repository.EmpRepository2;
 import com.kh.ct.global.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final EmpRepository empRepository;
+    private final EmpRepository2 empRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
