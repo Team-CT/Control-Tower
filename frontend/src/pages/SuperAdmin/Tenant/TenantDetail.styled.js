@@ -138,7 +138,7 @@ export const PlanBadgeLarge = styled.div`
 
 export const QuickActionsBar = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   margin-bottom: 32px;
 
@@ -184,7 +184,7 @@ export const ActionIcon = styled.span`
 
 export const StatsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-bottom: 32px;
 

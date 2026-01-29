@@ -1,74 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './TenantManagement.styled';
+import { tenantService } from '../../../api/tenant/services';
 
 const TenantManagement = () => {
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState('list');
   const [searchQuery, setSearchQuery] = useState('');
+  const [tenants, setTenants] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // TODO: Zustand state mapping
-  const tenants = [
-    {
-      id: 'KAL-001',
-      name: '대한항공',
-      plan: 'Enterprise',
-      employeeCount: 1250,
-      status: 'active',
-      icon: '✈️'
-    },
-    {
-      id: 'AAR-002',
-      name: '아시아나항공',
-      plan: 'Professional',
-      employeeCount: 890,
-      status: 'active',
-      icon: '✈️'
-    },
-    {
-      id: 'SIA-003',
-      name: 'Singapore Airlines',
-      plan: 'Enterprise',
-      employeeCount: 1500,
-      status: 'active',
-      icon: '✈️'
-    },
-    {
-      id: 'EK-004',
-      name: 'Emirates',
-      plan: 'Enterprise',
-      employeeCount: 2100,
-      status: 'payment-pending',
-      icon: '✈️'
-    },
-    {
-      id: 'JJA-005',
-      name: '제주항공',
-      plan: 'Basic',
-      employeeCount: 320,
-      status: 'inactive',
-      icon: '✈️'
-    },
-    {
-      id: 'JAL-006',
-      name: 'Japan Airlines',
-      plan: 'Professional',
-      employeeCount: 980,
-      status: 'active',
-      icon: '✈️'
+  // 데이터 로드
+  useEffect(() => {
+    fetchTenants();
+  }, []);
+
+  const fetchTenants = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await tenantService.getTenants(searchQuery);
+      setTenants(response.data);
+    } catch (err) {
+      console.error('테넌트 데이터 로드 실패:', err);
+      setError('데이터를 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
 
-  // 🔥 수정: navigate 함수
+  const handleSearch = () => {
+    fetchTenants();
+  };
+
   const handleViewDetail = (tenantId) => {
-    navigate(`/tenant-detail/${tenantId}`);
+    navigate(`/super-admin/tenants/${tenantId}`);
   };
 
   const getStatusText = (status) => {
     switch (status) {
       case 'active':
         return '정상 서비스 중';
-      case 'payment-pending':
+      case 'payment_pending':
         return '결제 중';
       case 'inactive':
         return '미납으로 인한 정지';
@@ -81,7 +55,7 @@ const TenantManagement = () => {
     switch (status) {
       case 'active':
         return '✓';
-      case 'payment-pending':
+      case 'payment_pending':
         return '⏱';
       case 'inactive':
         return '⚠';
@@ -89,6 +63,33 @@ const TenantManagement = () => {
         return '';
     }
   };
+
+  if (loading) {
+    return (
+      <S.MainContainer>
+        <S.ContentWrapper>
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            <p>데이터를 불러오는 중...</p>
+          </div>
+        </S.ContentWrapper>
+      </S.MainContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <S.MainContainer>
+        <S.ContentWrapper>
+          <div style={{ textAlign: 'center', padding: '50px', color: '#dc2626' }}>
+            <p>{error}</p>
+            <button onClick={fetchTenants} style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}>
+              다시 시도
+            </button>
+          </div>
+        </S.ContentWrapper>
+      </S.MainContainer>
+    );
+  }
 
   return (
     <S.MainContainer>
@@ -107,6 +108,7 @@ const TenantManagement = () => {
               placeholder="항공사명, 테넌트 ID 검색..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             />
           </S.SearchInputWrapper>
 
@@ -138,7 +140,7 @@ const TenantManagement = () => {
                 <S.CardBody>
                   <S.TenantId>테넌트 ID: {tenant.id}</S.TenantId>
                   <S.PlanBadge plan={tenant.plan}>{tenant.plan}</S.PlanBadge>
-                  <S.EmployeeCount>활성 직원 수: {tenant.employeeCount.toLocaleString()}명</S.EmployeeCount>
+                  <S.EmployeeCount>활성 직원 수: {(tenant.employeeCount || 0).toLocaleString()}명</S.EmployeeCount>
                 </S.CardBody>
 
                 <S.CardFooter>
@@ -185,7 +187,7 @@ const TenantManagement = () => {
                     <S.TableCell>
                       <S.PlanBadge plan={tenant.plan}>{tenant.plan}</S.PlanBadge>
                     </S.TableCell>
-                    <S.TableCell>{tenant.employeeCount.toLocaleString()}명</S.TableCell>
+                    <S.TableCell>{(tenant.employeeCount || 0).toLocaleString()}명</S.TableCell>
                     <S.TableCell>
                       <S.StatusBadge status={tenant.status}>
                         <S.StatusIcon>{getStatusIcon(tenant.status)}</S.StatusIcon>
