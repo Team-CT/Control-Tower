@@ -49,9 +49,15 @@ const CompanyRegistrationManagement = () => {
     fetchApplications();
   };
 
-  const handleViewDetail = (application) => {
-    setSelectedApplication(application);
-    setModalType(application.status);
+  const handleViewDetail = async (application) => {
+    try {
+      const response = await airlineApplyService.getApplicationDetail(application.id);
+      setSelectedApplication(response.data);
+      setModalType(application.status);
+    } catch (err) {
+      console.error('상세 정보 로드 실패:', err);
+      alert('상세 정보를 불러오는데 실패했습니다.');
+    }
   };
 
   const handleCloseModal = () => {
@@ -239,6 +245,14 @@ const CompanyRegistrationManagement = () => {
 
 // Pending Modal Component
 const PendingModal = ({ application, onClose, onApprove, onReject }) => {
+  // 완료된 단계 수 계산
+  const completedSteps = [
+    application.emailDomainVerified,
+    true, // 필수 서류 제출 (항상 완료로 가정)
+    true, // 이메일 확인 유효성 (항상 완료로 가정)
+    true  // 사업자 등록증 확인 (항상 완료로 가정)
+  ].filter(Boolean).length;
+
   return (
     <S.ModalOverlay onClick={onClose}>
       <S.ModalContainer onClick={(e) => e.stopPropagation()}>
@@ -253,14 +267,20 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
             <S.ProgressHeader>
               <S.ProgressIcon>⏱</S.ProgressIcon>
               <S.ProgressTitle>검증 절차</S.ProgressTitle>
-              <S.ProgressCount>4/4</S.ProgressCount>
+              <S.ProgressCount>{completedSteps}/4</S.ProgressCount>
             </S.ProgressHeader>
-            <S.ProgressBar progress={100} />
+            <S.ProgressBar progress={(completedSteps / 4) * 100} />
             <S.ProgressStepsGrid>
-              <S.ProgressStep completed>
-                <S.StepIcon>✓</S.StepIcon>
+              <S.ProgressStep completed={application.emailDomainVerified}>
+                <S.StepIcon error={!application.emailDomainVerified}>
+                  {application.emailDomainVerified ? '✓' : '✗'}
+                </S.StepIcon>
                 <S.StepLabel>이메일 도메인 검증</S.StepLabel>
-                <S.StepDescription>이메일 도메인이 확인되었습니다.</S.StepDescription>
+                <S.StepDescription>
+                  {application.emailDomainVerified 
+                    ? '이메일 도메인이 확인되었습니다.'
+                    : '이메일 도메인이 일치하지 않습니다.'}
+                </S.StepDescription>
               </S.ProgressStep>
               <S.ProgressStep completed>
                 <S.StepIcon>✓</S.StepIcon>
@@ -299,13 +319,15 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
           </S.InfoSection>
 
           {/* Domain Verification */}
-          <S.VerificationBox>
+          <S.VerificationBox error={!application.emailDomainVerified}>
             <S.VerificationHeader>
               <S.VerificationIcon>ℹ️</S.VerificationIcon>
               <S.VerificationTitle>도메인 검증</S.VerificationTitle>
             </S.VerificationHeader>
-            <S.VerificationMessage success>
-              ✓ 이메일 도메인과 항공사명이 일치합니다.
+            <S.VerificationMessage success={application.emailDomainVerified}>
+              {application.emailDomainVerified 
+                ? '✓ 이메일 도메인과 항공사명이 일치합니다.'
+                : '✗ 이메일 도메인과 항공사명이 일치하지 않습니다.'}
             </S.VerificationMessage>
           </S.VerificationBox>
 
@@ -372,13 +394,15 @@ const ApprovedModal = ({ application, onClose }) => {
             </S.InfoItem>
           </S.InfoSection>
 
-          <S.VerificationBox>
+          <S.VerificationBox error={!application.emailDomainVerified}>
             <S.VerificationHeader>
               <S.VerificationIcon>ℹ️</S.VerificationIcon>
               <S.VerificationTitle>도메인 검증</S.VerificationTitle>
             </S.VerificationHeader>
-            <S.VerificationMessage success>
-              ✓ 이메일 도메인과 항공사명이 일치합니다.
+            <S.VerificationMessage success={application.emailDomainVerified}>
+              {application.emailDomainVerified 
+                ? '✓ 이메일 도메인과 항공사명이 일치합니다.'
+                : '✗ 이메일 도메인과 항공사명이 일치하지 않습니다.'}
             </S.VerificationMessage>
           </S.VerificationBox>
 
@@ -437,13 +461,15 @@ const RejectedModal = ({ application, onClose }) => {
             </S.InfoItem>
           </S.InfoSection>
 
-          <S.VerificationBox error>
+          <S.VerificationBox error={!application.emailDomainVerified}>
             <S.VerificationHeader>
               <S.VerificationIcon>ℹ️</S.VerificationIcon>
               <S.VerificationTitle>도메인 검증</S.VerificationTitle>
             </S.VerificationHeader>
-            <S.VerificationMessage error>
-              ✗ 이메일 도메인과 항공사명이 일치하지 않습니다. 검토가 필요합니다.
+            <S.VerificationMessage success={application.emailDomainVerified}>
+              {application.emailDomainVerified 
+                ? '✓ 이메일 도메인과 항공사명이 일치합니다.'
+                : '✗ 이메일 도메인과 항공사명이 일치하지 않습니다. 검토가 필요합니다.'}
             </S.VerificationMessage>
           </S.VerificationBox>
 

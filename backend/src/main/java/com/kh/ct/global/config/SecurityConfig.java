@@ -37,6 +37,9 @@ public class SecurityConfig {
                         //인증없이 가능한 경우
                         .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/members").permitAll()
+                        
+                        // [임시] 슈퍼 관리자 대시보드 테스트용 - 인증 없이 접근 허용
+                        .requestMatchers("/api/super-admin/airline-applications/**").permitAll()
 
                         //관리자 전용
                         .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")
@@ -71,10 +74,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CommandLineRunnerpasswordEncodeRunner(PasswordEncoder passwordEncoder) {
+    public CommandLineRunner passwordEncodeRunner(PasswordEncoder passwordEncoder) {
         return args -> {
-            StringrawPassword="admin123";
-            StringencodedPassword= passwordEncoder.encode(rawPassword);
+            String rawPassword = "admin123";
+            String encodedPassword = passwordEncoder.encode(rawPassword);
 
             System.out.println("🔐 RAW PASSWORD     : " + rawPassword);
             System.out.println("🔐 ENCODED PASSWORD : " + encodedPassword);

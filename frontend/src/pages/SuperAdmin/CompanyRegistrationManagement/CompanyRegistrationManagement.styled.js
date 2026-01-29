@@ -323,8 +323,8 @@ export const StepIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #d4f4dd;
-  color: #0f7a35;
+  background-color: ${props => props.error ? '#fee2e2' : '#d4f4dd'};
+  color: ${props => props.error ? '#dc2626' : '#0f7a35'};
   border-radius: 50%;
   font-size: 12px;
   font-weight: 600;
