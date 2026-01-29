@@ -18,7 +18,13 @@ export const empPhysicalTestService = {
 
         // empId는 query로 보내기 (컨트롤러가 @RequestParam이라서)
         return uploadApi.post(`${API_ENDPOINTS.HEALTH.SAVE}?empId=${empId}`, fd);
-    }
+    },
+
+    detail: (empId, physicalTestId) => {
+    return api.get(API_ENDPOINTS.HEALTH.DETAIL, {
+        params: { empId, physicalTestId },
+    });
+},
 }
 
 

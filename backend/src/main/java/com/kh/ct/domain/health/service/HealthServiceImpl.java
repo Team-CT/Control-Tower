@@ -114,6 +114,40 @@ public class HealthServiceImpl implements HealthService {
 
     }
 
+    @Override
+    public HealthDto.PhysicalTestDetailResponse getEmpPhysicalTestById(String empId, Long physicalTestId) {
+        EmpPhysicalTest test = healthRepository.findById(physicalTestId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 검진 id: " + physicalTestId));
+
+        Emp emp = empRepository.findById(empId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 empId: " + empId));
+
+        if (test.getEmpId() == null || !empId.equals(test.getEmpId().getEmpId())) { // userId는 Emp PK 필드명에 맞게 수정
+            throw new IllegalArgumentException("해당 사원의 검진 데이터가 아닙니다.");
+        }
+
+        return HealthDto.PhysicalTestDetailResponse.builder()
+                .empId(empId)
+                .empName(emp.getEmpName())
+                .startDate(emp.getStartDate())
+                .departmentName(emp.getDepartmentId().getDepartmentName())
+                .job(emp.getJob())
+                .email(emp.getEmail())
+                .phone(emp.getPhone())
+                .address(emp.getAddress())
+                .testDate(test.getTestDate() == null ? null : test.getTestDate())
+                .height(test.getHeight())
+                .weight(test.getWeight())
+                .bloodSugar(test.getBloodSugar())
+                .systolicBloodPressure(test.getSystolicBloodPressure())
+                .diastolicBloodPressure(test.getDiastolicBloodPressure())
+                .cholesterol(test.getCholesterol())
+                .heartRate(test.getHeartRate())
+                .bmi(test.getBmi())
+                .bodyFat(test.getBodyFat())
+                .build();
+    }
+
 
     private String getExt(String filename) {
         int idx = filename.lastIndexOf('.');

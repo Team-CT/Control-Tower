@@ -9,5 +9,5 @@ public interface HealthService {
 
     public Long save(MultipartFile pdfFile, String empId, HealthDto.PhysicalTestRequest body);
 
-
+    public HealthDto.PhysicalTestDetailResponse getEmpPhysicalTestById(String empId, Long physicalTestId);
 }
