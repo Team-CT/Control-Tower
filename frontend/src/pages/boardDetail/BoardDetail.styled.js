@@ -60,7 +60,7 @@ export const PostHeader = styled.div`
 
 export const CategoryBadge = styled.div`
   display: inline-block;
-  background: ${props => props.bgColor || '#E5F3FF'};
+  background: ${props => props.$bgColor || '#E5F3FF'};
   color: ${props => {
     if (props.bgColor === '#FFE5E5') return '#D32F2F';
     if (props.bgColor === '#FFF9E5') return '#F57C00';
@@ -184,7 +184,28 @@ export const LocationTitle = styled.span`
   font-weight: 700;
   color: #4A90E2;
 `;
+export const DeleteButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #fff5f5; /* 아주 연한 빨강 배경 */
+  color: #e03131; /* 진한 빨강 글자 */
+  border: 1px solid #ffc9c9;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
 
+  &:hover {
+    background-color: #ffe3e3;
+    border-color: #ffa8a8;
+  }
+
+  &:active {
+    background-color: #ffc9c9;
+  }
+`;
 export const LocationAddress = styled.span`
   color: #555;
   font-size: 15px;
