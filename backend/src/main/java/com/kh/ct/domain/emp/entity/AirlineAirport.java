@@ -23,9 +23,9 @@ public class AirlineAirport extends BaseTimeEntity {
 
     @JoinColumn(name = "airline_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Airline airlineId;
+    private Airline airline;
 
     @JoinColumn(name = "airport_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Airport airportId;
+    private Airport airport;
 }

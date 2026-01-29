@@ -23,7 +23,7 @@ public class Department {
 
     private Integer empCount;
 
-    @JoinColumn(name = "parent_department")
+    @JoinColumn(name = "parent_department", nullable = true)
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     private Department parentDepartment;
 
