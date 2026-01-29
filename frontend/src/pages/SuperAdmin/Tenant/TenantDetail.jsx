@@ -1,79 +1,152 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as S from './TenantDetail.styled';
+import { tenantService } from '../../../api/tenant/services';
 
 const TenantDetail = () => {
   const { tenantId } = useParams();
   const navigate = useNavigate();
+  const [tenantData, setTenantData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // TODO: Zustand state mapping
-  const tenantData = {
-    id: 'KAL-001',
-    name: '대한항공',
-    plan: 'Enterprise',
-    planPrice: '$999/월',
-    employeeCount: 1250,
-    activeUsers: 1180,
-    managedFeatures: 8,
-    totalRevenue: '$11,988',
-    status: 'active',
-    icon: '✈️',
-    country: '대한민국',
-    address: '서울특별시 강서구 하늘길 260',
-    email: 'admin@koreanair.com',
-    phone: '+82-2-1234-5678',
-    joinDate: '2025-03-15',
-    billingPeriod: '연간',
-    nextBilling: '2026-03-15',
-    usageStats: {
-      storageUsage: 45.2,
-      lastLogin: '2026-01-20 14:30',
-      activeEmployees: 1180
-    },
-    activityLog: [
-      {
-        id: 1,
-        action: '관리자 로그인',
-        timestamp: '2026-01-20 14:30',
-        user: 'admin@koreanair.com'
-      },
-      {
-        id: 2,
-        action: '신규 직원 5명 추가',
-        timestamp: '2026-01-20 10:15',
-        user: 'hr@koreanair.com'
-      },
-      {
-        id: 3,
-        action: '플랜 업그레이드 요청',
-        timestamp: '2026-01-19 16:20',
-        user: 'admin@koreanair.com'
-      },
-      {
-        id: 4,
-        action: '결제 완료',
-        timestamp: '2026-01-19 09:00',
-        user: 'system'
-      },
-      {
-        id: 5,
-        action: '보고서 생성',
-        timestamp: '2026-01-18 14:45',
-        user: 'manager@koreanair.com'
-      }
-    ]
+  useEffect(() => {
+    fetchTenantDetail();
+  }, [tenantId]);
+
+  const fetchTenantDetail = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await tenantService.getTenantDetail(tenantId);
+      setTenantData(response.data);
+    } catch (err) {
+      console.error('테넌트 상세 정보 로드 실패:', err);
+      setError('데이터를 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoBack = () => {
-    navigate('/tenant-management');
+    navigate('/super-admin/tenants');
   };
 
+  const handleSuspendAccount = async () => {
+    if (!window.confirm('정말로 이 계정을 정지하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await tenantService.updateTenantStatus(tenantId, 'INACTIVE');
+      alert('계정이 정지되었습니다.');
+      // 데이터 다시 로드
+      fetchTenantDetail();
+    } catch (err) {
+      console.error('계정 정지 실패:', err);
+      alert('계정 정지에 실패했습니다.');
+    }
+  };
+
+  const handleActivateAccount = async () => {
+    if (!window.confirm('이 계정을 활성화하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await tenantService.updateTenantStatus(tenantId, 'ACTIVE');
+      alert('계정이 활성화되었습니다.');
+      // 데이터 다시 로드
+      fetchTenantDetail();
+    } catch (err) {
+      console.error('계정 활성화 실패:', err);
+      alert('계정 활성화에 실패했습니다.');
+    }
+  };
+
+  // 현재 상태에 따라 동적으로 Quick Actions 생성
+  const isInactive = tenantData?.status?.toUpperCase() === 'INACTIVE';
+  
   const quickActions = [
-    { id: 1, label: '구독 플랜 변경', icon: '💳', action: () => console.log('플랜 변경') },
-    { id: 2, label: '긴급 로그아웃', icon: '🔐', action: () => console.log('긴급 로그아웃') },
-    { id: 3, label: '계정 정지', icon: '🚫', action: () => console.log('계정 정지') },
-    { id: 4, label: '로그 보기', icon: '📄', action: () => console.log('로그 보기') }
+    { id: 1, label: '긴급 로그아웃', icon: '🔐', action: () => console.log('긴급 로그아웃') },
+    { 
+      id: 2, 
+      label: isInactive ? '계정 활성화' : '계정 정지', 
+      icon: isInactive ? '✅' : '🚫', 
+      action: isInactive ? handleActivateAccount : handleSuspendAccount 
+    },
+    { id: 3, label: '로그 보기', icon: '📄', action: () => console.log('로그 보기') }
   ];
+
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR');
+  };
+
+  const formatDateTime = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleString('ko-KR');
+  };
+
+  const getStatusText = (status) => {
+    const upperStatus = status?.toUpperCase();
+    switch (upperStatus) {
+      case 'ACTIVE':
+        return '정상 서비스 중';
+      case 'PAYMENT_PENDING':
+        return '결제 중';
+      case 'INACTIVE':
+        return '미납으로 인한 정지';
+      default:
+        return status;
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    const upperStatus = status?.toUpperCase();
+    switch (upperStatus) {
+      case 'ACTIVE':
+        return '✓';
+      case 'PAYMENT_PENDING':
+        return '⏱';
+      case 'INACTIVE':
+        return '⚠';
+      default:
+        return '✓';
+    }
+  };
+
+  if (loading) {
+    return (
+      <S.MainContainer>
+        <S.ContentWrapper>
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            <p>데이터를 불러오는 중...</p>
+          </div>
+        </S.ContentWrapper>
+      </S.MainContainer>
+    );
+  }
+
+  if (error || !tenantData) {
+    return (
+      <S.MainContainer>
+        <S.ContentWrapper>
+          <S.BackButton onClick={handleGoBack}>
+            ← 테넌트 목록으로 돌아가기
+          </S.BackButton>
+          <div style={{ textAlign: 'center', padding: '50px', color: '#dc2626' }}>
+            <p>{error || '데이터를 찾을 수 없습니다.'}</p>
+            <button onClick={fetchTenantDetail} style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}>
+              다시 시도
+            </button>
+          </div>
+        </S.ContentWrapper>
+      </S.MainContainer>
+    );
+  }
 
   return (
     <S.MainContainer>
@@ -92,7 +165,7 @@ const TenantDetail = () => {
           </S.TenantHeaderLeft>
           <S.TenantHeaderRight>
             <S.StatusBadgeLarge status={tenantData.status}>
-              ✓ 정상 서비스 중
+              {getStatusIcon(tenantData.status)} {getStatusText(tenantData.status)}
             </S.StatusBadgeLarge>
             <S.PlanBadgeLarge plan={tenantData.plan}>
               {tenantData.plan} 플랜
@@ -112,33 +185,25 @@ const TenantDetail = () => {
         <S.StatsGrid>
           <S.StatCard>
             <S.StatIcon>👥</S.StatIcon>
-            <S.StatValue>{tenantData.employeeCount.toLocaleString()}</S.StatValue>
-            <S.StatLabel>활성 직원 수</S.StatLabel>
-            <S.StatSubtext>전체: 1,500명</S.StatSubtext>
+            <S.StatValue>{(tenantData.employeeCount || 0).toLocaleString()}</S.StatValue>
+            <S.StatLabel>전체 직원 수</S.StatLabel>
+            <S.StatSubtext>등록된 직원</S.StatSubtext>
             <S.TrendIndicator positive>↗</S.TrendIndicator>
           </S.StatCard>
 
           <S.StatCard>
             <S.StatIcon>📊</S.StatIcon>
-            <S.StatValue>{tenantData.activeUsers.toLocaleString()}</S.StatValue>
-            <S.StatLabel>월간 활성 사용자</S.StatLabel>
-            <S.StatSubtext>지난 30일 기준</S.StatSubtext>
+            <S.StatValue>{(tenantData.activeUsers || 0).toLocaleString()}</S.StatValue>
+            <S.StatLabel>활성 사용자</S.StatLabel>
+            <S.StatSubtext>현재 활성 상태</S.StatSubtext>
             <S.TrendIndicator positive>↗</S.TrendIndicator>
           </S.StatCard>
 
           <S.StatCard>
             <S.StatIcon>⚙️</S.StatIcon>
-            <S.StatValue>{tenantData.managedFeatures}</S.StatValue>
-            <S.StatLabel>관리자 계정</S.StatLabel>
-            <S.StatSubtext>유형 관리자 포함</S.StatSubtext>
-            <S.TrendIndicator positive>↗</S.TrendIndicator>
-          </S.StatCard>
-
-          <S.StatCard>
-            <S.StatIcon>💰</S.StatIcon>
-            <S.StatValue>{tenantData.totalRevenue}</S.StatValue>
-            <S.StatLabel>총 매출</S.StatLabel>
-            <S.StatSubtext>누적 결제</S.StatSubtext>
+            <S.StatValue>{tenantData.managedFeatures || 0}</S.StatValue>
+            <S.StatLabel>관리 기능</S.StatLabel>
+            <S.StatSubtext>활성화된 기능</S.StatSubtext>
             <S.TrendIndicator positive>↗</S.TrendIndicator>
           </S.StatCard>
         </S.StatsGrid>
@@ -176,22 +241,22 @@ const TenantDetail = () => {
                 구독 정보
               </S.SectionTitle>
               <S.InfoList>
-                <S.InfoRow>
+                {/* <S.InfoRow>
                   <S.InfoLabel>💰 현재 플랜</S.InfoLabel>
                   <S.InfoValue>{tenantData.plan} - {tenantData.planPrice}</S.InfoValue>
-                </S.InfoRow>
+                </S.InfoRow> */}
                 <S.InfoRow>
                   <S.InfoLabel>📅 가입일</S.InfoLabel>
-                  <S.InfoValue>{tenantData.joinDate}</S.InfoValue>
+                  <S.InfoValue>{formatDate(tenantData.joinDate)}</S.InfoValue>
                 </S.InfoRow>
-                <S.InfoRow>
+                {/* <S.InfoRow>
                   <S.InfoLabel>🔄 결제 주기</S.InfoLabel>
                   <S.InfoValue>{tenantData.billingPeriod}</S.InfoValue>
                 </S.InfoRow>
                 <S.InfoRow>
                   <S.InfoLabel>⏰ 다음 결제일</S.InfoLabel>
                   <S.InfoValue>{tenantData.nextBilling}</S.InfoValue>
-                </S.InfoRow>
+                </S.InfoRow> */}
               </S.InfoList>
             </S.InfoSection>
           </S.LeftColumn>
@@ -205,43 +270,30 @@ const TenantDetail = () => {
               <S.UsageItem>
                 <S.UsageLabel>스토리지 사용량</S.UsageLabel>
                 <S.ProgressBarContainer>
-                  <S.ProgressBar progress={tenantData.usageStats.storageUsage} />
+                  <S.ProgressBar progress={tenantData.usageStats?.storageUsage || 0} />
                 </S.ProgressBarContainer>
-                <S.UsageValue>{tenantData.usageStats.storageUsage} / 100</S.UsageValue>
+                <S.UsageValue>{tenantData.usageStats?.storageUsage || 0} / 100 GB</S.UsageValue>
               </S.UsageItem>
               <S.InfoList>
                 <S.InfoRow>
                   <S.InfoLabel>⏰ 마지막 로그인</S.InfoLabel>
-                  <S.InfoValue>{tenantData.usageStats.lastLogin}</S.InfoValue>
+                  <S.InfoValue>{formatDateTime(tenantData.usageStats?.lastLogin) || '정보 없음'}</S.InfoValue>
                 </S.InfoRow>
                 <S.InfoRow>
                   <S.InfoLabel>👥 월간 활성 사용자</S.InfoLabel>
-                  <S.InfoValue>{tenantData.usageStats.activeEmployees.toLocaleString()}명</S.InfoValue>
+                  <S.InfoValue>{(tenantData.usageStats?.activeEmployees || 0).toLocaleString()}명</S.InfoValue>
                 </S.InfoRow>
               </S.InfoList>
             </S.InfoSection>
 
             <S.InfoSection>
-              <S.SectionHeader>
-                <S.SectionTitle>
-                  <S.SectionIcon>📄</S.SectionIcon>
-                  최근 활동 로그
-                </S.SectionTitle>
-                <S.ViewAllLink href="#">전체 로그 보기</S.ViewAllLink>
-              </S.SectionHeader>
-              <S.ActivityList>
-                {tenantData.activityLog.map((log) => (
-                  <S.ActivityItem key={log.id}>
-                    <S.ActivityDot />
-                    <S.ActivityContent>
-                      <S.ActivityAction>{log.action}</S.ActivityAction>
-                      <S.ActivityMeta>
-                        {log.timestamp} · {log.user}
-                      </S.ActivityMeta>
-                    </S.ActivityContent>
-                  </S.ActivityItem>
-                ))}
-              </S.ActivityList>
+              <S.SectionTitle>
+                <S.SectionIcon>📄</S.SectionIcon>
+                최근 활동 로그
+              </S.SectionTitle>
+              <div style={{ padding: '20px', textAlign: 'center', color: '#6f767e' }}>
+                활동 로그 기능은 준비 중입니다.
+              </div>
             </S.InfoSection>
           </S.RightColumn>
         </S.ContentGrid>
