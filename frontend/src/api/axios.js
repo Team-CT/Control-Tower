@@ -2,37 +2,20 @@ import axios from 'axios';
 import { API_CONFIG } from './config';
 import useAuthStore from '../store/authStore';
 
-const api = axios.create({
+export const api = axios.create({
   baseURL: API_CONFIG.BASE_URL,
   timeout: API_CONFIG.TIMEOUT,
   headers: API_CONFIG.HEADERS,
 });
 
-// ✅ Request 인터셉터: 토큰 자동 첨부
-// Request 인터셉터 - 토큰 자동 첨부
-api.interceptors.request.use(
-  (config) => {
-    try {
-      // Zustand store에서 직접 state 가져오기
-      const token = useAuthStore.getState().token;
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-        console.log('토큰 첨부:', token.substring(0, 20) + '...');
-      } else {
-        console.log('토큰 없음');
-      }
-    } catch (error) {
-      console.error('❌ Auth store error:', error);
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
+// ✅ 업로드 전용: Content-Type을 기본으로 박지 않음
+export const uploadApi = axios.create({
+  baseURL: API_CONFIG.BASE_URL,
+  timeout: API_CONFIG.TIMEOUT,
+});
 
-// ✅ Response 인터셉터: 에러 공통 처리
-api.interceptors.response.use(
+const applyInterceptors = (instance) => { 
+  instance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
@@ -62,5 +45,8 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+}
+applyInterceptors(api);
+applyInterceptors(uploadApi);
 
 export default api;

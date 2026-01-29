@@ -12,4 +12,10 @@ export const API_CONFIG = {
 
 export const API_ENDPOINTS = {
  //필요한endpoint작성
+
+   HEALTH: {
+    BASE: `/api/health`,
+    PREVIEW : `/api/health/preview`,
+    SAVE : `/api/health/save`,
+  },
 };

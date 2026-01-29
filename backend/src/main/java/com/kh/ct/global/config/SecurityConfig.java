@@ -37,6 +37,8 @@ public class SecurityConfig {
                         //인증없이 가능한 경우
                         .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/members").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/health/preview").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/health/save").permitAll()
 
                         //슈퍼 관리자 전용
                         .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
