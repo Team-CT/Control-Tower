@@ -32,9 +32,49 @@ const TenantDetail = () => {
     navigate('/super-admin/tenants');
   };
 
+  const handleSuspendAccount = async () => {
+    if (!window.confirm('정말로 이 계정을 정지하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await tenantService.updateTenantStatus(tenantId, 'INACTIVE');
+      alert('계정이 정지되었습니다.');
+      // 데이터 다시 로드
+      fetchTenantDetail();
+    } catch (err) {
+      console.error('계정 정지 실패:', err);
+      alert('계정 정지에 실패했습니다.');
+    }
+  };
+
+  const handleActivateAccount = async () => {
+    if (!window.confirm('이 계정을 활성화하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      await tenantService.updateTenantStatus(tenantId, 'ACTIVE');
+      alert('계정이 활성화되었습니다.');
+      // 데이터 다시 로드
+      fetchTenantDetail();
+    } catch (err) {
+      console.error('계정 활성화 실패:', err);
+      alert('계정 활성화에 실패했습니다.');
+    }
+  };
+
+  // 현재 상태에 따라 동적으로 Quick Actions 생성
+  const isInactive = tenantData?.status?.toUpperCase() === 'INACTIVE';
+  
   const quickActions = [
     { id: 1, label: '긴급 로그아웃', icon: '🔐', action: () => console.log('긴급 로그아웃') },
-    { id: 2, label: '계정 정지', icon: '🚫', action: () => console.log('계정 정지') },
+    { 
+      id: 2, 
+      label: isInactive ? '계정 활성화' : '계정 정지', 
+      icon: isInactive ? '✅' : '🚫', 
+      action: isInactive ? handleActivateAccount : handleSuspendAccount 
+    },
     { id: 3, label: '로그 보기', icon: '📄', action: () => console.log('로그 보기') }
   ];
 
@@ -48,6 +88,34 @@ const TenantDetail = () => {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleString('ko-KR');
+  };
+
+  const getStatusText = (status) => {
+    const upperStatus = status?.toUpperCase();
+    switch (upperStatus) {
+      case 'ACTIVE':
+        return '정상 서비스 중';
+      case 'PAYMENT_PENDING':
+        return '결제 중';
+      case 'INACTIVE':
+        return '미납으로 인한 정지';
+      default:
+        return status;
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    const upperStatus = status?.toUpperCase();
+    switch (upperStatus) {
+      case 'ACTIVE':
+        return '✓';
+      case 'PAYMENT_PENDING':
+        return '⏱';
+      case 'INACTIVE':
+        return '⚠';
+      default:
+        return '✓';
+    }
   };
 
   if (loading) {
@@ -97,7 +165,7 @@ const TenantDetail = () => {
           </S.TenantHeaderLeft>
           <S.TenantHeaderRight>
             <S.StatusBadgeLarge status={tenantData.status}>
-              ✓ 정상 서비스 중
+              {getStatusIcon(tenantData.status)} {getStatusText(tenantData.status)}
             </S.StatusBadgeLarge>
             <S.PlanBadgeLarge plan={tenantData.plan}>
               {tenantData.plan} 플랜

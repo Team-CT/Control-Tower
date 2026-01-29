@@ -25,11 +25,11 @@ public class Emp extends BaseTimeEntity {
 
     @JoinColumn(name = "airline_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    private Airline airline;
+    private Airline airlineId;
 
     @JoinColumn(name = "department_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
-    private Department department;
+    private Department departmentId;
 
     @Column(nullable = false, length = 100)
     private String empName;

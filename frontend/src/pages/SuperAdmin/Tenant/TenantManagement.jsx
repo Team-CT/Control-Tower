@@ -39,12 +39,13 @@ const TenantManagement = () => {
   };
 
   const getStatusText = (status) => {
-    switch (status) {
-      case 'active':
+    const upperStatus = status?.toUpperCase();
+    switch (upperStatus) {
+      case 'ACTIVE':
         return '정상 서비스 중';
-      case 'payment_pending':
+      case 'PAYMENT_PENDING':
         return '결제 중';
-      case 'inactive':
+      case 'INACTIVE':
         return '미납으로 인한 정지';
       default:
         return status;
@@ -52,12 +53,13 @@ const TenantManagement = () => {
   };
 
   const getStatusIcon = (status) => {
-    switch (status) {
-      case 'active':
+    const upperStatus = status?.toUpperCase();
+    switch (upperStatus) {
+      case 'ACTIVE':
         return '✓';
-      case 'payment_pending':
+      case 'PAYMENT_PENDING':
         return '⏱';
-      case 'inactive':
+      case 'INACTIVE':
         return '⚠';
       default:
         return '';

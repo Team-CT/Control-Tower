@@ -48,7 +48,7 @@ public class AuthService {
                 .empId(emp.getEmpId())
                 .empName(emp.getEmpName())
                 .role(emp.getRole().name()) // role이 Enum이면 .name()
-                .airlineId(emp.getAirline() != null ? emp.getAirline().getAirlineId() : null)
+                .airlineId(emp.getAirlineId() != null ? emp.getAirlineId().getAirlineId() : null)
                 .build();
     }
 }

@@ -67,9 +67,9 @@ public class Airline extends BaseTimeEntity {
 
     @JoinColumn(name = "airline_apply_id")
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    private AirlineApply airlineApply;
+    private AirlineApply airlineApplyId;
 
-    @OneToMany(mappedBy = "airline", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "airlineId", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AirlineAirport> airlineAirports = new ArrayList<>();
 
