@@ -17,5 +17,6 @@ export const API_ENDPOINTS = {
     BASE: `/api/health`,
     PREVIEW : `/api/health/preview`,
     SAVE : `/api/health/save`,
+    DETAIL: `/api/health/detail`,
   },
 };

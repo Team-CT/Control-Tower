@@ -114,4 +114,43 @@ public class HealthDto {
 
     }
 
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class PhysicalTestDetailResponse {
+        @JsonProperty("emp_id")
+        private String empId;
+        @JsonProperty("emp_name")
+        private String empName;
+        @JsonProperty("START_DATE")
+        private LocalDateTime startDate;
+        @JsonProperty("DEPARTMENT_NAME")
+        private String departmentName;
+        private String job;
+        private String email;
+        private String phone;
+        private String address;
+
+        @JsonProperty("test_date")
+        private LocalDateTime testDate; // "2026-01-26" 형태 권장
+        private Integer height;
+        private Integer weight;
+        @JsonProperty("blood_sugar")
+        private Integer bloodSugar;
+        @JsonProperty("systolic_blood_pressure")
+        private Integer systolicBloodPressure;
+        @JsonProperty("diastolic_blood_pressure")
+        private Integer diastolicBloodPressure;
+        private Integer cholesterol;
+        @JsonProperty("heart_rate")
+        private Integer heartRate;
+        private Integer bmi;
+        @JsonProperty("body_fat")
+        private Integer bodyFat;
+
+
+    }
+
+
 }

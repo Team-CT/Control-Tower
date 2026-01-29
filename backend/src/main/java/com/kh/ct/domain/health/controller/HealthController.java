@@ -51,5 +51,17 @@ public class HealthController {
     }
 
 
+    /**
+     * 건강 정보 상세 보기
+     * @param empId
+     * @param physicalTestId
+     * @return
+     */
+    @GetMapping("/detail")
+    public ResponseEntity<HealthDto.PhysicalTestDetailResponse> getEmpPhysicalById(@RequestParam("empId") String empId,
+                                                                            @RequestParam("physicalTestId") Long physicalTestId) {
+        HealthDto.PhysicalTestDetailResponse result = healthService.getEmpPhysicalTestById(empId, physicalTestId);
+        return ResponseEntity.ok(result);
+    }
 
 }

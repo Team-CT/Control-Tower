@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   MainContainer,
@@ -60,25 +60,56 @@ import {
   VitalUnit,
   VitalStatus
 } from './EmployeeHealthDetail.styled';
+import { empPhysicalTestService } from '../../api/Health/healthService';
 
-const EmployeeHealthDetail = () => {
+const EmployeeHealthDetail = ({empId,physicalTestId}) => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('건강 개요');
+  const [detail, setDetail] = useState(null);
 
   {/* TODO: Zustand state mapping */}
-  const employeeData = {
-    id: 'EMP-2024-0547',
-    name: '김민수',
-    avatar: '김',
-    department: '객실 승무부',
-    role: '신임 승무원',
-    birthDate: '1985-05-12',
-    joinDate: '2015-03-15',
-    email: 'minsu.kim@koreanair.com',
-    phone: '010-1234-5678',
-    address: '서울특별시 강서구 하늘길 260',
-    healthStatus: '정상'
-  };
+
+    useEffect(() => {
+    const fetchDetail = async () => {
+      try {
+        //const res = await empPhysicalTestService.detail(empId, physicalTestId);
+        const res = await empPhysicalTestService.detail("TEST", 1);
+        setDetail(res.data);
+      } catch (e) {
+        console.error(e);
+        alert("상세 조회 실패");
+      }
+    };
+    
+    if (empId && physicalTestId) fetchDetail();
+  }, [empId, physicalTestId]);
+  // const employeeData = {
+  //   id: 'EMP-2024-0547',
+  //   name: '김민수',
+  //   avatar: '김',
+  //   department: '객실 승무부',
+  //   role: '신임 승무원',
+  //   birthDate: '1985-05-12',
+  //   joinDate: '2015-03-15',
+  //   email: 'minsu.kim@koreanair.com',
+  //   phone: '010-1234-5678',
+  //   address: '서울특별시 강서구 하늘길 260',
+  //   healthStatus: '정상'
+  // };
+  const employeeData = useMemo(() => {
+    if (!detail) return null;
+    return {
+      id: detail.emp_id,
+      name: detail.emp_name,
+      avatar: (detail.emp_name || "?").slice(0, 1),
+      department: detail.DEPARTMENT_NAME,
+      role: detail.job,
+      joinDate: detail.START_DATE ? detail.START_DATE.slice(0, 10) : "-",
+      email: detail.email,
+      phone: detail.phone,
+      address: detail.address,
+      healthStatus: "정상", // 없으면 임시 / 추후 로직
+    };
+  }, [detail]);
 
   const upcomingCheckup = {
     type: '대한항공 건강검진센터',
@@ -92,18 +123,36 @@ const EmployeeHealthDetail = () => {
     status: '완료'
   };
 
-  const vitalSigns = [
-    { icon: '📏', label: '키', value: '175', unit: 'cm', status: 'normal' },
-    { icon: '⚖️', label: '체중', value: '72', unit: 'kg', status: 'normal' },
-    { icon: '📊', label: 'BMI', value: '23.5', unit: '', status: 'warning' },
-    { icon: '❤️', label: '심박수', value: '72', unit: 'bpm', status: 'normal' },
-    { icon: '🩸', label: '혈압', value: '120/80', unit: 'mmHg', status: 'normal' },
-    { icon: '💉', label: '체지방률', value: '18.5', unit: '%', status: 'normal' },
-    { icon: '🩺', label: '혈당', value: '95', unit: 'mg/dL', status: 'normal' },
-    { icon: '💊', label: '콜레스테롤', value: '185', unit: 'mg/dL', status: 'normal' }
-  ];
+    const vitalSigns = useMemo(() => {
+    if (!detail) return [];
+    const bp =
+      detail.systolic_blood_pressure != null && detail.diastolic_blood_pressure != null
+        ? `${detail.systolic_blood_pressure}/${detail.diastolic_blood_pressure}`
+        : "-/-";
 
-  const tabs = ['건강 개요', '검진 이력', '예방접종 기록'];
+    return [
+      { icon: "📏", label: "키", value: detail.height ?? "-", unit: "cm", status: "normal" },
+      { icon: "⚖️", label: "체중", value: detail.weight ?? "-", unit: "kg", status: "normal" },
+      { icon: "📊", label: "BMI", value: detail.bmi ?? "-", unit: "", status: "normal" },
+      { icon: "❤️", label: "심박수", value: detail.heart_rate ?? "-", unit: "bpm", status: "normal" },
+      { icon: "🩸", label: "혈압", value: bp, unit: "mmHg", status: "normal" },
+      { icon: "💉", label: "체지방률", value: detail.body_fat ?? "-", unit: "%", status: "normal" },
+      { icon: "🩺", label: "혈당", value: detail.blood_sugar ?? "-", unit: "mg/dL", status: "normal" },
+      { icon: "💊", label: "콜레스테롤", value: detail.cholesterol ?? "-", unit: "mg/dL", status: "normal" },
+    ];
+  }, [detail]);
+
+  // const vitalSigns = [
+  //   { icon: '📏', label: '키', value: '175', unit: 'cm', status: 'normal' },
+  //   { icon: '⚖️', label: '체중', value: '72', unit: 'kg', status: 'normal' },
+  //   { icon: '📊', label: 'BMI', value: '23.5', unit: '', status: 'warning' },
+  //   { icon: '❤️', label: '심박수', value: '72', unit: 'bpm', status: 'normal' },
+  //   { icon: '🩸', label: '혈압', value: '120/80', unit: 'mmHg', status: 'normal' },
+  //   { icon: '💉', label: '체지방률', value: '18.5', unit: '%', status: 'normal' },
+  //   { icon: '🩺', label: '혈당', value: '95', unit: 'mg/dL', status: 'normal' },
+  //   { icon: '💊', label: '콜레스테롤', value: '185', unit: 'mg/dL', status: 'normal' }
+  // ];
+
 
   const handleBack = () => {
     navigate('/employeehealthmanagement');
@@ -134,26 +183,26 @@ const EmployeeHealthDetail = () => {
 
         <EmployeeProfileCard>
           <ProfileSection>
-            <AvatarLarge>{employeeData.avatar}</AvatarLarge>
+            <AvatarLarge >{employeeData?.avatar ?? "?"}</AvatarLarge>
             <ProfileInfo>
               <ProfileLabel>이름</ProfileLabel>
-              <ProfileValue>{employeeData.name}</ProfileValue>
+              <ProfileValue>{employeeData?.name ?? "-"}</ProfileValue>
             </ProfileInfo>
           </ProfileSection>
 
           <InfoGrid>
             <InfoItem>
               <InfoLabel>사번</InfoLabel>
-              <InfoValue>{employeeData.id}</InfoValue>
+              <InfoValue>{employeeData?.id ?? "-"}</InfoValue>
             </InfoItem>
-            <InfoItem>
+            {/* <InfoItem>
               <InfoLabel>생년월일</InfoLabel>
               <InfoValue>{employeeData.birthDate}</InfoValue>
-            </InfoItem>
+            </InfoItem> */}
             <InfoItem>
               <InfoLabel>건강 상태</InfoLabel>
               <HealthStatusBadge status="normal">
-                {employeeData.healthStatus}
+                정상
               </HealthStatusBadge>
             </InfoItem>
           </InfoGrid>
@@ -161,30 +210,30 @@ const EmployeeHealthDetail = () => {
           <InfoGrid>
             <InfoItem>
               <InfoLabel>부서</InfoLabel>
-              <InfoValue>{employeeData.department}</InfoValue>
+              <InfoValue>{employeeData?.department_name ?? "-"}</InfoValue>
             </InfoItem>
             <InfoItem>
               <InfoLabel>직급</InfoLabel>
-              <InfoValue>{employeeData.role}</InfoValue>
+              <InfoValue>{employeeData?.job ?? "-"}</InfoValue>
             </InfoItem>
             <InfoItem>
               <InfoLabel>입사일</InfoLabel>
-              <InfoValue>{employeeData.joinDate}</InfoValue>
+              <InfoValue>{employeeData?.start_date ?? "-"}</InfoValue>
             </InfoItem>
           </InfoGrid>
 
           <InfoGrid>
             <InfoItem>
               <InfoLabel>📧 이메일</InfoLabel>
-              <InfoValue>{employeeData.email}</InfoValue>
+              <InfoValue>{employeeData?.email ?? "-"}</InfoValue>
             </InfoItem>
             <InfoItem>
               <InfoLabel>📞 연락처</InfoLabel>
-              <InfoValue>{employeeData.phone}</InfoValue>
+              <InfoValue>{employeeData?.phone ?? "-"}</InfoValue>
             </InfoItem>
             <InfoItem>
               <InfoLabel>📍 주소</InfoLabel>
-              <InfoValue>{employeeData.address}</InfoValue>
+              <InfoValue>{employeeData?.address ?? "-"}</InfoValue>
             </InfoItem>
           </InfoGrid>
         </EmployeeProfileCard>
@@ -207,22 +256,7 @@ const EmployeeHealthDetail = () => {
           </SuccessBox>
         </AlertSection>
 
-        <TabContainer>
-          <TabList>
-            {tabs.map((tab) => (
-              <Tab
-                key={tab}
-                active={activeTab === tab}
-                onClick={() => setActiveTab(tab)}
-              >
-                {tab}
-              </Tab>
-            ))}
-          </TabList>
-
-          <TabContent>
-            {activeTab === '건강 개요' && (
-              <>
+        <>
                 <CheckupCard>
                   <CheckupHeader>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -286,21 +320,6 @@ const EmployeeHealthDetail = () => {
                   </VitalGrid>
                 </VitalSignsCard>
               </>
-            )}
-
-            {activeTab === '검진 이력' && (
-              <div style={{ padding: '40px', textAlign: 'center', color: '#6B7280' }}>
-                검진 이력 내용이 여기에 표시됩니다.
-              </div>
-            )}
-
-            {activeTab === '예방접종 기록' && (
-              <div style={{ padding: '40px', textAlign: 'center', color: '#6B7280' }}>
-                예방접종 기록이 여기에 표시됩니다.
-              </div>
-            )}
-          </TabContent>
-        </TabContainer>
       </ContentWrapper>
     </MainContainer>
   );

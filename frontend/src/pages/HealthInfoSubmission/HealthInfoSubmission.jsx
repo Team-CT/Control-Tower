@@ -235,6 +235,7 @@ const callSave = async () => {
     {/* TODO: Submit with Zustand */}
     console.log('Submitting:', { formData, uploadedFile, selectedMethod });
     alert('건강 정보가 제출되었습니다.');
+    
   };
 
   return (
