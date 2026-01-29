@@ -11,8 +11,9 @@ import Register from './pages/Register/Register';
 import SelectId from './pages/SelectId/SelectId';
 import SelectPwd from './pages/SelectPwd/SelectPwd';
 import WorkLogin from './pages/WorkLogin/WorkLogin';
-import Board from './pages/Board/Board';
-import BoardDetail from './pages/BoardDetail/BoardDetail';
+import Board from './pages/board/board';
+import BoardDetail from './pages/boardDetail/boardDetail';
+import BoardEdit from './pages/boardEdit/boardEdit';
 import QnA from './pages/QnA/QnA';
 import EmployeeDashboard from './pages/EmployeeDashboard/EmployeeDashboard';
 import EmployeeManagement from './pages/EmployeeManagement/EmployeeManagement';
@@ -47,6 +48,7 @@ import CompanyRegistrationManagement from './pages/SuperAdmin/CompanyRegistratio
 
 // 레이아웃 컴포넌트 Import
 import MainLayout from './layout/MainLayout';
+
 
 // SuperAdminDashboard는 CompanyRegistrationManagement를 사용
 const SuperAdminDashboard = CompanyRegistrationManagement;
@@ -89,7 +91,8 @@ const ThemedApp = () => {
           
           {/* [게시판] */}
           <Route path="/board" element={<Board />} />
-          <Route path="/board/detail" element={<BoardDetail />} />
+          <Route path="/board/detail/:boardId" element={<BoardDetail />} />
+          <Route path="/board/edit/:boardId" element={<BoardEdit />} />
           <Route path="/qna" element={<QnA />} />
           
           {/* [인사 관리] */}

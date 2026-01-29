@@ -31,4 +31,11 @@ public class Board extends BaseTimeEntity {
     private Emp boardWriter;
 
     private Integer boardCount;
+
+    // Board.java 내부
+    public void update(String boardType, String boardTitle, String boardContent) {
+        this.boardType = boardType;
+        this.boardTitle = boardTitle;
+        this.boardContent = boardContent;
+    }
 }

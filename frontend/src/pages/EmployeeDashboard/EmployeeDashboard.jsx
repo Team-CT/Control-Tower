@@ -1,47 +1,216 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import * as S from './EmployeeDashboard.styled';
+import { getTodayString ,getYearString ,getWorkingDaysInMonth } from './Total_date';
+import { fetchDashboardData } from "./dashboardApi"; 
+import { ATTENDANCE_CONFIG } from './Total_working'; 
+import { useNavigate } from 'react-router-dom';
+
 
 const EmployeeDashboard = () => {
-  // TODO: Zustand state mapping
-  const [currentTime] = useState('08:45');
-  const [currentDate] = useState('2026년 1월 15일 (화)');
-  
+
+  const [leaveCount, setLeaveCount] = useState(0);
+  const [currentTime, setCurrentTime] = useState('--:--'); 
+  const [currentDate] = useState(getTodayString());
+  const [statusInfo, setStatusInfo] = useState(ATTENDANCE_CONFIG.DEFAULT);
+  const [currentYear] = useState(getYearString());
+const [totalWorkingDays, setTotalWorkingDays] = useState(0); // 이번 달 총 평일 수
+  const [actualWorkingDays, setActualWorkingDays] = useState(0);
+const [flightTime, setFlightTime] = useState(0); //비행시간 
+const [flightCount, setFlightCount] = useState(0); // 비행 횟수 
+const [healthData, setHealthData] = useState({
+    healthPoint: 0,
+    stressPoint: 0,
+    fatiguePoint: 0,
+    physicalPoint: 0
+  });
+const [recentNotifications, setRecentNotifications] = useState([]);
+const navigate = useNavigate();
+const handleHealthDetailClick = () => {
+    // 클릭 시 이동할 경로 설정
+    navigate('/health-dashboard');
+  };
+  useEffect(() => { 
+    const loadData = async () => {
+      try {
+
+        const storageData = localStorage.getItem('auth-storage');
+       const parsedData = JSON.parse(storageData);
+        
+        // 3. 토큰 및 사원 정보 추출
+        const token = parsedData.state?.token;
+        const empId = parsedData.state?.emp?.empId;
+        const empName = parsedData.state?.emp?.empName;
+        const role = parsedData.state?.emp?.role;
+
+        console.log("확인된 사번:", empId);
+        console.log("확인된 이름:", empName);
+        console.log("확인된 역할:", role);
+        console.log("현재 로컬스토리에서 가져온 토큰:", token);
+            if (!token) {
+                navigate('/login');
+                return;
+            }
+
+            // 2. 인자 없이 API 호출 (백엔드에서 토큰으로 유저 식별)
+            const data = await fetchDashboardData();
+
+        setTotalWorkingDays(getWorkingDaysInMonth());
+        console.log("1. 전체 응답 데이터:", data);
+
+        
+        // 1. 연차 개수 설정
+        if (data.empInfo) {
+          setLeaveCount(data.empInfo.leaveCount || 0);
+        }
+
+     // [추가] 백엔드 DTO에서 넘어온 workingDays(실제 근무일) 설정
+        if (data.workingDays !== undefined) {
+          setActualWorkingDays(data.workingDays);
+        }
+        // 2. 출결 상태 및 출근 시간 설정
+        if (data.attendanceList && data.attendanceList.length > 0) {
+          const todayData = data.attendanceList[0];
+          
+          // Enum 값에 따른 설정값 가져오기
+          const config = ATTENDANCE_CONFIG[todayData.attendanceStatus] || ATTENDANCE_CONFIG.DEFAULT;
+          setStatusInfo(config);
+
+          // 시간 표시 (HH:mm)
+          if (todayData.inTime) {
+            setCurrentTime(todayData.inTime.substring(0, 5));
+          }
+        }
+
+         if (data.totalFlightHours !== undefined) {
+        setFlightTime(data.totalFlightHours);
+      }
+      if (data.totalFlightCount !== undefined) {
+        setFlightCount(data.totalFlightCount);
+      }
+
+     if (data.healthInfo) {
+  setHealthData({
+    healthPoint: data.healthInfo.healthPoint || 0,
+    stressPoint: data.healthInfo.stressPoint || 0,
+    fatiguePoint: data.healthInfo.fatiguePoint || 0,
+    physicalPoint: data.healthInfo.physicalPoint || 0
+  });
+}
+
+   const newNotifications = [];
+// 1. 한국 시간 기준 오늘 날짜 문자열 (YYYY-MM-DD) 생성
+const todayStr = new Date().toLocaleDateString('en-CA'); 
+
+if (data.attendanceList && data.attendanceList.length > 0) {
+    // 2. 리스트를 복사하여 ID 역순(최신순)으로 정렬
+    const sortedList = [...data.attendanceList].sort((a, b) => b.attendanceId - a.attendanceId);
+
+    // 3. 정렬된 리스트에서 오늘(todayStr)이 아닌 첫 번째 데이터를 찾음 (이것이 전날 근태)
+    const lastWorkDay = sortedList.find(item => item.attendanceDate !== todayStr);
+
+    if (lastWorkDay) {
+        // 정의해두신 ATTENDANCE_CONFIG 활용
+        const status = ATTENDANCE_CONFIG[lastWorkDay.attendanceStatus] || ATTENDANCE_CONFIG.DEFAULT;
+        
+        // 날짜 가독성을 위해 월-일만 추출 (선택 사항)
+        const dateParts = lastWorkDay.attendanceDate.split('-');
+        const formattedDate = `${dateParts[1]}월 ${dateParts[2]}일`;
+
+        newNotifications.push({
+            id: 1,
+            icon: lastWorkDay.attendanceStatus === 'ABSENT' ? '❗' : '✅',
+            title: '전일 근태 결과 확인',
+            message: `${formattedDate} 근태가 [${status.label}]로 처리되었습니다.`,
+            time: '최종 반영',
+            color: status.color
+        });
+    } else {
+        // 오늘 기록만 있거나 과거 기록이 아예 없는 경우
+        newNotifications.push({
+            id: 1,
+            icon: 'ℹ️',
+            title: '근태 알림',
+            message: '이전 근무 기록이 존재하지 않습니다.',
+            time: '-',
+            color: '#95A5A6'
+        });
+    }
+}
+
+
+
+
+                const issueFlight = data.flightList?.find(f => f.flightStatus === 'DELAYED' || f.flightStatus === 'CANCELLED');
+        if (issueFlight) {
+            newNotifications.push({
+                id: 2,
+                icon: '⚠️',
+                title: issueFlight.flightStatus === 'DELAYED' ? '비행 지연 공지' : '비행 취소 공지',
+                // DTO의 flyStartTime(yyyy-MM-dd HH:mm)에서 시간만 추출
+                message: `[${issueFlight.flyStartTime.substring(11)}] ${issueFlight.flightNumber}편이 ${issueFlight.flightStatus === 'DELAYED' ? '지연' : '취소'}되었습니다.`,
+                time: '실시간',
+                color: '#E74C3C'
+            });
+        } else {
+            const nextFlight = data.flightList?.[0];
+            newNotifications.push({
+                id: 2,
+                icon: '✈️',
+                title: '스케줄 정상',
+                message: nextFlight ? `다음 비행: ${nextFlight.flightNumber} (${nextFlight.flyStartTime.substring(11)})` : '지연/취소된 일정이 없습니다.',
+                time: '현재',
+                color: '#4A90E2'
+            });
+        }
+             setRecentNotifications(newNotifications);
+
+      } catch (error) {
+        console.error("데이터를 불러오는데 실패했습니다.", error);
+        console.error("에러 상세 정보:", error.response);
+        if(error.response?.status === 401) navigate('/login');
+      }
+    };
+
+    loadData();
+  }, [navigate]);
+
+
   // 통계 데이터
   const statistics = [
-    { 
+   { 
+      id: 'day', 
+      icon: '💼', 
+      label: '이번 달 근무일', 
+      value: actualWorkingDays, 
+      unit: `/ ${totalWorkingDays}일`,
+      subInfo: '정상 근무 중',
+      color: '#F39C12'
+    },
+   { 
+    id: 'flight', 
+    icon: '✈️', 
+    label: '누적 비행시간', 
+    value: flightTime,  // [수정] 상태값 반영
+    unit: '시간',
+    subInfo: `비행 수 : ${flightCount}회`, // [수정] 상태값 반영
+    color: '#27AE60'
+  },
+     { 
       id: 'leave', 
       icon: '📅', 
-      label: '이번 달 연차', 
-      value: 18, 
-      unit: '/ 22일',
-      subInfo: '잔여 근무 중',
+      label: '남은 연차', 
+      value: `${leaveCount}`, 
+      unit: `일`,
+      subInfo: `${currentYear}`,
       color: '#4A90E2'
-    },
-    { 
-      id: 'flight', 
-      icon: '✈️', 
-      label: '누적 비행시간', 
-      value: 847, 
-      unit: '시간',
-      subInfo: '이번 달 +42시간',
-      color: '#27AE60'
-    },
-    { 
-      id: 'health', 
-      icon: '🏥', 
-      label: '건강 검진', 
-      value: 12, 
-      unit: '월',
-      subInfo: '3월 15일 예정',
-      color: '#F39C12'
     },
     { 
       id: 'stress', 
       icon: '❤️', 
       label: '건강 점수', 
-      value: 82, 
+      value: healthData.healthPoint, 
       unit: '점',
-      subInfo: '지난달 대비 +5점',
+      subInfo: '평균 지수',
       color: '#E74C3C'
     }
   ];
@@ -78,31 +247,24 @@ const EmployeeDashboard = () => {
   ];
 
   // 최근 알림
-  const recentNotifications = [
-    {
-      id: 1,
-      type: 'attendance',
-      icon: '✅',
-      title: '출퇴근 완료',
-      message: '1/20 업무 근태가 완료되었습니다.',
-      time: '5분전',
-      color: '#27AE60'
-    },
-    {
-      id: 2,
-      type: 'schedule',
-      icon: '✈️',
-      title: '비행 일정 변경',
-      message: 'KE008 항공 4/30(목) 08:00로 변경',
-      time: '3시간',
-      color: '#4A90E2'
-    }
-  ];
+
 
   // 성과 데이터
-  const performanceData = {
-    attendance: { label: '연차', current: 12, total: 18, percentage: 66.7 },
-    leave: { label: '근무일', current: 18, total: 22, percentage: 81.8 }
+ const performanceData = {
+    attendance: { 
+      label: '연차 사용', 
+      // 총 연차를 15일로 가정할 때: (15 - 남은연차) = 사용한 연차
+      current: Math.max(0, 15 - leaveCount), 
+      total: 15, 
+      percentage: Math.min(100, ((15 - leaveCount) / 15) * 100) 
+    },
+    leave: { 
+      label: '근무일', 
+      current: actualWorkingDays, 
+      total: totalWorkingDays, 
+      // 이번 달 근무 진행률 (실제근무일 / 이번달 총 평일)
+      percentage: totalWorkingDays > 0 ? (actualWorkingDays / totalWorkingDays) * 100 : 0 
+    }
   };
 
   return (
@@ -113,7 +275,7 @@ const EmployeeDashboard = () => {
           <S.BannerContent>
             <S.BannerInfo>
               <S.BannerLabel>오늘의 근무 상태</S.BannerLabel>
-              <S.BannerTitle>정상 출근 완료 - {currentDate}</S.BannerTitle>
+              <S.BannerTitle>{statusInfo.label} - {currentDate}</S.BannerTitle>
             </S.BannerInfo>
             <S.BannerTime>{currentTime}</S.BannerTime>
           </S.BannerContent>
@@ -143,9 +305,9 @@ const EmployeeDashboard = () => {
           <S.ScheduleSection>
             <S.SectionHeader>
               <S.SectionTitle>
-                📅 이번 주 일정
+                📅 오늘 일정
               </S.SectionTitle>
-              <S.SectionAction>전체보기</S.SectionAction>
+              
             </S.SectionHeader>
 
             <S.ScheduleList>
@@ -174,57 +336,52 @@ const EmployeeDashboard = () => {
               </S.SectionHeader>
 
               <S.HealthScore>
-                <S.ScoreValue>82</S.ScoreValue>
+                <S.ScoreValue>{healthData.healthPoint}</S.ScoreValue>
                 <S.ScoreGrid>
                   <S.ScoreItem>
-                    <S.ScoreGrade grade="A">A</S.ScoreGrade>
-                    <S.ScoreLabel>체력</S.ScoreLabel>
+                    <S.ScoreGrade grade="A">{healthData.physicalPoint}</S.ScoreGrade>
+                    <S.ScoreLabel>체력(신체건강)</S.ScoreLabel>
                   </S.ScoreItem>
                   <S.ScoreItem>
-                    <S.ScoreGrade grade="B+">B+</S.ScoreGrade>
+                    <S.ScoreGrade grade="B+">{healthData.stressPoint}</S.ScoreGrade>
                     <S.ScoreLabel>스트레스</S.ScoreLabel>
                   </S.ScoreItem>
                 </S.ScoreGrid>
               </S.HealthScore>
 
-              <S.HealthActionButton>
+              <S.HealthActionButton onClick={handleHealthDetailClick}>
                 📊 상세 정보보기
               </S.HealthActionButton>
             </S.HealthSection>
 
             {/* 최근 알림 */}
             <S.NotificationSection>
-              <S.SectionHeader>
-                <S.SectionTitle>🔔 최근 알림</S.SectionTitle>
-                <S.SectionAction>전체 보기</S.SectionAction>
-              </S.SectionHeader>
-
-              <S.NotificationList>
-                {recentNotifications.map((notification) => (
-                  <S.NotificationItem key={notification.id}>
-                    <S.NotificationIcon color={notification.color}>
-                      {notification.icon}
-                    </S.NotificationIcon>
-                    <S.NotificationContent>
-                      <S.NotificationTitle>{notification.title}</S.NotificationTitle>
-                      <S.NotificationMessage>{notification.message}</S.NotificationMessage>
-                      <S.NotificationTime>{notification.time}</S.NotificationTime>
-                    </S.NotificationContent>
-                  </S.NotificationItem>
-                ))}
-              </S.NotificationList>
-            </S.NotificationSection>
+                            <S.SectionHeader>
+                                <S.SectionTitle>🔔 최근 알림</S.SectionTitle>
+                            </S.SectionHeader>
+                            <S.NotificationList>
+                                {recentNotifications.map((noti) => (
+                                    <S.NotificationItem key={noti.id}>
+                                        <S.NotificationIcon color={noti.color}>{noti.icon}</S.NotificationIcon>
+                                        <S.NotificationContent>
+                                            <S.NotificationTitle>{noti.title}</S.NotificationTitle>
+                                            <S.NotificationMessage>{noti.message}</S.NotificationMessage>
+                                            <S.NotificationTime>{noti.time}</S.NotificationTime>
+                                        </S.NotificationContent>
+                                    </S.NotificationItem>
+                                ))}
+                            </S.NotificationList>
+                        </S.NotificationSection>
           </S.RightPanel>
         </S.ContentGrid>
 
-        {/* 성과 차트 */}
         <S.PerformanceSection>
           <S.SectionHeader>
-            <S.SectionTitle>📊 성과</S.SectionTitle>
-            <S.PerformanceButton>월간 성과</S.PerformanceButton>
+            <S.SectionTitle>📊 이번 달 현황</S.SectionTitle>
           </S.SectionHeader>
 
           <S.PerformanceChart>
+            {/* 연차 사용 바 */}
             <S.ChartBar>
               <S.ChartLabel>연차</S.ChartLabel>
               <S.ChartProgress>
@@ -234,13 +391,14 @@ const EmployeeDashboard = () => {
                 />
               </S.ChartProgress>
               <S.ChartValue>
-                {performanceData.attendance.current}일 
-                <S.ChartTotal>/ {performanceData.attendance.total}일</S.ChartTotal>
+                {performanceData.attendance.current}일 사용 
+                <S.ChartTotal>/ {leaveCount}일</S.ChartTotal>
               </S.ChartValue>
             </S.ChartBar>
 
+            {/* 근무일 바 */}
             <S.ChartBar>
-              <S.ChartLabel>근무일</S.ChartLabel>
+              <S.ChartLabel>근무</S.ChartLabel>
               <S.ChartProgress>
                 <S.ChartFill 
                   width={performanceData.leave.percentage} 
@@ -248,7 +406,7 @@ const EmployeeDashboard = () => {
                 />
               </S.ChartProgress>
               <S.ChartValue>
-                {performanceData.leave.current}일 
+                {performanceData.leave.current}일 출근 
                 <S.ChartTotal>/ {performanceData.leave.total}일</S.ChartTotal>
               </S.ChartValue>
             </S.ChartBar>
