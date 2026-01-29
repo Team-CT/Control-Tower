@@ -40,4 +40,27 @@ public class AirlineApply extends BaseTimeEntity {
 
     @Lob
     private String airlineApplyCancelReason;
+
+    @Column(nullable = false)
+    private Boolean emailDomainVerified = false;
+
+    @Column(length = 500)
+    private String businessLicensePath;
+
+    @Column(length = 500)
+    private String employmentCertPath;
+
+    // 비즈니스 로직 메서드
+    public void approve() {
+        this.airlineApplyStatus = CommonEnums.ApplyStatus.APPROVED;
+    }
+
+    public void reject(String reason) {
+        this.airlineApplyStatus = CommonEnums.ApplyStatus.REJECTED;
+        this.airlineApplyCancelReason = reason;
+    }
+
+    public void setEmailDomainVerified(Boolean verified) {
+        this.emailDomainVerified = verified;
+    }
 }

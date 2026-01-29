@@ -38,6 +38,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/members").permitAll()
 
+                        //슈퍼 관리자 전용
+                        .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
+
                         //관리자 전용
                         .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/members/search").hasRole("ADMIN")
