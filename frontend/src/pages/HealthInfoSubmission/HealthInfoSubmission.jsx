@@ -39,6 +39,8 @@ import {
   GuideItemTitle,
   GuideItemDescription
 } from './HealthInfoSubmission.styled';
+import axios from 'axios';
+import { empPhysicalTestService} from '../../api/Health/healthService';
 
 const HealthInfoSubmission = () => {
   const [selectedMethod, setSelectedMethod] = useState('text');
@@ -47,9 +49,27 @@ const HealthInfoSubmission = () => {
     classification: '',
     memo: ''
   });
+  const [empId, setEmpId] = useState("");
+  const [previewData, setPreviewData] = useState(null); 
   
   const fileInputRef = useRef(null);
   const maxCharacters = 2000;
+
+  const formatPreviewToMemo = (d) => {
+  const line = (label, value) => `${label}: ${value ?? "-"}`;
+  return [
+    line("검사일", d?.test_date),
+    line("키", d?.height),
+    line("체중", d?.weight),
+    line("혈당", d?.blood_sugar),
+    line("수축기혈압", d?.systolic_blood_pressure),
+    line("이완기혈압", d?.diastolic_blood_pressure),
+    line("콜레스테롤", d?.cholesterol),
+    line("심박수", d?.heart_rate),
+    line("BMI", d?.bmi),
+    line("체지방", d?.body_fat),
+  ].join("\n");
+};
 
   {/* TODO: Zustand state mapping */}
   const noticeItems = [
@@ -74,7 +94,51 @@ const HealthInfoSubmission = () => {
     }
   ];
 
-  const handleFileUpload = (event) => {
+  const callPreview = async (file) => {
+  const fd = new FormData();
+  fd.append("file", file);
+
+  const res = await axios.post("/preview", fd, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  setPreviewData(res.data);
+};
+
+const callSave = async () => {
+  if (!empId) {
+    alert("empId가 필요합니다.");
+    return;
+  }
+  if (!uploadedFile) {
+    alert("파일을 업로드해주세요.");
+    return;
+  }
+  if (!previewData) {
+    alert("미리보기 데이터가 없습니다. 먼저 파일을 업로드해주세요.");
+    return;
+  }
+
+  // 백엔드 save는 @RequestPart("data") HealthDto.PhysicalTestRequest 를 받으므로
+  // JSON을 application/json 파트로 넣어야 함
+  const fd = new FormData();
+  fd.append("empId", empId);
+  fd.append("file", uploadedFile);
+  fd.append(
+    "data",
+    new Blob([JSON.stringify(previewData)], { type: "application/json" })
+  );
+
+  const res = await axios.post("/save", fd, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+
+  const savedId = res.data; // Long
+  // 저장 후 리스트/상세로 이동
+  // navigate(`/health/physical-tests/${savedId}`) 등
+  alert(`저장 완료 (id: ${savedId})`);
+};
+
+  const handleFileUpload = async(event) => {
     const file = event.target.files[0];
     if (file) {
       // Validate file size (10MB max)
@@ -91,7 +155,26 @@ const HealthInfoSubmission = () => {
       }
 
       setUploadedFile(file);
+      setSelectedMethod("file");
       {/* TODO: Upload file with Zustand */}
+      try {
+        const fd = new FormData();
+        fd.append("file", file);
+        const res = await empPhysicalTestService.preview(fd);
+        const preview = res.data;
+        console.log(res);
+        setPreviewData(preview);
+        setFormData((prev) => ({
+          ...prev,
+          classification: "건강검진",            
+          memo: formatPreviewToMemo(preview),  
+        }));
+        setSelectedMethod("text");
+
+      } catch (e) {
+        console.error(e);
+        alert("미리보기(파싱) 실패");
+      }
     }
   };
 
@@ -124,7 +207,7 @@ const HealthInfoSubmission = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.classification.trim()) {
       alert('정보 유형을 입력해주세요.');
       return;
@@ -140,9 +223,13 @@ const HealthInfoSubmission = () => {
       return;
     }
 
-    if (formData.memo.trim().length < 50 && selectedMethod === 'text') {
-      alert('최소 50자 이상 입력해주세요.');
-      return;
+
+    try {
+      console.log(previewData);
+      await empPhysicalTestService.save('TEST',uploadedFile,previewData);
+    } catch (e) {
+      console.error(e);
+      alert("저장 실패");
     }
 
     {/* TODO: Submit with Zustand */}
