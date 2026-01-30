@@ -1,7 +1,7 @@
 package com.kh.ct.domain.board.service;
 
-import com.kh.ct.global.entity.File;
 import com.kh.ct.global.repository.FileRepository;
+import com.kh.ct.global.entity.File;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

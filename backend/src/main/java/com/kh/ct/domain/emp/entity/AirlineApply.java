@@ -16,23 +16,17 @@ public class AirlineApply extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long airlineApplyId;
 
-    @Column(length = 100)
+    @Column(length = 100, nullable = false)
     private String airlineName;
 
+    @Column(length = 150, nullable = false)
+    private String airlineApplyEmail;
+
     @Column(length = 100)
-    private String theme;
+    private String managerName;
 
     @Column(length = 50)
-    private String mainNumber;
-
-    @Column(length = 255)
-    private String airlineAddress;
-
-    @Column(length = 500)
-    private String airlineDesc;
-
-    @Column(length = 150)
-    private String airlineApplyEmail;
+    private String managerPhone;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
