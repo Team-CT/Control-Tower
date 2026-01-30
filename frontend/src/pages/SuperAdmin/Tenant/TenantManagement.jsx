@@ -150,7 +150,6 @@ const TenantManagement = () => {
 
                 <S.CardBody>
                   <S.TenantId>테넌트 ID: {tenant.id}</S.TenantId>
-                  <S.PlanBadge plan={tenant.plan}>{tenant.plan}</S.PlanBadge>
                   <S.EmployeeCount>활성 직원 수: {(tenant.employeeCount || 0).toLocaleString()}명</S.EmployeeCount>
                 </S.CardBody>
 
@@ -178,7 +177,6 @@ const TenantManagement = () => {
                 <S.TableRow>
                   <S.TableHeader>항공사</S.TableHeader>
                   <S.TableHeader>테넌트 ID</S.TableHeader>
-                  <S.TableHeader>플랜</S.TableHeader>
                   <S.TableHeader>활성 직원 수</S.TableHeader>
                   <S.TableHeader>상태</S.TableHeader>
                   <S.TableHeader>상세보기</S.TableHeader>
@@ -194,9 +192,6 @@ const TenantManagement = () => {
                       </S.TenantInfo>
                     </S.TableCell>
                     <S.TableCell>{tenant.id}</S.TableCell>
-                    <S.TableCell>
-                      <S.PlanBadge plan={tenant.plan}>{tenant.plan}</S.PlanBadge>
-                    </S.TableCell>
                     <S.TableCell>{(tenant.employeeCount || 0).toLocaleString()}명</S.TableCell>
                     <S.TableCell>
                       <S.StatusBadge status={tenant.status}>

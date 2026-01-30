@@ -167,9 +167,6 @@ const TenantDetail = () => {
             <S.StatusBadgeLarge status={tenantData.status}>
               {getStatusIcon(tenantData.status)} {getStatusText(tenantData.status)}
             </S.StatusBadgeLarge>
-            <S.PlanBadgeLarge plan={tenantData.plan}>
-              {tenantData.plan} 플랜
-            </S.PlanBadgeLarge>
           </S.TenantHeaderRight>
         </S.TenantHeader>
 
@@ -237,26 +234,14 @@ const TenantDetail = () => {
 
             <S.InfoSection>
               <S.SectionTitle>
-                <S.SectionIcon>💳</S.SectionIcon>
-                구독 정보
+                <S.SectionIcon>📅</S.SectionIcon>
+                가입 정보
               </S.SectionTitle>
               <S.InfoList>
-                {/* <S.InfoRow>
-                  <S.InfoLabel>💰 현재 플랜</S.InfoLabel>
-                  <S.InfoValue>{tenantData.plan} - {tenantData.planPrice}</S.InfoValue>
-                </S.InfoRow> */}
                 <S.InfoRow>
                   <S.InfoLabel>📅 가입일</S.InfoLabel>
                   <S.InfoValue>{formatDate(tenantData.joinDate)}</S.InfoValue>
                 </S.InfoRow>
-                {/* <S.InfoRow>
-                  <S.InfoLabel>🔄 결제 주기</S.InfoLabel>
-                  <S.InfoValue>{tenantData.billingPeriod}</S.InfoValue>
-                </S.InfoRow>
-                <S.InfoRow>
-                  <S.InfoLabel>⏰ 다음 결제일</S.InfoLabel>
-                  <S.InfoValue>{tenantData.nextBilling}</S.InfoValue>
-                </S.InfoRow> */}
               </S.InfoList>
             </S.InfoSection>
           </S.LeftColumn>
