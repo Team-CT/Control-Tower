@@ -18,6 +18,15 @@ const CompanyRegistrationManagement = () => {
     fetchApplications();
   }, []);
 
+  // 검색어 변경 시 자동 검색 (디바운스 적용)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchApplications();
+    }, 300); // 300ms 디바운스
+
+    return () => clearTimeout(timer);
+  }, [searchKeyword]);
+
   const fetchApplications = async () => {
     try {
       setLoading(true);
