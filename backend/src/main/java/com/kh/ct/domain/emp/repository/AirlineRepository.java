@@ -24,6 +24,10 @@ public interface AirlineRepository extends JpaRepository<Airline, Long> {
 
     // AirlineApply ID로 Airline 조회
     @Query("SELECT a FROM Airline a WHERE a.airlineApplyId.airlineApplyId = :airlineApplyId")
-    Airline findByAirlineApplyId(@Param("airlineApplyId") Long airlineApplyId);
+    java.util.Optional<Airline> findByAirlineApplyId(@Param("airlineApplyId") Long airlineApplyId);
+    
+    // AirlineApply ID로 Airline 존재 여부 확인
+    @Query("SELECT COUNT(a) > 0 FROM Airline a WHERE a.airlineApplyId.airlineApplyId = :airlineApplyId")
+    boolean existsByAirlineApplyId(@Param("airlineApplyId") Long airlineApplyId);
 }
 

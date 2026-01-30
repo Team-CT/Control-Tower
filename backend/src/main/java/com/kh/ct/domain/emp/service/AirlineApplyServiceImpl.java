@@ -51,9 +51,38 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
     }
 
     @Override
+    @Transactional // readOnly = false로 오버라이드 (Airline 생성 가능하도록)
     public AirlineApplyDto.DetailResponse getApplicationDetail(Long id) {
         AirlineApply application = airlineApplyRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 신청을 찾을 수 없습니다. ID: " + id));
+        
+        // 승인되었지만 Airline이 없는 경우 자동 생성 (기존 승인 건 처리)
+        if (application.getAirlineApplyStatus() == com.kh.ct.global.common.CommonEnums.ApplyStatus.APPROVED) {
+            java.util.Optional<Airline> existingAirlineOpt = airlineRepository.findByAirlineApplyId(application.getAirlineApplyId());
+            if (existingAirlineOpt.isEmpty()) {
+                // Airline 자동 생성
+                Airline newAirline = Airline.builder()
+                        .airlineName(application.getAirlineName())
+                        .theme("gray") // 기본 테마
+                        .mainNumber("") // 기본값
+                        .airlineAddress("") // 기본값
+                        .airlineDesc("") // 기본값
+                        .email(application.getAirlineApplyEmail())
+                        .phone(application.getManagerPhone())
+                        .plan("Professional")
+                        .status(AirlineStatus.ACTIVE)
+                        .icon("✈️")
+                        .country("대한민국")
+                        .joinDate(application.getCreateDate() != null ? 
+                                application.getCreateDate().toLocalDate() : LocalDate.now())
+                        .storageUsage(0.0)
+                        .lastLoginDate(LocalDateTime.now())
+                        .airlineApplyId(application)
+                        .build();
+                airlineRepository.save(newAirline);
+            }
+        }
+        
         return convertToDetailResponse(application);
     }
 
@@ -64,32 +93,52 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
         AirlineApply application = airlineApplyRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 신청을 찾을 수 없습니다. ID: " + id));
         
-        // 2. 아이디 중복 체크
+        // 2. 이미 승인된 경우 체크
+        if (application.getAirlineApplyStatus() == com.kh.ct.global.common.CommonEnums.ApplyStatus.APPROVED) {
+            throw new IllegalArgumentException("이미 승인된 신청입니다.");
+        }
+        
+        // 3. 아이디 중복 체크
         if (empRepository.findById(adminId).isPresent()) {
             throw new IllegalArgumentException("이미 사용 중인 아이디입니다: " + adminId);
         }
         
-        // 3. 승인 처리
+        // 4. 승인 처리
         application.approve();
         
-        // 4. Airline(테넌트) 엔티티 생성
-        Airline airline = Airline.builder()
-                .airlineName(application.getAirlineName())
-                .email(application.getAirlineApplyEmail())
-                .phone(application.getManagerPhone())
-                .plan("Professional") // 기본 플랜
-                .status(AirlineStatus.ACTIVE)
-                .icon("✈️")
-                .country("대한민국")
-                .joinDate(LocalDate.now())
-                .storageUsage(0.0)
-                .lastLoginDate(LocalDateTime.now())
-                .airlineApplyId(application)
-                .build();
+        // 5. Airline(테넌트) 엔티티 생성 (이미 존재하는지 확인)
+        Airline airline = airlineRepository.findByAirlineApplyId(application.getAirlineApplyId())
+                .orElse(null);
         
-        airlineRepository.save(airline);
+        if (airline == null) {
+            // Airline이 없으면 생성 (중복 체크를 한 번 더 수행)
+            if (!airlineRepository.existsByAirlineApplyId(application.getAirlineApplyId())) {
+                airline = Airline.builder()
+                        .airlineName(application.getAirlineName())
+                        .theme("gray") // 기본 테마
+                        .mainNumber("") // 기본값
+                        .airlineAddress("") // 기본값
+                        .airlineDesc("") // 기본값
+                        .email(application.getAirlineApplyEmail())
+                        .phone(application.getManagerPhone())
+                        .plan("Professional") // 기본 플랜
+                        .status(AirlineStatus.ACTIVE)
+                        .icon("✈️")
+                        .country("대한민국")
+                        .joinDate(LocalDate.now())
+                        .storageUsage(0.0)
+                        .lastLoginDate(LocalDateTime.now())
+                        .airlineApplyId(application)
+                        .build();
+                airline = airlineRepository.save(airline);
+            } else {
+                // 저장 전에 다른 트랜잭션에서 생성되었을 수 있으므로 다시 조회
+                airline = airlineRepository.findByAirlineApplyId(application.getAirlineApplyId())
+                        .orElseThrow(() -> new IllegalStateException("Airline 생성 중 오류가 발생했습니다."));
+            }
+        }
         
-        // 5. 항공사 관리자 계정 생성
+        // 6. 항공사 관리자 계정 생성
         String tempPassword = generateTempPassword();
         String encodedPassword = passwordEncoder.encode(tempPassword);
         
@@ -177,9 +226,9 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
         // 승인된 경우 Airline ID 조회
         Long airlineId = null;
         if (entity.getAirlineApplyStatus() == com.kh.ct.global.common.CommonEnums.ApplyStatus.APPROVED) {
-            Airline airline = airlineRepository.findByAirlineApplyId(entity.getAirlineApplyId());
-            if (airline != null) {
-                airlineId = airline.getAirlineId();
+            java.util.Optional<Airline> airlineOpt = airlineRepository.findByAirlineApplyId(entity.getAirlineApplyId());
+            if (airlineOpt.isPresent()) {
+                airlineId = airlineOpt.get().getAirlineId();
             }
         }
 

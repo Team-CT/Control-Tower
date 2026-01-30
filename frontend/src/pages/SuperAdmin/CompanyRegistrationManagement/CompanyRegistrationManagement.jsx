@@ -55,9 +55,6 @@ const CompanyRegistrationManagement = () => {
   const handleViewDetail = async (application) => {
     try {
       const response = await airlineApplyService.getApplicationDetail(application.id);
-      console.log('=== 상세 정보 응답 ===', response.data);
-      console.log('airlineId:', response.data.airlineId);
-      console.log('status:', response.data.status);
       setSelectedApplication(response.data);
       setModalType(application.status);
     } catch (err) {
@@ -316,17 +313,17 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
                     : '이메일 도메인이 일치하지 않습니다.'}
                 </S.StepDescription>
               </S.ProgressStep>
-              <S.ProgressStep completed>
+              <S.ProgressStep $completed={true}>
                 <S.StepIcon>✓</S.StepIcon>
                 <S.StepLabel>필수 서류 제출</S.StepLabel>
                 <S.StepDescription>모든 필수 서류가 제출되었습니다.</S.StepDescription>
               </S.ProgressStep>
-              <S.ProgressStep completed>
+              <S.ProgressStep $completed={true}>
                 <S.StepIcon>✓</S.StepIcon>
                 <S.StepLabel>이메일 확인 유효성</S.StepLabel>
                 <S.StepDescription>이메일 확인이 완료되었습니다.</S.StepDescription>
               </S.ProgressStep>
-              <S.ProgressStep completed>
+              <S.ProgressStep $completed={true}>
                 <S.StepIcon>✓</S.StepIcon>
                 <S.StepLabel>사업자 등록증 확인</S.StepLabel>
                 <S.StepDescription>사업자 등록증이 검토되었습니다.</S.StepDescription>
@@ -421,15 +418,11 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
 const ApprovedModal = ({ application, onClose }) => {
   const navigate = useNavigate();
 
-  console.log('=== ApprovedModal 렌더링 ===');
-  console.log('application:', application);
-  console.log('application.airlineId:', application.airlineId);
-
   const handleViewTenant = () => {
     if (application.airlineId) {
       navigate(`/super-admin/tenants/${application.airlineId}`);
     } else {
-      alert('테넌트 정보를 찾을 수 없습니다.');
+      alert('테넌트 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
     }
   };
 
@@ -513,14 +506,10 @@ const ApprovedModal = ({ application, onClose }) => {
         </S.ModalContent>
 
         <S.ModalFooter>
-          {application.airlineId ? (
+          {application.airlineId && (
             <S.ApproveButton onClick={handleViewTenant} style={{ marginRight: '10px' }}>
               🏢 테넌트 상세보기
             </S.ApproveButton>
-          ) : (
-            <div style={{ fontSize: '12px', color: '#999', marginRight: 'auto' }}>
-              ℹ️ 이 신청은 구버전에서 승인되어 테넌트 정보가 없습니다.
-            </div>
           )}
           <S.CloseOnlyButton onClick={onClose}>닫기</S.CloseOnlyButton>
         </S.ModalFooter>
