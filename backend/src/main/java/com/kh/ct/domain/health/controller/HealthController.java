@@ -3,6 +3,10 @@ package com.kh.ct.domain.health.controller;
 import com.kh.ct.domain.health.dto.HealthDto;
 import com.kh.ct.domain.health.service.HealthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -62,6 +66,19 @@ public class HealthController {
                                                                             @RequestParam("physicalTestId") Long physicalTestId) {
         HealthDto.PhysicalTestDetailResponse result = healthService.getEmpPhysicalTestById(empId, physicalTestId);
         return ResponseEntity.ok(result);
+    }
+
+    /**
+     * 개인 건강 정보 제출 이력
+     * @param empId
+     * @param pageable
+     * @return
+     */
+    @GetMapping("/getPhysicalTest")
+    public ResponseEntity<Page<HealthDto.PhysicalTestResponse>> getPhysicalTestByEmpId(@RequestParam("empId") String empId,
+                                                                                      @PageableDefault(size = 4, sort = "testDate", direction = Sort.Direction.DESC) Pageable pageable) {
+        
+        return ResponseEntity.ok(healthService.getPhysicalTestByEmpId(empId,pageable));
     }
 
 }

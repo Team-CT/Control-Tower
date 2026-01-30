@@ -95,6 +95,8 @@ public class HealthDto {
         private Integer bmi;
         @JsonProperty("body_fat")
         private Integer bodyFat;
+        @JsonProperty("file_id")
+        private Long fileId;
 
         public static PhysicalTestResponse from (PhysicalTestRequest  physicalTest) {
             return PhysicalTestResponse.builder()
@@ -108,6 +110,22 @@ public class HealthDto {
                     .heartRate(physicalTest.getHeartRate())
                     .bmi(physicalTest.getBmi())
                     .bodyFat(physicalTest.getBodyFat())
+                    .build();
+        }
+
+        public static PhysicalTestResponse from(EmpPhysicalTest e) {
+            return PhysicalTestResponse.builder()
+                    .testDate(e.getTestDate())   // Response가 LocalDateTime이면 그대로
+                    .height(e.getHeight())
+                    .weight(e.getWeight())
+                    .bloodSugar(e.getBloodSugar())
+                    .systolicBloodPressure(e.getSystolicBloodPressure())
+                    .diastolicBloodPressure(e.getDiastolicBloodPressure())
+                    .cholesterol(e.getCholesterol())
+                    .heartRate(e.getHeartRate())
+                    .bmi(e.getBmi())
+                    .bodyFat(e.getBodyFat())
+                    .fileId(e.getFileId() != null ? e.getFileId().getFileId() : null)
                     .build();
         }
 
@@ -148,6 +166,21 @@ public class HealthDto {
         private Integer bmi;
         @JsonProperty("body_fat")
         private Integer bodyFat;
+
+        public static PhysicalTestDetailResponse from(EmpPhysicalTest e) {
+            return PhysicalTestDetailResponse.builder()
+                    .testDate(e.getTestDate())
+                    .height(e.getHeight())
+                    .weight(e.getWeight())
+                    .bloodSugar(e.getBloodSugar())
+                    .systolicBloodPressure(e.getSystolicBloodPressure())
+                    .diastolicBloodPressure(e.getDiastolicBloodPressure())
+                    .cholesterol(e.getCholesterol())
+                    .heartRate(e.getHeartRate())
+                    .bmi(e.getBmi())
+                    .bodyFat(e.getBodyFat())
+                    .build();
+        }
 
 
     }

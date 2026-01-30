@@ -21,10 +21,15 @@ export const empPhysicalTestService = {
     },
 
     detail: (empId, physicalTestId) => {
-    return api.get(API_ENDPOINTS.HEALTH.DETAIL, {
-        params: { empId, physicalTestId },
-    });
-},
+        return api.get(API_ENDPOINTS.HEALTH.DETAIL, {
+            params: { empId, physicalTestId },
+        });
+    },
+    getPhysicalTest: (empId, page = 0, size = 10) => {
+        return api.get("/api/health/getPhysicalTest", {
+            params: { empId, page, size, sort: "testDate,desc" },
+        });
+    },
 }
 
 

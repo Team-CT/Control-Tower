@@ -10,6 +10,8 @@ import com.kh.ct.domain.health.service.parser.PdfTextExtractor;
 import com.kh.ct.global.entity.File;
 import com.kh.ct.global.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -146,6 +148,14 @@ public class HealthServiceImpl implements HealthService {
                 .bmi(test.getBmi())
                 .bodyFat(test.getBodyFat())
                 .build();
+    }
+
+    @Override
+    public Page<HealthDto.PhysicalTestResponse> getPhysicalTestByEmpId(String empId, Pageable pageable) {
+        Page<EmpPhysicalTest> posts;
+
+        posts = healthRepository.findByEmpId_EmpId(empId,pageable);
+        return posts.map(HealthDto.PhysicalTestResponse::from);
     }
 
 
