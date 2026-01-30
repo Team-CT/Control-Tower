@@ -16,6 +16,15 @@ const TenantManagement = () => {
     fetchTenants();
   }, []);
 
+  // 검색어 변경 시 자동 검색 (디바운스 적용)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchTenants();
+    }, 300); // 300ms 디바운스
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const fetchTenants = async () => {
     try {
       setLoading(true);
@@ -173,7 +182,6 @@ const TenantManagement = () => {
                   <S.TableHeader>활성 직원 수</S.TableHeader>
                   <S.TableHeader>상태</S.TableHeader>
                   <S.TableHeader>상세보기</S.TableHeader>
-                  <S.TableHeader>작업</S.TableHeader>
                 </S.TableRow>
               </S.TableHead>
               <S.TableBody>
