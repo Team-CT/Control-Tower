@@ -22,11 +22,11 @@ public class AuthService {
 
         // 1) 회원 조회 (empId 기준 조회가 안전)
         Emp emp = empRepository.findById(request.getEmpId())
-                .orElseThrow(() -> new IllegalArgumentException("아이디가 일치하지 않습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("아이디나 비밀번호가 일치하지 않습니다."));
 
         // 2) 비밀번호 검증
         if (!passwordEncoder.matches(request.getEmpPwd(), emp.getEmpPwd())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new IllegalArgumentException("아이디나 비밀번호가 일치하지 않습니다.");
         }
 
         // 3) 토큰 발급
