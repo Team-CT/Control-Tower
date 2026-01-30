@@ -18,9 +18,8 @@ public class PasswordCode extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long PasswordCodeId;
 
-    @JoinColumn(nullable = false, name = "emp_id")
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Emp empId;
+    @Column(length = 150)
+    private String email;
 
     @Column(length = 200)
     private String passwordCode;
