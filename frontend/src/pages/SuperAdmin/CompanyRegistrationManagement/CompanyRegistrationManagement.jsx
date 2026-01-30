@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as S from './CompanyRegistrationManagement.styled';
 import { airlineApplyService } from '../../../api/airline-apply/services';
 
@@ -9,6 +10,8 @@ const CompanyRegistrationManagement = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [showAdminIdModal, setShowAdminIdModal] = useState(false);
+  const [adminId, setAdminId] = useState('');
 
   // 데이터 로드
   useEffect(() => {
@@ -52,6 +55,9 @@ const CompanyRegistrationManagement = () => {
   const handleViewDetail = async (application) => {
     try {
       const response = await airlineApplyService.getApplicationDetail(application.id);
+      console.log('=== 상세 정보 응답 ===', response.data);
+      console.log('airlineId:', response.data.airlineId);
+      console.log('status:', response.data.status);
       setSelectedApplication(response.data);
       setModalType(application.status);
     } catch (err) {
@@ -65,16 +71,34 @@ const CompanyRegistrationManagement = () => {
     setModalType(null);
   };
 
-  const handleApprove = async () => {
+  const handleApprove = () => {
+    // 아이디 입력 모달 표시
+    setShowAdminIdModal(true);
+  };
+
+  const handleConfirmApprove = async () => {
+    if (!adminId || adminId.trim() === '') {
+      alert('관리자 아이디를 입력해주세요.');
+      return;
+    }
+
     try {
-      await airlineApplyService.approveApplication(selectedApplication.id);
-      alert('승인되었습니다.');
+      await airlineApplyService.approveApplication(selectedApplication.id, adminId);
+      alert('승인되었습니다. 관리자 계정이 생성되었습니다.');
+      setShowAdminIdModal(false);
+      setAdminId('');
       fetchApplications();
       handleCloseModal();
     } catch (err) {
       console.error('승인 실패:', err);
-      alert('승인 처리에 실패했습니다.');
+      const errorMessage = err.response?.data?.message || '승인 처리에 실패했습니다.';
+      alert(errorMessage);
     }
+  };
+
+  const handleCancelAdminIdModal = () => {
+    setShowAdminIdModal(false);
+    setAdminId('');
   };
 
   const handleReject = async () => {
@@ -192,12 +216,12 @@ const CompanyRegistrationManagement = () => {
                     </S.TableCell>
                     <S.TableCell>{app.email}</S.TableCell>
                     <S.TableCell>
-                      <S.StatusBadge status={app.verificationStatus}>
+                      <S.StatusBadge $status={app.verificationStatus}>
                         {app.verificationStatus === '완치' ? '✓ 일치' : '✗ 불일치'}
                       </S.StatusBadge>
                     </S.TableCell>
                     <S.TableCell>
-                      <S.DocumentStatusBadge status={app.documentStatus}>
+                      <S.DocumentStatusBadge $status={app.documentStatus}>
                         {app.documentStatus === '대기' && '⏱ 대기'}
                         {app.documentStatus === '승인' && '✓ 승인'}
                         {app.documentStatus === '반려' && '✗ 반려'}
@@ -238,6 +262,16 @@ const CompanyRegistrationManagement = () => {
             onClose={handleCloseModal}
           />
         )}
+
+        {/* Admin ID Input Modal */}
+        {showAdminIdModal && (
+          <AdminIdInputModal
+            adminId={adminId}
+            setAdminId={setAdminId}
+            onConfirm={handleConfirmApprove}
+            onCancel={handleCancelAdminIdModal}
+          />
+        )}
       </S.ContentWrapper>
     </S.MainContainer>
   );
@@ -269,10 +303,10 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
               <S.ProgressTitle>검증 절차</S.ProgressTitle>
               <S.ProgressCount>{completedSteps}/4</S.ProgressCount>
             </S.ProgressHeader>
-            <S.ProgressBar progress={(completedSteps / 4) * 100} />
+            <S.ProgressBar $progress={(completedSteps / 4) * 100} />
             <S.ProgressStepsGrid>
-              <S.ProgressStep completed={application.emailDomainVerified}>
-                <S.StepIcon error={!application.emailDomainVerified}>
+              <S.ProgressStep $completed={application.emailDomainVerified}>
+                <S.StepIcon $error={!application.emailDomainVerified}>
                   {application.emailDomainVerified ? '✓' : '✗'}
                 </S.StepIcon>
                 <S.StepLabel>이메일 도메인 검증</S.StepLabel>
@@ -313,18 +347,28 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
             </S.InfoItem>
 
             <S.InfoItem>
+              <S.InfoLabel>담당자 이름</S.InfoLabel>
+              <S.InfoValue>👤 {application.managerName || '미입력'}</S.InfoValue>
+            </S.InfoItem>
+
+            <S.InfoItem>
+              <S.InfoLabel>담당자 전화번호</S.InfoLabel>
+              <S.InfoValue>📞 {application.managerPhone || '미입력'}</S.InfoValue>
+            </S.InfoItem>
+
+            <S.InfoItem>
               <S.InfoLabel>신청 일시</S.InfoLabel>
               <S.InfoValue>📅 {application.date}</S.InfoValue>
             </S.InfoItem>
           </S.InfoSection>
 
           {/* Domain Verification */}
-          <S.VerificationBox error={!application.emailDomainVerified}>
+          <S.VerificationBox $error={!application.emailDomainVerified}>
             <S.VerificationHeader>
               <S.VerificationIcon>ℹ️</S.VerificationIcon>
               <S.VerificationTitle>도메인 검증</S.VerificationTitle>
             </S.VerificationHeader>
-            <S.VerificationMessage success={application.emailDomainVerified}>
+            <S.VerificationMessage $success={application.emailDomainVerified}>
               {application.emailDomainVerified 
                 ? '✓ 이메일 도메인과 항공사명이 일치합니다.'
                 : '✗ 이메일 도메인과 항공사명이 일치하지 않습니다.'}
@@ -335,23 +379,30 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
           <S.DocumentSection>
             <S.DocumentTitle>첨부 서류</S.DocumentTitle>
             <S.DocumentList>
-              <S.DocumentItem>
-                <S.DocumentIcon>📄</S.DocumentIcon>
-                <S.DocumentName>사업자등록증.pdf</S.DocumentName>
-                <S.DownloadLink href="#">⬇ 다운로드</S.DownloadLink>
-              </S.DocumentItem>
-              <S.DocumentItem>
-                <S.DocumentIcon>📄</S.DocumentIcon>
-                <S.DocumentName>재직서.pdf</S.DocumentName>
-                <S.DownloadLink href="#">⬇ 다운로드</S.DownloadLink>
-              </S.DocumentItem>
+              {application.documents && application.documents.length > 0 ? (
+                application.documents.map((doc, index) => (
+                  <S.DocumentItem key={index}>
+                    <S.DocumentIcon>📄</S.DocumentIcon>
+                    <S.DocumentName>{doc.fileName}</S.DocumentName>
+                    <S.DownloadLink 
+                      href={`http://localhost:8001/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      👁 보기
+                    </S.DownloadLink>
+                  </S.DocumentItem>
+                ))
+              ) : (
+                <p style={{ color: '#999', textAlign: 'center' }}>첨부된 서류가 없습니다.</p>
+              )}
             </S.DocumentList>
           </S.DocumentSection>
 
           {/* Current Status */}
           <S.StatusSection>
             <S.StatusLabel>현재 상태</S.StatusLabel>
-            <S.StatusBadgeLarge status="pending">
+            <S.StatusBadgeLarge $status="pending">
               ⏱ 대기 중
             </S.StatusBadgeLarge>
           </S.StatusSection>
@@ -368,6 +419,20 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
 
 // Approved Modal Component
 const ApprovedModal = ({ application, onClose }) => {
+  const navigate = useNavigate();
+
+  console.log('=== ApprovedModal 렌더링 ===');
+  console.log('application:', application);
+  console.log('application.airlineId:', application.airlineId);
+
+  const handleViewTenant = () => {
+    if (application.airlineId) {
+      navigate(`/super-admin/tenants/${application.airlineId}`);
+    } else {
+      alert('테넌트 정보를 찾을 수 없습니다.');
+    }
+  };
+
   return (
     <S.ModalOverlay onClick={onClose}>
       <S.ModalContainer onClick={(e) => e.stopPropagation()}>
@@ -389,17 +454,27 @@ const ApprovedModal = ({ application, onClose }) => {
             </S.InfoItem>
 
             <S.InfoItem>
+              <S.InfoLabel>담당자 이름</S.InfoLabel>
+              <S.InfoValue>👤 {application.managerName || '미입력'}</S.InfoValue>
+            </S.InfoItem>
+
+            <S.InfoItem>
+              <S.InfoLabel>담당자 전화번호</S.InfoLabel>
+              <S.InfoValue>📞 {application.managerPhone || '미입력'}</S.InfoValue>
+            </S.InfoItem>
+
+            <S.InfoItem>
               <S.InfoLabel>신청 일시</S.InfoLabel>
               <S.InfoValue>📅 {application.date}</S.InfoValue>
             </S.InfoItem>
           </S.InfoSection>
 
-          <S.VerificationBox error={!application.emailDomainVerified}>
+          <S.VerificationBox $error={!application.emailDomainVerified}>
             <S.VerificationHeader>
               <S.VerificationIcon>ℹ️</S.VerificationIcon>
               <S.VerificationTitle>도메인 검증</S.VerificationTitle>
             </S.VerificationHeader>
-            <S.VerificationMessage success={application.emailDomainVerified}>
+            <S.VerificationMessage $success={application.emailDomainVerified}>
               {application.emailDomainVerified 
                 ? '✓ 이메일 도메인과 항공사명이 일치합니다.'
                 : '✗ 이메일 도메인과 항공사명이 일치하지 않습니다.'}
@@ -409,23 +484,44 @@ const ApprovedModal = ({ application, onClose }) => {
           <S.DocumentSection>
             <S.DocumentTitle>첨부 서류</S.DocumentTitle>
             <S.DocumentList>
-              <S.DocumentItem>
-                <S.DocumentIcon>📄</S.DocumentIcon>
-                <S.DocumentName>사업자등록증.pdf</S.DocumentName>
-                <S.DownloadLink href="#">⬇ 다운로드</S.DownloadLink>
-              </S.DocumentItem>
+              {application.documents && application.documents.length > 0 ? (
+                application.documents.map((doc, index) => (
+                  <S.DocumentItem key={index}>
+                    <S.DocumentIcon>📄</S.DocumentIcon>
+                    <S.DocumentName>{doc.fileName}</S.DocumentName>
+                    <S.DownloadLink 
+                      href={`http://localhost:8001/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      👁 보기
+                    </S.DownloadLink>
+                  </S.DocumentItem>
+                ))
+              ) : (
+                <p style={{ color: '#999', textAlign: 'center' }}>첨부된 서류가 없습니다.</p>
+              )}
             </S.DocumentList>
           </S.DocumentSection>
 
           <S.StatusSection>
             <S.StatusLabel>현재 상태</S.StatusLabel>
-            <S.StatusBadgeLarge status="approved">
+            <S.StatusBadgeLarge $status="approved">
               ✓ 승인됨
             </S.StatusBadgeLarge>
           </S.StatusSection>
         </S.ModalContent>
 
         <S.ModalFooter>
+          {application.airlineId ? (
+            <S.ApproveButton onClick={handleViewTenant} style={{ marginRight: '10px' }}>
+              🏢 테넌트 상세보기
+            </S.ApproveButton>
+          ) : (
+            <div style={{ fontSize: '12px', color: '#999', marginRight: 'auto' }}>
+              ℹ️ 이 신청은 구버전에서 승인되어 테넌트 정보가 없습니다.
+            </div>
+          )}
           <S.CloseOnlyButton onClick={onClose}>닫기</S.CloseOnlyButton>
         </S.ModalFooter>
       </S.ModalContainer>
@@ -456,17 +552,27 @@ const RejectedModal = ({ application, onClose }) => {
             </S.InfoItem>
 
             <S.InfoItem>
+              <S.InfoLabel>담당자 이름</S.InfoLabel>
+              <S.InfoValue>👤 {application.managerName || '미입력'}</S.InfoValue>
+            </S.InfoItem>
+
+            <S.InfoItem>
+              <S.InfoLabel>담당자 전화번호</S.InfoLabel>
+              <S.InfoValue>📞 {application.managerPhone || '미입력'}</S.InfoValue>
+            </S.InfoItem>
+
+            <S.InfoItem>
               <S.InfoLabel>신청 일시</S.InfoLabel>
               <S.InfoValue>📅 {application.date}</S.InfoValue>
             </S.InfoItem>
           </S.InfoSection>
 
-          <S.VerificationBox error={!application.emailDomainVerified}>
+          <S.VerificationBox $error={!application.emailDomainVerified}>
             <S.VerificationHeader>
               <S.VerificationIcon>ℹ️</S.VerificationIcon>
               <S.VerificationTitle>도메인 검증</S.VerificationTitle>
             </S.VerificationHeader>
-            <S.VerificationMessage success={application.emailDomainVerified}>
+            <S.VerificationMessage $success={application.emailDomainVerified}>
               {application.emailDomainVerified 
                 ? '✓ 이메일 도메인과 항공사명이 일치합니다.'
                 : '✗ 이메일 도메인과 항공사명이 일치하지 않습니다. 검토가 필요합니다.'}
@@ -476,17 +582,38 @@ const RejectedModal = ({ application, onClose }) => {
           <S.DocumentSection>
             <S.DocumentTitle>첨부 서류</S.DocumentTitle>
             <S.DocumentList>
-              <S.DocumentItem>
-                <S.DocumentIcon>📄</S.DocumentIcon>
-                <S.DocumentName>사업자등록증.pdf</S.DocumentName>
-                <S.DownloadLink href="#">⬇ 다운로드</S.DownloadLink>
-              </S.DocumentItem>
+              {application.documents && application.documents.length > 0 ? (
+                application.documents.map((doc, index) => (
+                  <S.DocumentItem key={index}>
+                    <S.DocumentIcon>📄</S.DocumentIcon>
+                    <S.DocumentName>{doc.fileName}</S.DocumentName>
+                    <S.DownloadLink 
+                      href={`http://localhost:8001/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      👁 보기
+                    </S.DownloadLink>
+                  </S.DocumentItem>
+                ))
+              ) : (
+                <p style={{ color: '#999', textAlign: 'center' }}>첨부된 서류가 없습니다.</p>
+              )}
             </S.DocumentList>
           </S.DocumentSection>
 
+          {application.cancelReason && (
+            <S.InfoSection>
+              <S.InfoItem>
+                <S.InfoLabel>반려 사유</S.InfoLabel>
+                <S.InfoValue style={{ color: '#dc2626' }}>{application.cancelReason}</S.InfoValue>
+              </S.InfoItem>
+            </S.InfoSection>
+          )}
+
           <S.StatusSection>
             <S.StatusLabel>현재 상태</S.StatusLabel>
-            <S.StatusBadgeLarge status="rejected">
+            <S.StatusBadgeLarge $status="rejected">
               ✗ 반려됨
             </S.StatusBadgeLarge>
           </S.StatusSection>
@@ -494,6 +621,51 @@ const RejectedModal = ({ application, onClose }) => {
 
         <S.ModalFooter>
           <S.CloseOnlyButton onClick={onClose}>닫기</S.CloseOnlyButton>
+        </S.ModalFooter>
+      </S.ModalContainer>
+    </S.ModalOverlay>
+  );
+};
+
+// Admin ID Input Modal Component
+const AdminIdInputModal = ({ adminId, setAdminId, onConfirm, onCancel }) => {
+  return (
+    <S.ModalOverlay onClick={onCancel}>
+      <S.ModalContainer onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+        <S.ModalHeader>
+          <S.ModalTitle>관리자 아이디 입력</S.ModalTitle>
+          <S.CloseButton onClick={onCancel}>✕</S.CloseButton>
+        </S.ModalHeader>
+
+        <S.ModalContent>
+          <S.InfoSection>
+            <S.InfoItem>
+              <S.InfoLabel>항공사 최고 관리자 아이디</S.InfoLabel>
+              <input
+                type="text"
+                value={adminId}
+                onChange={(e) => setAdminId(e.target.value)}
+                placeholder="아이디를 입력하세요"
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  marginTop: '8px'
+                }}
+                onKeyPress={(e) => e.key === 'Enter' && onConfirm()}
+              />
+            </S.InfoItem>
+            <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
+              ℹ️ 입력한 아이디로 항공사 관리자 계정이 생성됩니다.
+            </p>
+          </S.InfoSection>
+        </S.ModalContent>
+
+        <S.ModalFooter>
+          <S.RejectButton onClick={onCancel}>취소</S.RejectButton>
+          <S.ApproveButton onClick={onConfirm}>✓ 확인</S.ApproveButton>
         </S.ModalFooter>
       </S.ModalContainer>
     </S.ModalOverlay>

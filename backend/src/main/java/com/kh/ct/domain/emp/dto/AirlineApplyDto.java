@@ -34,14 +34,13 @@ public class AirlineApplyDto {
         private LocalDateTime date;
         private String airlineName;
         private String email;
-        private String theme;
-        private String mainNumber;
-        private String airlineAddress;
-        private String airlineDesc;
+        private String managerName;
+        private String managerPhone;
         private Boolean emailDomainVerified;
         private String status;
         private String cancelReason;
         private List<DocumentInfo> documents;
+        private Long airlineId; // 승인된 경우 Airline의 ID
     }
 
     @Getter
@@ -55,8 +54,10 @@ public class AirlineApplyDto {
 
     @Getter
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class ApproveRequest {
-        // 필요시 추가 필드
+        @NotBlank(message = "관리자 아이디는 필수입니다")
+        private String adminId;
     }
 
     @Getter

@@ -135,8 +135,8 @@ export const StatusBadge = styled.span`
   border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
-  background-color: ${props => props.status === '완치' ? '#d4f4dd' : '#ffe4e6'};
-  color: ${props => props.status === '완치' ? '#0f7a35' : '#dc2626'};
+  background-color: ${props => props.$status === '완치' ? '#d4f4dd' : '#ffe4e6'};
+  color: ${props => props.$status === '완치' ? '#0f7a35' : '#dc2626'};
 `;
 
 export const DocumentStatusBadge = styled.span`
@@ -148,15 +148,15 @@ export const DocumentStatusBadge = styled.span`
   font-size: 13px;
   font-weight: 500;
   background-color: ${props => {
-    if (props.status === '대기') return '#fff3cd';
-    if (props.status === '승인') return '#d4f4dd';
-    if (props.status === '반려') return '#ffe4e6';
+    if (props.$status === '대기') return '#fff3cd';
+    if (props.$status === '승인') return '#d4f4dd';
+    if (props.$status === '반려') return '#ffe4e6';
     return '#f1f3f5';
   }};
   color: ${props => {
-    if (props.status === '대기') return '#856404';
-    if (props.status === '승인') return '#0f7a35';
-    if (props.status === '반려') return '#dc2626';
+    if (props.$status === '대기') return '#856404';
+    if (props.$status === '승인') return '#0f7a35';
+    if (props.$status === '반려') return '#dc2626';
     return '#6f767e';
   }};
 `;
@@ -293,7 +293,7 @@ export const ProgressBar = styled.div`
   &::after {
     content: '';
     display: block;
-    width: ${props => props.progress}%;
+    width: ${props => props.$progress}%;
     height: 100%;
     background: linear-gradient(90deg, #4c6fff 0%, #6b8aff 100%);
     border-radius: 4px;
@@ -314,7 +314,7 @@ export const ProgressStepsGrid = styled.div`
 export const ProgressStep = styled.div`
   display: flex;
   gap: 12px;
-  opacity: ${props => props.completed ? 1 : 0.5};
+  opacity: ${props => props.$completed ? 1 : 0.5};
 `;
 
 export const StepIcon = styled.div`
@@ -323,8 +323,8 @@ export const StepIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${props => props.error ? '#fee2e2' : '#d4f4dd'};
-  color: ${props => props.error ? '#dc2626' : '#0f7a35'};
+  background-color: ${props => props.$error ? '#fee2e2' : '#d4f4dd'};
+  color: ${props => props.$error ? '#dc2626' : '#0f7a35'};
   border-radius: 50%;
   font-size: 12px;
   font-weight: 600;
@@ -379,8 +379,8 @@ export const InfoValue = styled.div`
 
 // Verification Box
 export const VerificationBox = styled.div`
-  background-color: ${props => props.error ? '#fff5f5' : '#f0f9ff'};
-  border: 1px solid ${props => props.error ? '#fee2e2' : '#e0f2fe'};
+  background-color: ${props => props.$error ? '#fff5f5' : '#f0f9ff'};
+  border: 1px solid ${props => props.$error ? '#fee2e2' : '#e0f2fe'};
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 24px;
@@ -406,7 +406,7 @@ export const VerificationTitle = styled.h4`
 
 export const VerificationMessage = styled.p`
   font-size: 14px;
-  color: ${props => props.error ? '#dc2626' : props.success ? '#0f7a35' : '#1a1d1f'};
+  color: ${props => props.$error ? '#dc2626' : props.$success ? '#0f7a35' : '#1a1d1f'};
   margin: 0;
   line-height: 1.5;
 `;
@@ -485,15 +485,15 @@ export const StatusBadgeLarge = styled.div`
   font-size: 14px;
   font-weight: 600;
   background-color: ${props => {
-    if (props.status === 'pending') return '#fff3cd';
-    if (props.status === 'approved') return '#d4f4dd';
-    if (props.status === 'rejected') return '#ffe4e6';
+    if (props.$status === 'pending') return '#fff3cd';
+    if (props.$status === 'approved') return '#d4f4dd';
+    if (props.$status === 'rejected') return '#ffe4e6';
     return '#f1f3f5';
   }};
   color: ${props => {
-    if (props.status === 'pending') return '#856404';
-    if (props.status === 'approved') return '#0f7a35';
-    if (props.status === 'rejected') return '#dc2626';
+    if (props.$status === 'pending') return '#856404';
+    if (props.$status === 'approved') return '#0f7a35';
+    if (props.$status === 'rejected') return '#dc2626';
     return '#6f767e';
   }};
 `;

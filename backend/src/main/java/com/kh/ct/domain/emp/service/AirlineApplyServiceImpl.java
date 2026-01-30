@@ -1,14 +1,24 @@
 package com.kh.ct.domain.emp.service;
 
 import com.kh.ct.domain.emp.dto.AirlineApplyDto;
+import com.kh.ct.domain.emp.entity.Airline;
 import com.kh.ct.domain.emp.entity.AirlineApply;
+import com.kh.ct.domain.emp.entity.AirlineStatus;
+import com.kh.ct.domain.emp.entity.Emp;
 import com.kh.ct.domain.emp.repository.AirlineApplyRepository;
+import com.kh.ct.domain.emp.repository.AirlineRepository;
+import com.kh.ct.domain.emp.repository.EmpRepository;
+import com.kh.ct.global.common.CommonEnums;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -17,6 +27,9 @@ import java.util.stream.Collectors;
 public class AirlineApplyServiceImpl implements AirlineApplyService {
 
     private final AirlineApplyRepository airlineApplyRepository;
+    private final AirlineRepository airlineRepository;
+    private final EmpRepository empRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<AirlineApplyDto.ListResponse> getAllApplications() {
@@ -46,10 +59,80 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
 
     @Override
     @Transactional
-    public void approveApplication(Long id) {
+    public void approveApplication(Long id, String adminId) {
+        // 1. 신청 정보 조회
         AirlineApply application = airlineApplyRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 신청을 찾을 수 없습니다. ID: " + id));
+        
+        // 2. 아이디 중복 체크
+        if (empRepository.findById(adminId).isPresent()) {
+            throw new IllegalArgumentException("이미 사용 중인 아이디입니다: " + adminId);
+        }
+        
+        // 3. 승인 처리
         application.approve();
+        
+        // 4. Airline(테넌트) 엔티티 생성
+        Airline airline = Airline.builder()
+                .airlineName(application.getAirlineName())
+                .email(application.getAirlineApplyEmail())
+                .phone(application.getManagerPhone())
+                .plan("Professional") // 기본 플랜
+                .status(AirlineStatus.ACTIVE)
+                .icon("✈️")
+                .country("대한민국")
+                .joinDate(LocalDate.now())
+                .storageUsage(0.0)
+                .lastLoginDate(LocalDateTime.now())
+                .airlineApplyId(application)
+                .build();
+        
+        airlineRepository.save(airline);
+        
+        // 5. 항공사 관리자 계정 생성
+        String tempPassword = generateTempPassword();
+        String encodedPassword = passwordEncoder.encode(tempPassword);
+        
+        Emp adminAccount = Emp.builder()
+                .empId(adminId)
+                .airlineId(airline) // 생성된 Airline과 연결
+                .empName(application.getManagerName() != null ? application.getManagerName() : "관리자")
+                .empPwd(encodedPassword)
+                .age(30) // 기본값
+                .role(CommonEnums.Role.AIRLINE_ADMIN)
+                .phone(application.getManagerPhone())
+                .job("항공사 관리자")
+                .email(application.getAirlineApplyEmail())
+                .empStatus(CommonEnums.EmpStatus.Y)
+                .startDate(LocalDateTime.now())
+                .leaveCount(15.0f)
+                .empNo(generateEmpNo(application.getAirlineName()))
+                .build();
+        
+        empRepository.save(adminAccount);
+        
+        // TODO: 실제 운영 환경에서는 이메일로 임시 비밀번호 전송 필요
+        System.out.println("=== 항공사 관리자 계정 생성 완료 ===");
+        System.out.println("아이디: " + adminId);
+        System.out.println("임시 비밀번호: " + tempPassword);
+        System.out.println("이메일: " + application.getAirlineApplyEmail());
+    }
+    
+    /**
+     * 임시 비밀번호 생성 (8자리 랜덤)
+     */
+    private String generateTempPassword() {
+        return UUID.randomUUID().toString().substring(0, 8);
+    }
+    
+    /**
+     * 사원번호 생성 (항공사명 약자 + 타임스탬프)
+     */
+    private String generateEmpNo(String airlineName) {
+        String prefix = airlineName.length() >= 3 
+            ? airlineName.substring(0, 3).toUpperCase() 
+            : airlineName.toUpperCase();
+        return prefix + "-" + System.currentTimeMillis();
     }
 
     @Override
@@ -91,19 +174,27 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                     .build());
         }
 
+        // 승인된 경우 Airline ID 조회
+        Long airlineId = null;
+        if (entity.getAirlineApplyStatus() == com.kh.ct.global.common.CommonEnums.ApplyStatus.APPROVED) {
+            Airline airline = airlineRepository.findByAirlineApplyId(entity.getAirlineApplyId());
+            if (airline != null) {
+                airlineId = airline.getAirlineId();
+            }
+        }
+
         return AirlineApplyDto.DetailResponse.builder()
                 .id(entity.getAirlineApplyId())
                 .date(entity.getCreateDate())
                 .airlineName(entity.getAirlineName())
                 .email(entity.getAirlineApplyEmail())
-                .theme(entity.getTheme())
-                .mainNumber(entity.getMainNumber())
-                .airlineAddress(entity.getAirlineAddress())
-                .airlineDesc(entity.getAirlineDesc())
+                .managerName(entity.getManagerName())
+                .managerPhone(entity.getManagerPhone())
                 .emailDomainVerified(entity.getEmailDomainVerified())
                 .status(entity.getAirlineApplyStatus().name())
                 .cancelReason(entity.getAirlineApplyCancelReason())
                 .documents(documents)
+                .airlineId(airlineId)
                 .build();
     }
 }

@@ -22,9 +22,9 @@ public interface AirlineApplyService {
     AirlineApplyDto.DetailResponse getApplicationDetail(Long id);
 
     /**
-     * 승인
+     * 승인 (관리자 계정 생성 포함)
      */
-    void approveApplication(Long id);
+    void approveApplication(Long id, String adminId);
 
     /**
      * 반려

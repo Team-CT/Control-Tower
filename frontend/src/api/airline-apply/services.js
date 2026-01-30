@@ -13,8 +13,8 @@ export const airlineApplyService = {
   },
 
   // 승인
-  approveApplication: (id) => {
-    return api.post(`/api/super-admin/airline-applications/${id}/approve`);
+  approveApplication: (id, adminId) => {
+    return api.post(`/api/super-admin/airline-applications/${id}/approve`, { adminId });
   },
 
   // 반려

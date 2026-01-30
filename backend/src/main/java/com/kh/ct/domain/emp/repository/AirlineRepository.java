@@ -21,5 +21,9 @@ public interface AirlineRepository extends JpaRepository<Airline, Long> {
 
     @Query(value = "SELECT COUNT(*) FROM emp WHERE airline_id = :airlineId AND emp_status = 'Y'", nativeQuery = true)
     Long countActiveEmployeesByAirlineId(@Param("airlineId") Long airlineId);
+
+    // AirlineApply ID로 Airline 조회
+    @Query("SELECT a FROM Airline a WHERE a.airlineApplyId.airlineApplyId = :airlineApplyId")
+    Airline findByAirlineApplyId(@Param("airlineApplyId") Long airlineApplyId);
 }
 

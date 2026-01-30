@@ -41,9 +41,10 @@ public class AirlineApplyController {
 
     @PostMapping("/{id}/approve")
     public ResponseEntity<Void> approveApplication(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @Valid @RequestBody AirlineApplyDto.ApproveRequest request
     ) {
-        airlineApplyService.approveApplication(id);
+        airlineApplyService.approveApplication(id, request.getAdminId());
         return ResponseEntity.ok().build();
     }
 
