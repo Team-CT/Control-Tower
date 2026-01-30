@@ -1,57 +1,65 @@
 import styled from 'styled-components';
 import { Plane } from 'lucide-react';
 
+/** 단색 회색 톤 토큰 (Login과 동일 컨셉) */
+const TOKENS = {
+  pageBg: '#f3f4f6',
+  cardBg: '#ffffff',
+  leftBg: '#f9fafb',
+
+  textPrimary: '#111827',
+  textSecondary: '#4b5563',
+  textTertiary: '#9ca3af',
+
+  border: '#e5e7eb',
+  shadow: '0 20px 40px rgba(0,0,0,0.08)',
+  shadowBtn: '0 4px 12px rgba(0,0,0,0.12)',
+
+  accent: '#111827',
+  ring: 'rgba(17,24,39,0.15)',
+};
+
+/* ---------- Layout ---------- */
 export const Container = styled.div`
   min-height: 100vh;
+  background: ${TOKENS.pageBg};
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f5f7fa;
   padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 `;
 
 export const ContentWrapper = styled.div`
-  display: flex;
   width: 100%;
   max-width: 1000px;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
   min-height: 600px;
+  display: flex;
+  background: ${TOKENS.cardBg};
+  border-radius: 24px;
+  box-shadow: ${TOKENS.shadow};
+  overflow: hidden;
+  border: 1px solid ${TOKENS.border};
 
   @media (max-width: 768px) {
     flex-direction: column;
-    height: auto;
   }
 `;
 
-// 왼쪽 브랜드 섹션
+/* ---------- Left : Brand ---------- */
 export const BrandSection = styled.div`
   flex: 1;
-  background: ${props => `linear-gradient(135deg, ${props.theme.primary} 0%, ${props.theme.secondary} 100%)`};
+  background: ${TOKENS.leftBg};
   padding: 60px 40px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  color: white;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-    pointer-events: none;
-  }
+  border-right: 1px solid ${TOKENS.border};
 
   @media (max-width: 768px) {
+    border-right: none;
+    border-bottom: 1px solid ${TOKENS.border};
     padding: 40px 30px;
-    min-height: 300px;
   }
 `;
 
@@ -59,68 +67,86 @@ export const BrandHeader = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  z-index: 1;
 `;
 
 export const LogoIcon = styled(Plane)`
   width: 32px;
   height: 32px;
   transform: rotate(-45deg);
+  color: ${TOKENS.textPrimary};
 `;
 
 export const BrandName = styled.h1`
   font-size: 24px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
+  font-weight: 900;
+  margin: 0;
+  color: ${TOKENS.textPrimary};
 `;
 
 export const ServiceInfo = styled.div`
-  z-index: 1;
   margin-top: 40px;
 `;
 
 export const ServiceTitle = styled.h2`
-  font-size: 36px;
-  font-weight: 700;
-  margin-bottom: 12px;
+  font-size: 32px;
+  font-weight: 900;
+  margin: 0 0 12px;
+  color: ${TOKENS.textPrimary};
 `;
 
 export const ServiceDescription = styled.p`
   font-size: 15px;
-  line-height: 1.6;
-  opacity: 0.9;
-  max-width: 90%;
+  line-height: 1.7;
+  color: ${TOKENS.textSecondary};
+  max-width: 92%;
+  margin: 0;
 `;
 
+/* ---------- Stepper ---------- */
 export const Stepper = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  z-index: 1;
   margin-top: 40px;
 `;
 
 export const Step = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  opacity: ${props => props.$active ? 1 : 0.5};
-  transition: opacity 0.3s;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 900;
+  white-space: nowrap;
+
+  background: ${({ $active }) => ($active ? TOKENS.accent : 'transparent')};
+  color: ${({ $active, $done }) =>
+    $active ? '#ffffff' : $done ? TOKENS.textPrimary : TOKENS.textTertiary};
+
+  border: ${({ $active, $done }) =>
+    $active
+      ? '1px solid transparent'
+      : $done
+      ? '1px solid rgba(17,24,39,0.25)'
+      : `1px solid ${TOKENS.border}`};
+
+  transition: all 0.25s ease;
 `;
 
 export const StepLine = styled.div`
   flex: 1;
   height: 2px;
-  background: rgba(255, 255, 255, 0.3);
+  background: ${({ $done }) => ($done ? TOKENS.accent : TOKENS.border)};
+  transition: background 0.25s ease;
 `;
 
-// 오른쪽 폼 섹션
-export const RegisterSection = styled.div`  // Rename FormSection to RegisterSection to match import
+/* ---------- Right : Register ---------- */
+export const RegisterSection = styled.div`
   flex: 1.2;
-  background: white;
+  background: ${TOKENS.cardBg};
   padding: 60px 40px;
   display: flex;
   align-items: center;
   justify-content: center;
+  isolation: isolate;
 
   @media (max-width: 768px) {
     padding: 40px 24px;
@@ -132,23 +158,21 @@ export const RegisterCard = styled.div`
   max-width: 400px;
 `;
 
-// This was Header, renamed to RegisterHeader to match usage
-export const RegisterHeader = styled.div` 
-  text-align: left;
-  margin-bottom: 32px;
+export const RegisterHeader = styled.div`
+  margin-bottom: 36px;
 `;
 
 export const RegisterTitle = styled.h2`
-  font-size: 24px;
-  font-weight: 700;
-  color: #1a1a1a;
-  margin-bottom: 8px;
+  font-size: 28px;
+  font-weight: 900;
+  margin: 0;
+  color: ${TOKENS.textPrimary};
 `;
 
 export const RegisterForm = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
 `;
 
 export const InputGroup = styled.div`
@@ -159,8 +183,8 @@ export const InputGroup = styled.div`
 
 export const InputLabel = styled.label`
   font-size: 14px;
-  font-weight: 600;
-  color: #374151;
+  font-weight: 800;
+  color: ${TOKENS.textPrimary};
 `;
 
 export const InputRow = styled.div`
@@ -168,81 +192,120 @@ export const InputRow = styled.div`
   gap: 8px;
 `;
 
-// [테마 적용] 입력창
+/* Input */
 export const Input = styled.input`
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border: 1px solid ${TOKENS.border};
+  border-radius: 10px;
   font-size: 15px;
-  transition: all 0.2s;
+  background: #f9fafb;
+  color: ${TOKENS.textPrimary};
   outline: none;
-  box-sizing: border-box; 
+  box-sizing: border-box;
 
   &:focus {
-    border-color: ${props => props.theme.primary};
-    box-shadow: 0 0 0 3px ${props => props.theme.primary}20;
+    background: #fff;
+    border-color: ${TOKENS.accent};
+    box-shadow: 0 0 0 4px ${TOKENS.ring};
+  }
+
+  &::placeholder {
+    color: ${TOKENS.textTertiary};
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 `;
 
+/* Buttons */
 export const SubmitButton = styled.button`
   width: 100%;
   padding: 14px;
-  background-color: ${props => props.theme.primary};
-  color: white;
+  background: ${TOKENS.accent};
+  color: #fff;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 900;
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: 12px;
+  transition: all 0.2s ease;
+  margin-top: 8px;
 
   &:hover {
-    background-color: ${props => props.theme.secondary};
+    box-shadow: ${TOKENS.shadowBtn};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 `;
 
 export const SmallButton = styled.button`
   white-space: nowrap;
-  padding: 0 20px;
-  background-color: #f3f4f6;
-  color: #4b5563;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  padding: 0 16px;
+  height: 44px;
+  background: ${TOKENS.cardBg};
+  color: ${TOKENS.textPrimary};
+  border: 1px solid ${TOKENS.border};
+  border-radius: 10px;
+  font-weight: 900;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 
   &:hover {
-    background-color: #e5e7eb;
-    color: #1f2937;
+    box-shadow: ${TOKENS.shadowBtn};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
   }
 `;
 
 export const PrevButton = styled.button`
   width: 100%;
   padding: 14px;
-  background-color: transparent;
-  color: #6b7280;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  background: transparent;
+  color: ${TOKENS.textSecondary};
+  border: 1px solid ${TOKENS.border};
+  border-radius: 12px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 900;
   cursor: pointer;
-  transition: all 0.2s;
-  margin-top: -8px;
+  transition: all 0.2s ease;
+  margin-top: -6px;
 
   &:hover {
-    background-color: #f9fafb;
-    color: #374151;
+    color: ${TOKENS.textPrimary};
+    box-shadow: ${TOKENS.shadowBtn};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
   }
 `;
 
+/* Toggle */
 export const ToggleContainer = styled.div`
   display: flex;
   gap: 8px;
-  background: #f3f4f6;
+  background: #f9fafb;
+  border: 1px solid ${TOKENS.border};
   padding: 4px;
   border-radius: 12px;
 `;
@@ -250,46 +313,46 @@ export const ToggleContainer = styled.div`
 export const ToggleButton = styled.button`
   flex: 1;
   padding: 10px;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid transparent;
+  border-radius: 10px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 900;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  background-color: ${props => props.$active ? 'white' : 'transparent'};
-  color: ${props => props.$active ? props.$color : '#6b7280'};
-  box-shadow: ${props => props.$active ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'};
+  transition: all 0.2s ease;
+
+  background: ${props => (props.$active ? TOKENS.accent : 'transparent')};
+  color: ${props => (props.$active ? '#fff' : TOKENS.textSecondary)};
 
   &:hover {
-    color: ${props => !props.$active && '#374151'};
+    color: ${props => (props.$active ? '#fff' : TOKENS.textPrimary)};
   }
 `;
 
 export const RowGroup = styled.div`
   display: flex;
   gap: 16px;
-  
+
   > div {
     flex: 1;
   }
 `;
 
+/* Link */
 export const LoginLink = styled.span`
   display: block;
   text-align: center;
-  color: #6b7280;
+  color: ${TOKENS.textTertiary};
   font-size: 14px;
   margin-top: 24px;
   cursor: pointer;
-  
+
   &:hover {
-    color: ${props => props.theme.primary};
+    color: ${TOKENS.textPrimary};
     text-decoration: underline;
   }
 `;
 
-// 프로필 이미지 업로드 관련 스타일
+/* ---------- Profile Image ---------- */
 export const ProfileImageSection = styled.div`
   display: flex;
   align-items: center;
@@ -301,12 +364,12 @@ export const ProfileImagePreview = styled.div`
   height: 80px;
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid #e5e7eb;
-  background: #f3f4f6;
+  border: 1px solid ${TOKENS.border};
+  background: #f9fafb;
   display: flex;
   align-items: center;
   justify-content: center;
-  
+
   img {
     width: 100%;
     height: 100%;
@@ -316,33 +379,54 @@ export const ProfileImagePreview = styled.div`
 
 export const ProfilePlaceholder = styled.div`
   font-size: 32px;
-  color: #9ca3af;
+  color: ${TOKENS.textTertiary};
 `;
 
 export const ImageUploadButton = styled.button`
-  padding: 10px 20px;
-  background-color: #f3f4f6;
-  color: #4b5563;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  padding: 10px 14px;
+  background: ${TOKENS.cardBg};
+  color: ${TOKENS.textPrimary};
+  border: 1px solid ${TOKENS.border};
+  border-radius: 12px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 900;
   cursor: pointer;
-  transition: all 0.2s;
-  
+  transition: all 0.2s ease;
+
   &:hover {
-    background-color: #e5e7eb;
-    color: #1f2937;
+    box-shadow: ${TOKENS.shadowBtn};
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
   }
 `;
 
 export const HelperText = styled.p`
   font-size: 12px;
-  color: #6b7280;
+  color: ${TOKENS.textTertiary};
   margin-top: 4px;
 `;
 
-// Unused but kept for compatibility if needed elsewhere or strictly following older file
+/* ✅ 타이머 배지 (인증번호 인풋 뒤/옆 표시) */
+export const TimerBadge = styled.div`
+  height: 44px;
+  min-width: 64px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid ${TOKENS.border};
+  background: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 13px;
+  color: ${({ $expired }) => ($expired ? TOKENS.textTertiary : TOKENS.textPrimary)};
+`;
+
+/* Unused but kept for compatibility */
 export const FormSection = styled.div``;
 export const FormCard = styled.div``;
 export const Header = styled.div``;

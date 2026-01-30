@@ -97,15 +97,14 @@ const Login = () => {
       <S.ContentWrapper>
         <S.BrandSection>
           <S.BrandHeader>
-            <S.LogoIcon />
-            <S.BrandName>{theme.name}</S.BrandName>
+            <S.ServiceTitle>
+              <S.LogoIcon />
+              SkyHR
+            </S.ServiceTitle>
           </S.BrandHeader>
 
           <S.ServiceInfo>
-            <S.ServiceTitle>
-              <S.ServiceIcon />
-              SkyHR
-            </S.ServiceTitle>
+
             <S.ServiceSubtitle>통합 HR 시스템</S.ServiceSubtitle>
             <S.ServiceDescription>
               {theme.name} 임직원을 위한 통합 HR 관리 시스템 입니다. 근태 관리, 전자 결재,
