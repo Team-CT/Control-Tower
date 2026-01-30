@@ -210,9 +210,6 @@ const TenantManagement = () => {
                         👁 상세보기
                       </S.ViewDetailButtonSmall>
                     </S.TableCell>
-                    <S.TableCell>
-                      <S.ActionButton>⋮</S.ActionButton>
-                    </S.TableCell>
                   </S.TableRow>
                 ))}
               </S.TableBody>
