@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   MainContainer,
   ContentWrapper,
@@ -41,6 +41,7 @@ import {
 } from './HealthInfoSubmission.styled';
 import axios from 'axios';
 import { empPhysicalTestService} from '../../api/Health/healthService';
+import useAuthStore from '../../store/authStore';
 
 const HealthInfoSubmission = () => {
   const [selectedMethod, setSelectedMethod] = useState('text');
@@ -49,8 +50,14 @@ const HealthInfoSubmission = () => {
     classification: '',
     memo: ''
   });
-  const [empId, setEmpId] = useState("");
+
   const [previewData, setPreviewData] = useState(null); 
+  const empId = useAuthStore((s) => s.getEmpId());
+  const hydrate = useAuthStore((s) => s.hydrate);
+
+  useEffect(() => {
+    if (!empId) hydrate();
+  }, [empId, hydrate]);
   
   const fileInputRef = useRef(null);
   const maxCharacters = 2000;
@@ -99,7 +106,7 @@ const HealthInfoSubmission = () => {
   fd.append("file", file);
 
   const res = await axios.post("/preview", fd, {
-    headers: { "Content-Type": "multipart/form-data" },
+    headers: { "Content-Type": "multipart/form-data" }, 
   });
   setPreviewData(res.data);
 };
@@ -226,7 +233,7 @@ const callSave = async () => {
 
     try {
       console.log(previewData);
-      await empPhysicalTestService.save('TEST',uploadedFile,previewData);
+      await empPhysicalTestService.save(empId,uploadedFile,previewData);
     } catch (e) {
       console.error(e);
       alert("저장 실패");
