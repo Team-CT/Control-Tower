@@ -202,20 +202,14 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
             String businessLicensePath,
             String employmentCertPath
     ) {
-        // 1. 이메일 도메인 검증
-        String emailDomain = extractDomain(request.getManagerEmail());
-        boolean emailDomainVerified = emailDomain.equalsIgnoreCase(request.getCompanyDomain());
-
-        // 2. AirlineApply 엔티티 생성
+        // AirlineApply 엔티티 생성
         AirlineApply application = AirlineApply.builder()
                 .airlineName(request.getAirlineName())
                 .airlineApplyEmail(request.getManagerEmail())
                 .managerName(request.getManagerName())
                 .managerPhone(request.getManagerPhone())
-                .companyDomain(request.getCompanyDomain())
-                .additionalInfo(request.getAdditionalInfo())
                 .airlineApplyStatus(CommonEnums.ApplyStatus.PENDING)
-                .emailDomainVerified(emailDomainVerified)
+                .emailDomainVerified(false) // 도메인 검증 비활성화
                 .businessLicensePath(businessLicensePath)
                 .employmentCertPath(employmentCertPath)
                 .build();
@@ -320,24 +314,6 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                 .build();
     }
 
-    /**
-     * 이메일에서 도메인 추출
-     */
-    private String extractDomain(String email) {
-        if (email == null || !email.contains("@")) {
-            return "";
-        }
-        return email.substring(email.indexOf("@") + 1);
-    }
-
-    /**
-     * 도메인에서 국가 추출 (간단한 예시, 실제로는 더 복잡한 로직 필요)
-     */
-    private String extractCountryFromDomain(String domain) {
-        // 실제로는 도메인 기반 국가 매핑 테이블이나 API 사용
-        // 여기서는 기본값 반환
-        return "대한민국";
-    }
 
     // Entity -> DTO 변환 메서드
     private AirlineApplyDto.ListResponse convertToListResponse(AirlineApply entity) {

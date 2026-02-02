@@ -76,12 +76,6 @@ public class AirlineApplyDto {
         @NotBlank(message = "항공사명은 필수입니다")
         private String airlineName;
 
-        @NotBlank(message = "국가는 필수입니다")
-        private String country;
-
-        @NotBlank(message = "회사 도메인은 필수입니다")
-        private String companyDomain;
-
         @NotBlank(message = "담당자 이름은 필수입니다")
         private String managerName;
 
@@ -90,8 +84,6 @@ public class AirlineApplyDto {
 
         @NotBlank(message = "담당자 이메일은 필수입니다")
         private String managerEmail;
-
-        private String additionalInfo;
     }
 
     @Getter
