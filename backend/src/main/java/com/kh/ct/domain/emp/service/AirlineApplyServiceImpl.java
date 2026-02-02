@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -127,7 +128,7 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                         .plan("Professional") // 기본 플랜
                         .status(AirlineStatus.ACTIVE)
                         .icon("✈️")
-                        .country(application.getCompanyDomain() != null ? extractCountryFromDomain(application.getCompanyDomain()) : "대한민국")
+                        .country("대한민국") // 국내 서비스
                         .joinDate(LocalDate.now())
                         .storageUsage(0.0)
                         .lastLoginDate(LocalDateTime.now())
@@ -202,20 +203,14 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
             String businessLicensePath,
             String employmentCertPath
     ) {
-        // 1. 이메일 도메인 검증
-        String emailDomain = extractDomain(request.getManagerEmail());
-        boolean emailDomainVerified = emailDomain.equalsIgnoreCase(request.getCompanyDomain());
-
-        // 2. AirlineApply 엔티티 생성
+        // AirlineApply 엔티티 생성
         AirlineApply application = AirlineApply.builder()
                 .airlineName(request.getAirlineName())
                 .airlineApplyEmail(request.getManagerEmail())
                 .managerName(request.getManagerName())
                 .managerPhone(request.getManagerPhone())
-                .companyDomain(request.getCompanyDomain())
-                .additionalInfo(request.getAdditionalInfo())
                 .airlineApplyStatus(CommonEnums.ApplyStatus.PENDING)
-                .emailDomainVerified(emailDomainVerified)
+                .emailDomainVerified(false) // 도메인 검증 비활성화
                 .businessLicensePath(businessLicensePath)
                 .employmentCertPath(employmentCertPath)
                 .build();
@@ -311,7 +306,7 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
         activationTokenRepository.save(activationToken);
         
         // 8. 활성화 링크 생성
-        String activationLink = "http://localhost:3000/account-activation?token=" + token;
+        String activationLink = "http://localhost:5173/account-activation?token=" + token;
         
         return AirlineApplyDto.ApproveResponse.builder()
                 .activationLink(activationLink)
@@ -320,24 +315,6 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                 .build();
     }
 
-    /**
-     * 이메일에서 도메인 추출
-     */
-    private String extractDomain(String email) {
-        if (email == null || !email.contains("@")) {
-            return "";
-        }
-        return email.substring(email.indexOf("@") + 1);
-    }
-
-    /**
-     * 도메인에서 국가 추출 (간단한 예시, 실제로는 더 복잡한 로직 필요)
-     */
-    private String extractCountryFromDomain(String domain) {
-        // 실제로는 도메인 기반 국가 매핑 테이블이나 API 사용
-        // 여기서는 기본값 반환
-        return "대한민국";
-    }
 
     // Entity -> DTO 변환 메서드
     private AirlineApplyDto.ListResponse convertToListResponse(AirlineApply entity) {
@@ -346,7 +323,6 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                 .date(entity.getCreateDate())
                 .airlineName(entity.getAirlineName())
                 .email(entity.getAirlineApplyEmail())
-                .verificationStatus(entity.getEmailDomainVerified())
                 .documentStatus(entity.getAirlineApplyStatus().name())
                 .status(entity.getAirlineApplyStatus().name().toLowerCase())
                 .build();
@@ -370,12 +346,33 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                     .build());
         }
 
-        // 승인된 경우 Airline ID 조회
+        // 승인된 경우 Airline ID 및 활성화 링크 조회
         Long airlineId = null;
+        String activationLink = null;
         if (entity.getAirlineApplyStatus() == com.kh.ct.global.common.CommonEnums.ApplyStatus.APPROVED) {
             java.util.Optional<Airline> airlineOpt = airlineRepository.findByAirlineApplyId(entity.getAirlineApplyId());
             if (airlineOpt.isPresent()) {
                 airlineId = airlineOpt.get().getAirlineId();
+                
+                // 관리자 계정 조회
+                java.util.Optional<Emp> adminOpt = empRepository.findByAirlineIdAndRole(
+                    airlineOpt.get(), 
+                    CommonEnums.Role.AIRLINE_ADMIN
+                );
+                
+                if (adminOpt.isPresent()) {
+                    // 활성화 토큰 조회 (사용되지 않은 최신 토큰)
+                    List<ActivationToken> tokens = activationTokenRepository
+                        .findByEmpIdAndUsedFalseOrderByCreateDateDesc(adminOpt.get());
+                    
+                    java.util.Optional<ActivationToken> tokenOpt = tokens.stream()
+                        .filter(token -> token.getExpiresAt().isAfter(LocalDateTime.now()))
+                        .findFirst();
+                    
+                    if (tokenOpt.isPresent()) {
+                        activationLink = "http://localhost:5173/account-activation?token=" + tokenOpt.get().getToken();
+                    }
+                }
             }
         }
 
@@ -386,11 +383,11 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                 .email(entity.getAirlineApplyEmail())
                 .managerName(entity.getManagerName())
                 .managerPhone(entity.getManagerPhone())
-                .emailDomainVerified(entity.getEmailDomainVerified())
                 .status(entity.getAirlineApplyStatus().name())
                 .cancelReason(entity.getAirlineApplyCancelReason())
                 .documents(documents)
                 .airlineId(airlineId)
+                .activationLink(activationLink)
                 .build();
     }
 }

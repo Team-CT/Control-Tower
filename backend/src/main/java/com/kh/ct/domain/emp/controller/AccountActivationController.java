@@ -30,5 +30,13 @@ public class AccountActivationController {
         AccountActivationDto.ActivationResponse response = accountActivationService.activateAccount(token, request);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/regenerate/{airlineApplyId}")
+    public ResponseEntity<AccountActivationDto.RegenerateLinkResponse> regenerateLink(
+            @PathVariable Long airlineApplyId
+    ) {
+        AccountActivationDto.RegenerateLinkResponse response = accountActivationService.regenerateActivationLink(airlineApplyId);
+        return ResponseEntity.ok(response);
+    }
 }
 

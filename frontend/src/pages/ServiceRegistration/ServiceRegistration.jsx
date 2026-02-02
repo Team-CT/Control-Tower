@@ -16,13 +16,11 @@ import {
   Label,
   RequiredMark,
   Input,
-  Select,
   HelpText,
   FileUploadArea,
   UploadIcon,
   UploadText,
   UploadHint,
-  TextArea,
   InfoBox,
   InfoTitle,
   InfoList,
@@ -37,14 +35,11 @@ const ServiceRegistration = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     airlineName: '',
-    country: '',
-    companyDomain: '',
     managerName: '',
     managerPhone: '',
     managerEmail: '',
     businessLicense: null,
-    employmentCert: null,
-    additionalInfo: ''
+    employmentCert: null
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -72,9 +67,8 @@ const ServiceRegistration = () => {
 
   const handleSubmit = async () => {
     // 필수 필드 검증
-    if (!formData.airlineName || !formData.country || !formData.companyDomain ||
-        !formData.managerName || !formData.managerPhone || !formData.managerEmail ||
-        !formData.businessLicense || !formData.employmentCert) {
+    if (!formData.airlineName || !formData.managerName || !formData.managerPhone || 
+        !formData.managerEmail || !formData.businessLicense || !formData.employmentCert) {
       alert('필수 항목을 모두 입력해주세요.');
       return;
     }
@@ -89,12 +83,9 @@ const ServiceRegistration = () => {
       // JSON 데이터 추가
       const data = {
         airlineName: formData.airlineName,
-        country: formData.country,
-        companyDomain: formData.companyDomain,
         managerName: formData.managerName,
         managerPhone: formData.managerPhone,
-        managerEmail: formData.managerEmail,
-        additionalInfo: formData.additionalInfo || ''
+        managerEmail: formData.managerEmail
       };
       submitFormData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
 
@@ -143,7 +134,7 @@ const ServiceRegistration = () => {
           </SectionHeader>
 
           <FormGrid>
-            <FormGroup>
+            <FormGroup $fullWidth>
               <Label>
                 항공사명 <RequiredMark>*</RequiredMark>
               </Label>
@@ -153,35 +144,6 @@ const ServiceRegistration = () => {
                 value={formData.airlineName}
                 onChange={(e) => handleInputChange('airlineName', e.target.value)}
               />
-            </FormGroup>
-
-            <FormGroup>
-              <Label>
-                국가 <RequiredMark>*</RequiredMark>
-              </Label>
-              <Select
-                value={formData.country}
-                onChange={(e) => handleInputChange('country', e.target.value)}
-              >
-                <option value="">국가를 선택하세요</option>
-                <option value="KR">대한민국</option>
-                <option value="US">미국</option>
-                <option value="JP">일본</option>
-                {/* TODO: Add more countries */}
-              </Select>
-            </FormGroup>
-
-            <FormGroup fullWidth>
-              <Label>
-                회사 도메인 <RequiredMark>*</RequiredMark>
-              </Label>
-              <Input
-                type="text"
-                placeholder="예: koreanair.com"
-                value={formData.companyDomain}
-                onChange={(e) => handleInputChange('companyDomain', e.target.value)}
-              />
-              <HelpText>이메일 도메인 검증에 사용됩니다</HelpText>
             </FormGroup>
           </FormGrid>
         </FormSection>
@@ -218,7 +180,7 @@ const ServiceRegistration = () => {
               />
             </FormGroup>
 
-            <FormGroup fullWidth>
+            <FormGroup $fullWidth>
               <Label>
                 담당자 이메일 <RequiredMark>*</RequiredMark>
               </Label>
@@ -241,7 +203,7 @@ const ServiceRegistration = () => {
           </SectionHeader>
 
           <FormGrid>
-            <FormGroup fullWidth>
+            <FormGroup $fullWidth>
               <Label>
                 사업자등록증 <RequiredMark>*</RequiredMark>
               </Label>
@@ -269,7 +231,7 @@ const ServiceRegistration = () => {
               </FileUploadArea>
             </FormGroup>
 
-            <FormGroup fullWidth>
+            <FormGroup $fullWidth>
               <Label>
                 재직증명서 <RequiredMark>*</RequiredMark>
               </Label>
@@ -299,29 +261,10 @@ const ServiceRegistration = () => {
           </FormGrid>
         </FormSection>
 
-        {/* Section 4: 추가 정보 (선택) */}
-        <FormSection>
-          <SectionHeader>
-            <SectionNumber>4</SectionNumber>
-            <SectionTitle>추가 정보 (선택)</SectionTitle>
-          </SectionHeader>
-
-          <FormGroup fullWidth>
-            <Label>기타 안내 사항</Label>
-            <TextArea
-              placeholder="서비스 이용 목적이나 기타 문의사항을 입력해 주세요"
-              value={formData.additionalInfo}
-              onChange={(e) => handleInputChange('additionalInfo', e.target.value)}
-              rows={4}
-            />
-          </FormGroup>
-        </FormSection>
-
         {/* 신청 전 확인사항 */}
         <InfoBox>
           <InfoTitle>📋 신청 전 확인사항</InfoTitle>
           <InfoList>
-            <InfoItem>• 담당자 이메일로 회사 도메인[@company.com]과 일치하여야 합니다</InfoItem>
             <InfoItem>• 제출하신 서류는 항공사 업종 확인용으로만 사용됩니다</InfoItem>
             <InfoItem>• 신청 완료는 1-2 영업일 소요되며, 결과는 이메일로 안내됩니다</InfoItem>
             <InfoItem>• 승인 후 계정 발급과 팀장과 팀 설정은 상세사항 안내와 함께 제공됩니다</InfoItem>

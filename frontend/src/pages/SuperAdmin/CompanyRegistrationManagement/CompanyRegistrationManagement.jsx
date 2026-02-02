@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './CompanyRegistrationManagement.styled';
 import { airlineApplyService } from '../../../api/airline-apply/services';
+import { accountActivationService } from '../../../api/account-activation/services';
 
 const CompanyRegistrationManagement = () => {
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -41,7 +42,6 @@ const CompanyRegistrationManagement = () => {
         date: formatDate(app.date),
         airlineName: app.airlineName,
         email: app.email,
-        verificationStatus: app.verificationStatus ? '완치' : '불일치',
         documentStatus: formatDocumentStatus(app.documentStatus),
         status: app.status
       }));
@@ -68,6 +68,10 @@ const CompanyRegistrationManagement = () => {
       const response = await airlineApplyService.getApplicationDetail(application.id);
       setSelectedApplication(response.data);
       setModalType(application.status);
+      // 승인된 경우 활성화 링크도 설정
+      if (application.status === 'approved' && response.data.activationLink) {
+        setActivationLink(response.data.activationLink);
+      }
     } catch (err) {
       console.error('상세 정보 로드 실패:', err);
       alert('상세 정보를 불러오는데 실패했습니다.');
@@ -107,6 +111,25 @@ const CompanyRegistrationManagement = () => {
   const handleCancelAdminIdModal = () => {
     setShowAdminIdModal(false);
     setAdminId('');
+  };
+
+  const handleRegenerateLink = async (applicationId) => {
+    try {
+      const response = await accountActivationService.regenerateLink(applicationId);
+      // 상세 정보 다시 로드하여 새로운 링크 가져오기
+      const detailResponse = await airlineApplyService.getApplicationDetail(applicationId);
+      const updatedApplication = {
+        ...selectedApplication,
+        ...detailResponse.data,
+        activationLink: response.data.activationLink
+      };
+      setSelectedApplication(updatedApplication);
+      setActivationLink(response.data.activationLink);
+      return response.data;
+    } catch (err) {
+      console.error('링크 재발급 실패:', err);
+      throw err;
+    }
   };
 
   const handleReject = async () => {
@@ -203,7 +226,6 @@ const CompanyRegistrationManagement = () => {
                 <S.TableHeader>신청 일시</S.TableHeader>
                 <S.TableHeader>항공사명</S.TableHeader>
                 <S.TableHeader>담당자 이메일</S.TableHeader>
-                <S.TableHeader>도메인 검증</S.TableHeader>
                 <S.TableHeader>상태</S.TableHeader>
                 <S.TableHeader>작업</S.TableHeader>
               </S.TableRow>
@@ -211,7 +233,7 @@ const CompanyRegistrationManagement = () => {
             <S.TableBody>
               {applications.length === 0 ? (
                 <S.TableRow>
-                  <S.TableCell colSpan="6" style={{ textAlign: 'center', padding: '40px' }}>
+                  <S.TableCell colSpan="5" style={{ textAlign: 'center', padding: '40px' }}>
                     신청 내역이 없습니다.
                   </S.TableCell>
                 </S.TableRow>
@@ -223,11 +245,6 @@ const CompanyRegistrationManagement = () => {
                       <S.AirlineName>{app.airlineName}</S.AirlineName>
                     </S.TableCell>
                     <S.TableCell>{app.email}</S.TableCell>
-                    <S.TableCell>
-                      <S.StatusBadge $status={app.verificationStatus}>
-                        {app.verificationStatus === '완치' ? '✓ 일치' : '✗ 불일치'}
-                      </S.StatusBadge>
-                    </S.TableCell>
                     <S.TableCell>
                       <S.DocumentStatusBadge $status={app.documentStatus}>
                         {app.documentStatus === '대기' && '⏱ 대기'}
@@ -261,6 +278,7 @@ const CompanyRegistrationManagement = () => {
           <ApprovedModal
             application={selectedApplication}
             onClose={handleCloseModal}
+            onRegenerateLink={handleRegenerateLink}
           />
         )}
 
@@ -299,12 +317,7 @@ const CompanyRegistrationManagement = () => {
 // Pending Modal Component
 const PendingModal = ({ application, onClose, onApprove, onReject }) => {
   // 완료된 단계 수 계산
-  const completedSteps = [
-    application.emailDomainVerified,
-    true, // 필수 서류 제출 (항상 완료로 가정)
-    true, // 이메일 확인 유효성 (항상 완료로 가정)
-    true  // 사업자 등록증 확인 (항상 완료로 가정)
-  ].filter(Boolean).length;
+  const completedSteps = 3; // 필수 서류 제출, 이메일 확인, 사업자 등록증 확인
 
   return (
     <S.ModalOverlay onClick={onClose}>
@@ -320,21 +333,10 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
             <S.ProgressHeader>
               <S.ProgressIcon>⏱</S.ProgressIcon>
               <S.ProgressTitle>검증 절차</S.ProgressTitle>
-              <S.ProgressCount>{completedSteps}/4</S.ProgressCount>
+              <S.ProgressCount>{completedSteps}/3</S.ProgressCount>
             </S.ProgressHeader>
-            <S.ProgressBar $progress={(completedSteps / 4) * 100} />
+            <S.ProgressBar $progress={(completedSteps / 3) * 100} />
             <S.ProgressStepsGrid>
-              <S.ProgressStep $completed={application.emailDomainVerified}>
-                <S.StepIcon $error={!application.emailDomainVerified}>
-                  {application.emailDomainVerified ? '✓' : '✗'}
-                </S.StepIcon>
-                <S.StepLabel>이메일 도메인 검증</S.StepLabel>
-                <S.StepDescription>
-                  {application.emailDomainVerified 
-                    ? '이메일 도메인이 확인되었습니다.'
-                    : '이메일 도메인이 일치하지 않습니다.'}
-                </S.StepDescription>
-              </S.ProgressStep>
               <S.ProgressStep $completed={true}>
                 <S.StepIcon>✓</S.StepIcon>
                 <S.StepLabel>필수 서류 제출</S.StepLabel>
@@ -381,19 +383,6 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
             </S.InfoItem>
           </S.InfoSection>
 
-          {/* Domain Verification */}
-          <S.VerificationBox $error={!application.emailDomainVerified}>
-            <S.VerificationHeader>
-              <S.VerificationIcon>ℹ️</S.VerificationIcon>
-              <S.VerificationTitle>도메인 검증</S.VerificationTitle>
-            </S.VerificationHeader>
-            <S.VerificationMessage $success={application.emailDomainVerified}>
-              {application.emailDomainVerified 
-                ? '✓ 이메일 도메인과 항공사명이 일치합니다.'
-                : '✗ 이메일 도메인과 항공사명이 일치하지 않습니다.'}
-            </S.VerificationMessage>
-          </S.VerificationBox>
-
           {/* Attached Documents */}
           <S.DocumentSection>
             <S.DocumentTitle>첨부 서류</S.DocumentTitle>
@@ -437,14 +426,54 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
 };
 
 // Approved Modal Component
-const ApprovedModal = ({ application, onClose }) => {
+const ApprovedModal = ({ application, onClose, onRegenerateLink }) => {
   const navigate = useNavigate();
+  const [regenerating, setRegenerating] = useState(false);
+  const [currentLink, setCurrentLink] = useState(application.activationLink);
+
+  // application.activationLink가 변경되면 currentLink도 업데이트
+  useEffect(() => {
+    setCurrentLink(application.activationLink);
+  }, [application.activationLink]);
 
   const handleViewTenant = () => {
     if (application.airlineId) {
       navigate(`/super-admin/tenants/${application.airlineId}`);
     } else {
       alert('테넌트 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+    }
+  };
+
+  const handleCopyLink = () => {
+    const linkToCopy = currentLink || application.activationLink;
+    if (linkToCopy) {
+      navigator.clipboard.writeText(linkToCopy).then(() => {
+        alert('링크가 클립보드에 복사되었습니다.');
+      }).catch(() => {
+        alert('링크 복사에 실패했습니다.');
+      });
+    }
+  };
+
+  const handleRegenerateLink = async () => {
+    if (!window.confirm('활성화 링크를 재발급하시겠습니까? 기존 링크는 더 이상 사용할 수 없습니다.')) {
+      return;
+    }
+
+    try {
+      setRegenerating(true);
+      const result = await onRegenerateLink(application.id);
+      // 새 링크로 상태 업데이트
+      if (result && result.activationLink) {
+        setCurrentLink(result.activationLink);
+      }
+      alert('활성화 링크가 재발급되었습니다.');
+    } catch (err) {
+      console.error('링크 재발급 실패:', err);
+      const errorMessage = err.response?.data?.message || '링크 재발급에 실패했습니다.';
+      alert(errorMessage);
+    } finally {
+      setRegenerating(false);
     }
   };
 
@@ -484,17 +513,92 @@ const ApprovedModal = ({ application, onClose }) => {
             </S.InfoItem>
           </S.InfoSection>
 
-          <S.VerificationBox $error={!application.emailDomainVerified}>
-            <S.VerificationHeader>
-              <S.VerificationIcon>ℹ️</S.VerificationIcon>
-              <S.VerificationTitle>도메인 검증</S.VerificationTitle>
-            </S.VerificationHeader>
-            <S.VerificationMessage $success={application.emailDomainVerified}>
-              {application.emailDomainVerified 
-                ? '✓ 이메일 도메인과 항공사명이 일치합니다.'
-                : '✗ 이메일 도메인과 항공사명이 일치하지 않습니다.'}
-            </S.VerificationMessage>
-          </S.VerificationBox>
+          {/* Activation Link Section */}
+          <S.InfoSection>
+            <S.InfoItem>
+              <S.InfoLabel>활성화 링크</S.InfoLabel>
+              {(currentLink || application.activationLink) ? (
+                <>
+                  <div style={{ 
+                    display: 'flex', 
+                    gap: '10px', 
+                    alignItems: 'center',
+                    marginTop: '8px'
+                  }}>
+                    <input
+                      type="text"
+                      value={currentLink || application.activationLink}
+                      readOnly
+                      style={{
+                        flex: 1,
+                        padding: '10px',
+                        border: '1px solid #e5e7eb',
+                        borderRadius: '6px',
+                        fontSize: '14px',
+                        backgroundColor: '#f9fafb'
+                      }}
+                    />
+                    <button
+                      onClick={handleCopyLink}
+                      style={{
+                        padding: '10px 20px',
+                        backgroundColor: '#3b82f6',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '14px'
+                      }}
+                    >
+                      복사
+                    </button>
+                    <button
+                      onClick={handleRegenerateLink}
+                      disabled={regenerating}
+                      style={{
+                        padding: '10px 20px',
+                        backgroundColor: '#10b981',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: regenerating ? 'not-allowed' : 'pointer',
+                        fontSize: '14px',
+                        opacity: regenerating ? 0.6 : 1
+                      }}
+                    >
+                      {regenerating ? '재발급 중...' : '재발급'}
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
+                    ℹ️ 이 링크를 항공사 관리자에게 전달하여 계정 활성화를 완료하도록 안내하세요.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
+                    활성화 링크가 없습니다. 재발급 버튼을 클릭하여 새 링크를 생성하세요.
+                  </p>
+                  <button
+                    onClick={handleRegenerateLink}
+                    disabled={regenerating}
+                    style={{
+                      marginTop: '12px',
+                      padding: '10px 20px',
+                      backgroundColor: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      cursor: regenerating ? 'not-allowed' : 'pointer',
+                      fontSize: '14px',
+                      opacity: regenerating ? 0.6 : 1
+                    }}
+                  >
+                    {regenerating ? '재발급 중...' : '링크 재발급'}
+                  </button>
+                </>
+              )}
+            </S.InfoItem>
+          </S.InfoSection>
 
           <S.DocumentSection>
             <S.DocumentTitle>첨부 서류</S.DocumentTitle>
@@ -577,18 +681,6 @@ const RejectedModal = ({ application, onClose }) => {
               <S.InfoValue>📅 {application.date}</S.InfoValue>
             </S.InfoItem>
           </S.InfoSection>
-
-          <S.VerificationBox $error={!application.emailDomainVerified}>
-            <S.VerificationHeader>
-              <S.VerificationIcon>ℹ️</S.VerificationIcon>
-              <S.VerificationTitle>도메인 검증</S.VerificationTitle>
-            </S.VerificationHeader>
-            <S.VerificationMessage $success={application.emailDomainVerified}>
-              {application.emailDomainVerified 
-                ? '✓ 이메일 도메인과 항공사명이 일치합니다.'
-                : '✗ 이메일 도메인과 항공사명이 일치하지 않습니다. 검토가 필요합니다.'}
-            </S.VerificationMessage>
-          </S.VerificationBox>
 
           <S.DocumentSection>
             <S.DocumentTitle>첨부 서류</S.DocumentTitle>

@@ -20,7 +20,6 @@ public class AirlineApplyDto {
         private LocalDateTime date;
         private String airlineName;
         private String email;
-        private Boolean verificationStatus;
         private String documentStatus;
         private String status;
     }
@@ -36,11 +35,11 @@ public class AirlineApplyDto {
         private String email;
         private String managerName;
         private String managerPhone;
-        private Boolean emailDomainVerified;
         private String status;
         private String cancelReason;
         private List<DocumentInfo> documents;
         private Long airlineId; // 승인된 경우 Airline의 ID
+        private String activationLink; // 승인된 경우 활성화 링크
     }
 
     @Getter
@@ -76,12 +75,6 @@ public class AirlineApplyDto {
         @NotBlank(message = "항공사명은 필수입니다")
         private String airlineName;
 
-        @NotBlank(message = "국가는 필수입니다")
-        private String country;
-
-        @NotBlank(message = "회사 도메인은 필수입니다")
-        private String companyDomain;
-
         @NotBlank(message = "담당자 이름은 필수입니다")
         private String managerName;
 
@@ -90,8 +83,6 @@ public class AirlineApplyDto {
 
         @NotBlank(message = "담당자 이메일은 필수입니다")
         private String managerEmail;
-
-        private String additionalInfo;
     }
 
     @Getter

@@ -12,6 +12,11 @@ export const accountActivationService = {
       password,
       passwordConfirm,
     });
+  },
+
+  // 활성화 링크 재발급
+  regenerateLink: (airlineApplyId) => {
+    return api.post(`/api/account-activation/regenerate/${airlineApplyId}`);
   }
 };
 
