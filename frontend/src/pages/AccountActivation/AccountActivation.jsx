@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import * as S from './AccountActivation.styled';
-import InitialSetup from './InitialSetup'; // 초기 설정 컴포넌트 import
+import InitialSetup from './InitialSetup';
+import { accountActivationService } from '../../api/account-activation/services';
 
 const AccountActivation = () => {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const token = searchParams.get('token');
+
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -11,15 +17,41 @@ const AccountActivation = () => {
     service: false,
     privacy: false,
   });
-  const [isActivationComplete, setIsActivationComplete] = useState(false); // 활성화 완료 상태
+  const [isActivationComplete, setIsActivationComplete] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  // TODO: Zustand state mapping
-  const userInfo = {
-    email: 'admin@koreanair.com',
-    country: '대한민국',
-    role: '대한항공',
-    activationDate: '2026-01-20 14:30',
-  };
+  useEffect(() => {
+    if (!token) {
+      setError('유효하지 않은 활성화 링크입니다.');
+      setLoading(false);
+      return;
+    }
+
+    const fetchActivationInfo = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await accountActivationService.getActivationInfo(token);
+        setUserInfo({
+          email: response.data.email,
+          country: response.data.country,
+          role: response.data.airlineName,
+          activationDate: new Date(response.data.activationDate).toLocaleString('ko-KR'),
+        });
+      } catch (err) {
+        console.error('활성화 정보 로드 실패:', err);
+        const errorMessage = err.response?.data?.message || '활성화 정보를 불러오는데 실패했습니다.';
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchActivationInfo();
+  }, [token]);
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
@@ -33,12 +65,31 @@ const AccountActivation = () => {
     setTermsAgreed(prev => ({ ...prev, [type]: !prev[type] }));
   };
 
-  const handleSubmit = () => {
-    // TODO: API 연동 - 계정 활성화 처리
-    console.log('Account activation submitted');
-    
-    // 활성화 완료 후 초기 설정 페이지로 이동
-    setIsActivationComplete(true);
+  const handleSubmit = async () => {
+    if (!token) {
+      alert('유효하지 않은 활성화 링크입니다.');
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setError(null);
+      await accountActivationService.activateAccount(token, password, passwordConfirm);
+      alert('계정 활성화가 완료되었습니다.');
+      setIsActivationComplete(true);
+    } catch (err) {
+      console.error('계정 활성화 실패:', err);
+      const errorMessage = err.response?.data?.message || '계정 활성화에 실패했습니다.';
+      setError(errorMessage);
+      alert(errorMessage);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const isFormValid = password && passwordConfirm && 
@@ -47,6 +98,33 @@ const AccountActivation = () => {
   // 활성화 완료 시 초기 설정 페이지 렌더링
   if (isActivationComplete) {
     return <InitialSetup />;
+  }
+
+  if (loading) {
+    return (
+      <S.MainContainer>
+        <S.ContentWrapper>
+          <div style={{ textAlign: 'center', padding: '50px' }}>
+            <p>정보를 불러오는 중...</p>
+          </div>
+        </S.ContentWrapper>
+      </S.MainContainer>
+    );
+  }
+
+  if (error && !userInfo) {
+    return (
+      <S.MainContainer>
+        <S.ContentWrapper>
+          <div style={{ textAlign: 'center', padding: '50px', color: '#dc2626' }}>
+            <p>{error}</p>
+            <button onClick={() => navigate('/')} style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}>
+              홈으로 돌아가기
+            </button>
+          </div>
+        </S.ContentWrapper>
+      </S.MainContainer>
+    );
   }
 
   return (
@@ -75,32 +153,40 @@ const AccountActivation = () => {
             항공사 관리자 계정을 활성화하고 보안 설정을 완료하세요
           </S.Subtitle>
 
-          {/* Section 1: 본인 확인 정보 */}
-          <S.Section>
-            <S.SectionHeader>
-              <S.SectionNumber>1</S.SectionNumber>
-              <S.SectionTitle>본인 확인 정보</S.SectionTitle>
-            </S.SectionHeader>
+          {error && (
+            <div style={{ color: '#dc2626', textAlign: 'center', marginBottom: '20px' }}>
+              {error}
+            </div>
+          )}
 
-            <S.InfoGrid>
-              <S.InfoItem>
-                <S.InfoLabel>이메일</S.InfoLabel>
-                <S.InfoValue>{userInfo.email}</S.InfoValue>
-              </S.InfoItem>
-              <S.InfoItem>
-                <S.InfoLabel>항공사명</S.InfoLabel>
-                <S.InfoValue>{userInfo.role}</S.InfoValue>
-              </S.InfoItem>
-              <S.InfoItem>
-                <S.InfoLabel>국가</S.InfoLabel>
-                <S.InfoValue>{userInfo.country}</S.InfoValue>
-              </S.InfoItem>
-              <S.InfoItem>
-                <S.InfoLabel>승인 일시</S.InfoLabel>
-                <S.InfoValue>{userInfo.activationDate}</S.InfoValue>
-              </S.InfoItem>
-            </S.InfoGrid>
-          </S.Section>
+          {/* Section 1: 본인 확인 정보 */}
+          {userInfo && (
+            <S.Section>
+              <S.SectionHeader>
+                <S.SectionNumber>1</S.SectionNumber>
+                <S.SectionTitle>본인 확인 정보</S.SectionTitle>
+              </S.SectionHeader>
+
+              <S.InfoGrid>
+                <S.InfoItem>
+                  <S.InfoLabel>이메일</S.InfoLabel>
+                  <S.InfoValue>{userInfo.email}</S.InfoValue>
+                </S.InfoItem>
+                <S.InfoItem>
+                  <S.InfoLabel>항공사명</S.InfoLabel>
+                  <S.InfoValue>{userInfo.role}</S.InfoValue>
+                </S.InfoItem>
+                <S.InfoItem>
+                  <S.InfoLabel>국가</S.InfoLabel>
+                  <S.InfoValue>{userInfo.country}</S.InfoValue>
+                </S.InfoItem>
+                <S.InfoItem>
+                  <S.InfoLabel>승인 일시</S.InfoLabel>
+                  <S.InfoValue>{userInfo.activationDate}</S.InfoValue>
+                </S.InfoItem>
+              </S.InfoGrid>
+            </S.Section>
+          )}
 
           {/* Section 2: 비밀번호 설정 */}
           <S.Section>
@@ -190,10 +276,10 @@ const AccountActivation = () => {
           </S.Section>
 
           <S.SubmitButton 
-            disabled={!isFormValid}
+            disabled={!isFormValid || submitting}
             onClick={handleSubmit}
           >
-            계정 활성화 완료
+            {submitting ? '처리 중...' : '계정 활성화 완료'}
           </S.SubmitButton>
         </S.FormCard>
       </S.ContentWrapper>

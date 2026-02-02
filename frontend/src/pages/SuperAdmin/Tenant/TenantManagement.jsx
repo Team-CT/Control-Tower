@@ -16,6 +16,15 @@ const TenantManagement = () => {
     fetchTenants();
   }, []);
 
+  // 검색어 변경 시 자동 검색 (디바운스 적용)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchTenants();
+    }, 300); // 300ms 디바운스
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   const fetchTenants = async () => {
     try {
       setLoading(true);
@@ -141,7 +150,6 @@ const TenantManagement = () => {
 
                 <S.CardBody>
                   <S.TenantId>테넌트 ID: {tenant.id}</S.TenantId>
-                  <S.PlanBadge plan={tenant.plan}>{tenant.plan}</S.PlanBadge>
                   <S.EmployeeCount>활성 직원 수: {(tenant.employeeCount || 0).toLocaleString()}명</S.EmployeeCount>
                 </S.CardBody>
 
@@ -169,11 +177,9 @@ const TenantManagement = () => {
                 <S.TableRow>
                   <S.TableHeader>항공사</S.TableHeader>
                   <S.TableHeader>테넌트 ID</S.TableHeader>
-                  <S.TableHeader>플랜</S.TableHeader>
                   <S.TableHeader>활성 직원 수</S.TableHeader>
                   <S.TableHeader>상태</S.TableHeader>
                   <S.TableHeader>상세보기</S.TableHeader>
-                  <S.TableHeader>작업</S.TableHeader>
                 </S.TableRow>
               </S.TableHead>
               <S.TableBody>
@@ -186,9 +192,6 @@ const TenantManagement = () => {
                       </S.TenantInfo>
                     </S.TableCell>
                     <S.TableCell>{tenant.id}</S.TableCell>
-                    <S.TableCell>
-                      <S.PlanBadge plan={tenant.plan}>{tenant.plan}</S.PlanBadge>
-                    </S.TableCell>
                     <S.TableCell>{(tenant.employeeCount || 0).toLocaleString()}명</S.TableCell>
                     <S.TableCell>
                       <S.StatusBadge status={tenant.status}>
@@ -201,9 +204,6 @@ const TenantManagement = () => {
                       <S.ViewDetailButtonSmall onClick={() => handleViewDetail(tenant.id)}>
                         👁 상세보기
                       </S.ViewDetailButtonSmall>
-                    </S.TableCell>
-                    <S.TableCell>
-                      <S.ActionButton>⋮</S.ActionButton>
                     </S.TableCell>
                   </S.TableRow>
                 ))}

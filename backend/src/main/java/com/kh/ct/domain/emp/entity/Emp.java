@@ -81,4 +81,9 @@ public class Emp extends BaseTimeEntity {
             mappedBy = "empId", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EmpPhysicalTest> physicalTests = new ArrayList<>();
+
+    // 비즈니스 로직 메서드
+    public void updatePassword(String encodedPassword) {
+        this.empPwd = encodedPassword;
+    }
 }

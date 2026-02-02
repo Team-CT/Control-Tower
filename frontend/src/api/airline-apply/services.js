@@ -1,6 +1,15 @@
-import api from '../axios';
+import api, { uploadApi } from '../axios';
 
 export const airlineApplyService = {
+  // 가입 신청 생성
+  createApplication: (formData) => {
+    return uploadApi.post('/api/airline-applications', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+
   // 목록 조회
   getApplications: (keyword) => {
     const params = keyword ? { keyword } : {};
@@ -15,6 +24,11 @@ export const airlineApplyService = {
   // 승인
   approveApplication: (id, adminId) => {
     return api.post(`/api/super-admin/airline-applications/${id}/approve`, { adminId });
+  },
+
+  // 승인 (활성화 링크 포함)
+  approveApplicationWithLink: (id, adminId) => {
+    return api.post(`/api/super-admin/airline-applications/${id}/approve-with-link`, { adminId });
   },
 
   // 반려
