@@ -17,6 +17,30 @@ export const accountActivationService = {
   // 활성화 링크 재발급
   regenerateLink: (airlineApplyId) => {
     return api.post(`/api/account-activation/regenerate/${airlineApplyId}`);
+  },
+
+  // 초기 설정 완료
+  completeInitialSetup: (token, formData, logoFile) => {
+    const submitFormData = new FormData();
+    
+    // JSON 데이터 추가
+    const data = {
+      timezone: formData.timezone,
+      department: formData.department,
+      position: formData.position
+    };
+    submitFormData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+    
+    // 로고 파일 추가 (선택사항)
+    if (logoFile) {
+      submitFormData.append('logoFile', logoFile);
+    }
+    
+    return api.post(`/api/account-activation/initial-setup/${token}`, submitFormData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
   }
 };
 

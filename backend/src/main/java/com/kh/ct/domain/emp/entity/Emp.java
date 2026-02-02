@@ -86,4 +86,12 @@ public class Emp extends BaseTimeEntity {
     public void updatePassword(String encodedPassword) {
         this.empPwd = encodedPassword;
     }
+
+    public void updateEmpStatus(CommonEnums.EmpStatus status) {
+        this.empStatus = status;
+    }
+
+    public void updateAirlineId(Airline airline) {
+        this.airlineId = airline;
+    }
 }

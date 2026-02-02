@@ -54,5 +54,26 @@ public class AccountActivationDto {
         private String activationLink;
         private String message;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class InitialSetupRequest {
+        private String timezone;
+        private String department;
+        private String position;
+        // 로고 파일은 multipart로 별도 처리
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class InitialSetupResponse {
+        private String message;
+        private Boolean success;
+        private Long airlineId;
+    }
 }
 
