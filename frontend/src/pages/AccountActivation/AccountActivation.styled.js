@@ -236,8 +236,8 @@ export const ToggleButton = styled.button`
 `;
 
 export const PasswordHint = styled.div`
-  background: #eff6ff;
-  border-left: 3px solid #3b82f6;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
   padding: 16px 20px;
   border-radius: 8px;
   margin-top: 16px;
@@ -254,21 +254,22 @@ export const HintList = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 export const HintItem = styled.li`
-  font-size: 13px;
-  color: #3b82f6;
-  padding-left: 16px;
-  position: relative;
-  margin-bottom: 4px;
-
-  &:before {
-    content: '•';
-    position: absolute;
-    left: 0;
-    font-weight: 700;
-  }
+  font-size: 14px;
+  font-weight: 500;
+  color: ${props => props.$valid ? '#16a34a' : '#dc2626'};
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: ${props => props.$valid ? '#f0fdf4' : '#fef2f2'};
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 
   &:last-child {
     margin-bottom: 0;

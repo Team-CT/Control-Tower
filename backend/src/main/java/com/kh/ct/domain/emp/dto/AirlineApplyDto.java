@@ -75,6 +75,9 @@ public class AirlineApplyDto {
         @NotBlank(message = "항공사명은 필수입니다")
         private String airlineName;
 
+        @NotBlank(message = "항공사 주소는 필수입니다")
+        private String airlineAddress;
+
         @NotBlank(message = "담당자 이름은 필수입니다")
         private String managerName;
 

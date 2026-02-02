@@ -43,9 +43,82 @@ const EmployeeDashboard = () => {
     useEffect(() => {
         const loadData = async () => {
             try {
+                // --- 사용자 인증 정보 확인 ---
+                const storageData = localStorage.getItem('auth-storage');
+                if (!storageData) {
+                    navigate('/login');
+                    return;
+                }
+                const parsedData = JSON.parse(storageData);
+                const token = parsedData.state?.token;
+                const empId = parsedData.state?.emp?.empId;
+                const empName = parsedData.state?.emp?.empName;
+                const role = parsedData.state?.emp?.role;
+
+                if (!token) {
+                    navigate('/login');
+                    return;
+                }
+
+                // 슈퍼관리자는 대시보드 API를 호출하지 않음
+                if (role === 'SUPER_ADMIN') {
+                    navigate('/super-admin-dashboard', { replace: true });
+                    return;
+                }
+
+                // empId가 없거나 유효하지 않은 경우 처리
+                if (!empId || empId === 'SUPERADMIN' || empId === 'SUPER_ADMIN') {
+                    console.warn('유효하지 않은 empId:', empId);
+                    if (role === 'SUPER_ADMIN') {
+                        navigate('/super-admin-dashboard', { replace: true });
+                        return;
+                    }
+                    navigate('/login');
+                    return;
+                }
+
+                console.log("확인된 사번:", empId);
+                console.log("확인된 이름:", empName);
+                console.log("확인된 역할:", role);
+                console.log("현재 로컬스토리에서 가져온 토큰:", token);
+
+                // API 호출 (백엔드에서 토큰으로 유저 식별)
                 const data = await fetchDashboardData();
                 const todayStr = new Date().toLocaleDateString('en-CA'); // "YYYY-MM-DD"
 
+                console.log("1. 전체 응답 데이터:", data);
+
+                setTotalWorkingDays(getWorkingDaysInMonth());
+
+                // 1. 연차 개수 설정
+                if (data.empInfo) {
+                    setLeaveCount(data.empInfo.leaveCount || 0);
+                }
+
+                // 2. 실제 근무일 설정
+                if (data.workingDays !== undefined) {
+                    setActualWorkingDays(data.workingDays);
+                }
+
+                // 3. 비행 시간 및 횟수 설정
+                if (data.totalFlightHours !== undefined) {
+                    setFlightTime(data.totalFlightHours);
+                }
+                if (data.totalFlightCount !== undefined) {
+                    setFlightCount(data.totalFlightCount);
+                }
+
+                // 4. 건강 정보 설정
+                if (data.healthInfo) {
+                    setHealthData({
+                        healthPoint: data.healthInfo.healthPoint || 0,
+                        stressPoint: data.healthInfo.stressPoint || 0,
+                        fatiguePoint: data.healthInfo.fatiguePoint || 0,
+                        physicalPoint: data.healthInfo.physicalPoint || 0
+                    });
+                }
+
+                // 5. 비행 일정 가공
                 const flights = (data.flightList || []).map(f => {
                     const statusConfig = FLIGHT_STATUS_MAP[f.flightStatus] || FLIGHT_STATUS_MAP.DEFAULT;
                     return {
@@ -60,7 +133,7 @@ const EmployeeDashboard = () => {
                     };
                 });
 
-                // 2. 지상 일정 가공
+                // 6. 지상 일정 가공
                 const grounds = (data.groundScheduleList || []).map(g => ({
                     id: `ground-${g.groundScheduleId}`,
                     time: g.scheduleStartTime.substring(0, 5),
@@ -73,7 +146,7 @@ const EmployeeDashboard = () => {
                     statusColor: '#F39C12'
                 }));
 
-                // 3. 건강 프로그램 일정 가공
+                // 7. 건강 프로그램 일정 가공
                 const programs = (data.programList || []).map(p => ({
                     id: `prog-${p.programApplyId}`,
                     time: p.programStartTime,
@@ -85,58 +158,16 @@ const EmployeeDashboard = () => {
                     statusColor: '#E67E22'
                 }));
 
-                // 🚩 [정렬 로직] 모든 일정 합치기 및 날짜/시간순 정렬
+                // 8. 모든 일정 합치기 및 날짜/시간순 정렬
                 const combined = [...flights, ...grounds, ...programs]
-    .filter(item => item.date === todayStr) // ✅ 오늘 날짜와 일치하는 항목만 남김
-    .sort((a, b) => {
-        // 같은 날짜이므로 시간(time) 순서로만 정렬
-        return a.time.localeCompare(b.time);
-    });
+                    .filter(item => item.date === todayStr) // 오늘 날짜와 일치하는 항목만 남김
+                    .sort((a, b) => {
+                        // 같은 날짜이므로 시간(time) 순서로만 정렬
+                        return a.time.localeCompare(b.time);
+                    });
                 setTodaySchedule(combined);
 
-                // --- 사용자 및 근태 정보 세팅 ---
-                const storageData = localStorage.getItem('auth-storage');
-                if (!storageData) {
-                    navigate('/login');
-                    return;
-                }
-                const parsedData = JSON.parse(storageData);
-                const token = parsedData.state?.token;
-                if (!token) {
-                    navigate('/login');
-                    return;
-                }
-
-               
-        
-        // 3. 토큰 및 사원 정보 추출
-    
-        const empId = parsedData.state?.emp?.empId;
-        const empName = parsedData.state?.emp?.empName;
-        const role = parsedData.state?.emp?.role;
-
-        console.log("확인된 사번:", empId);
-        console.log("확인된 이름:", empName);
-        console.log("확인된 역할:", role);
-        console.log("현재 로컬스토리에서 가져온 토큰:", token);
-        console.log("1. 전체 응답 데이터:", data);
-
-                setTotalWorkingDays(getWorkingDaysInMonth());
-                if (data.empInfo) setLeaveCount(data.empInfo.leaveCount || 0);
-                if (data.workingDays !== undefined) setActualWorkingDays(data.workingDays);
-                if (data.totalFlightHours !== undefined) setFlightTime(data.totalFlightHours);
-                if (data.totalFlightCount !== undefined) setFlightCount(data.totalFlightCount);
-
-                if (data.healthInfo) {
-                    setHealthData({
-                        healthPoint: data.healthInfo.healthPoint || 0,
-                        stressPoint: data.healthInfo.stressPoint || 0,
-                        fatiguePoint: data.healthInfo.fatiguePoint || 0,
-                        physicalPoint: data.healthInfo.physicalPoint || 0
-                    });
-                }
-
-                // --- 출결 및 알림 로직 ---
+                // 9. 출결 및 알림 로직
                 const newNotifications = [];
                 if (data.attendanceList && data.attendanceList.length > 0) {
                     const todayData = data.attendanceList[0];
@@ -335,7 +366,7 @@ const EmployeeDashboard = () => {
                                 <S.ChartFill width={performanceData.attendance.percentage} color="#4A90E2" />
                             </S.ChartProgress>
                             <S.ChartValue>
-                                {performanceData.attendance.current}일 사용 
+                                {performanceData.attendance.current}일 사용
                                 <S.ChartTotal>/ 15일</S.ChartTotal>
                             </S.ChartValue>
                         </S.ChartBar>
@@ -346,7 +377,7 @@ const EmployeeDashboard = () => {
                                 <S.ChartFill width={performanceData.leave.percentage} color="#27AE60" />
                             </S.ChartProgress>
                             <S.ChartValue>
-                                {performanceData.leave.current}일 출근 
+                                {performanceData.leave.current}일 출근
                                 <S.ChartTotal>/ {totalWorkingDays}일</S.ChartTotal>
                             </S.ChartValue>
                         </S.ChartBar>

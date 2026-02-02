@@ -16,5 +16,7 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
     Optional<Emp> findByEmpIdAndEmpStatus(String empId, CommonEnums.EmpStatus status);
     
     Optional<Emp> findByAirlineIdAndRole(com.kh.ct.domain.emp.entity.Airline airline, CommonEnums.Role role);
+    
+    Optional<Emp> findByEmailAndRole(String email, CommonEnums.Role role);
 }
 
