@@ -4,6 +4,7 @@ import com.kh.ct.domain.emp.dto.AccountActivationDto;
 import com.kh.ct.domain.emp.entity.ActivationToken;
 import com.kh.ct.domain.emp.entity.Airline;
 import com.kh.ct.domain.emp.entity.AirlineApply;
+import com.kh.ct.domain.emp.entity.AirlineStatus;
 import com.kh.ct.domain.emp.entity.Emp;
 import com.kh.ct.domain.emp.repository.ActivationTokenRepository;
 import com.kh.ct.domain.emp.repository.AirlineApplyRepository;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -69,10 +71,12 @@ public class AccountActivationServiceImpl implements AccountActivationService {
             throw new IllegalArgumentException("만료되었거나 이미 사용된 토큰입니다.");
         }
 
-        // 3. 비밀번호 업데이트
+        // 3. 비밀번호 업데이트 및 계정 상태 활성화
         Emp emp = activationToken.getEmpId();
         String encodedPassword = passwordEncoder.encode(request.getPassword());
         emp.updatePassword(encodedPassword);
+        // 계정 상태를 Y(활성)로 변경
+        emp.updateEmpStatus(CommonEnums.EmpStatus.Y);
         empRepository.save(emp);
 
         // 4. 토큰 사용 처리
@@ -131,6 +135,59 @@ public class AccountActivationServiceImpl implements AccountActivationService {
         return AccountActivationDto.RegenerateLinkResponse.builder()
                 .activationLink(activationLink)
                 .message("활성화 링크가 재발급되었습니다.")
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public AccountActivationDto.InitialSetupResponse completeInitialSetup(
+            String token,
+            AccountActivationDto.InitialSetupRequest request,
+            String logoFilePath
+    ) {
+        // 1. 토큰으로 Emp 찾기 (사용된 토큰도 조회 가능하도록)
+        ActivationToken activationToken = activationTokenRepository.findByToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 토큰입니다."));
+
+        Emp emp = activationToken.getEmpId();
+
+        // 2. Emp의 email로 AirlineApply 찾기
+        AirlineApply application = airlineApplyRepository.findByAirlineApplyEmail(emp.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("해당 신청 정보를 찾을 수 없습니다."));
+
+        // 3. 이미 Airline이 생성되었는지 확인
+        if (airlineRepository.existsByAirlineApplyId(application.getAirlineApplyId())) {
+            throw new IllegalArgumentException("이미 초기 설정이 완료되었습니다.");
+        }
+
+        // 4. AirlineApply 정보 + InitialSetup 정보로 Airline 생성
+        Airline airline = Airline.builder()
+                .airlineName(application.getAirlineName())
+                .theme("gray") // 기본 테마
+                .mainNumber("") // 기본값
+                .airlineAddress("") // 기본값
+                .airlineDesc("") // 기본값
+                .email(application.getAirlineApplyEmail())
+                .phone(application.getManagerPhone())
+                .plan("Professional") // 기본 플랜
+                .status(AirlineStatus.ACTIVE)
+                .icon("✈️") // 기본 아이콘
+                .country("대한민국") // 국내 서비스
+                .joinDate(LocalDate.now())
+                .storageUsage(0.0)
+                .lastLoginDate(LocalDateTime.now())
+                .airlineApplyId(application)
+                .build();
+        airline = airlineRepository.save(airline);
+
+        // 5. Emp의 airlineId 업데이트
+        emp.updateAirlineId(airline);
+        empRepository.save(emp);
+
+        return AccountActivationDto.InitialSetupResponse.builder()
+                .message("초기 설정이 완료되었습니다.")
+                .success(true)
+                .airlineId(airline.getAirlineId())
                 .build();
     }
 }

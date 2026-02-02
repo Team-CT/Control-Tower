@@ -243,43 +243,14 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
         // 4. 승인 처리
         application.approve();
         
-        // 5. Airline(테넌트) 엔티티 생성
-        Airline airline = airlineRepository.findByAirlineApplyId(application.getAirlineApplyId())
-                .orElse(null);
-        
-        if (airline == null) {
-            if (!airlineRepository.existsByAirlineApplyId(application.getAirlineApplyId())) {
-                airline = Airline.builder()
-                        .airlineName(application.getAirlineName())
-                        .theme("gray")
-                        .mainNumber("")
-                        .airlineAddress("")
-                        .airlineDesc("")
-                        .email(application.getAirlineApplyEmail())
-                        .phone(application.getManagerPhone())
-                        .plan("Professional")
-                        .status(AirlineStatus.ACTIVE)
-                        .icon("✈️")
-                        .country("대한민국") // 기본값, AccountActivation에서 업데이트 가능
-                        .joinDate(LocalDate.now())
-                        .storageUsage(0.0)
-                        .lastLoginDate(LocalDateTime.now())
-                        .airlineApplyId(application)
-                        .build();
-                airline = airlineRepository.save(airline);
-            } else {
-                airline = airlineRepository.findByAirlineApplyId(application.getAirlineApplyId())
-                        .orElseThrow(() -> new IllegalStateException("Airline 생성 중 오류가 발생했습니다."));
-            }
-        }
-        
-        // 6. 항공사 관리자 계정 생성
-        String tempPassword = generateTempPassword();
-        String encodedPassword = passwordEncoder.encode(tempPassword);
+        // 5. 항공사 관리자 계정 생성 (Airline은 InitialSetup에서 생성)
+        // 공통 초기 비밀번호 사용
+        String initialPassword = "admin1234";
+        String encodedPassword = passwordEncoder.encode(initialPassword);
         
         Emp adminAccount = Emp.builder()
                 .empId(adminId)
-                .airlineId(airline)
+                .airlineId(null) // InitialSetup 완료 후 업데이트됨
                 .empName(application.getManagerName() != null ? application.getManagerName() : "관리자")
                 .empPwd(encodedPassword)
                 .age(30)
@@ -287,7 +258,7 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                 .phone(application.getManagerPhone())
                 .job("항공사 관리자")
                 .email(application.getAirlineApplyEmail())
-                .empStatus(CommonEnums.EmpStatus.Y)
+                .empStatus(CommonEnums.EmpStatus.S) // 초기 상태: S (활성화 대기)
                 .startDate(LocalDateTime.now())
                 .leaveCount(15.0f)
                 .empNo(generateEmpNo(application.getAirlineName()))
@@ -311,7 +282,7 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
         return AirlineApplyDto.ApproveResponse.builder()
                 .activationLink(activationLink)
                 .adminId(adminId)
-                .tempPassword(tempPassword)
+                .tempPassword(initialPassword) // 공통 초기 비밀번호 반환
                 .build();
     }
 

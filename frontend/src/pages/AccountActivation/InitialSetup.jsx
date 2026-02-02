@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import * as S from './InitialSetup.styled';
 import SetupComplete from './SetupComplete'; // 완료 화면 import
+import { accountActivationService } from '../../api/account-activation/services';
 
-const InitialSetup = () => {
+const InitialSetup = ({ token }) => {
   const [logoFile, setLogoFile] = useState(null);
   const [timezone, setTimezone] = useState('Asia/Seoul (KST, UTC+9)');
   const [department, setDepartment] = useState('본사');
   const [position, setPosition] = useState('');
   const [employeeFile, setEmployeeFile] = useState(null);
   const [isSetupComplete, setIsSetupComplete] = useState(false); // 설정 완료 상태
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
@@ -26,12 +29,33 @@ const InitialSetup = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // TODO: API 연동 - 초기 설정 완료 처리
-    console.log('Initial setup submitted');
-    
-    // 설정 완료 후 완료 페이지로 이동
-    setIsSetupComplete(true);
+  const handleSubmit = async () => {
+    if (!token) {
+      alert('유효하지 않은 토큰입니다.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const formData = {
+        timezone,
+        department,
+        position
+      };
+      
+      await accountActivationService.completeInitialSetup(token, formData, logoFile);
+      alert('초기 설정이 완료되었습니다.');
+      setIsSetupComplete(true);
+    } catch (err) {
+      console.error('초기 설정 실패:', err);
+      const errorMessage = err.response?.data?.message || '초기 설정에 실패했습니다.';
+      setError(errorMessage);
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // 설정 완료 시 완료 페이지 렌더링
@@ -201,8 +225,17 @@ const InitialSetup = () => {
             </S.WarningBox>
           </S.Section>
 
-          <S.SubmitButton onClick={handleSubmit}>
-            초기 설정 완료
+          {error && (
+            <div style={{ color: '#dc2626', textAlign: 'center', marginBottom: '20px' }}>
+              {error}
+            </div>
+          )}
+
+          <S.SubmitButton 
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading ? '처리 중...' : '초기 설정 완료'}
           </S.SubmitButton>
         </S.FormCard>
       </S.ContentWrapper>

@@ -97,7 +97,7 @@ const AccountActivation = () => {
 
   // 활성화 완료 시 초기 설정 페이지 렌더링
   if (isActivationComplete) {
-    return <InitialSetup />;
+    return <InitialSetup token={token} />;
   }
 
   if (loading) {

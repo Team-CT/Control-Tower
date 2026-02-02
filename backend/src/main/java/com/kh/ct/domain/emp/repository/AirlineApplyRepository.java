@@ -22,5 +22,11 @@ public interface AirlineApplyRepository extends JpaRepository<AirlineApply, Long
            "a.airlineApplyEmail LIKE %:keyword% " +
            "ORDER BY a.createDate DESC")
     List<AirlineApply> searchByKeyword(@Param("keyword") String keyword);
+
+    /**
+     * 이메일로 AirlineApply 조회 (승인된 신청만)
+     */
+    @Query("SELECT a FROM AirlineApply a WHERE a.airlineApplyEmail = :email AND a.airlineApplyStatus = 'APPROVED' ORDER BY a.createDate DESC")
+    java.util.Optional<AirlineApply> findByAirlineApplyEmail(@Param("email") String email);
 }
 
