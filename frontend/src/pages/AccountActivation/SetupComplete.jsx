@@ -9,10 +9,8 @@ const SetupComplete = () => {
     status: '활성화됨',
   };
 
-  const handleDashboardRedirect = () => {
-    // TODO: 대시보드로 라우팅 처리
-    console.log('Navigate to dashboard');
-    window.location.href = '/dashboard';
+  const handleMainRedirect = () => {
+    window.location.href = '/';
   };
 
   return (
@@ -50,8 +48,8 @@ const SetupComplete = () => {
             </S.InfoRow>
           </S.InfoCard>
 
-          <S.ActionButton onClick={handleDashboardRedirect}>
-            대시보드 이동
+          <S.ActionButton onClick={handleMainRedirect}>
+            메인으로
           </S.ActionButton>
         </S.SuccessCard>
       </S.ContentWrapper>

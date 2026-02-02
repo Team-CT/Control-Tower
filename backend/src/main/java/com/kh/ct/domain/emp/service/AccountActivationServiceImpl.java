@@ -36,17 +36,22 @@ public class AccountActivationServiceImpl implements AccountActivationService {
         ActivationToken activationToken = activationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 토큰입니다."));
 
-        if (!activationToken.isValid()) {
-            throw new IllegalArgumentException("만료되었거나 이미 사용된 토큰입니다.");
+        // 만료 시간 체크 제거 - used만 확인
+        if (activationToken.getUsed()) {
+            throw new IllegalArgumentException("이미 사용된 토큰입니다.");
         }
 
         Emp emp = activationToken.getEmpId();
-        Airline airline = emp.getAirlineId();
+        
+        // AirlineApply에서 정보 가져오기 (Airline이 아직 생성되지 않았을 수 있음)
+        AirlineApply application = airlineApplyRepository.findByAirlineApplyEmail(emp.getEmail())
+                .orElse(null);
 
         return AccountActivationDto.ActivationInfoResponse.builder()
                 .email(emp.getEmail())
-                .airlineName(airline != null ? airline.getAirlineName() : "정보 없음")
-                .country(airline != null ? airline.getCountry() : "정보 없음")
+                .airlineName(application != null ? application.getAirlineName() : "정보 없음")
+                .airlineAddress(application != null ? application.getAirlineAddress() : "정보 없음")
+                .country("대한민국") // 국내 서비스
                 .activationDate(activationToken.getCreateDate())
                 .isValid(true)
                 .build();
@@ -67,8 +72,9 @@ public class AccountActivationServiceImpl implements AccountActivationService {
         ActivationToken activationToken = activationTokenRepository.findByToken(token)
                 .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 토큰입니다."));
 
-        if (!activationToken.isValid()) {
-            throw new IllegalArgumentException("만료되었거나 이미 사용된 토큰입니다.");
+        // 만료 시간 체크 제거 - used만 확인
+        if (activationToken.getUsed()) {
+            throw new IllegalArgumentException("이미 사용된 토큰입니다.");
         }
 
         // 3. 비밀번호 업데이트 및 계정 상태 활성화
@@ -89,54 +95,7 @@ public class AccountActivationServiceImpl implements AccountActivationService {
                 .build();
     }
 
-    @Override
-    @Transactional
-    public AccountActivationDto.RegenerateLinkResponse regenerateActivationLink(Long airlineApplyId) {
-        // 1. 신청 정보 조회
-        AirlineApply application = airlineApplyRepository.findById(airlineApplyId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 신청을 찾을 수 없습니다. ID: " + airlineApplyId));
-
-        // 2. 승인된 신청인지 확인
-        if (application.getAirlineApplyStatus() != CommonEnums.ApplyStatus.APPROVED) {
-            throw new IllegalArgumentException("승인된 신청에 대해서만 링크를 재발급할 수 있습니다.");
-        }
-
-        // 3. Airline 조회
-        Airline airline = airlineRepository.findByAirlineApplyId(application.getAirlineApplyId())
-                .orElseThrow(() -> new IllegalArgumentException("항공사 정보를 찾을 수 없습니다."));
-
-        // 4. 관리자 계정 조회
-        Emp adminAccount = empRepository.findByAirlineIdAndRole(airline, CommonEnums.Role.AIRLINE_ADMIN)
-                .orElseThrow(() -> new IllegalArgumentException("관리자 계정을 찾을 수 없습니다."));
-
-        // 5. 기존 토큰 무효화 (사용되지 않은 토큰만)
-        List<ActivationToken> existingTokens = activationTokenRepository
-                .findByEmpIdAndUsedFalseOrderByCreateDateDesc(adminAccount);
-        for (ActivationToken token : existingTokens) {
-            if (token.getExpiresAt().isAfter(LocalDateTime.now())) {
-                token.markAsUsed();
-                activationTokenRepository.save(token);
-            }
-        }
-
-        // 6. 새 토큰 생성
-        String newToken = ActivationToken.generateToken();
-        ActivationToken activationToken = ActivationToken.builder()
-                .empId(adminAccount)
-                .token(newToken)
-                .expiresAt(LocalDateTime.now().plusDays(7)) // 7일 유효
-                .used(false)
-                .build();
-        activationTokenRepository.save(activationToken);
-
-        // 7. 새 활성화 링크 생성
-        String activationLink = "http://localhost:5173/account-activation?token=" + newToken;
-
-        return AccountActivationDto.RegenerateLinkResponse.builder()
-                .activationLink(activationLink)
-                .message("활성화 링크가 재발급되었습니다.")
-                .build();
-    }
+    // 재발급 기능 제거됨
 
     @Override
     @Transactional
@@ -157,18 +116,21 @@ public class AccountActivationServiceImpl implements AccountActivationService {
 
         // 3. 이미 Airline이 생성되었는지 확인
         if (airlineRepository.existsByAirlineApplyId(application.getAirlineApplyId())) {
-            throw new IllegalArgumentException("이미 초기 설정이 완료되었습니다.");
+            throw new com.kh.ct.global.exception.BusinessException(
+                    org.springframework.http.HttpStatus.CONFLICT,
+                    "이미 초기 설정이 완료되었습니다."
+            );
         }
 
         // 4. AirlineApply 정보 + InitialSetup 정보로 Airline 생성
         Airline airline = Airline.builder()
-                .airlineName(application.getAirlineName())
-                .theme("gray") // 기본 테마
-                .mainNumber("") // 기본값
-                .airlineAddress("") // 기본값
-                .airlineDesc("") // 기본값
-                .email(application.getAirlineApplyEmail())
-                .phone(application.getManagerPhone())
+                .airlineName(request.getAirlineName()) // 수정 가능한 항공사명
+                .airlineAddress(request.getAirlineAddress()) // 수정 가능한 주소
+                .theme(request.getTheme()) // 선택한 테마
+                .mainNumber(request.getRepresentativePhone()) // 대표자 번호
+                .airlineDesc(request.getAirlineDesc() != null ? request.getAirlineDesc() : "") // 항공사 설명
+                .email(request.getRepresentativeEmail()) // 대표 이메일
+                .phone(request.getRepresentativePhone()) // 대표자 번호
                 .plan("Professional") // 기본 플랜
                 .status(AirlineStatus.ACTIVE)
                 .icon("✈️") // 기본 아이콘

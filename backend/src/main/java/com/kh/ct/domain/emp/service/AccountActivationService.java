@@ -14,11 +14,6 @@ public interface AccountActivationService {
     AccountActivationDto.ActivationResponse activateAccount(String token, AccountActivationDto.ActivationRequest request);
 
     /**
-     * 활성화 링크 재발급 (승인된 신청에 대해)
-     */
-    AccountActivationDto.RegenerateLinkResponse regenerateActivationLink(Long airlineApplyId);
-
-    /**
      * 초기 설정 완료 (Airline 생성 및 Emp.airlineId 업데이트)
      */
     AccountActivationDto.InitialSetupResponse completeInitialSetup(String token, AccountActivationDto.InitialSetupRequest request, String logoFilePath);

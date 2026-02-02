@@ -45,10 +45,10 @@ public class AirlineApply extends BaseTimeEntity {
     private String employmentCertPath;
 
     @Column(length = 255)
-    private String companyDomain;
+    private String airlineAddress;
 
-    @Lob
-    private String additionalInfo;
+    @Column(length = 500)
+    private String activationLink;
 
     // 비즈니스 로직 메서드
     public void approve() {
@@ -62,5 +62,9 @@ public class AirlineApply extends BaseTimeEntity {
 
     public void setEmailDomainVerified(Boolean verified) {
         this.emailDomainVerified = verified;
+    }
+
+    public void setActivationLink(String activationLink) {
+        this.activationLink = activationLink;
     }
 }

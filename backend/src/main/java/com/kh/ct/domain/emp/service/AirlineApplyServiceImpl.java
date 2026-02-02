@@ -55,37 +55,12 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
     }
 
     @Override
-    @Transactional // readOnly = false로 오버라이드 (Airline 생성 가능하도록)
+    @Transactional(readOnly = true)
     public AirlineApplyDto.DetailResponse getApplicationDetail(Long id) {
         AirlineApply application = airlineApplyRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 신청을 찾을 수 없습니다. ID: " + id));
         
-        // 승인되었지만 Airline이 없는 경우 자동 생성 (기존 승인 건 처리)
-        if (application.getAirlineApplyStatus() == com.kh.ct.global.common.CommonEnums.ApplyStatus.APPROVED) {
-            java.util.Optional<Airline> existingAirlineOpt = airlineRepository.findByAirlineApplyId(application.getAirlineApplyId());
-            if (existingAirlineOpt.isEmpty()) {
-                // Airline 자동 생성
-                Airline newAirline = Airline.builder()
-                        .airlineName(application.getAirlineName())
-                        .theme("gray") // 기본 테마
-                        .mainNumber("") // 기본값
-                        .airlineAddress("") // 기본값
-                        .airlineDesc("") // 기본값
-                        .email(application.getAirlineApplyEmail())
-                        .phone(application.getManagerPhone())
-                        .plan("Professional")
-                        .status(AirlineStatus.ACTIVE)
-                        .icon("✈️")
-                        .country("대한민국")
-                        .joinDate(application.getCreateDate() != null ? 
-                                application.getCreateDate().toLocalDate() : LocalDate.now())
-                        .storageUsage(0.0)
-                        .lastLoginDate(LocalDateTime.now())
-                        .airlineApplyId(application)
-                        .build();
-                airlineRepository.save(newAirline);
-            }
-        }
+        // 자동 생성 로직 제거: 초기 설정이 완료된 경우에만 Airline이 존재함
         
         return convertToDetailResponse(application);
     }
@@ -206,6 +181,7 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
         // AirlineApply 엔티티 생성
         AirlineApply application = AirlineApply.builder()
                 .airlineName(request.getAirlineName())
+                .airlineAddress(request.getAirlineAddress())
                 .airlineApplyEmail(request.getManagerEmail())
                 .managerName(request.getManagerName())
                 .managerPhone(request.getManagerPhone())
@@ -266,18 +242,20 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
         
         adminAccount = empRepository.save(adminAccount);
         
-        // 7. ActivationToken 생성
+        // 7. ActivationToken 생성 (토큰은 링크에 포함되어야 함)
         String token = ActivationToken.generateToken();
         ActivationToken activationToken = ActivationToken.builder()
                 .empId(adminAccount)
                 .token(token)
-                .expiresAt(LocalDateTime.now().plusDays(7)) // 7일 유효
+                .expiresAt(LocalDateTime.now().plusYears(100)) // 만료 시간 제거 (거의 무제한)
                 .used(false)
                 .build();
         activationTokenRepository.save(activationToken);
         
-        // 8. 활성화 링크 생성
+        // 8. 활성화 링크 생성 및 AirlineApply에 저장
         String activationLink = "http://localhost:5173/account-activation?token=" + token;
+        application.setActivationLink(activationLink);
+        airlineApplyRepository.save(application);
         
         return AirlineApplyDto.ApproveResponse.builder()
                 .activationLink(activationLink)
@@ -327,25 +305,13 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                 airlineId = airlineOpt.get().getAirlineId();
             }
             
-            // 관리자 계정 조회 (email로 조회 - airlineId가 null일 수 있음)
-            java.util.Optional<Emp> adminOpt = empRepository.findByEmailAndRole(
-                entity.getAirlineApplyEmail(),
-                CommonEnums.Role.AIRLINE_ADMIN
-            );
-            
-            if (adminOpt.isPresent()) {
-                // 활성화 토큰 조회 (사용되지 않은 최신 토큰)
-                List<ActivationToken> tokens = activationTokenRepository
-                    .findByEmpIdAndUsedFalseOrderByCreateDateDesc(adminOpt.get());
-                
-                java.util.Optional<ActivationToken> tokenOpt = tokens.stream()
-                    .filter(token -> token.getExpiresAt().isAfter(LocalDateTime.now()))
-                    .findFirst();
-                
-                if (tokenOpt.isPresent()) {
-                    activationLink = "http://localhost:5173/account-activation?token=" + tokenOpt.get().getToken();
-                }
+            // 초기 설정이 완료되지 않은 경우에만 활성화 링크 제공
+            // (airlineId가 null이면 아직 InitialSetup 미완료)
+            if (airlineId == null) {
+                // AirlineApply에 저장된 activationLink 사용
+                activationLink = entity.getActivationLink();
             }
+            // airlineId가 있으면 초기 설정 완료된 것이므로 activationLink는 null로 유지
         }
 
         return AirlineApplyDto.DetailResponse.builder()

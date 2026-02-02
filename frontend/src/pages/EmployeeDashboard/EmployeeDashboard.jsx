@@ -107,10 +107,10 @@ const EmployeeDashboard = () => {
                     return;
                 }
 
-               
+
         
         // 3. 토큰 및 사원 정보 추출
-    
+
         const empId = parsedData.state?.emp?.empId;
         const empName = parsedData.state?.emp?.empName;
         const role = parsedData.state?.emp?.role;
@@ -119,6 +119,15 @@ const EmployeeDashboard = () => {
         console.log("확인된 이름:", empName);
         console.log("확인된 역할:", role);
         console.log("현재 로컬스토리에서 가져온 토큰:", token);
+            if (!token) {
+                navigate('/login');
+                return;
+            }
+
+            // 2. 인자 없이 API 호출 (백엔드에서 토큰으로 유저 식별)
+            const data = await fetchDashboardData();
+
+        setTotalWorkingDays(getWorkingDaysInMonth());
         console.log("1. 전체 응답 데이터:", data);
 
                 setTotalWorkingDays(getWorkingDaysInMonth());
@@ -335,7 +344,7 @@ const EmployeeDashboard = () => {
                                 <S.ChartFill width={performanceData.attendance.percentage} color="#4A90E2" />
                             </S.ChartProgress>
                             <S.ChartValue>
-                                {performanceData.attendance.current}일 사용 
+                                {performanceData.attendance.current}일 사용
                                 <S.ChartTotal>/ 15일</S.ChartTotal>
                             </S.ChartValue>
                         </S.ChartBar>
@@ -346,7 +355,7 @@ const EmployeeDashboard = () => {
                                 <S.ChartFill width={performanceData.leave.percentage} color="#27AE60" />
                             </S.ChartProgress>
                             <S.ChartValue>
-                                {performanceData.leave.current}일 출근 
+                                {performanceData.leave.current}일 출근
                                 <S.ChartTotal>/ {totalWorkingDays}일</S.ChartTotal>
                             </S.ChartValue>
                         </S.ChartBar>

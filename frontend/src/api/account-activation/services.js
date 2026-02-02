@@ -14,20 +14,19 @@ export const accountActivationService = {
     });
   },
 
-  // 활성화 링크 재발급
-  regenerateLink: (airlineApplyId) => {
-    return api.post(`/api/account-activation/regenerate/${airlineApplyId}`);
-  },
-
   // 초기 설정 완료
   completeInitialSetup: (token, formData, logoFile) => {
     const submitFormData = new FormData();
     
     // JSON 데이터 추가
     const data = {
-      timezone: formData.timezone,
-      department: formData.department,
-      position: formData.position
+      airlineName: formData.airlineName,
+      airlineAddress: formData.airlineAddress,
+      representativeName: formData.representativeName,
+      representativePhone: formData.representativePhone,
+      representativeEmail: formData.representativeEmail,
+      airlineDesc: formData.airlineDesc || '',
+      theme: formData.theme
     };
     submitFormData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
     
