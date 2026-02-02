@@ -67,5 +67,50 @@ public class AirlineApplyDto {
         @NotBlank(message = "반려 사유는 필수입니다")
         private String reason;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ApplyRequest {
+        @NotBlank(message = "항공사명은 필수입니다")
+        private String airlineName;
+
+        @NotBlank(message = "국가는 필수입니다")
+        private String country;
+
+        @NotBlank(message = "회사 도메인은 필수입니다")
+        private String companyDomain;
+
+        @NotBlank(message = "담당자 이름은 필수입니다")
+        private String managerName;
+
+        @NotBlank(message = "담당자 전화번호는 필수입니다")
+        private String managerPhone;
+
+        @NotBlank(message = "담당자 이메일은 필수입니다")
+        private String managerEmail;
+
+        private String additionalInfo;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ApplyResponse {
+        private Long id;
+        private String message;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ApproveResponse {
+        private String activationLink;
+        private String adminId;
+        private String tempPassword;
+    }
 }
 

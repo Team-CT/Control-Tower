@@ -25,6 +25,9 @@ export const uploadApi = axios.create({
 const AUTH_EXCLUDE = [
   { method: 'post', path: '/api/auth/login' },
   { method: 'post', path: '/api/members' }, // 회원가입(사용 시)
+  { method: 'post', path: '/api/airline-applications' }, // 가입 신청 (공개)
+  { method: 'get', path: '/api/account-activation' }, // 계정 활성화 정보 조회 (공개)
+  { method: 'post', path: '/api/account-activation' }, // 계정 활성화 완료 (공개)
   // { method: 'post', path: '/api/auth/refresh' }, // refresh 도입 시
 ];
 

@@ -5,6 +5,8 @@ import com.kh.ct.domain.emp.entity.Airline;
 import com.kh.ct.domain.emp.entity.AirlineApply;
 import com.kh.ct.domain.emp.entity.AirlineStatus;
 import com.kh.ct.domain.emp.entity.Emp;
+import com.kh.ct.domain.emp.entity.ActivationToken;
+import com.kh.ct.domain.emp.repository.ActivationTokenRepository;
 import com.kh.ct.domain.emp.repository.AirlineApplyRepository;
 import com.kh.ct.domain.emp.repository.AirlineRepository;
 import com.kh.ct.domain.emp.repository.EmpRepository;
@@ -30,6 +32,7 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
     private final AirlineRepository airlineRepository;
     private final EmpRepository empRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ActivationTokenRepository activationTokenRepository;
 
     @Override
     public List<AirlineApplyDto.ListResponse> getAllApplications() {
@@ -124,7 +127,7 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                         .plan("Professional") // 기본 플랜
                         .status(AirlineStatus.ACTIVE)
                         .icon("✈️")
-                        .country("대한민국")
+                        .country(application.getCompanyDomain() != null ? extractCountryFromDomain(application.getCompanyDomain()) : "대한민국")
                         .joinDate(LocalDate.now())
                         .storageUsage(0.0)
                         .lastLoginDate(LocalDateTime.now())
@@ -190,6 +193,150 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
         AirlineApply application = airlineApplyRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 신청을 찾을 수 없습니다. ID: " + id));
         application.reject(reason);
+    }
+
+    @Override
+    @Transactional
+    public AirlineApplyDto.ApplyResponse createApplication(
+            AirlineApplyDto.ApplyRequest request,
+            String businessLicensePath,
+            String employmentCertPath
+    ) {
+        // 1. 이메일 도메인 검증
+        String emailDomain = extractDomain(request.getManagerEmail());
+        boolean emailDomainVerified = emailDomain.equalsIgnoreCase(request.getCompanyDomain());
+
+        // 2. AirlineApply 엔티티 생성
+        AirlineApply application = AirlineApply.builder()
+                .airlineName(request.getAirlineName())
+                .airlineApplyEmail(request.getManagerEmail())
+                .managerName(request.getManagerName())
+                .managerPhone(request.getManagerPhone())
+                .companyDomain(request.getCompanyDomain())
+                .additionalInfo(request.getAdditionalInfo())
+                .airlineApplyStatus(CommonEnums.ApplyStatus.PENDING)
+                .emailDomainVerified(emailDomainVerified)
+                .businessLicensePath(businessLicensePath)
+                .employmentCertPath(employmentCertPath)
+                .build();
+
+        AirlineApply saved = airlineApplyRepository.save(application);
+
+        return AirlineApplyDto.ApplyResponse.builder()
+                .id(saved.getAirlineApplyId())
+                .message("가입 신청이 완료되었습니다.")
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public AirlineApplyDto.ApproveResponse approveApplicationWithLink(Long id, String adminId) {
+        // 1. 신청 정보 조회
+        AirlineApply application = airlineApplyRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 신청을 찾을 수 없습니다. ID: " + id));
+        
+        // 2. 이미 승인된 경우 체크
+        if (application.getAirlineApplyStatus() == CommonEnums.ApplyStatus.APPROVED) {
+            throw new IllegalArgumentException("이미 승인된 신청입니다.");
+        }
+        
+        // 3. 아이디 중복 체크
+        if (empRepository.findById(adminId).isPresent()) {
+            throw new IllegalArgumentException("이미 사용 중인 아이디입니다: " + adminId);
+        }
+        
+        // 4. 승인 처리
+        application.approve();
+        
+        // 5. Airline(테넌트) 엔티티 생성
+        Airline airline = airlineRepository.findByAirlineApplyId(application.getAirlineApplyId())
+                .orElse(null);
+        
+        if (airline == null) {
+            if (!airlineRepository.existsByAirlineApplyId(application.getAirlineApplyId())) {
+                airline = Airline.builder()
+                        .airlineName(application.getAirlineName())
+                        .theme("gray")
+                        .mainNumber("")
+                        .airlineAddress("")
+                        .airlineDesc("")
+                        .email(application.getAirlineApplyEmail())
+                        .phone(application.getManagerPhone())
+                        .plan("Professional")
+                        .status(AirlineStatus.ACTIVE)
+                        .icon("✈️")
+                        .country("대한민국") // 기본값, AccountActivation에서 업데이트 가능
+                        .joinDate(LocalDate.now())
+                        .storageUsage(0.0)
+                        .lastLoginDate(LocalDateTime.now())
+                        .airlineApplyId(application)
+                        .build();
+                airline = airlineRepository.save(airline);
+            } else {
+                airline = airlineRepository.findByAirlineApplyId(application.getAirlineApplyId())
+                        .orElseThrow(() -> new IllegalStateException("Airline 생성 중 오류가 발생했습니다."));
+            }
+        }
+        
+        // 6. 항공사 관리자 계정 생성
+        String tempPassword = generateTempPassword();
+        String encodedPassword = passwordEncoder.encode(tempPassword);
+        
+        Emp adminAccount = Emp.builder()
+                .empId(adminId)
+                .airlineId(airline)
+                .empName(application.getManagerName() != null ? application.getManagerName() : "관리자")
+                .empPwd(encodedPassword)
+                .age(30)
+                .role(CommonEnums.Role.AIRLINE_ADMIN)
+                .phone(application.getManagerPhone())
+                .job("항공사 관리자")
+                .email(application.getAirlineApplyEmail())
+                .empStatus(CommonEnums.EmpStatus.Y)
+                .startDate(LocalDateTime.now())
+                .leaveCount(15.0f)
+                .empNo(generateEmpNo(application.getAirlineName()))
+                .build();
+        
+        adminAccount = empRepository.save(adminAccount);
+        
+        // 7. ActivationToken 생성
+        String token = ActivationToken.generateToken();
+        ActivationToken activationToken = ActivationToken.builder()
+                .empId(adminAccount)
+                .token(token)
+                .expiresAt(LocalDateTime.now().plusDays(7)) // 7일 유효
+                .used(false)
+                .build();
+        activationTokenRepository.save(activationToken);
+        
+        // 8. 활성화 링크 생성
+        String activationLink = "http://localhost:3000/account-activation?token=" + token;
+        
+        return AirlineApplyDto.ApproveResponse.builder()
+                .activationLink(activationLink)
+                .adminId(adminId)
+                .tempPassword(tempPassword)
+                .build();
+    }
+
+    /**
+     * 이메일에서 도메인 추출
+     */
+    private String extractDomain(String email) {
+        if (email == null || !email.contains("@")) {
+            return "";
+        }
+        return email.substring(email.indexOf("@") + 1);
+    }
+
+    /**
+     * 도메인에서 국가 추출 (간단한 예시, 실제로는 더 복잡한 로직 필요)
+     */
+    private String extractCountryFromDomain(String domain) {
+        // 실제로는 도메인 기반 국가 매핑 테이블이나 API 사용
+        // 여기서는 기본값 반환
+        return "대한민국";
     }
 
     // Entity -> DTO 변환 메서드

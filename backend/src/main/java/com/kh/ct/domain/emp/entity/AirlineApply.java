@@ -44,6 +44,12 @@ public class AirlineApply extends BaseTimeEntity {
     @Column(length = 500)
     private String employmentCertPath;
 
+    @Column(length = 255)
+    private String companyDomain;
+
+    @Lob
+    private String additionalInfo;
+
     // 비즈니스 로직 메서드
     public void approve() {
         this.airlineApplyStatus = CommonEnums.ApplyStatus.APPROVED;

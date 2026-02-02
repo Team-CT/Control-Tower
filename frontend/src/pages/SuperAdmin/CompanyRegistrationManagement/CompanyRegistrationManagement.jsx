@@ -12,6 +12,8 @@ const CompanyRegistrationManagement = () => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [showAdminIdModal, setShowAdminIdModal] = useState(false);
   const [adminId, setAdminId] = useState('');
+  const [activationLink, setActivationLink] = useState('');
+  const [showActivationLinkModal, setShowActivationLinkModal] = useState(false);
 
   // 데이터 로드
   useEffect(() => {
@@ -89,12 +91,12 @@ const CompanyRegistrationManagement = () => {
     }
 
     try {
-      await airlineApplyService.approveApplication(selectedApplication.id, adminId);
-      alert('승인되었습니다. 관리자 계정이 생성되었습니다.');
+      const response = await airlineApplyService.approveApplicationWithLink(selectedApplication.id, adminId);
+      setActivationLink(response.data.activationLink);
       setShowAdminIdModal(false);
       setAdminId('');
+      setShowActivationLinkModal(true);
       fetchApplications();
-      handleCloseModal();
     } catch (err) {
       console.error('승인 실패:', err);
       const errorMessage = err.response?.data?.message || '승인 처리에 실패했습니다.';
@@ -276,6 +278,17 @@ const CompanyRegistrationManagement = () => {
             setAdminId={setAdminId}
             onConfirm={handleConfirmApprove}
             onCancel={handleCancelAdminIdModal}
+          />
+        )}
+
+        {/* Activation Link Modal */}
+        {showActivationLinkModal && (
+          <ActivationLinkModal
+            activationLink={activationLink}
+            onClose={() => {
+              setShowActivationLinkModal(false);
+              handleCloseModal();
+            }}
           />
         )}
       </S.ContentWrapper>
@@ -664,6 +677,77 @@ const AdminIdInputModal = ({ adminId, setAdminId, onConfirm, onCancel }) => {
         <S.ModalFooter>
           <S.RejectButton onClick={onCancel}>취소</S.RejectButton>
           <S.ApproveButton onClick={onConfirm}>✓ 확인</S.ApproveButton>
+        </S.ModalFooter>
+      </S.ModalContainer>
+    </S.ModalOverlay>
+  );
+};
+
+// Activation Link Modal Component
+const ActivationLinkModal = ({ activationLink, onClose }) => {
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(activationLink).then(() => {
+      alert('링크가 클립보드에 복사되었습니다.');
+    }).catch(() => {
+      alert('링크 복사에 실패했습니다.');
+    });
+  };
+
+  return (
+    <S.ModalOverlay onClick={onClose}>
+      <S.ModalContainer onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+        <S.ModalHeader>
+          <S.ModalTitle>계정 활성화 링크</S.ModalTitle>
+          <S.CloseButton onClick={onClose}>✕</S.CloseButton>
+        </S.ModalHeader>
+
+        <S.ModalContent>
+          <S.InfoSection>
+            <S.InfoItem>
+              <S.InfoLabel>활성화 링크</S.InfoLabel>
+              <div style={{ 
+                display: 'flex', 
+                gap: '10px', 
+                alignItems: 'center',
+                marginTop: '8px'
+              }}>
+                <input
+                  type="text"
+                  value={activationLink}
+                  readOnly
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    backgroundColor: '#f9fafb'
+                  }}
+                />
+                <button
+                  onClick={handleCopyLink}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: '#3b82f6',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  복사
+                </button>
+              </div>
+            </S.InfoItem>
+            <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '12px' }}>
+              ℹ️ 이 링크를 항공사 관리자에게 전달하여 계정 활성화를 완료하도록 안내하세요.
+            </p>
+          </S.InfoSection>
+        </S.ModalContent>
+
+        <S.ModalFooter>
+          <S.CloseOnlyButton onClick={onClose}>닫기</S.CloseOnlyButton>
         </S.ModalFooter>
       </S.ModalContainer>
     </S.ModalOverlay>

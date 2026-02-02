@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   MainContainer,
   ContentWrapper,
@@ -30,9 +31,10 @@ import {
   Footer,
   Copyright
 } from './ServiceRegistration.styled';
+import { airlineApplyService } from '../../api/airline-apply/services';
 
 const ServiceRegistration = () => {
-  // {/* TODO: Zustand state mapping */}
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     airlineName: '',
     country: '',
@@ -41,21 +43,82 @@ const ServiceRegistration = () => {
     managerPhone: '',
     managerEmail: '',
     businessLicense: null,
-    bankStatement: null,
+    employmentCert: null,
     additionalInfo: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleFileUpload = (field, file) => {
-    setFormData(prev => ({ ...prev, [field]: file }));
+    if (file) {
+      // 파일 크기 검증 (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        alert('파일 크기는 10MB를 초과할 수 없습니다.');
+        return;
+      }
+      // 파일 타입 검증
+      const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('PDF 또는 이미지 파일만 업로드 가능합니다.');
+        return;
+      }
+      setFormData(prev => ({ ...prev, [field]: file }));
+    }
   };
 
-  const handleSubmit = () => {
-    // {/* TODO: API call for service registration */}
-    console.log('Form submitted:', formData);
+  const handleSubmit = async () => {
+    // 필수 필드 검증
+    if (!formData.airlineName || !formData.country || !formData.companyDomain ||
+        !formData.managerName || !formData.managerPhone || !formData.managerEmail ||
+        !formData.businessLicense || !formData.employmentCert) {
+      alert('필수 항목을 모두 입력해주세요.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      // FormData 생성
+      const submitFormData = new FormData();
+      
+      // JSON 데이터 추가
+      const data = {
+        airlineName: formData.airlineName,
+        country: formData.country,
+        companyDomain: formData.companyDomain,
+        managerName: formData.managerName,
+        managerPhone: formData.managerPhone,
+        managerEmail: formData.managerEmail,
+        additionalInfo: formData.additionalInfo || ''
+      };
+      submitFormData.append('data', new Blob([JSON.stringify(data)], { type: 'application/json' }));
+
+      // 파일 추가
+      if (formData.businessLicense) {
+        submitFormData.append('businessLicense', formData.businessLicense);
+      }
+      if (formData.employmentCert) {
+        submitFormData.append('employmentCert', formData.employmentCert);
+      }
+
+      const response = await airlineApplyService.createApplication(submitFormData);
+      
+      alert('가입 신청이 완료되었습니다. 검토 후 결과를 이메일로 안내드리겠습니다.');
+      // 성공 시 홈으로 이동하거나 다른 페이지로 이동
+      navigate('/');
+    } catch (err) {
+      console.error('가입 신청 실패:', err);
+      const errorMessage = err.response?.data?.message || '가입 신청에 실패했습니다. 다시 시도해주세요.';
+      setError(errorMessage);
+      alert(errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -182,14 +245,26 @@ const ServiceRegistration = () => {
               <Label>
                 사업자등록증 <RequiredMark>*</RequiredMark>
               </Label>
-              <FileUploadArea>
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => handleFileUpload('businessLicense', e.target.files[0])}
+                style={{ display: 'none' }}
+                id="businessLicense-upload"
+              />
+              <FileUploadArea
+                onClick={() => document.getElementById('businessLicense-upload').click()}
+                style={{ cursor: 'pointer' }}
+              >
                 <UploadIcon>
                   <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                     <path d="M16 22V10M16 10L11 15M16 10L21 15" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     <path d="M28 20V26C28 27.1046 27.1046 28 26 28H6C4.89543 28 4 27.1046 4 26V20" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </UploadIcon>
-                <UploadText>파일 업로드</UploadText>
+                <UploadText>
+                  {formData.businessLicense ? formData.businessLicense.name : '파일 업로드'}
+                </UploadText>
                 <UploadHint>PDF, JPG, PNG (최대 10MB)</UploadHint>
               </FileUploadArea>
             </FormGroup>
@@ -198,14 +273,26 @@ const ServiceRegistration = () => {
               <Label>
                 재직증명서 <RequiredMark>*</RequiredMark>
               </Label>
-              <FileUploadArea>
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) => handleFileUpload('employmentCert', e.target.files[0])}
+                style={{ display: 'none' }}
+                id="employmentCert-upload"
+              />
+              <FileUploadArea
+                onClick={() => document.getElementById('employmentCert-upload').click()}
+                style={{ cursor: 'pointer' }}
+              >
                 <UploadIcon>
                   <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
                     <path d="M16 22V10M16 10L11 15M16 10L21 15" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     <path d="M28 20V26C28 27.1046 27.1046 28 26 28H6C4.89543 28 4 27.1046 4 26V20" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
                 </UploadIcon>
-                <UploadText>파일 업로드</UploadText>
+                <UploadText>
+                  {formData.employmentCert ? formData.employmentCert.name : '파일 업로드'}
+                </UploadText>
                 <UploadHint>PDF, JPG, PNG (최대 10MB)</UploadHint>
               </FileUploadArea>
             </FormGroup>
@@ -241,8 +328,13 @@ const ServiceRegistration = () => {
           </InfoList>
         </InfoBox>
 
-        <SubmitButton onClick={handleSubmit}>
-          가입 신청하기
+        {error && (
+          <div style={{ color: '#dc2626', textAlign: 'center', marginBottom: '20px' }}>
+            {error}
+          </div>
+        )}
+        <SubmitButton onClick={handleSubmit} disabled={loading}>
+          {loading ? '신청 중...' : '가입 신청하기'}
         </SubmitButton>
 
         <Footer>

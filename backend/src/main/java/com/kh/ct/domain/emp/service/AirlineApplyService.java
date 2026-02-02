@@ -30,5 +30,19 @@ public interface AirlineApplyService {
      * 반려
      */
     void rejectApplication(Long id, String reason);
+
+    /**
+     * 가입 신청 생성
+     */
+    AirlineApplyDto.ApplyResponse createApplication(
+            AirlineApplyDto.ApplyRequest request,
+            String businessLicensePath,
+            String employmentCertPath
+    );
+
+    /**
+     * 승인 (관리자 계정 생성 및 활성화 링크 반환)
+     */
+    AirlineApplyDto.ApproveResponse approveApplicationWithLink(Long id, String adminId);
 }
 
