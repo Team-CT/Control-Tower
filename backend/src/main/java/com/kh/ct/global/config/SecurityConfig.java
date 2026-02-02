@@ -39,9 +39,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/members").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/health/preview").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/health/save").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/airline-applications").permitAll()
+                        .requestMatchers("/api/account-activation/**").permitAll()
                         
-                        //슈퍼 관리자 전용
+                        //슈퍼 관리자 전용 (테스트용으로 주석처리)
                         .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
+                        
+                        //테스트용: 슈퍼 관리자 전용 경로를 permitAll로 변경
+                        //.requestMatchers("/api/super-admin/**").permitAll()
 
                         //관리자 전용
                         .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")

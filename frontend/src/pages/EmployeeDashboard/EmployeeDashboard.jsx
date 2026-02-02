@@ -51,6 +51,23 @@ const handleHealthDetailClick = () => {
                 return;
             }
 
+            // 슈퍼관리자는 대시보드 API를 호출하지 않음 (다른 대시보드로 리다이렉트)
+            if (role === 'SUPER_ADMIN') {
+                navigate('/super-admin-dashboard', { replace: true });
+                return;
+            }
+
+            // empId가 없거나 유효하지 않은 경우 처리
+            if (!empId || empId === 'SUPERADMIN' || empId === 'SUPER_ADMIN') {
+                console.warn('유효하지 않은 empId:', empId);
+                if (role === 'SUPER_ADMIN') {
+                    navigate('/super-admin-dashboard', { replace: true });
+                    return;
+                }
+                navigate('/login');
+                return;
+            }
+
             // 2. 인자 없이 API 호출 (백엔드에서 토큰으로 유저 식별)
             const data = await fetchDashboardData();
 
