@@ -51,9 +51,17 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of("입력값 검증에 실패하였습니다.", errors));
     }
 
+    // BusinessException 처리 (비즈니스 로직 예외)
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex) {
+        return ResponseEntity.status(ex.getStatus())
+                .body(ErrorResponse.of(ex.getMessage()));
+    }
+
     // 나머지 (500)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {
+        ex.printStackTrace(); // 로그 출력
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of("서버 오류가 발생했습니다."));
     }
