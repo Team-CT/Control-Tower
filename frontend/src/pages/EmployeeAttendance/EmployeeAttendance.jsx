@@ -1,263 +1,343 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { Calendar, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
-
-const MainContainer = styled.div`
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
-  margin-bottom: 32px;
-`;
-
-const Title = styled.h1`
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-`;
-
-const Subtitle = styled.p`
-  font-size: 14px;
-  color: var(--text-secondary);
-`;
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin-bottom: 32px;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-`;
-
-const StatCard = styled.div`
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-const StatIcon = styled.div`
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  background: ${props => props.$color || 'var(--primary-color)'};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-`;
-
-const StatLabel = styled.div`
-  font-size: 14px;
-  color: var(--text-secondary);
-  font-weight: 500;
-`;
-
-const StatValue = styled.div`
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--text-primary);
-`;
-
-const CalendarSection = styled.div`
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 32px;
-  margin-bottom: 32px;
-`;
-
-const CalendarHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-`;
-
-const MonthTitle = styled.h2`
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-`;
-
-const NavButtons = styled.div`
-  display: flex;
-  gap: 8px;
-`;
-
-const NavButton = styled.button`
-  width: 36px;
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-main);
-  color: var(--text-primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-
-  &:hover {
-    background: var(--bg-hover);
-  }
-`;
-
-const CalendarGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
-`;
-
-const DayHeader = styled.div`
-  text-align: center;
-  padding: 12px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-secondary);
-`;
-
-const DayCell = styled.div`
-  aspect-ratio: 1;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 8px;
-  cursor: pointer;
-  background: ${props => props.$isToday ? 'var(--primary-color)' : 'var(--bg-main)'};
-  color: ${props => props.$isToday ? 'white' : 'var(--text-primary)'};
-  position: relative;
-
-  &:hover {
-    background: ${props => props.$isToday ? 'var(--primary-color)' : 'var(--bg-hover)'};
-  }
-`;
-
-const DayNumber = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  margin-bottom: 4px;
-`;
-
-const AttendanceStatus = styled.div`
-  font-size: 10px;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: ${props => {
-    if (props.$status === 'present') return '#D4EDDA';
-    if (props.$status === 'absent') return '#F8D7DA';
-    if (props.$status === 'late') return '#FFF3CD';
-    return 'transparent';
-  }};
-  color: ${props => {
-    if (props.$status === 'present') return '#155724';
-    if (props.$status === 'absent') return '#721C24';
-    if (props.$status === 'late') return '#856404';
-    return 'var(--text-secondary)';
-  }};
-  text-align: center;
-`;
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, CheckCircle, Plane, Sun, Calendar as CalendarIcon } from 'lucide-react';
+import { attendanceService } from '../../api/attendance';
+import useAuthStore from '../../store/authStore';
+import * as S from './EmployeeAttendance.styled';
 
 const EmployeeAttendance = () => {
-  const [currentMonth, setCurrentMonth] = useState('2026년 1월');
-  
-  // [QA Mock] 로컬 스토리지 데이터 불러오기
-  const storedData = localStorage.getItem('attendance_mock');
-  const attendance = storedData ? JSON.parse(storedData) : {};
-  
-  const todayDate = new Date().getDate(); // 실제 오늘 날짜
-  const isTodayWorked = attendance.date === new Date().toISOString().split('T')[0];
+  const getEmpId = useAuthStore((state) => state.getEmpId);
+  const empId = getEmpId();
 
-  // Mock data
-  const stats = [
-    { 
-      label: '오늘의 상태', 
-      value: isTodayWorked ? (attendance.status === 'working' ? '근무 중' : '퇴근 완료') : '미출근', 
-      icon: isTodayWorked ? (attendance.status === 'working' ? CheckCircle : CheckCircle) : AlertCircle, 
-      color: isTodayWorked ? (attendance.status === 'working' ? '#50C878' : '#4A90E2') : '#e5e7eb' 
-    },
-    { label: '이번 달 지각', value: '0', icon: AlertCircle, color: '#FFB84D' },
-    { label: '이번 달 결근', value: '0', icon: XCircle, color: '#FF6B6B' },
-    { label: '총 근무시간', value: '162h', icon: Clock, color: '#4A90E2' },
-  ];
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [stats, setStats] = useState(null);
+  const [calendarData, setCalendarData] = useState({});
+  const [dailyDataMap, setDailyDataMap] = useState({});  // 날짜별 상세 정보
+  const [selectedDailyData, setSelectedDailyData] = useState(null);  // 선택된 날짜의 상세 정보
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const attendanceData = {
-    ...{
-      1: 'present', 2: 'present', 3: 'present', 5: 'present', 
-      6: 'present', 7: 'present', 8: 'present', 9: 'present',
-      10: 'absent', 12: 'present', 13: 'present', 14: 'late'
-    },
-    // 오늘 날짜 데이터 동적 추가
-    ...(isTodayWorked ? { [todayDate]: attendance.status === 'working' ? 'present' : 'present' } : {})
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth() + 1;
+
+  /**
+   * 데이터 로드 함수
+   */
+  const loadData = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const [statsData, calendarDataRes] = await Promise.all([
+        attendanceService.getMonthlyStats(empId, year, month),
+        attendanceService.getCalendarData(empId, year, month)
+      ]);
+
+      setStats(statsData);
+      setCalendarData(calendarDataRes.attendanceMap || {});
+      setDailyDataMap(calendarDataRes.dailyDataMap || {});  // 상세 정보 저장
+    } catch (err) {
+      console.error('데이터 로드 실패:', err);
+      setError('근태 데이터를 불러오는데 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
-  
-  const renderCalendar = () => {
-    const days = [];
-    const totalDays = new Date(2026, 1, 0).getDate(); // 1월의 마지막 날짜
+  useEffect(() => {
+    loadData();
+  }, [currentDate]);
 
-    for (let i = 1; i <= totalDays; i++) {
+  // selectedDate 변경 시 해당 날짜 데이터 찾기
+  useEffect(() => {
+    const day = selectedDate.getDate();
+    const selectedMonth = selectedDate.getMonth() + 1;
+    const selectedYear = selectedDate.getFullYear();
+
+    // 선택한 날짜가 현재 표시 중인 월과 같은지 확인
+    if (selectedYear === year && selectedMonth === month) {
+      const dailyData = dailyDataMap[day] || null;
+      setSelectedDailyData(dailyData);
+    } else {
+      setSelectedDailyData(null);
+    }
+  }, [selectedDate, dailyDataMap, year, month]);
+
+  const handlePrevMonth = () => {
+    setCurrentDate(new Date(year, month - 2, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentDate(new Date(year, month, 1));
+  };
+
+  /**
+   * 상태 텍스트 변환 헬퍼 함수
+   */
+  const getStatusText = (status) => {
+    const statusMap = {
+      'PRESENT': '정상 출근',
+      'LATE': '지각',
+      'ABSENT': '결근',
+      'EARLY_LEAVE': '조퇴',
+      'HALF_DAY': '반차',
+      'VACATION': '휴가'
+    };
+    return statusMap[status] || '알 수 없음';
+  };
+
+  /**
+   * 시간 포맷팅 헬퍼 함수 (HH:MM:SS -> HH:MM)
+   */
+  const formatTime = (time) => {
+    if (!time) return '-';
+    // LocalTime 형식이 "HH:MM:SS" 또는 "HH:MM" 형식으로 오는 경우
+    if (typeof time === 'string') {
+      const parts = time.split(':');
+      return `${parts[0]}:${parts[1]}`;
+    }
+    return time;
+  };
+
+  /**
+   * 과거 날짜 여부 확인 함수
+   */
+  const isPastDate = (date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const compareDate = new Date(date);
+    compareDate.setHours(0, 0, 0, 0);
+    return compareDate < today;
+  };
+
+  /**
+   * 근태 정정 신청 모달 열기
+   */
+  const handleCorrectionModalOpen = () => {
+    if (selectedDailyData) {
+      // TODO: 모달 열기 로직 구현
+      console.log('근태 정정 신청:', selectedDailyData);
+      alert(`${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()} 근태 정정 신청 모달을 열어야 합니다.`);
+    }
+  };
+
+  /**
+   * 캘린더 렌더링
+   */
+  const renderCalendar = () => {
+    const firstDay = new Date(year, month - 1, 1);
+    const lastDay = new Date(year, month, 0);
+    const daysInMonth = lastDay.getDate();
+    const startingDayOfWeek = firstDay.getDay();
+
+    const days = [];
+    const today = new Date();
+    const isCurrentMonth = today.getFullYear() === year && today.getMonth() + 1 === month;
+
+    // 이전 달의 빈 칸
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(<S.DayCell key={`empty-${i}`} $isOtherMonth />);
+    }
+
+    // 현재 달의 날짜들
+    for (let day = 1; day <= daysInMonth; day++) {
+      const isToday = isCurrentMonth && day === today.getDate();
+      const isSelected = selectedDate.getFullYear() === year &&
+        selectedDate.getMonth() + 1 === month &&
+        selectedDate.getDate() === day;
+      const status = calendarData[day];
+
       days.push(
-        <DayCell key={i} $isToday={i === todayDate}>
-          <DayNumber>{i}</DayNumber>
-          {attendanceData[i] && (
-            <AttendanceStatus $status={attendanceData[i]}>
-              {attendanceData[i] === 'present' && '출근'}
-              {attendanceData[i] === 'late' && '지각'}
-              {attendanceData[i] === 'absent' && '결근'}
-            </AttendanceStatus>
-          )}
-        </DayCell>
+        <S.DayCell
+          key={day}
+          $isToday={isToday}
+          $isSelected={isSelected}
+          onClick={() => setSelectedDate(new Date(year, month - 1, day))}
+        >
+          <S.DayNumber>{day}</S.DayNumber>
+          {status && <S.StatusDot $status={status} />}
+        </S.DayCell>
       );
     }
+
     return days;
   };
 
+  const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토'];
+  const monthTitle = `${year}년 ${month}월`;
+
+  // 로그인 확인
+  if (!empId) {
+    return (
+      <S.PageContainer>
+        <S.ContentArea>
+          <S.ErrorContainer>
+            <S.ErrorMessage>로그인이 필요합니다.</S.ErrorMessage>
+          </S.ErrorContainer>
+        </S.ContentArea>
+      </S.PageContainer>
+    );
+  }
+
+  if (loading) {
+    return (
+      <S.PageContainer>
+        <S.ContentArea>
+          <S.LoadingContainer>데이터를 불러오는 중...</S.LoadingContainer>
+        </S.ContentArea>
+      </S.PageContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <S.PageContainer>
+        <S.ContentArea>
+          <S.ErrorContainer>
+            <S.ErrorMessage>{error}</S.ErrorMessage>
+            <S.RetryButton onClick={loadData}>다시 시도</S.RetryButton>
+          </S.ErrorContainer>
+        </S.ContentArea>
+      </S.PageContainer>
+    );
+  }
+
   return (
-    <MainContainer>
-      <Header>
-        <Title>내 근태 현황</Title>
-        <Subtitle>나의 출퇴근 기록과 근무 시간을 확인하세요</Subtitle>
-      </Header>
+    <S.PageContainer>
+      <S.ContentArea>
 
-      <StatsGrid>
-        {stats.map((stat, index) => (
-          <StatCard key={index}>
-            <StatIcon $color={stat.color}>
-              <stat.icon size={24} />
-            </StatIcon>
-            <StatLabel>{stat.label}</StatLabel>
-            <StatValue>{stat.value}</StatValue>
-          </StatCard>
-        ))}
-      </StatsGrid>
+        <S.PageHeader>
+          <S.PageTitle>근태 관리</S.PageTitle>
+          <S.PageSubtitle>나의 근태 현황을 확인하고 출퇴근 기록을 관리하세요</S.PageSubtitle>
+        </S.PageHeader>
 
-      <CalendarSection>
-        <CalendarHeader>
-          <MonthTitle>{currentMonth}</MonthTitle>
-          <NavButtons>
-            <NavButton onClick={() => console.log('prev')}>‹</NavButton>
-            <NavButton onClick={() => console.log('next')}>›</NavButton>
-          </NavButtons>
-        </CalendarHeader>
+        <S.StatsGrid>
+          <S.StatCard>
+            <S.StatIconWrapper $bgColor="#d1fae5" $iconColor="#10b981">
+              <CheckCircle size={28} />
+            </S.StatIconWrapper>
+            <S.StatValue>{stats?.presentDaysCount || 0}일</S.StatValue>
+            <S.StatLabel>이번 달 출근</S.StatLabel>
+          </S.StatCard>
 
-        <CalendarGrid>
-          {daysOfWeek.map(day => (
-            <DayHeader key={day}>{day}</DayHeader>
-          ))}
-          {renderCalendar()}
-        </CalendarGrid>
-      </CalendarSection>
-    </MainContainer>
+          <S.StatCard>
+            <S.StatIconWrapper $bgColor="#dbeafe" $iconColor="#3b82f6">
+              <Plane size={28} />
+            </S.StatIconWrapper>
+            <S.StatValue>{stats?.totalWorkHours || 0}h</S.StatValue>
+            <S.StatLabel>이번 달 근무시간</S.StatLabel>
+          </S.StatCard>
+
+          <S.StatCard>
+            <S.StatIconWrapper $bgColor="#fef3c7" $iconColor="#f59e0b">
+              <Sun size={28} />
+            </S.StatIconWrapper>
+            <S.StatValue>{stats?.lateCount || 0}</S.StatValue>
+            <S.StatLabel>지각 횟수</S.StatLabel>
+          </S.StatCard>
+
+          <S.StatCard>
+            <S.StatIconWrapper $bgColor="#fce7f3" $iconColor="#ec4899">
+              <CalendarIcon size={28} />
+            </S.StatIconWrapper>
+            <S.StatValue>{stats?.absentCount || 0}</S.StatValue>
+            <S.StatLabel>결근 내역</S.StatLabel>
+          </S.StatCard>
+        </S.StatsGrid>
+
+        <S.MainContent>
+          <S.CalendarSection>
+            <S.CalendarHeader>
+              <S.MonthTitle>{monthTitle}</S.MonthTitle>
+              <S.NavButtons>
+                <S.NavButton onClick={handlePrevMonth}>
+                  <ChevronLeft size={18} />
+                </S.NavButton>
+                <S.NavButton onClick={handleNextMonth}>
+                  <ChevronRight size={18} />
+                </S.NavButton>
+              </S.NavButtons>
+            </S.CalendarHeader>
+
+            <S.CalendarGrid>
+              {daysOfWeek.map((day, index) => (
+                <S.DayHeader key={day} $isWeekend={index === 0 || index === 6}>
+                  {day}
+                </S.DayHeader>
+              ))}
+              {renderCalendar()}
+            </S.CalendarGrid>
+
+            <S.Legend>
+              <S.LegendItem>
+                <S.LegendDot $color="#10b981" />
+                출근
+              </S.LegendItem>
+              <S.LegendItem>
+                <S.LegendDot $color="#f59e0b" />
+                지각/조퇴
+              </S.LegendItem>
+              <S.LegendItem>
+                <S.LegendDot $color="#ef4444" />
+                결근
+              </S.LegendItem>
+              <S.LegendItem>
+                <S.LegendDot $color="#8b5cf6" />
+                휴가/반차
+              </S.LegendItem>
+            </S.Legend>
+          </S.CalendarSection>
+
+          <S.Sidebar>
+            <S.SidebarCard>
+              <S.SidebarTitle>
+                {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월 {selectedDate.getDate()}일
+              </S.SidebarTitle>
+
+              {selectedDailyData ? (
+                <>
+                  <S.ScheduleItem>
+                    <S.ScheduleName>근태 정보</S.ScheduleName>
+                    <S.ScheduleDate>
+                      출근: {formatTime(selectedDailyData.inTime)}
+                    </S.ScheduleDate>
+                    <S.ScheduleDate>
+                      퇴근: {formatTime(selectedDailyData.outTime)}
+                    </S.ScheduleDate>
+                    <S.ScheduleDate>
+                      근무시간: {selectedDailyData.workHours !== null ? `${selectedDailyData.workHours}시간` : '계산 불가'}
+                    </S.ScheduleDate>
+                    <S.ScheduleStatus>
+                      {getStatusText(selectedDailyData.attendanceStatus)}
+                    </S.ScheduleStatus>
+                  </S.ScheduleItem>
+                  <S.ActionButton
+                    onClick={handleCorrectionModalOpen}
+                    disabled={!selectedDailyData}
+                  >
+                    근태 정정 신청하기
+                  </S.ActionButton>
+                </>
+              ) : (
+                <S.ScheduleItem>
+                  <S.ScheduleName>일정이 없습니다</S.ScheduleName>
+                  <S.ScheduleDate>
+                    {selectedDate.getFullYear()}-{String(selectedDate.getMonth() + 1).padStart(2, '0')}-{String(selectedDate.getDate()).padStart(2, '0')}
+                  </S.ScheduleDate>
+                </S.ScheduleItem>
+              )}
+
+              <S.ActionButton
+                $primary
+                disabled={isPastDate(selectedDate)}
+              >
+                휴가 신청하기
+              </S.ActionButton>
+            </S.SidebarCard>
+          </S.Sidebar>
+        </S.MainContent>
+      </S.ContentArea>
+    </S.PageContainer>
   );
 };
 
