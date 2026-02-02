@@ -63,7 +63,7 @@ export const DateDisplay = styled.div`
 `;
 
 export const CurrentTime = styled.div`
-  font-size: 56px;
+  font-size: 40px;
   font-weight: 800;
   color: #FFFFFF;
   font-family: 'Segoe UI', system-ui, sans-serif;
@@ -142,15 +142,15 @@ export const StatUnit = styled.span`
 
 export const StatTrend = styled.div`
   font-size: 13px;
-  color: #10B981;
+  color: #18ad7c;
   font-weight: 500;
   display: flex;
   align-items: center;
   gap: 4px;
 
   &::before {
-    content: '↑';
-    color: #10B981;
+    content: '';
+    color: #18ad7c;
   }
 `;
 
@@ -390,9 +390,9 @@ export const QuickMenuItem = styled.div`
   display: flex;
   gap: 12px;
   padding: 16px;
-  background: ${props => props.completed ? '#F0F9FF' : '#FEF3C7'};
+  background: ${props => props.$completed ? '#F0F9FF' : '#FEF3C7'};
   border-radius: 12px;
-  border: 1px solid ${props => props.completed ? '#BFDBFE' : '#FDE68A'};
+  border: 1px solid ${props => props.$completed ? '#BFDBFE' : '#FDE68A'};
 `;
 
 export const CheckIcon = styled.div`
@@ -458,7 +458,7 @@ export const MonthButton = styled.button`
 
 export const ProgressGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 32px;
 
   @media (max-width: 768px) {
