@@ -1,51 +1,81 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./FlightSchedule.styled";
+import { flightScheduleService } from "../../api/flightSchedule/services";
+import useAuthStore from "../../store/authStore";
 
 const FlightSchedule = () => {
   const navigate = useNavigate();
-  
-  // ✅ 역할(Role) 확인: Login.jsx에서 저장한 'userRole' 사용 ('ADMIN' or 'EMP')
-  const userRole = localStorage.getItem('userRole') || 'EMP'; 
-  const isAdmin = userRole === 'ADMIN';
+  const { getRole, emp } = useAuthStore();
+  const userRole = getRole();
+  const isAdmin = userRole === 'AIRLINE_ADMIN' || userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
+  const airlineId = emp?.airlineId;
 
-  const [selectedDate, setSelectedDate] = useState("4월 9일 (수)");
-  const [departureCity, setDepartureCity] = useState("ICN");
-  const [arrivalCity, setArrivalCity] = useState("LAX");
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [departureCity, setDepartureCity] = useState("");
+  const [arrivalCity, setArrivalCity] = useState("");
+  const [flightList, setFlightList] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  // Mock Data: isAssignedToMe 속성 추가 (로그인한 직원에게 배정된 비행인지 여부)
-  const flightList = [
-    {
-      id: 1,
-      flightNumber: "KE001",
-      departure: { time: "10:30", code: "ICN", airport: "인천국제공항" },
-      arrival: { time: "06:45", code: "LAX", airport: "로스앤젤레스 국제공항" },
-      duration: "11시간 15분",
-      status: "정상",
-      crewAssigned: true,
-      isAssignedToMe: true, // ✅ 로그인한 직원이 배정됨
-    },
-    {
-      id: 2,
-      flightNumber: "KE002",
-      departure: { time: "14:20", code: "ICN", airport: "인천국제공항" },
-      arrival: { time: "09:10", code: "JFK", airport: "뉴욕 JFK 공항" },
-      duration: "13시간 50분",
-      status: "정상",
-      crewAssigned: true,
-      isAssignedToMe: false, // ❌ 배정되지 않음
-    },
-    {
-      id: 3,
-      flightNumber: "KE003",
-      departure: { time: "18:00", code: "ICN", airport: "인천국제공항" },
-      arrival: { time: "22:30", code: "HND", airport: "하네다 공항" },
-      duration: "2시간 30분",
-      status: "정상",
-      crewAssigned: true,
-      isAssignedToMe: true, // ✅ 로그인한 직원이 배정됨
-    },
-  ];
+  // 비행편 목록 조회
+  useEffect(() => {
+    loadFlightSchedules();
+  }, []);
+
+  const loadFlightSchedules = async () => {
+    try {
+      setLoading(true);
+      const params = {};
+      
+      // 관리자인 경우 항공사 ID 추가
+      if (isAdmin && airlineId) {
+        params.airlineId = airlineId;
+      }
+      
+      // 출발지/도착지 필터
+      if (departureCity) {
+        params.departure = departureCity;
+      }
+      if (arrivalCity) {
+        params.destination = arrivalCity;
+      }
+      
+      const response = await flightScheduleService.getFlightSchedules(params);
+      const flights = response.data?.data || response.data || [];
+      setFlightList(flights);
+    } catch (error) {
+      console.error('비행편 목록 조회 실패:', error);
+      alert('비행편 목록을 불러오는데 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = () => {
+    loadFlightSchedules();
+  };
+
+  // 날짜 포맷팅
+  const formatDate = (date) => {
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const dayName = days[date.getDay()];
+    return `${month}월 ${day}일 (${dayName})`;
+  };
+
+  // 비행 상태 한글 변환
+  const getStatusText = (status) => {
+    const statusMap = {
+      'DELAYED': '지연',
+      'CANCELLED': '취소',
+      'DEPARTED': '출발',
+      'ARRIVED': '도착',
+      'ASSIGNING': '배정중',
+      'ASSIGNED': '배정완료'
+    };
+    return statusMap[status] || status;
+  };
 
   // ✅ 필터링 로직: 관리자는 전체, 직원은 본인 배정 비행편만
   const displayedFlights = isAdmin 
@@ -81,7 +111,11 @@ const FlightSchedule = () => {
 
         <S.FilterGroup>
           <S.FilterLabel>날짜 선택</S.FilterLabel>
-          <S.DateInput type="text" value={selectedDate} readOnly />
+          <S.DateInput 
+            type="date" 
+            value={selectedDate.toISOString().split('T')[0]}
+            onChange={(e) => setSelectedDate(new Date(e.target.value))}
+          />
         </S.FilterGroup>
 
         <S.FilterGroup>
@@ -106,16 +140,20 @@ const FlightSchedule = () => {
           </S.CitySelect>
         </S.FilterGroup>
 
-        <S.SearchButton type="button">검색</S.SearchButton>
+        <S.SearchButton type="button" onClick={handleSearch}>검색</S.SearchButton>
       </S.FilterSection>
 
       {/* Flight List */}
       <S.FlightListContainer>
-        {displayedFlights.length > 0 ? (
+        {loading ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+            로딩 중...
+          </div>
+        ) : displayedFlights.length > 0 ? (
           displayedFlights.map((flight) => (
             <S.FlightCard
-              key={flight.id}
-              onClick={() => navigate(`/flightschedule/${flight.id}`)}
+              key={flight.flyScheduleId}
+              onClick={() => navigate(`/flightschedule/${flight.flyScheduleId}`)}
               style={{ cursor: "pointer" }}
             >
               <S.CardHeader>
@@ -124,27 +162,33 @@ const FlightSchedule = () => {
                   <div>
                     <S.FlightNumber>
                       {flight.flightNumber}
-                      {!isAdmin && <span style={{fontSize: '0.8em', marginLeft: '8px', color: '#4a90e2'}}>● 배정됨</span>}
+                      {!isAdmin && flight.isAssignedToMe && (
+                        <span style={{fontSize: '0.8em', marginLeft: '8px', color: '#4a90e2'}}>● 배정됨</span>
+                      )}
                     </S.FlightNumber>
-                    <S.FlightDate>4월 9일 (수) • 대한항공</S.FlightDate>
+                    <S.FlightDate>
+                      {formatDate(new Date(flight.flyStartTime))} • {flight.airlineName || '항공사'}
+                    </S.FlightDate>
                   </div>
                 </S.FlightBadge>
 
                 <S.StatusBadgeGroup>
                   <S.StatusBadge $status="normal">
-                    운항 {flight.status}
+                    운항 {getStatusText(flight.flightStatus)}
                   </S.StatusBadge>
-                  <S.StatusBadge $status="assigned">
-                    승무원 배정
-                  </S.StatusBadge>
+                  {flight.crewAssigned && (
+                    <S.StatusBadge $status="assigned">
+                      승무원 배정
+                    </S.StatusBadge>
+                  )}
                 </S.StatusBadgeGroup>
               </S.CardHeader>
 
               <S.FlightRoute>
                 <S.RoutePoint>
-                  <S.RouteTime>{flight.departure.time}</S.RouteTime>
-                  <S.RouteCode>{flight.departure.code}</S.RouteCode>
-                  <S.RouteAirport>{flight.departure.airport}</S.RouteAirport>
+                  <S.RouteTime>{flight.departureTime}</S.RouteTime>
+                  <S.RouteCode>{flight.departure}</S.RouteCode>
+                  <S.RouteAirport>{flight.departure}</S.RouteAirport>
                 </S.RoutePoint>
 
                 <S.RouteIndicator>
@@ -154,9 +198,9 @@ const FlightSchedule = () => {
                 </S.RouteIndicator>
 
                 <S.RoutePoint>
-                  <S.RouteTime>{flight.arrival.time}</S.RouteTime>
-                  <S.RouteCode>{flight.arrival.code}</S.RouteCode>
-                  <S.RouteAirport>{flight.arrival.airport}</S.RouteAirport>
+                  <S.RouteTime>{flight.arrivalTime}</S.RouteTime>
+                  <S.RouteCode>{flight.destination}</S.RouteCode>
+                  <S.RouteAirport>{flight.destination}</S.RouteAirport>
                 </S.RoutePoint>
               </S.FlightRoute>
             </S.FlightCard>

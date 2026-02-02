@@ -10,6 +10,12 @@ export const api = axios.create({
   headers: API_CONFIG.HEADERS,
 });
 
+// 개발 환경에서 baseURL 확인
+if (import.meta.env.DEV) {
+  console.log('[AXIOS] Base URL:', API_CONFIG.BASE_URL || '(프록시 사용)');
+  console.log('[AXIOS] Timeout:', API_CONFIG.TIMEOUT);
+}
+
 // ✅ 업로드 전용: Content-Type을 기본으로 박지 않음
 export const uploadApi = axios.create({
   baseURL: API_CONFIG.BASE_URL,
@@ -96,6 +102,9 @@ const applyInterceptors = (instance) => {
         }
       } else if (error.request) {
         console.error('네트워크 에러(요청은 갔는데 응답 없음):', error.request);
+        console.error('백엔드 서버가 실행 중인지 확인하세요. (포트: 8001)');
+        console.error('요청 URL:', error.config?.url);
+        console.error('Base URL:', error.config?.baseURL);
       } else {
         console.error('요청 설정 에러:', error.message);
       }
