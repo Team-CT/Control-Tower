@@ -45,5 +45,14 @@ public class AccountActivationDto {
         private String message;
         private Boolean success;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class RegenerateLinkResponse {
+        private String activationLink;
+        private String message;
+    }
 }
 

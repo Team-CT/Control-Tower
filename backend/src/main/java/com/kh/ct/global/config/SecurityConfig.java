@@ -43,6 +43,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/airlines").permitAll()
                         .requestMatchers("/api/super-admin/**").permitAll()
                         .requestMatchers("/api/file/download/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/airline-applications").permitAll() // 가입 신청 (공개)
+                        .requestMatchers("/api/account-activation/**").permitAll() // 계정 활성화 (공개)
                         .requestMatchers("/api/flight-schedules/**").authenticated()
                         
                         //관리자 전용

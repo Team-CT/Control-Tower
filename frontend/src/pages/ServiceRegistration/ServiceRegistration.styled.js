@@ -127,7 +127,7 @@ export const FormGroup = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  grid-column: ${props => props.fullWidth ? 'span 2' : 'span 1'};
+  grid-column: ${props => props.$fullWidth ? 'span 2' : 'span 1'};
 
   @media (max-width: 768px) {
     grid-column: span 1;

@@ -20,7 +20,6 @@ public class AirlineApplyDto {
         private LocalDateTime date;
         private String airlineName;
         private String email;
-        private Boolean verificationStatus;
         private String documentStatus;
         private String status;
     }
@@ -36,11 +35,11 @@ public class AirlineApplyDto {
         private String email;
         private String managerName;
         private String managerPhone;
-        private Boolean emailDomainVerified;
         private String status;
         private String cancelReason;
         private List<DocumentInfo> documents;
         private Long airlineId; // 승인된 경우 Airline의 ID
+        private String activationLink; // 승인된 경우 활성화 링크
     }
 
     @Getter

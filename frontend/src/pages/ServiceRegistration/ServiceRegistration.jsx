@@ -134,7 +134,7 @@ const ServiceRegistration = () => {
           </SectionHeader>
 
           <FormGrid>
-            <FormGroup fullWidth>
+            <FormGroup $fullWidth>
               <Label>
                 항공사명 <RequiredMark>*</RequiredMark>
               </Label>
@@ -180,7 +180,7 @@ const ServiceRegistration = () => {
               />
             </FormGroup>
 
-            <FormGroup fullWidth>
+            <FormGroup $fullWidth>
               <Label>
                 담당자 이메일 <RequiredMark>*</RequiredMark>
               </Label>
@@ -203,7 +203,7 @@ const ServiceRegistration = () => {
           </SectionHeader>
 
           <FormGrid>
-            <FormGroup fullWidth>
+            <FormGroup $fullWidth>
               <Label>
                 사업자등록증 <RequiredMark>*</RequiredMark>
               </Label>
@@ -231,7 +231,7 @@ const ServiceRegistration = () => {
               </FileUploadArea>
             </FormGroup>
 
-            <FormGroup fullWidth>
+            <FormGroup $fullWidth>
               <Label>
                 재직증명서 <RequiredMark>*</RequiredMark>
               </Label>
