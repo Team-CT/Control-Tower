@@ -321,28 +321,29 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
         Long airlineId = null;
         String activationLink = null;
         if (entity.getAirlineApplyStatus() == com.kh.ct.global.common.CommonEnums.ApplyStatus.APPROVED) {
+            // Airline 조회 (InitialSetup 완료 시 생성됨)
             java.util.Optional<Airline> airlineOpt = airlineRepository.findByAirlineApplyId(entity.getAirlineApplyId());
             if (airlineOpt.isPresent()) {
                 airlineId = airlineOpt.get().getAirlineId();
+            }
+            
+            // 관리자 계정 조회 (email로 조회 - airlineId가 null일 수 있음)
+            java.util.Optional<Emp> adminOpt = empRepository.findByEmailAndRole(
+                entity.getAirlineApplyEmail(),
+                CommonEnums.Role.AIRLINE_ADMIN
+            );
+            
+            if (adminOpt.isPresent()) {
+                // 활성화 토큰 조회 (사용되지 않은 최신 토큰)
+                List<ActivationToken> tokens = activationTokenRepository
+                    .findByEmpIdAndUsedFalseOrderByCreateDateDesc(adminOpt.get());
                 
-                // 관리자 계정 조회
-                java.util.Optional<Emp> adminOpt = empRepository.findByAirlineIdAndRole(
-                    airlineOpt.get(), 
-                    CommonEnums.Role.AIRLINE_ADMIN
-                );
+                java.util.Optional<ActivationToken> tokenOpt = tokens.stream()
+                    .filter(token -> token.getExpiresAt().isAfter(LocalDateTime.now()))
+                    .findFirst();
                 
-                if (adminOpt.isPresent()) {
-                    // 활성화 토큰 조회 (사용되지 않은 최신 토큰)
-                    List<ActivationToken> tokens = activationTokenRepository
-                        .findByEmpIdAndUsedFalseOrderByCreateDateDesc(adminOpt.get());
-                    
-                    java.util.Optional<ActivationToken> tokenOpt = tokens.stream()
-                        .filter(token -> token.getExpiresAt().isAfter(LocalDateTime.now()))
-                        .findFirst();
-                    
-                    if (tokenOpt.isPresent()) {
-                        activationLink = "http://localhost:5173/account-activation?token=" + tokenOpt.get().getToken();
-                    }
+                if (tokenOpt.isPresent()) {
+                    activationLink = "http://localhost:5173/account-activation?token=" + tokenOpt.get().getToken();
                 }
             }
         }
