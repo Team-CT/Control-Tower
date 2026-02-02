@@ -58,6 +58,15 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(ex.getMessage()));
     }
 
+    // RuntimeException 처리 (500)
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex) {
+        ex.printStackTrace(); // 로그 출력
+        String message = ex.getMessage() != null ? ex.getMessage() : "서버 오류가 발생했습니다.";
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.of(message));
+    }
+
     // 나머지 (500)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception ex) {

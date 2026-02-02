@@ -82,7 +82,7 @@ const ServiceRegistration = () => {
       // FormData 생성
       const submitFormData = new FormData();
       
-      // JSON 데이터 추가
+      // JSON 데이터 추가 (@RequestPart가 JSON을 파싱하려면 application/json Content-Type 필요)
       const data = {
         airlineName: formData.airlineName,
         airlineAddress: formData.airlineAddress,
