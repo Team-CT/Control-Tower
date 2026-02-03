@@ -74,4 +74,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of("서버 오류가 발생했습니다."));
     }
+
+
+    @ExceptionHandler(EmpNoConflictException.class)
+    public ResponseEntity<ErrorResponse> handleEmpNoConflict(EmpNoConflictException ex) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("new_emp_no", ex.getNewEmpNo());
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(ex.getMessage(), errors));
+    }
+
 }

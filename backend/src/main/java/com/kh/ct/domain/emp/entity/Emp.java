@@ -66,7 +66,7 @@ public class Emp extends BaseTimeEntity {
 
     private Float leaveCount;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false, length = 50, unique = true)
     private String empNo;
 
     @JoinColumn(name = "profile_Image")
