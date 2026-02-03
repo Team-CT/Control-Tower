@@ -1,117 +1,110 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect , useCallback } from 'react';
+import axios from 'axios';
 import * as S from './QnA.styled';
-import { Search, MessageSquare, Eye, MessageCircle, Heart } from 'lucide-react';
-
+import { Search, MessageSquare, Eye, MessageCircle, Heart ,CheckCircle2, // 이거 추가
+  Clock} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 const QnA = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('최신순');
+  const [qnaList, setQnaList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [newPost, setNewPost] = useState({ title: '', content: '' });
+const [currentPage, setCurrentPage] = useState(0); // 백엔드는 0번부터 시작
+  const [totalPages, setTotalPages] = useState(1);
+ const navigate = useNavigate();
 
-  const qnaList = [
-    {
-      id: 1,
-      category: '공지',
-      categoryColor: '#FFE5E5',
-      title: '2026년 건강검진 일정 안내',
-      author: '인사팀',
-      date: '2026-01-10',
-      views: 1234,
-      comments: 12,
-      likes: 45
-    },
-    {
-      id: 2,
-      category: '공지',
-      categoryColor: '#FFE5E5',
-      title: '신규 휴무제 2주 프로그램 안내',
-      author: '근태팀',
-      date: '2026-01-08',
-      views: 856,
-      comments: 8,
-      likes: 23
-    },
-    {
-      id: 3,
-      category: '답변',
-      categoryColor: '#E5F3FF',
-      title: '비행 일정 변경 관련 문의드립니다',
-      author: '김민수',
-      date: '2026-01-13',
-      views: 142,
-      comments: 5,
-      likes: 12
-    },
-    {
-      id: 4,
-      category: '이벤트',
-      categoryColor: '#FFF9E5',
-      title: '건강 프로그램 참여 이벤트 안내',
-      author: '건강관리팀',
-      date: '2026-01-12',
-      views: 523,
-      comments: 28,
-      likes: 89
-    },
-    {
-      id: 5,
-      category: '답변',
-      categoryColor: '#E5F3FF',
-      title: '시차 적응 팁 공유합니다',
-      author: '이영희',
-      date: '2026-01-11',
-      views: 267,
-      comments: 15,
-      likes: 34
-    },
-    {
-      id: 6,
-      category: '답변',
-      categoryColor: '#E5F3FF',
-      title: '휴가 상황 관련 문의 드립니다',
-      author: '박상수',
-      date: '2026-01-10',
-      views: 189,
-      comments: 7,
-      likes: 9
-    },
-    {
-      id: 7,
-      category: '답변',
-      categoryColor: '#E5F3FF',
-      title: '승무원 복지 프로그램 추천합니다',
-      author: '최우수',
-      date: '2026-01-09',
-      views: 312,
-      comments: 22,
-      likes: 56
-    },
-    {
-      id: 8,
-      category: '답변',
-      categoryColor: '#E5F3FF',
-      title: '비행 중 건강 관리 방법',
-      author: '최지영',
-      date: '2026-01-09',
-      views: 445,
-      comments: 18,
-      likes: 42
-    },
-    {
-      id: 9,
-      category: '답변',
-      categoryColor: '#E5F3FF',
-      title: '비행 중 건강 관리 방법',
-      author: '최지영',
-      date: '2026-01-09',
-      views: 445,
-      comments: 18,
-      likes: 42
+  // 2. API 호출 로직
+
+ const fetchQuestions = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      // 백엔드 엔드포인트에 page와 size 전달
+      const response = await axios.get(`/api/questions?page=${currentPage}&size=10`);
+      
+      // Page 객체에서 content(목록)와 totalPages(전체 페이지) 추출
+      const { content, totalPages } = response.data;
+      
+      setQnaList(content || []); 
+      setTotalPages(totalPages || 1);
+      
+      console.log("📦 받은 데이터:", response.data);
+    } catch (error) {
+      console.error("데이터를 불러오는데 실패했습니다:", error);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  }, [currentPage]); // 페이지 바뀔 때마다 실행
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log('Searching for:', searchQuery);
-  };
+  useEffect(() => {
+    fetchQuestions();
+  }, [fetchQuestions]);
+
+
+
+ const filteredList = qnaList.filter((item) => {
+  const query = searchQuery.toLowerCase();
+  
+  // 제목, 내용, 작성자 이름 중 검색어가 포함된 것이 있는지 확인
+  return (
+    item.questionTitle?.toLowerCase().includes(query) ||
+    item.questionContent?.toLowerCase().includes(query) ||
+    item.questionerName?.toLowerCase().includes(query)
+  );
+});
+
+// 2. handleSearch 함수는 이제 엔터를 쳤을 때 새로고침 방지만 하면 됩니다.
+const handleSearch = (e) => {
+  e.preventDefault(); // 페이지 새로고침 방지
+  // 실제 필터링은 위에서 실시간(filteredList)으로 일어납니다.
+};
+
+const handleCreatePost = async (e) => {
+  e.preventDefault();
+
+  try {
+    // 1. 변수명을 storageData로 통일
+    const storageData = localStorage.getItem('auth-storage');
+    
+    // 콘솔에 찍어서 데이터가 잘 나오는지 확인 (개발용)
+    console.log("로컬스토리지 데이터:", storageData);
+
+    if (!storageData) {
+      alert("로그인 정보가 없습니다. 다시 로그인 해주세요.");
+      return;
+    }
+
+    // 2. 파싱 로직
+    const parsedData = JSON.parse(storageData);
+    const token = parsedData.state?.token;
+
+    if (!token) {
+      alert("유효한 토큰이 없습니다. 다시 로그인해주세요.");
+      return;
+    }
+
+    // 3. API 요청
+    await axios.post('/api/questions', {
+      title: newPost.title,
+      content: newPost.content
+    }, {
+      headers: { 
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    alert("글이 성공적으로 등록되었습니다.");
+    setIsModalOpen(false);
+    setNewPost({ title: '', content: '' });
+    fetchQuestions(); // 리스트 새로고침
+console.log("6. ✅ 서버 응답 결과:", response.data);
+  } catch (error) {
+    console.error("등록 실패 상세:", error);
+    alert("등록 중 오류가 발생했습니다.");
+  }
+};
 
   return (
     <S.PageContainer>
@@ -122,8 +115,45 @@ const QnA = () => {
               <MessageSquare size={28} />
               Q&A
             </S.PageTitle>
-            <S.CreateButton>+ 글쓰기</S.CreateButton>
+            <S.CreateButton onClick={() => setIsModalOpen(true)}>+ 글쓰기</S.CreateButton>
           </S.PageHeader>
+
+{/* 2. 글쓰기 모달 영역 */}
+          {isModalOpen && (
+            <S.ModalOverlay onClick={() => setIsModalOpen(false)}>
+              <S.ModalContainer onClick={(e) => e.stopPropagation()}>
+                <S.ModalHeader>
+                  <h3>질문하기</h3>
+                  <button onClick={() => setIsModalOpen(false)}>×</button>
+                </S.ModalHeader>
+                <S.ModalBody onSubmit={handleCreatePost}>
+                  <S.FormGroup>
+                    <label>제목</label>
+                    <input 
+                      type="text" 
+                      placeholder="제목을 입력하세요"
+                      value={newPost.title}
+                      onChange={(e) => setNewPost({...newPost, title: e.target.value})}
+                    />
+                  </S.FormGroup>
+                  <S.FormGroup>
+                    <label>내용</label>
+                    <textarea 
+                      placeholder="내용을 상세히 입력해주세요"
+                      rows="10"
+                      value={newPost.content}
+                      onChange={(e) => setNewPost({...newPost, content: e.target.value})}
+                    />
+                  </S.FormGroup>
+                  <S.ModalFooter>
+                    <S.CancelButton type="button" onClick={() => setIsModalOpen(false)}>취소</S.CancelButton>
+                    <S.SubmitButton type="submit">등록하기</S.SubmitButton>
+                  </S.ModalFooter>
+                </S.ModalBody>
+              </S.ModalContainer>
+            </S.ModalOverlay>
+          )}
+
 
           <S.SearchSection>
             <S.SearchForm onSubmit={handleSearch}>
@@ -138,63 +168,68 @@ const QnA = () => {
               </S.SearchButton>
             </S.SearchForm>
             <S.FilterButton 
-              active={selectedFilter === '최신순'}
+              $active={selectedFilter === '최신순'}
               onClick={() => setSelectedFilter('최신순')}
             >
               최신순
             </S.FilterButton>
           </S.SearchSection>
+<S.QnaList>
+  {filteredList.map((item) => (
+    <S.QnaItem key={item.questionId}
+    onClick={() => navigate(`/qna/${item.questionId}`)}>
+      <S.CategoryBadge 
+        $bgColor={item.answered ? '#3a774c' : '#FACC15'}
+        $textColor={item.answered ? '#e0e0e0' : '#422006'}
+      >
+        {/* 상태에 따른 아이콘 렌더링 */}
+        {item.answered ? (
+          <CheckCircle2 size={14} style={{ marginRight: '4px' }} />
+        ) : (
+          <Clock size={14} style={{ marginRight: '4px' }} />
+        )}
+        {item.answered ? '답변완료' : '답변대기'}
+      </S.CategoryBadge>
 
-          <S.QnaList>
-            {qnaList.map((item) => (
-              <S.QnaItem key={item.id}>
-                <S.CategoryBadge bgColor={item.categoryColor}>
-                  {item.category}
-                </S.CategoryBadge>
-                <S.QnaContent>
-                  <S.QnaTitle>
-                    {item.category === '공지' && '📌 '}
-                    {item.title}
-                  </S.QnaTitle>
-                  <S.QnaMetaRow>
-                    <S.QnaMeta>
-                      <S.MetaItem>
-                        <S.MetaIcon>👤</S.MetaIcon>
-                        {item.author}
-                      </S.MetaItem>
-                      <S.MetaItem>
-                        <S.MetaIcon>📅</S.MetaIcon>
-                        {item.date}
-                      </S.MetaItem>
-                      <S.MetaItem>
-                        <Eye size={14} />
-                        {item.views}
-                      </S.MetaItem>
-                    </S.QnaMeta>
-                    <S.QnaStats>
-                      <S.StatItem>
-                        <MessageCircle size={16} />
-                        {item.comments}
-                      </S.StatItem>
-                      <S.StatItem>
-                        <Heart size={16} />
-                        {item.likes}
-                      </S.StatItem>
-                    </S.QnaStats>
-                  </S.QnaMetaRow>
-                </S.QnaContent>
-              </S.QnaItem>
-            ))}
-          </S.QnaList>
-
+      <S.QnaContent>
+        <S.QnaTitle>{item.questionTitle}</S.QnaTitle>
+        <S.QnaMetaRow>
+          <S.QnaMeta>
+            <S.MetaItem>
+              <S.MetaIcon>👤</S.MetaIcon>
+              {item.questionerName}
+            </S.MetaItem>
+            <S.MetaItem>
+              <S.MetaIcon>📅</S.MetaIcon>
+              {item.createDate ? item.createDate.split('T')[0] : '-'}
+            </S.MetaItem>
+          </S.QnaMeta>
+        </S.QnaMetaRow>
+      </S.QnaContent>
+    </S.QnaItem>
+  ))}
+</S.QnaList>
+{/* 페이지네이션 버튼 동적 생성 */}
           <S.Pagination>
-            <S.PaginationButton disabled>‹</S.PaginationButton>
-            <S.PageNumber active>1</S.PageNumber>
-            <S.PageNumber>2</S.PageNumber>
-            <S.PageNumber>3</S.PageNumber>
-            <S.PageNumber>4</S.PageNumber>
-            <S.PageNumber>5</S.PageNumber>
-            <S.PaginationButton>›</S.PaginationButton>
+            <S.PaginationButton 
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 0))}
+              disabled={currentPage === 0}
+            >‹</S.PaginationButton>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <S.PageNumber 
+                key={i} 
+                $active={currentPage === i}
+                onClick={() => setCurrentPage(i)}
+              >
+                {i + 1}
+              </S.PageNumber>
+            ))}
+
+            <S.PaginationButton 
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages - 1))}
+              disabled={currentPage >= totalPages - 1}
+            >›</S.PaginationButton>
           </S.Pagination>
         </S.ContentWrapper>
       </S.MainContent>

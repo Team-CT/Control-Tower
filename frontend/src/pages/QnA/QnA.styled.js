@@ -150,19 +150,19 @@ export const QnaItem = styled.div`
 `;
 
 export const CategoryBadge = styled.div`
-  background: ${props => props.bgColor || '#E5F3FF'};
-  color: ${props => {
-    if (props.bgColor === '#FFE5E5') return '#D32F2F';
-    if (props.bgColor === '#FFF9E5') return '#F57C00';
-    return '#1976D2';
-  }};
-  padding: 8px 16px;
+  display: flex;           /* 수평 정렬 */
+  align-items: center;     /* 세로 중앙 정렬 */
+  justify-content: center;
+  background: ${props => props.$bgColor || '#E5F3FF'};
+  color: ${props => props.$textColor || '#1976D2'};
+  padding: 6px 12px;       /* 아이콘이 들어갔으므로 여백 살짝 조정 */
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
-  min-width: 70px;
+  min-width: 90px;         /* 아이콘 때문에 가로가 넓어지므로 살짝 조정 */
   text-align: center;
+  gap: 4px;                /* 아이콘과 글자 사이 간격 */
 `;
 
 export const QnaContent = styled.div`
@@ -252,9 +252,9 @@ export const PaginationButton = styled.button`
 export const PageNumber = styled.button`
   width: 40px;
   height: 40px;
-  border: 1px solid ${props => props.active ? '#4A90E2' : '#E5E8EB'};
-  background: ${props => props.active ? '#4A90E2' : 'white'};
-  color: ${props => props.active ? 'white' : '#666'};
+  border: 1px solid ${props => props.$active ? '#4A90E2' : '#E5E8EB'};
+  background: ${props => props.$active ? '#4A90E2' : 'white'};
+  color: ${props => props.$active ? 'white' : '#666'};
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
@@ -263,6 +263,52 @@ export const PageNumber = styled.button`
 
   &:hover {
     border-color: #4A90E2;
-    color: ${props => props.active ? 'white' : '#4A90E2'};
+    color: ${props => props.$active ? 'white' : '#4A90E2'};
   }
+`;
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
+`;
+
+export const ModalContainer = styled.div`
+  background: white; width: 500px; padding: 24px;
+  border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+`;
+
+export const ModalHeader = styled.div`
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+  h3 { margin: 0; font-size: 20px; }
+  button { background: none; border: none; font-size: 24px; cursor: pointer; }
+`;
+
+export const ModalBody = styled.form`
+  display: flex; flex-direction: column; gap: 16px;
+`;
+
+export const FormGroup = styled.div`
+  display: flex; flex-direction: column; gap: 8px;
+  label { font-weight: 600; font-size: 14px; }
+  input, textarea {
+    padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;
+    &:focus { outline: none; border-color: #3a774c; }
+  }
+`;
+
+export const ModalFooter = styled.div`
+  display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;
+`;
+
+export const CancelButton = styled.button`
+  padding: 10px 20px; background: #eee; border: none; border-radius: 6px; cursor: pointer;
+`;
+
+export const SubmitButton = styled.button`
+  padding: 10px 20px; background: #3a774c; color: white; border: none; border-radius: 6px; cursor: pointer;
+  &:hover { background: #2d5a3a; }
 `;
