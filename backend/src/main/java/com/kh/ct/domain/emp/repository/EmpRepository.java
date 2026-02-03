@@ -24,6 +24,15 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
     
     Optional<Emp> findByEmailAndRole(String email, CommonEnums.Role role);
 
+    boolean existsByEmpNo(String empNo);
+
+    @Query("""
+        select max(e.empNo)
+        from Emp e
+        where e.empNo like concat(:yearPrefix, '%')
+    """)
+    String findMaxEmpNoByYearPrefix(@Param("yearPrefix") String yearPrefix);
+
     @Query(
             value = """
     select new com.kh.ct.domain.health.dto.HealthDto$AdminEmpHealthRow(

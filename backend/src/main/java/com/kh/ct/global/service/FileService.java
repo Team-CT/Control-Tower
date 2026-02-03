@@ -70,4 +70,21 @@ public class FileService {
         Path path = Paths.get(meta.getPath());
         return new UrlResource(path.toUri());
     }
+
+    @Transactional
+    public void deleteFile(Long fileId) {
+        File meta = getFile(fileId);
+
+        // 1) 디스크 파일 삭제 (실패해도 DB 삭제는 진행하는 정책)
+        try {
+            Path path = Paths.get(meta.getPath()).normalize();
+            Files.deleteIfExists(path);
+        } catch (Exception e) {
+            // 지금 단계(Simple Delete)에서는 무시하고 진행
+            // 운영 단계면 로그 남기거나 정책 결정 필요
+        }
+
+        // 2) DB 메타 삭제
+        fileRepository.delete(meta);
+    }
 }

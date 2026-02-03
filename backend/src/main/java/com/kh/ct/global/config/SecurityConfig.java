@@ -36,23 +36,23 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         //인증없이 가능한 경우
                         .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/members").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/emps").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/emps/check-id").permitAll()
+                        .requestMatchers(HttpMethod.GET,  "/api/emps/emp-no/preview").permitAll()
+
                         .requestMatchers(HttpMethod.POST,"/api/health/preview").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/health/save").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/airline-applications").permitAll()
                         .requestMatchers("/api/account-activation/**").permitAll()
                         .requestMatchers("/api/questions/**").permitAll()
                         //인증
-                        .requestMatchers("/api/file/download/**").permitAll()
+                        .requestMatchers("/api/file/**").permitAll()
 
                         //슈퍼 관리자 전용
                         .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
 
 
                         //관리자 전용
-                        .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/members/search").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/members/**").hasRole("ADMIN")
                         .requestMatchers("/api/dashboard/admin/**").permitAll()
                         //나머지경로
                         .anyRequest().authenticated()

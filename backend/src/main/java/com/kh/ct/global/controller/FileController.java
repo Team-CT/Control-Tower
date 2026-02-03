@@ -52,4 +52,16 @@ public class FileController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    @DeleteMapping("/{fileId}")
+    public ResponseEntity<Void> deleteFile(@PathVariable Long fileId) {
+        try {
+            fileService.deleteFile(fileId);
+            return ResponseEntity.noContent().build(); // 204
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
 }
