@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, ChevronRight, CheckCircle, Plane, Sun, Calendar as CalendarIcon } from 'lucide-react';
 import { attendanceService } from '../../api/attendance';
 import useAuthStore from '../../store/authStore';
 import * as S from './EmployeeAttendance.styled';
 
 const EmployeeAttendance = () => {
+  const navigate = useNavigate();
   const getEmpId = useAuthStore((state) => state.getEmpId);
   const empId = getEmpId();
 
@@ -33,11 +35,25 @@ const EmployeeAttendance = () => {
         attendanceService.getCalendarData(empId, year, month)
       ]);
 
+      console.log('📊 근태 통계 데이터:', statsData);
+      console.log('📅 캘린더 데이터:', calendarDataRes);
+      console.log('🗓️ attendanceMap:', calendarDataRes.attendanceMap);
+      console.log('📋 dailyDataMap:', calendarDataRes.dailyDataMap);
+
       setStats(statsData);
       setCalendarData(calendarDataRes.attendanceMap || {});
       setDailyDataMap(calendarDataRes.dailyDataMap || {});  // 상세 정보 저장
+
+      // LEAVE_PENDING과 LEAVE 상태 확인
+      const leaveStatuses = Object.entries(calendarDataRes.attendanceMap || {})
+        .filter(([_, status]) => status === 'LEAVE_PENDING' || status === 'LEAVE');
+      if (leaveStatuses.length > 0) {
+        console.log('✅ 휴가 관련 상태 발견:', leaveStatuses);
+      } else {
+        console.log('⚠️ 휴가 관련 상태 없음');
+      }
     } catch (err) {
-      console.error('데이터 로드 실패:', err);
+      console.error('❌ 데이터 로드 실패:', err);
       setError('근태 데이터를 불러오는데 실패했습니다. 다시 시도해주세요.');
     } finally {
       setLoading(false);
@@ -81,9 +97,28 @@ const EmployeeAttendance = () => {
       'ABSENT': '결근',
       'EARLY_LEAVE': '조퇴',
       'HALF_DAY': '반차',
-      'VACATION': '휴가'
+      'VACATION': '휴가',
+      'LEAVE_PENDING': '휴가 대기',
+      'LEAVE': '휴가'
     };
     return statusMap[status] || '알 수 없음';
+  };
+
+  /**
+   * 상태 색상 변환 헬퍼 함수
+   */
+  const getStatusColor = (status) => {
+    const colorMap = {
+      'PRESENT': '#10b981',        // 초록색
+      'LATE': '#f59e0b',           // 주황색
+      'ABSENT': '#ef4444',         // 빨간색
+      'EARLY_LEAVE': '#f59e0b',    // 주황색
+      'HALF_DAY': '#8b5cf6',       // 보라색
+      'VACATION': '#3b82f6',       // 파란색
+      'LEAVE_PENDING': '#fbbf24',  // 노란색 (휴가 대기)
+      'LEAVE': '#3b82f6'           // 파란색 (휴가 승인)
+    };
+    return colorMap[status] || '#9ca3af';
   };
 
   /**
@@ -100,25 +135,54 @@ const EmployeeAttendance = () => {
   };
 
   /**
-   * 과거 날짜 여부 확인 함수
+   * 3일 이내 날짜 여부 확인 함수 (오늘 포함)
+   * 휴가는 최소 3일 전에 신청 가능
    */
-  const isPastDate = (date) => {
+  const isWithinThreeDays = (date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const compareDate = new Date(date);
     compareDate.setHours(0, 0, 0, 0);
-    return compareDate < today;
+    const minDate = new Date(today);
+    minDate.setDate(minDate.getDate() + 3);
+    return compareDate < minDate;
   };
 
   /**
-   * 근태 정정 신청 모달 열기
+   * 근태 정정 신청 페이지로 이동
    */
   const handleCorrectionModalOpen = () => {
     if (selectedDailyData) {
-      // TODO: 모달 열기 로직 구현
-      console.log('근태 정정 신청:', selectedDailyData);
-      alert(`${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()} 근태 정정 신청 모달을 열어야 합니다.`);
+      const year = selectedDate.getFullYear();
+      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+      const day = String(selectedDate.getDate()).padStart(2, '0');
+      const dateString = `${year}-${month}-${day}`;
+
+      // 선택된 날짜와 근태 데이터를 state로 전달하여 정정 신청 페이지로 이동
+      navigate('/protest-apply', {
+        state: {
+          selectedDate: dateString,
+          selectedDailyData: selectedDailyData
+        }
+      });
     }
+  };
+
+  /**
+   * 휴가 신청 페이지로 이동
+   */
+  const handleLeaveApply = () => {
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
+
+    // 선택된 날짜를 state로 전달하여 휴가 신청 페이지로 이동
+    navigate('/leave-apply', {
+      state: {
+        selectedDate: dateString
+      }
+    });
   };
 
   /**
@@ -283,7 +347,15 @@ const EmployeeAttendance = () => {
               </S.LegendItem>
               <S.LegendItem>
                 <S.LegendDot $color="#8b5cf6" />
-                휴가/반차
+                반차
+              </S.LegendItem>
+              <S.LegendItem>
+                <S.LegendDot $color="#fbbf24" />
+                휴가 대기
+              </S.LegendItem>
+              <S.LegendItem>
+                <S.LegendDot $color="#3b82f6" />
+                휴가 승인
               </S.LegendItem>
             </S.Legend>
           </S.CalendarSection>
@@ -307,7 +379,13 @@ const EmployeeAttendance = () => {
                     <S.ScheduleDate>
                       근무시간: {selectedDailyData.workHours !== null ? `${selectedDailyData.workHours}시간` : '계산 불가'}
                     </S.ScheduleDate>
-                    <S.ScheduleStatus>
+                    <S.ScheduleStatus style={{
+                      backgroundColor: getStatusColor(selectedDailyData.attendanceStatus) + '20',
+                      color: getStatusColor(selectedDailyData.attendanceStatus),
+                      padding: '4px 12px',
+                      borderRadius: '12px',
+                      fontWeight: '600'
+                    }}>
                       {getStatusText(selectedDailyData.attendanceStatus)}
                     </S.ScheduleStatus>
                   </S.ScheduleItem>
@@ -329,7 +407,9 @@ const EmployeeAttendance = () => {
 
               <S.ActionButton
                 $primary
-                disabled={isPastDate(selectedDate)}
+                onClick={handleLeaveApply}
+                disabled={isWithinThreeDays(selectedDate)}
+                title={isWithinThreeDays(selectedDate) ? '휴가는 최소 3일 전에 신청 가능합니다.' : '휴가 신청 페이지로 이동'}
               >
                 휴가 신청하기
               </S.ActionButton>

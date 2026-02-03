@@ -203,12 +203,14 @@ export const StatusDot = styled.div`
   height: 6px;
   border-radius: 50%;
   background: ${props => {
-    if (props.$status === 'present') return '#10b981';      // 출근 - 녹색
-    if (props.$status === 'late') return '#f59e0b';         // 지각 - 주황
-    if (props.$status === 'early_leave') return '#f59e0b';  // 조퇴 - 주황 (지각과 동일)
-    if (props.$status === 'absent') return '#ef4444';       // 결근 - 빨강
-    if (props.$status === 'vacation') return '#8b5cf6';     // 휴가 - 보라
-    if (props.$status === 'half_day') return '#8b5cf6';     // 반차 - 보라 (휴가와 동일)
+    if (props.$status === 'PRESENT' || props.$status === 'present') return '#10b981';      // 출근 - 녹색
+    if (props.$status === 'LATE' || props.$status === 'late') return '#f59e0b';            // 지각 - 주황
+    if (props.$status === 'EARLY_LEAVE' || props.$status === 'early_leave') return '#f59e0b';  // 조퇴 - 주황
+    if (props.$status === 'ABSENT' || props.$status === 'absent') return '#ef4444';        // 결근 - 빨강
+    if (props.$status === 'VACATION' || props.$status === 'vacation') return '#3b82f6';    // 휴가 - 파랑
+    if (props.$status === 'HALF_DAY' || props.$status === 'half_day') return '#8b5cf6';    // 반차 - 보라
+    if (props.$status === 'LEAVE_PENDING') return '#fbbf24';  // 휴가 대기 - 노랑
+    if (props.$status === 'LEAVE') return '#3b82f6';          // 휴가 승인 - 파랑
     return 'transparent';
   }};
   margin-top: 2px;

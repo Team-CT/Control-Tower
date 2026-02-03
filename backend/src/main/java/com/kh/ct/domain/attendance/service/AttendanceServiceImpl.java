@@ -154,12 +154,15 @@ public class AttendanceServiceImpl implements AttendanceService {
      */
     private String convertStatusToFrontend(CommonEnums.AttendanceStatus status) {
         return switch (status) {
-            case PRESENT -> "present";
-            case LATE -> "late";
-            case ABSENT -> "absent";
-            case EARLY_LEAVE -> "early_leave";
-            case HALF_DAY -> "half_day";
-            case VACATION -> "vacation";
+            case PRESENT -> "PRESENT";
+            case LATE -> "LATE";
+            case ABSENT -> "ABSENT";
+            case EARLY_LEAVE -> "EARLY_LEAVE";
+            case HALF_DAY -> "HALF_DAY";
+            case VACATION -> "VACATION";
+            case LEAVE_PENDING -> "LEAVE_PENDING";  // 휴가 대기
+            case LEAVE -> "LEAVE";                  // 휴가 승인
+            case PROTEST_PENDING -> "PROTEST_PENDING";  // 정정 신청 대기
             default -> "unknown";
         };
     }
