@@ -111,3 +111,67 @@ export const CategoryBadge = styled.div`
   text-align: center;
   gap: 4px;                /* 아이콘과 글자 사이 간격 */
 `;
+
+export const AdminReplyBox = styled.div`
+  background: #fdfdfd;
+  border: 1px solid #e1e4e8;
+  border-radius: 12px;
+  padding: 24px;
+  
+  h3 { font-size: 18px; margin-bottom: 16px; color: #333; }
+  
+  textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    resize: vertical;
+    font-size: 15px;
+    margin-bottom: 16px;
+    &:focus { outline: none; border-color: #3a774c; }
+  }
+`;
+
+export const AdminReplyForm = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+  .btn-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    button {
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 1px solid #ddd;
+    }
+    .submit {
+        background: #3a774c;
+        color: white;
+        border: none;
+    }
+  }
+`;
+
+export const SubmitButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #3a774c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  float: right;
+  &:hover { background: #2d5a3a; }
+`;

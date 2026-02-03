@@ -33,4 +33,17 @@ public class Question extends BaseTimeEntity{
 
     @Lob
     private String answerContent;
+
+    public void updateAnswer(String answerContent, Emp answerer) {
+        this.answerContent = answerContent;
+        this.answerer = answerer;
+        // BaseTimeEntity를 상속받고 있다면,
+        // 이 메서드가 실행되어 데이터가 변경될 때 updateDate가 자동으로 갱신됩니다.
+    }
+
+    public void update(String title, String content) {
+        this.questionTitle = title;
+        this.questionContent = content;
+        // Dirty Checking을 통해 변경 사항이 DB에 반영됩니다.
+    }
 }

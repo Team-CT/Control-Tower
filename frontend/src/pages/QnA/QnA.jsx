@@ -85,7 +85,7 @@ const handleCreatePost = async (e) => {
     }
 
     // 3. API 요청
-    await axios.post('/api/questions', {
+    const response = await axios.post('/api/questions', {
       title: newPost.title,
       content: newPost.content
     }, {
