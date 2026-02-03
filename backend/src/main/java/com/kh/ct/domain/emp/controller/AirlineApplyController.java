@@ -1,6 +1,6 @@
 package com.kh.ct.domain.emp.controller;
 
-import com.kh.ct.domain.board.service.FileService;
+import com.kh.ct.global.service.FileService;
 import com.kh.ct.domain.emp.dto.AirlineApplyDto;
 import com.kh.ct.domain.emp.service.AirlineApplyService;
 import jakarta.validation.Valid;

@@ -1,10 +1,9 @@
-package com.kh.ct.domain.board.controller;
+package com.kh.ct.global.controller;
 
-import com.kh.ct.domain.board.service.FileService;
+import com.kh.ct.global.service.FileService;
 import com.kh.ct.global.entity.File;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,8 +14,6 @@ import org.springframework.web.util.UriUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 
 @RestController

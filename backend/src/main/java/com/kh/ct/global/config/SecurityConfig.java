@@ -41,10 +41,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/health/save").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/airline-applications").permitAll()
                         .requestMatchers("/api/account-activation/**").permitAll()
-                        
+                        //인증
+                        .requestMatchers("/api/file/download/**").permitAll()
+
                         //슈퍼 관리자 전용
                         .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
-                        .requestMatchers("/api/file/download/**").permitAll()
+
 
                         //관리자 전용
                         .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")

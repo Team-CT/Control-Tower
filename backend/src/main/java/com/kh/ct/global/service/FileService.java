@@ -1,9 +1,8 @@
-package com.kh.ct.domain.board.service;
+package com.kh.ct.global.service;
 
 import com.kh.ct.global.entity.File;
 import com.kh.ct.global.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
