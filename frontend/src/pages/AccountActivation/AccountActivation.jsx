@@ -39,6 +39,7 @@ const AccountActivation = () => {
           email: response.data.email,
           country: response.data.country,
           role: response.data.airlineName,
+          airlineAddress: response.data.airlineAddress,
           activationDate: new Date(response.data.activationDate).toLocaleString('ko-KR'),
         });
       } catch (err) {
@@ -52,6 +53,15 @@ const AccountActivation = () => {
 
     fetchActivationInfo();
   }, [token]);
+
+  // 비밀번호 검증 함수들
+  const passwordValidations = {
+    minLength: password.length >= 8,
+    hasUpperCase: /[A-Z]/.test(password),
+    hasLowerCase: /[a-z]/.test(password),
+    hasNumber: /[0-9]/.test(password),
+    hasSpecialChar: /[!@#$%^&*]/.test(password)
+  };
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
@@ -97,7 +107,7 @@ const AccountActivation = () => {
 
   // 활성화 완료 시 초기 설정 페이지 렌더링
   if (isActivationComplete) {
-    return <InitialSetup token={token} />;
+    return <InitialSetup token={token} initialData={userInfo} />;
   }
 
   if (loading) {
@@ -226,11 +236,19 @@ const AccountActivation = () => {
             </S.PasswordField>
 
             <S.PasswordHint>
-              <S.HintTitle>최소 8자 이상</S.HintTitle>
               <S.HintList>
-                <S.HintItem>영문 대문자, 소문자 포함</S.HintItem>
-                <S.HintItem>숫자 포함</S.HintItem>
-                <S.HintItem>특수문자 포함 (!@#$%^&*)</S.HintItem>
+                <S.HintItem $valid={passwordValidations.minLength}>
+                  {passwordValidations.minLength ? '✓' : '○'} 최소 8자 이상
+                </S.HintItem>
+                <S.HintItem $valid={passwordValidations.hasUpperCase && passwordValidations.hasLowerCase}>
+                  {passwordValidations.hasUpperCase && passwordValidations.hasLowerCase ? '✓' : '○'} 영문 대문자, 소문자 포함
+                </S.HintItem>
+                <S.HintItem $valid={passwordValidations.hasNumber}>
+                  {passwordValidations.hasNumber ? '✓' : '○'} 숫자 포함
+                </S.HintItem>
+                <S.HintItem $valid={passwordValidations.hasSpecialChar}>
+                  {passwordValidations.hasSpecialChar ? '✓' : '○'} 특수문자 포함 (!@#$%^&*)
+                </S.HintItem>
               </S.HintList>
             </S.PasswordHint>
           </S.Section>

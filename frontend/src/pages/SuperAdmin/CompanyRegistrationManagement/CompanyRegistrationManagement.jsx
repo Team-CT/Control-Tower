@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './CompanyRegistrationManagement.styled';
 import { airlineApplyService } from '../../../api/airline-apply/services';
-import { accountActivationService } from '../../../api/account-activation/services';
 
 const CompanyRegistrationManagement = () => {
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -113,24 +112,7 @@ const CompanyRegistrationManagement = () => {
     setAdminId('');
   };
 
-  const handleRegenerateLink = async (applicationId) => {
-    try {
-      const response = await accountActivationService.regenerateLink(applicationId);
-      // 상세 정보 다시 로드하여 새로운 링크 가져오기
-      const detailResponse = await airlineApplyService.getApplicationDetail(applicationId);
-      const updatedApplication = {
-        ...selectedApplication,
-        ...detailResponse.data,
-        activationLink: response.data.activationLink
-      };
-      setSelectedApplication(updatedApplication);
-      setActivationLink(response.data.activationLink);
-      return response.data;
-    } catch (err) {
-      console.error('링크 재발급 실패:', err);
-      throw err;
-    }
-  };
+  // 재발급 기능 제거됨
 
   const handleReject = async () => {
     const reason = prompt('반려 사유를 입력해주세요:');
@@ -278,7 +260,6 @@ const CompanyRegistrationManagement = () => {
           <ApprovedModal
             application={selectedApplication}
             onClose={handleCloseModal}
-            onRegenerateLink={handleRegenerateLink}
           />
         )}
 
@@ -426,54 +407,24 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
 };
 
 // Approved Modal Component
-const ApprovedModal = ({ application, onClose, onRegenerateLink }) => {
+const ApprovedModal = ({ application, onClose }) => {
   const navigate = useNavigate();
-  const [regenerating, setRegenerating] = useState(false);
-  const [currentLink, setCurrentLink] = useState(application.activationLink);
-
-  // application.activationLink가 변경되면 currentLink도 업데이트
-  useEffect(() => {
-    setCurrentLink(application.activationLink);
-  }, [application.activationLink]);
 
   const handleViewTenant = () => {
     if (application.airlineId) {
       navigate(`/super-admin/tenants/${application.airlineId}`);
     } else {
-      alert('테넌트 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+      alert('초기 설정이 완료되지 않아 테넌트 정보를 확인할 수 없습니다.');
     }
   };
 
   const handleCopyLink = () => {
-    const linkToCopy = currentLink || application.activationLink;
-    if (linkToCopy) {
-      navigator.clipboard.writeText(linkToCopy).then(() => {
+    if (application.activationLink) {
+      navigator.clipboard.writeText(application.activationLink).then(() => {
         alert('링크가 클립보드에 복사되었습니다.');
       }).catch(() => {
         alert('링크 복사에 실패했습니다.');
       });
-    }
-  };
-
-  const handleRegenerateLink = async () => {
-    if (!window.confirm('활성화 링크를 재발급하시겠습니까? 기존 링크는 더 이상 사용할 수 없습니다.')) {
-      return;
-    }
-
-    try {
-      setRegenerating(true);
-      const result = await onRegenerateLink(application.id);
-      // 새 링크로 상태 업데이트
-      if (result && result.activationLink) {
-        setCurrentLink(result.activationLink);
-      }
-      alert('활성화 링크가 재발급되었습니다.');
-    } catch (err) {
-      console.error('링크 재발급 실패:', err);
-      const errorMessage = err.response?.data?.message || '링크 재발급에 실패했습니다.';
-      alert(errorMessage);
-    } finally {
-      setRegenerating(false);
     }
   };
 
@@ -513,92 +464,74 @@ const ApprovedModal = ({ application, onClose, onRegenerateLink }) => {
             </S.InfoItem>
           </S.InfoSection>
 
-          {/* Activation Link Section */}
-          <S.InfoSection>
-            <S.InfoItem>
-              <S.InfoLabel>활성화 링크</S.InfoLabel>
-              {(currentLink || application.activationLink) ? (
-                <>
-                  <div style={{ 
-                    display: 'flex', 
-                    gap: '10px', 
-                    alignItems: 'center',
-                    marginTop: '8px'
-                  }}>
-                    <input
-                      type="text"
-                      value={currentLink || application.activationLink}
-                      readOnly
-                      style={{
-                        flex: 1,
-                        padding: '10px',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '6px',
-                        fontSize: '14px',
-                        backgroundColor: '#f9fafb'
-                      }}
-                    />
-                    <button
-                      onClick={handleCopyLink}
-                      style={{
-                        padding: '10px 20px',
-                        backgroundColor: '#3b82f6',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontSize: '14px'
-                      }}
-                    >
-                      복사
-                    </button>
-                    <button
-                      onClick={handleRegenerateLink}
-                      disabled={regenerating}
-                      style={{
-                        padding: '10px 20px',
-                        backgroundColor: '#10b981',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        cursor: regenerating ? 'not-allowed' : 'pointer',
-                        fontSize: '14px',
-                        opacity: regenerating ? 0.6 : 1
-                      }}
-                    >
-                      {regenerating ? '재발급 중...' : '재발급'}
-                    </button>
-                  </div>
-                  <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
-                    ℹ️ 이 링크를 항공사 관리자에게 전달하여 계정 활성화를 완료하도록 안내하세요.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p style={{ fontSize: '14px', color: '#6b7280', marginTop: '8px' }}>
-                    활성화 링크가 없습니다. 재발급 버튼을 클릭하여 새 링크를 생성하세요.
-                  </p>
-                  <button
-                    onClick={handleRegenerateLink}
-                    disabled={regenerating}
+          {/* Activation Link Section - 초기 설정이 완료되지 않은 경우에만 표시 */}
+          {/* airlineId가 null이면 Airline 테이블에 레코드가 없는 것 = 초기 설정 미완료 */}
+          {!application.airlineId && application.activationLink && (
+            <S.InfoSection>
+              <S.InfoItem>
+                <S.InfoLabel>활성화 링크</S.InfoLabel>
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '10px', 
+                  alignItems: 'center',
+                  marginTop: '8px'
+                }}>
+                  <input
+                    type="text"
+                    value={application.activationLink}
+                    readOnly
                     style={{
-                      marginTop: '12px',
+                      flex: 1,
+                      padding: '10px',
+                      border: '1px solid #e5e7eb',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      backgroundColor: '#f9fafb'
+                    }}
+                  />
+                  <button
+                    onClick={handleCopyLink}
+                    style={{
                       padding: '10px 20px',
-                      backgroundColor: '#10b981',
+                      backgroundColor: '#3b82f6',
                       color: 'white',
                       border: 'none',
                       borderRadius: '6px',
-                      cursor: regenerating ? 'not-allowed' : 'pointer',
-                      fontSize: '14px',
-                      opacity: regenerating ? 0.6 : 1
+                      cursor: 'pointer',
+                      fontSize: '14px'
                     }}
                   >
-                    {regenerating ? '재발급 중...' : '링크 재발급'}
+                    복사
                   </button>
-                </>
-              )}
-            </S.InfoItem>
-          </S.InfoSection>
+                </div>
+                <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
+                  ℹ️ 이 링크를 항공사 관리자에게 전달하여 계정 활성화를 완료하도록 안내하세요.
+                </p>
+              </S.InfoItem>
+            </S.InfoSection>
+          )}
+          
+          {/* 초기 설정 완료 안내 - Airline 테이블에 레코드가 생성되었을 때만 표시 */}
+          {/* airlineId가 있으면 Airline 테이블에 레코드가 있는 것 = 초기 설정 완료 */}
+          {application.airlineId && (
+            <S.InfoSection>
+              <S.InfoItem>
+                <S.InfoLabel>초기 설정 상태</S.InfoLabel>
+                <div style={{ 
+                  marginTop: '8px',
+                  padding: '12px',
+                  backgroundColor: '#f0fdf4',
+                  border: '1px solid #86efac',
+                  borderRadius: '6px',
+                  color: '#166534',
+                  fontSize: '14px',
+                  fontWeight: '500'
+                }}>
+                  ✓ 초기 설정이 완료되었습니다. 활성화 링크는 더 이상 필요하지 않습니다.
+                </div>
+              </S.InfoItem>
+            </S.InfoSection>
+          )}
 
           <S.DocumentSection>
             <S.DocumentTitle>첨부 서류</S.DocumentTitle>

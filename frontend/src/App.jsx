@@ -50,7 +50,6 @@ import CompanyRegistrationManagement from './pages/SuperAdmin/CompanyRegistratio
 // 레이아웃 컴포넌트 Import
 import MainLayout from './layout/MainLayout';
 
-
 // SuperAdminDashboard는 CompanyRegistrationManagement를 사용
 const SuperAdminDashboard = CompanyRegistrationManagement;
 
@@ -81,7 +80,7 @@ const ThemedApp = () => {
           <Route path="/dashboard" element={<EmployeeDashboard />} />
 
           {/* 관리자/슈퍼관리자 대시보드 */}
-          <Route path="/admin-dashboard" element={<AdmDashboard />} />
+          <Route path="/dashboard/admin" element={<AdmDashboard />} />
           <Route path="/super-admin-dashboard" element={<SuperAdminDashboard />} />
 
           {/* [슈퍼 관리자 전용] */}

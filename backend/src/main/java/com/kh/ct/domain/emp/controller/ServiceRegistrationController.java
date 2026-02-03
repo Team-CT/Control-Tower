@@ -3,6 +3,7 @@ package com.kh.ct.domain.emp.controller;
 import com.kh.ct.domain.board.service.FileService;
 import com.kh.ct.domain.emp.dto.AirlineApplyDto;
 import com.kh.ct.domain.emp.service.AirlineApplyService;
+import com.kh.ct.global.exception.BusinessException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -38,7 +39,7 @@ public class ServiceRegistrationController {
                 employmentCertPath = fileService.saveFile(employmentCert).getPath();
             }
         } catch (IOException e) {
-            throw new RuntimeException("파일 저장 중 오류가 발생했습니다.", e);
+            throw BusinessException.badRequest("파일 저장 중 오류가 발생했습니다: " + e.getMessage());
         }
         
         AirlineApplyDto.ApplyResponse response = airlineApplyService.createApplication(

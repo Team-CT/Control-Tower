@@ -35,6 +35,7 @@ const ServiceRegistration = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     airlineName: '',
+    airlineAddress: '',
     managerName: '',
     managerPhone: '',
     managerEmail: '',
@@ -67,8 +68,9 @@ const ServiceRegistration = () => {
 
   const handleSubmit = async () => {
     // 필수 필드 검증
-    if (!formData.airlineName || !formData.managerName || !formData.managerPhone || 
-        !formData.managerEmail || !formData.businessLicense || !formData.employmentCert) {
+    if (!formData.airlineName || !formData.airlineAddress || !formData.managerName || 
+        !formData.managerPhone || !formData.managerEmail || !formData.businessLicense || 
+        !formData.employmentCert) {
       alert('필수 항목을 모두 입력해주세요.');
       return;
     }
@@ -80,9 +82,10 @@ const ServiceRegistration = () => {
       // FormData 생성
       const submitFormData = new FormData();
       
-      // JSON 데이터 추가
+      // JSON 데이터 추가 (@RequestPart가 JSON을 파싱하려면 application/json Content-Type 필요)
       const data = {
         airlineName: formData.airlineName,
+        airlineAddress: formData.airlineAddress,
         managerName: formData.managerName,
         managerPhone: formData.managerPhone,
         managerEmail: formData.managerEmail
@@ -143,6 +146,18 @@ const ServiceRegistration = () => {
                 placeholder="예: 대한항공"
                 value={formData.airlineName}
                 onChange={(e) => handleInputChange('airlineName', e.target.value)}
+              />
+            </FormGroup>
+
+            <FormGroup $fullWidth>
+              <Label>
+                항공사 주소 <RequiredMark>*</RequiredMark>
+              </Label>
+              <Input
+                type="text"
+                placeholder="예: 서울특별시 강서구 하늘길 112"
+                value={formData.airlineAddress}
+                onChange={(e) => handleInputChange('airlineAddress', e.target.value)}
               />
             </FormGroup>
           </FormGrid>

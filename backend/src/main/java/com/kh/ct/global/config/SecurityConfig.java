@@ -39,6 +39,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/members").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/health/preview").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/health/save").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/airline-applications").permitAll()
+                        .requestMatchers("/api/account-activation/**").permitAll()
                         
                         //슈퍼 관리자 전용
                         .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
@@ -47,7 +49,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/members/search").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/members/**").hasRole("ADMIN")
-
+                        .requestMatchers("/api/dashboard/admin/**").permitAll()
                         //나머지경로
                         .anyRequest().authenticated()
                 )
@@ -73,23 +75,6 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    /**
-     * 비밀번호 암호화 테스트용 Bean
-     * 서버 시작 시 평문 비밀번호를 암호화하여 콘솔에 출력합니다.
-     */
-    @Bean
-    public CommandLineRunner passwordEncodeRunner(PasswordEncoder passwordEncoder) {
-        return args -> {
-            String rawPassword = "admin123";   // 👉 여기 원하는 평문 비밀번호 입력
-            String encodedPassword = passwordEncoder.encode(rawPassword);
-
-            System.out.println("=================================");
-            System.out.println("🔐 RAW PASSWORD     : " + rawPassword);
-            System.out.println("🔐 ENCODED PASSWORD : " + encodedPassword);
-            System.out.println("=================================");
-        };
     }
 
 }

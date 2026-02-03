@@ -37,14 +37,6 @@ public class AccountActivationController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/regenerate/{airlineApplyId}")
-    public ResponseEntity<AccountActivationDto.RegenerateLinkResponse> regenerateLink(
-            @PathVariable Long airlineApplyId
-    ) {
-        AccountActivationDto.RegenerateLinkResponse response = accountActivationService.regenerateActivationLink(airlineApplyId);
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping(value = "/initial-setup/{token}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<AccountActivationDto.InitialSetupResponse> completeInitialSetup(
             @PathVariable String token,

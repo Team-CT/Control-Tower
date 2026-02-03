@@ -3,15 +3,24 @@ import * as S from './InitialSetup.styled';
 import SetupComplete from './SetupComplete'; // 완료 화면 import
 import { accountActivationService } from '../../api/account-activation/services';
 
-const InitialSetup = ({ token }) => {
+const InitialSetup = ({ token, initialData }) => {
   const [logoFile, setLogoFile] = useState(null);
-  const [timezone, setTimezone] = useState('Asia/Seoul (KST, UTC+9)');
-  const [department, setDepartment] = useState('본사');
-  const [position, setPosition] = useState('');
+  const [airlineName, setAirlineName] = useState(initialData?.role || '');
+  const [airlineAddress, setAirlineAddress] = useState(initialData?.airlineAddress || '');
+  const [representativeName, setRepresentativeName] = useState('');
+  const [representativePhone, setRepresentativePhone] = useState('');
+  const [representativeEmail, setRepresentativeEmail] = useState('');
+  const [airlineDesc, setAirlineDesc] = useState('');
+  const [theme, setTheme] = useState('#3b82f6'); // 기본 파란색 헥스코드
   const [employeeFile, setEmployeeFile] = useState(null);
   const [isSetupComplete, setIsSetupComplete] = useState(false); // 설정 완료 상태
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [password, setPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
+  const [setupResponse, setSetupResponse] = useState(null); // 초기 설정 완료 응답 데이터
 
   const handleLogoUpload = (e) => {
     const file = e.target.files[0];
@@ -35,17 +44,44 @@ const InitialSetup = ({ token }) => {
       return;
     }
 
+    // 필수 필드 검증
+    if (!airlineName || !airlineAddress || !representativeName || 
+        !representativePhone || !representativeEmail || !theme || !password || !passwordConfirm) {
+      alert('필수 항목을 모두 입력해주세요.');
+      return;
+    }
+
+    // 비밀번호 일치 확인
+    if (password !== passwordConfirm) {
+      alert('비밀번호가 일치하지 않습니다.');
+      return;
+    }
+
+    // 비밀번호 유효성 검증
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+      alert('비밀번호는 영문 대소문자, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.');
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
       
       const formData = {
-        timezone,
-        department,
-        position
+        airlineName,
+        airlineAddress,
+        representativeName,
+        representativePhone,
+        representativeEmail,
+        airlineDesc: airlineDesc || '',
+        theme,
+        password,
+        passwordConfirm
       };
       
-      await accountActivationService.completeInitialSetup(token, formData, logoFile);
+      const response = await accountActivationService.completeInitialSetup(token, formData, logoFile);
+      setSetupResponse(response.data);
       alert('초기 설정이 완료되었습니다.');
       setIsSetupComplete(true);
     } catch (err) {
@@ -60,7 +96,7 @@ const InitialSetup = ({ token }) => {
 
   // 설정 완료 시 완료 페이지 렌더링
   if (isSetupComplete) {
-    return <SetupComplete />;
+    return <SetupComplete setupData={setupResponse} />;
   }
 
   return (
@@ -86,7 +122,7 @@ const InitialSetup = ({ token }) => {
 
           <S.Title>항공사 초기 설정</S.Title>
           <S.Subtitle>
-            항공사의 기본 정보와 조직 구조를 설정하세요
+            항공사의 기본 정보를 설정하세요
           </S.Subtitle>
 
           {/* Section 1: 기본 정보 입력 */}
@@ -123,59 +159,202 @@ const InitialSetup = ({ token }) => {
               </S.LogoUploadArea>
             </S.LogoUploadSection>
 
-            <S.InputField>
-              <S.Label>
-                <S.LabelIcon>🕐</S.LabelIcon>
-                기본 시간대
-              </S.Label>
-              <S.Select value={timezone} onChange={(e) => setTimezone(e.target.value)}>
-                <option value="Asia/Seoul (KST, UTC+9)">Asia/Seoul (KST, UTC+9)</option>
-                <option value="America/New_York (EST, UTC-5)">America/New_York (EST, UTC-5)</option>
-                <option value="Europe/London (GMT, UTC+0)">Europe/London (GMT, UTC+0)</option>
-                <option value="Asia/Tokyo (JST, UTC+9)">Asia/Tokyo (JST, UTC+9)</option>
-              </S.Select>
+            <S.InputField style={{ marginTop: '20px' }}>
+              <S.Label>항공사명</S.Label>
+              <S.Input
+                type="text"
+                value={airlineName}
+                onChange={(e) => setAirlineName(e.target.value)}
+                placeholder={initialData?.role || '항공사명을 입력하세요'}
+              />
+            </S.InputField>
+
+            <S.InputField style={{ marginTop: '20px' }}>
+              <S.Label>항공사 주소</S.Label>
+              <S.Input
+                type="text"
+                value={airlineAddress}
+                onChange={(e) => setAirlineAddress(e.target.value)}
+                placeholder={initialData?.airlineAddress || '항공사 주소를 입력하세요'}
+              />
             </S.InputField>
           </S.Section>
 
-          {/* Section 2: 조직 구조 생성 */}
+          {/* Section 2: 비밀번호 설정 */}
           <S.Section>
             <S.SectionHeader>
               <S.SectionNumber>2</S.SectionNumber>
-              <S.SectionTitle>조직 구조 생성</S.SectionTitle>
+              <S.SectionTitle>비밀번호 설정</S.SectionTitle>
             </S.SectionHeader>
 
-            <S.Label>본부 / 지점 목록</S.Label>
-            
-            <S.DepartmentInputWrapper>
-              <S.DepartmentIconWrapper>
-                <S.DepartmentIcon>🏢</S.DepartmentIcon>
-              </S.DepartmentIconWrapper>
-              <S.Input
-                value={department}
-                onChange={(e) => setDepartment(e.target.value)}
-                placeholder="본사명 입력"
-              />
-              <S.AddButton>+ 추가</S.AddButton>
-            </S.DepartmentInputWrapper>
-
             <S.InputField>
-              <S.Input
-                value={position}
-                onChange={(e) => setPosition(e.target.value)}
-                placeholder="부서명 입력"
-              />
-              <S.PositionDropdown>
-                <option>지점</option>
-                <option>본부</option>
-                <option>팀</option>
-              </S.PositionDropdown>
+              <S.Label>비밀번호</S.Label>
+              <div style={{ position: 'relative' }}>
+                <S.Input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+                  style={{ paddingRight: '40px' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '18px'
+                  }}
+                >
+                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+            </S.InputField>
+
+            <S.InputField style={{ marginTop: '20px' }}>
+              <S.Label>비밀번호 확인</S.Label>
+              <div style={{ position: 'relative' }}>
+                <S.Input
+                  type={showPasswordConfirm ? 'text' : 'password'}
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
+                  placeholder="비밀번호를 다시 입력하세요"
+                  style={{ paddingRight: '40px' }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    fontSize: '18px'
+                  }}
+                >
+                  {showPasswordConfirm ? '👁️' : '👁️‍🗨️'}
+                </button>
+              </div>
+              {passwordConfirm && password !== passwordConfirm && (
+                <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
+                  비밀번호가 일치하지 않습니다.
+                </div>
+              )}
+              {passwordConfirm && password === passwordConfirm && (
+                <div style={{ color: '#16a34a', fontSize: '12px', marginTop: '4px' }}>
+                  ✓ 비밀번호가 일치합니다.
+                </div>
+              )}
             </S.InputField>
           </S.Section>
 
-          {/* Section 3: 직원 초대 / 등록 */}
+          {/* Section 3: 대표자 정보 및 항공사 정보 */}
           <S.Section>
             <S.SectionHeader>
               <S.SectionNumber>3</S.SectionNumber>
+              <S.SectionTitle>대표자 정보 및 항공사 정보</S.SectionTitle>
+            </S.SectionHeader>
+
+            <S.InputField>
+              <S.Label>대표자 이름</S.Label>
+              <S.Input
+                type="text"
+                value={representativeName}
+                onChange={(e) => setRepresentativeName(e.target.value)}
+                placeholder="대표자 이름을 입력하세요"
+              />
+            </S.InputField>
+
+            <S.InputField style={{ marginTop: '20px' }}>
+              <S.Label>대표자 번호</S.Label>
+              <S.Input
+                type="tel"
+                value={representativePhone}
+                onChange={(e) => setRepresentativePhone(e.target.value)}
+                placeholder="010-1234-5678"
+              />
+            </S.InputField>
+
+            <S.InputField style={{ marginTop: '20px' }}>
+              <S.Label>대표 이메일</S.Label>
+              <S.Input
+                type="email"
+                value={representativeEmail}
+                onChange={(e) => setRepresentativeEmail(e.target.value)}
+                placeholder="representative@airline.com"
+              />
+            </S.InputField>
+
+            <S.InputField style={{ marginTop: '20px' }}>
+              <S.Label>항공사 설명</S.Label>
+              <textarea
+                value={airlineDesc}
+                onChange={(e) => setAirlineDesc(e.target.value)}
+                placeholder="항공사에 대한 설명을 입력하세요"
+                style={{
+                  width: '100%',
+                  minHeight: '100px',
+                  padding: '12px',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical'
+                }}
+              />
+            </S.InputField>
+
+            <S.InputField style={{ marginTop: '20px' }}>
+              <S.Label>테마 색깔</S.Label>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginTop: '8px' }}>
+                <input
+                  type="color"
+                  value={theme}
+                  onChange={(e) => setTheme(e.target.value)}
+                  style={{
+                    width: '60px',
+                    height: '60px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    padding: '4px'
+                  }}
+                />
+                <div style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px',
+                  padding: '8px 16px',
+                  backgroundColor: '#f9fafb',
+                  borderRadius: '6px',
+                  border: '1px solid #e5e7eb'
+                }}>
+                  <span style={{ fontSize: '14px', color: '#6b7280' }}>선택된 색상:</span>
+                  <span style={{ 
+                    fontSize: '14px', 
+                    fontWeight: '600',
+                    color: theme,
+                    fontFamily: 'monospace'
+                  }}>
+                    {theme}
+                  </span>
+                </div>
+              </div>
+            </S.InputField>
+          </S.Section>
+
+          {/* Section 4: 직원 초대 / 등록 (기능 구현 보류) */}
+          <S.Section>
+            <S.SectionHeader>
+              <S.SectionNumber>4</S.SectionNumber>
               <S.SectionTitle>직원 초대 / 등록</S.SectionTitle>
             </S.SectionHeader>
 
@@ -214,7 +393,7 @@ const InitialSetup = ({ token }) => {
               </label>
             </S.FileUploadArea>
 
-            <S.WarningBox>
+            {/* <S.WarningBox>
               <S.WarningIcon>⚠️</S.WarningIcon>
               <S.WarningTitle>주의사항</S.WarningTitle>
               <S.WarningList>
@@ -222,7 +401,7 @@ const InitialSetup = ({ token }) => {
                 <S.WarningItem>이메일 주소는 중복될 수 없습니다</S.WarningItem>
                 <S.WarningItem>업로드 후 직원들에게 초기 이메일이 자동 발송됩니다</S.WarningItem>
               </S.WarningList>
-            </S.WarningBox>
+            </S.WarningBox> */}
           </S.Section>
 
           {error && (
