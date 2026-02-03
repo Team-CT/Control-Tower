@@ -41,6 +41,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/health/save").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/airline-applications").permitAll()
                         .requestMatchers("/api/account-activation/**").permitAll()
+                        .requestMatchers("/api/questions/**").permitAll()
                         //인증
                         .requestMatchers("/api/file/download/**").permitAll()
 

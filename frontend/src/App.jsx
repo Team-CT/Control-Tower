@@ -47,6 +47,7 @@ import ProtestApply from './pages/ProtestApply/ProtestApply.jsx';
 import TenantManagement from './pages/SuperAdmin/Tenant/TenantManagement.jsx';
 import TenantDetail from './pages/SuperAdmin/Tenant/TenantDetail.jsx';
 import CompanyRegistrationManagement from './pages/SuperAdmin/CompanyRegistrationManagement/CompanyRegistrationManagement.jsx';
+import QnADetail from './pages/QnADetail/QnADetail.jsx';
 
 // 레이아웃 컴포넌트 Import
 import MainLayout from './layout/MainLayout';
@@ -95,7 +96,7 @@ const ThemedApp = () => {
           <Route path="/board/detail/:boardId" element={<BoardDetail />} />
           <Route path="/board/edit/:boardId" element={<BoardEdit />} />
           <Route path="/qna" element={<QnA />} />
-
+          <Route path="/qna/:id" element={<QnADetail />} />
           {/* [인사 관리] */}
           <Route path="/employee-list" element={<EmployeeManagement />} />
           <Route path="/employee-list/detail" element={<EmployeeDetail />} />
