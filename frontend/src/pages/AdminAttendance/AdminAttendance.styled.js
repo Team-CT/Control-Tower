@@ -1,552 +1,380 @@
 import styled from 'styled-components';
 
-// 전체 페이지 레이아웃 (사이드바 260px 제외한 영역)
-export const PageLayout = styled.div`
-  display: flex;
-  min-height: 100%;
+export const Container = styled.div`
   width: 100%;
-  background: var(--bg-main);
+  min-height: 100vh;
+  background: #f9fafb;
+  padding: 24px;
 `;
 
-// 메인 콘텐츠 영역 (사이드바 우측)
-export const MainContentArea = styled.div`
-  flex: 1;
-  padding: 32px 48px;
-  max-width: 1600px;
-  margin: 0 auto;
-
-  @media (max-width: 1440px) {
-    padding: 24px 32px;
-  }
-
-  @media (max-width: 1024px) {
-    margin-left: 0;
-    padding: 20px 24px;
-  }
-`;
-
-// ==================== 헤더 영역 ====================
-
-export const PageHeader = styled.header`
+export const Header = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-  gap: 24px;
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    gap: 16px;
-  }
-`;
-
-export const Breadcrumb = styled.nav`
-  display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 24px;
 `;
 
-export const BreadcrumbItem = styled.span`
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 14px;
-  font-weight: ${props => props.$active ? '600' : '400'};
-  color: ${props => props.$active ? '#1d2838' : '#6b7280'};
-  cursor: ${props => props.$active ? 'default' : 'pointer'};
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: ${props => props.$active ? '#1d2838' : '#0284c7'};
-  }
-`;
-
-export const BreadcrumbSeparator = styled.span`
-  font-size: 14px;
-  color: #9ca3af;
-  user-select: none;
-`;
-
-export const PageTitle = styled.h1`
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 28px;
+export const Title = styled.h1`
+  font-size: 24px;
   font-weight: 700;
-  color: #1d2838;
+  color: #111827;
   margin: 0;
-
-  @media (max-width: 768px) {
-    font-size: 24px;
-  }
-`;
-
-export const HeaderActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-`;
-
-export const SearchButton = styled.button`
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 18px;
-
-  &:hover {
-    background: #f9fafb;
-    border-color: #0284c7;
-  }
-`;
-
-export const NotificationButton = styled.button`
-  position: relative;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 18px;
-
-  &:hover {
-    background: #f9fafb;
-    border-color: #0284c7;
-  }
-`;
-
-export const NotificationBadge = styled.span`
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #ef4444;
-  color: #ffffff;
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 11px;
-  font-weight: 600;
-  border-radius: 50%;
-  border: 2px solid #f0f7ff;
-`;
-
-export const UserProfile = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 16px 8px 8px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #f9fafb;
-    border-color: #0284c7;
-  }
-`;
-
-export const UserAvatar = styled.div`
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #0284c7;
-  color: #ffffff;
-  border-radius: 50%;
-  font-size: 18px;
 `;
 
 export const UserInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  font-size: 14px;
+  color: #6b7280;
 `;
 
-export const UserName = styled.span`
-  font-family: 'Noto Sans KR', sans-serif;
+export const TabContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e5e7eb;
+`;
+
+export const Tab = styled.button`
+  padding: 12px 24px;
   font-size: 14px;
   font-weight: 600;
-  color: #1d2838;
-  line-height: 1.2;
+  color: ${props => props.$active ? '#4f46e5' : '#6b7280'};
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid ${props => props.$active ? '#4f46e5' : 'transparent'};
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    color: #4f46e5;
+  }
 `;
 
-export const UserDepartment = styled.span`
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  color: #6b7280;
-  line-height: 1.2;
+export const MainContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 `;
 
-// ==================== 통계 카드 ====================
-
-export const StatsCardGrid = styled.div`
+// 상단 통계 카드
+export const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-  margin-bottom: 32px;
+  gap: 16px;
 
-  @media (max-width: 1280px) {
+  @media (max-width: 1200px) {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 768px) {
     grid-template-columns: 1fr;
   }
 `;
 
 export const StatCard = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 24px;
-  background: #ffffff;
-  border-left: 4px solid ${props => props.$color || '#e5e7eb'};
+  background: ${props => props.$color || '#ffffff'};
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-  }
-`;
-
-export const StatLabel = styled.div`
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  color: #6b7280;
-`;
-
-export const StatValue = styled.span`
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 36px;
-  font-weight: 700;
-  color: #1d2838;
-  margin-right: 8px;
-
-  @media (max-width: 768px) {
-    font-size: 28px;
-  }
-`;
-
-export const StatUnit = styled.span`
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-  color: #6b7280;
-`;
-
-// ==================== 컨트롤 패널 ====================
-
-export const ControlPanel = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  gap: 20px;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-`;
-
-export const MonthNavigator = styled.div`
+  padding: 20px;
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 8px 16px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
 `;
 
-export const NavButton = styled.button`
-  width: 32px;
-  height: 32px;
+export const StatIcon = styled.div`
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
-  border: none;
-  border-radius: 6px;
-  font-size: 18px;
-  color: #374151;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: #0284c7;
-    color: #ffffff;
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
+  color: ${props => props.$color || '#4f46e5'};
 `;
 
-export const CurrentMonth = styled.span`
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 16px;
-  font-weight: 600;
-  color: #1d2838;
-  min-width: 120px;
-  text-align: center;
-`;
-
-export const RefreshButton = styled.button`
+export const StatInfo = styled.div`
   display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  font-family: 'Noto Sans KR', sans-serif;
+  flex-direction: column;
+  gap: 4px;
+`;
+
+export const StatLabel = styled.div`
   font-size: 14px;
+  color: #6b7280;
   font-weight: 500;
-  color: #0284c7;
-  background: #ffffff;
-  border: 1px solid #0284c7;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+`;
 
-  &:hover {
-    background: #0284c7;
-    color: #ffffff;
+export const StatValue = styled.div`
+  font-size: 32px;
+  font-weight: 700;
+  color: ${props => props.$color || '#111827'};
+`;
+
+// 메인 컨텐츠 그리드 (좌측: 휴가 목록, 우측: 부서별 현황)
+export const ContentGrid = styled.div`
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
   }
 `;
 
-// ==================== 필터 탭 ====================
+export const LeftPanel = styled.div`
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+`;
 
-export const FilterTabs = styled.div`
+export const RightPanel = styled.div`
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+`;
+
+export const SectionHeader = styled.div`
   display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 2px;
-
-  @media (max-width: 768px) {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
 `;
 
-export const FilterTab = styled.button`
+export const SectionTitle = styled.h2`
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 20px;
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 15px;
-  font-weight: ${props => props.$active ? '600' : '500'};
-  color: ${props => props.$active ? '#0284c7' : '#6b7280'};
-  background: ${props => props.$active ? '#eff6ff' : 'transparent'};
-  border: none;
-  border-bottom: 2px solid ${props => props.$active ? '#0284c7' : 'transparent'};
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  position: relative;
-  bottom: -2px;
-
-  &:hover {
-    color: #0284c7;
-    background: #f0f9ff;
-  }
+  margin: 0;
 `;
 
-export const TabIcon = styled.span`
-  font-size: 16px;
+export const SectionIcon = styled.span`
+  font-size: 20px;
 `;
 
-export const TabLabel = styled.span``;
+export const FilterButtons = styled.div`
+  display: flex;
+  gap: 8px;
+`;
 
-export const TabBadge = styled.span`
+export const FilterButton = styled.button`
+  padding: 8px 16px;
   font-size: 13px;
   font-weight: 500;
-  color: ${props => props.$active ? '#0369a1' : '#9ca3af'};
-`;
-
-// ==================== 스케줄 테이블 ====================
-
-export const ScheduleTableWrapper = styled.div`
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-`;
-
-export const ScheduleTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-`;
-
-export const TableHeader = styled.thead`
-  background: #f9fafb;
-  border-bottom: 2px solid #e5e7eb;
-`;
-
-export const TableHeaderCell = styled.th`
-  padding: 16px 20px;
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: #374151;
-  text-align: left;
-  white-space: nowrap;
-
-  &:first-child {
-    padding-left: 28px;
-  }
-
-  &:last-child {
-    text-align: center;
-  }
-`;
-
-export const TableBody = styled.tbody``;
-
-export const TableRow = styled.tr`
-  border-bottom: 1px solid #f3f4f6;
-  transition: background 0.2s ease;
+  color: ${props => props.$active ? '#4f46e5' : '#6b7280'};
+  background: ${props => props.$active ? '#e0e7ff' : '#f3f4f6'};
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
 
   &:hover {
-    background: #f9fafb;
-  }
-
-  &:last-child {
-    border-bottom: none;
+    background: #e0e7ff;
+    color: #4f46e5;
   }
 `;
 
-export const TableCell = styled.td`
-  padding: 16px 20px;
-  font-family: 'Noto Sans KR', sans-serif;
-  font-size: 14px;
-  color: #1f2937;
-  vertical-align: middle;
+// 휴가 승인 대기 목록
+export const LeaveRequestList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: 600px;
+  overflow-y: auto;
 
-  &:first-child {
-    padding-left: 28px;
+  &::-webkit-scrollbar {
+    width: 6px;
   }
 
-  &:last-child {
-    text-align: center;
+  &::-webkit-scrollbar-track {
+    background: #f3f4f6;
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+
+    &:hover {
+      background: #9ca3af;
+    }
   }
 `;
 
-export const FlightNumber = styled.span`
-  font-weight: 600;
-  color: #1d2838;
+export const LeaveRequestCard = styled.div`
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #4f46e5;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
+  }
 `;
 
-export const RouteCode = styled.span`
-  font-weight: 600;
-  color: #374151;
-`;
-
-export const RouteArrow = styled.span`
-  margin: 0 8px;
-  color: #9ca3af;
-`;
-
-export const FlightTime = styled.span`
-  font-weight: 500;
-`;
-
-export const Duration = styled.span`
-  margin-right: 8px;
-  font-weight: 500;
-`;
-
-export const StatusBadge = styled.span`
-  display: inline-block;
-  padding: 4px 10px;
+export const RequestBadge = styled.div`
+  background: #fef3c7;
+  color: #d97706;
+  padding: 4px 12px;
+  border-radius: 12px;
   font-size: 12px;
-  font-weight: 500;
-  color: ${props => props.$type === '완결' ? '#047857' : '#0369a1'};
-  background: ${props => props.$type === '완결' ? '#d1fae5' : '#dbeafe'};
-  border-radius: 6px;
+  font-weight: 600;
+  white-space: nowrap;
 `;
 
-export const PassengerCount = styled.span`
-  font-weight: 500;
-  color: #374151;
-`;
-
-export const CrewSection = styled.div`
+export const RequestInfo = styled.div`
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 6px;
 `;
 
-export const CrewMember = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-`;
-
-export const CrewRole = styled.span`
-  display: inline-block;
-  padding: 4px 10px;
-  font-size: 12px;
+export const RequestName = styled.div`
+  font-size: 16px;
   font-weight: 600;
-  color: #ffffff;
-  background: #0284c7;
-  border-radius: 6px;
+  color: #111827;
 `;
 
-export const CrewName = styled.span`
-  font-weight: 600;
-  color: #1d2838;
-`;
-
-export const CrewBadge = styled.span`
-  padding: 4px 8px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #6b7280;
-  background: #f3f4f6;
-  border-radius: 4px;
-`;
-
-export const ActionButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  font-family: 'Noto Sans KR', sans-serif;
+export const RequestDepartment = styled.div`
   font-size: 13px;
+  color: #6b7280;
+`;
+
+export const RequestPeriod = styled.div`
+  font-size: 14px;
+  color: #374151;
   font-weight: 500;
-  color: #0284c7;
-  background: #ffffff;
-  border: 1px solid #0284c7;
+`;
+
+export const RequestReason = styled.div`
+  font-size: 13px;
+  color: #6b7280;
+`;
+
+export const ActionButtons = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+export const ApproveButton = styled.button`
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  background: #059669;
+  border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.2s;
 
   &:hover {
-    background: #0284c7;
-    color: #ffffff;
+    background: #047857;
+    transform: translateY(-1px);
   }
 
   &:active {
-    transform: scale(0.98);
+    transform: translateY(0);
   }
+`;
+
+export const RejectButton = styled.button`
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  background: #dc2626;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+`;
+
+// 부서별 현황
+export const DepartmentList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+export const DepartmentCard = styled.div`
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #4f46e5;
+    box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
+  }
+`;
+
+export const DepartmentHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+`;
+
+export const DepartmentName = styled.div`
+  font-size: 15px;
+  font-weight: 600;
+  color: #111827;
+`;
+
+export const DepartmentTotal = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: #4f46e5;
+`;
+
+export const ProgressBar = styled.div`
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 12px;
+`;
+
+export const ProgressFill = styled.div`
+  height: 100%;
+  width: ${props => props.$percentage || 0}%;
+  background: linear-gradient(90deg, #059669 0%, #10b981 100%);
+  transition: width 0.3s ease;
+`;
+
+export const DepartmentStats = styled.div`
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+`;
+
+export const DepartmentStat = styled.div`
+  color: ${props => props.$color || '#6b7280'};
+  font-weight: 500;
 `;

@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { 
-  Plane, Home, Users, Network, Clock, Calendar, 
-  ClipboardCheck, Activity, Leaf, 
+import {
+  Plane, Home, Users, Network, Clock, Calendar,
+  ClipboardCheck, Activity, Leaf,
   Megaphone, FileText, Settings, List, Smile,
   Sun, Moon, Building2, UserCheck
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAirlineTheme } from '../../context/AirlineThemeContext';
-import * as S from './Sidebar.styled'; 
+import * as S from './Sidebar.styled';
 
 // =================================================================
 // [1] 직원용 메뉴 구조 정의
@@ -27,7 +27,7 @@ const USER_MENU = [
     ]
   },
   {
-    category: "운항 관리",
+    category: "일정 관리",
     items: [
       { label: "비행편 크루 관리", icon: Plane, id: "/flightschedule" }
     ]
@@ -37,8 +37,8 @@ const USER_MENU = [
     items: [
       {
         label: "건강 현황",
-        icon: Activity, 
-        id: "/health-dashboard", 
+        icon: Activity,
+        id: "/health-dashboard",
         subItems: [
           { label: "건강 상세정보", id: "/employeehealthdetail" },
           { label: "건강 정보 제출", id: "/healthinfosubmission" },
@@ -72,13 +72,13 @@ const ADMIN_MENU = [
   {
     category: "관리 목록",
     items: [
-      { 
-        label: "직원 관리", 
-        icon: Users, 
+      {
+        label: "직원 관리",
+        icon: Users,
         id: "/employee-list",
         subItems: [
-            { label: "직원 목록", id: "/employee-list" },
-            { label: "직원 스케줄", id: "/employee-schedule" }
+          { label: "직원 목록", id: "/employee-list" },
+          { label: "직원 스케줄", id: "/employee-schedule" }
         ]
       },
       { label: "부서 관리", icon: Network, id: "/dept-manage" }
@@ -92,9 +92,10 @@ const ADMIN_MENU = [
     ]
   },
   {
-    category: "운항 관리",
+    category: "일정 관리",
     items: [
-      { label: "비행편 크루 관리", icon: Plane, id: "/flightschedule" }
+      { label: "비행편 크루 관리", icon: Plane, id: "/flightschedule" },
+      { label: "직원 일정 배정", icon: Calendar, id: "/staff-schedule-assignment" }
     ]
   },
   {
@@ -115,7 +116,7 @@ const ADMIN_MENU = [
   {
     category: "시스템 관리",
     items: [
-        { label: "공통 코드 관리", icon: List, id: "/common-code" }
+      { label: "공통 코드 관리", icon: List, id: "/common-code" }
     ]
   }
 ];
@@ -159,14 +160,14 @@ const SUPER_ADMIN_MENU = [
 
 const Sidebar = ({ userRole }) => {
   const navigate = useNavigate();
-  const location = useLocation(); 
+  const location = useLocation();
   const [openSubMenu, setOpenSubMenu] = useState(null);
   const { theme, isDarkMode, toggleDarkMode, approvalStatus } = useAirlineTheme();
 
   // 권한에 따라 보여줄 메뉴 리스트 결정
   let currentMenuItems;
   let roleLabel;
-  
+
   if (userRole === 'SUPER_ADMIN') {
     currentMenuItems = SUPER_ADMIN_MENU;
     roleLabel = '슈퍼 관리자';
@@ -223,10 +224,10 @@ const Sidebar = ({ userRole }) => {
         {currentMenuItems.map((section, index) => (
           <S.CategorySection key={index}>
             <S.CategoryTitle>{section.category}</S.CategoryTitle>
-            
+
             {section.items.map((item) => {
               const IconComponent = item.icon;
-              
+
               // 활성화 로직
               const isSelfActive = location.pathname === item.id;
               const isSubActive = item.subItems && item.subItems.some(sub => sub.id === location.pathname);
