@@ -39,6 +39,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/members").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/health/preview").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/health/save").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/airline-applications").permitAll()
+                        .requestMatchers("/api/account-activation/**").permitAll()
                         
                         //슈퍼 관리자 전용
                         .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")

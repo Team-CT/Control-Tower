@@ -1,11 +1,11 @@
 import React from 'react';
 import * as S from './SetupComplete.styled';
 
-const SetupComplete = () => {
-  // TODO: Zustand state mapping
+const SetupComplete = ({ setupData }) => {
+  // 백엔드에서 받은 데이터 사용
   const userInfo = {
-    airline: '대한항공',
-    email: 'admin@koreanair.com',
+    airline: setupData?.airlineName || '항공사',
+    adminId: setupData?.adminId || '관리자 계정',
     status: '활성화됨',
   };
 
@@ -35,12 +35,12 @@ const SetupComplete = () => {
             </S.InfoRow>
             <S.Divider />
             <S.InfoRow>
-              <S.InfoLabel>계정 이메일</S.InfoLabel>
-              <S.InfoValue>{userInfo.email}</S.InfoValue>
+              <S.InfoLabel>관리자 계정 ID</S.InfoLabel>
+              <S.InfoValue>{userInfo.adminId}</S.InfoValue>
             </S.InfoRow>
             <S.Divider />
             <S.InfoRow>
-              <S.InfoLabel>상태</S.InfoLabel>
+              <S.InfoLabel>계정 상태</S.InfoLabel>
               <S.StatusBadge>
                 <S.StatusIcon>✓</S.StatusIcon>
                 {userInfo.status}

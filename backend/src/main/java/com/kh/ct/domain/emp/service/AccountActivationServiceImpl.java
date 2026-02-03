@@ -142,7 +142,16 @@ public class AccountActivationServiceImpl implements AccountActivationService {
                 .build();
         airline = airlineRepository.save(airline);
 
-        // 5. Emp의 airlineId 업데이트
+        // 5. 비밀번호 일치 확인
+        if (!request.getPassword().equals(request.getPasswordConfirm())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 6. Emp의 비밀번호 업데이트
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        emp.updatePassword(encodedPassword);
+
+        // 7. Emp의 airlineId 업데이트
         emp.updateAirlineId(airline);
         empRepository.save(emp);
 
@@ -150,6 +159,8 @@ public class AccountActivationServiceImpl implements AccountActivationService {
                 .message("초기 설정이 완료되었습니다.")
                 .success(true)
                 .airlineId(airline.getAirlineId())
+                .airlineName(airline.getAirlineName())
+                .adminId(emp.getEmpId())
                 .build();
     }
 }
