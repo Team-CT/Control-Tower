@@ -41,6 +41,7 @@ import AirlineApprovalManagement from './pages/AirlineApprovalManagement/Airline
 import AccountActivation from './pages/AccountActivation/AccountActivation.jsx';
 import ServiceRegistration from './pages/ServiceRegistration/ServiceRegistration.jsx';
 import AdminAttendance from './pages/AdminAttendance/AdminAttendance.jsx';
+import StaffScheduleAssignment from './pages/StaffScheduleAssignment/StaffScheduleAssignment.jsx';
 import EmployeeAttendance from './pages/EmployeeAttendance/EmployeeAttendance.jsx';
 import ProtestApply from './pages/ProtestApply/ProtestApply.jsx';
 import TenantManagement from './pages/SuperAdmin/Tenant/TenantManagement.jsx';
@@ -101,7 +102,7 @@ const ThemedApp = () => {
           <Route path="/dept-manage" element={<DepartmentManagement />} />
           <Route path="/dept-manage/detail" element={<DepartmentDetail />} />
 
-          {/* [운항 관리] */}
+          {/* [일정 관리] */}
           <Route path="/flightschedule" element={<FlightSchedule />} />
           <Route path="/flightschedule/:flightId" element={<FlightScheduleDetail />} />
           <Route path="/crew/:crewId" element={<CrewMemberDetail />} />
@@ -109,6 +110,7 @@ const ThemedApp = () => {
           {/* [근태 관리] */}
           <Route path="/my-attendance" element={<EmployeeAttendance />} />
           <Route path="/admin-attendance" element={<AdminAttendance />} />
+          <Route path="/staff-schedule-assignment" element={<StaffScheduleAssignment />} />
           <Route path="/vacation" element={<LeaveApply />} />
           <Route path="/leave-apply" element={<LeaveApply />} />
           <Route path="/employee/leave-apply" element={<LeaveApply />} />
