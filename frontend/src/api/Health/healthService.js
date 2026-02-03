@@ -30,6 +30,12 @@ export const empPhysicalTestService = {
             params: { empId, page, size, sort: "testDate,desc" },
         });
     },
+
+    getAllPhysicalTest: ({ empName = "", page = 0, size = 5 }) =>
+        api.get("/api/health/getAllPhysicalTest", {
+        params: { empName, page, size },
+        }),
+
 }
 
 

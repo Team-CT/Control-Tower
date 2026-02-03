@@ -65,7 +65,7 @@ export const ActionButton = styled.button`
   }
 `;
 
-export const SearchSection = styled.div`
+export const SearchSection = styled.form`
   background: white;
   padding: 24px;
   border-radius: 12px;
@@ -122,11 +122,6 @@ export const FilterButton = styled.button`
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-
-  &:hover {
-    background-color: ${props => props.active ? props.theme.primary : '#E5E7EB'};
-    filter: brightness(props.active ? 0.9 : 1);
-  }
 `;
 
 export const FilterDivider = styled.div`
@@ -342,8 +337,4 @@ export const PageButton = styled.button`
   font-weight: 500;
   transition: all 0.2s;
 
-  &:hover:not(:disabled) {
-    background-color: ${props => props.active ? props.theme.primary : '#F3F4F6'};
-    filter: brightness(props.active ? 0.9 : 1);
-  }
 `;

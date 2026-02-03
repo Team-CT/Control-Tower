@@ -3,7 +3,9 @@ package com.kh.ct.domain.health.service;
 import com.kh.ct.domain.emp.entity.Emp;
 import com.kh.ct.domain.emp.repository.EmpRepository;
 import com.kh.ct.domain.health.dto.HealthDto;
+import com.kh.ct.domain.health.entity.EmpHealth;
 import com.kh.ct.domain.health.entity.EmpPhysicalTest;
+import com.kh.ct.domain.health.repository.EmpHealthRepository;
 import com.kh.ct.domain.health.repository.HealthRepository;
 import com.kh.ct.domain.health.service.parser.HealthLabelParser;
 import com.kh.ct.domain.health.service.parser.PdfTextExtractor;
@@ -34,6 +36,7 @@ public class HealthServiceImpl implements HealthService {
     private final PdfTextExtractor pdfTextExtractor;
     private final EmpRepository empRepository;
     private final FileRepository fileRepository;
+    private final EmpHealthRepository empHealthRepository;
 
     private final Path baseDir = Paths.get("uploads", "pdf").toAbsolutePath().normalize();
 
@@ -117,12 +120,19 @@ public class HealthServiceImpl implements HealthService {
     }
 
     @Override
-    public HealthDto.PhysicalTestDetailResponse getEmpPhysicalTestById(String empId, Long physicalTestId) {
-        EmpPhysicalTest test = healthRepository.findById(physicalTestId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 검진 id: " + physicalTestId));
+    public HealthDto.PhysicalTestDetailResponse getEmpPhysicalTestById(String empId) {
+
 
         Emp emp = empRepository.findById(empId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 empId: " + empId));
+
+        EmpPhysicalTest test = healthRepository
+                .findTopByEmpId_EmpIdOrderByTestDateDesc(empId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사원의 검진 데이터가 없습니다. empId=" + empId));
+
+        EmpHealth empHealth = empHealthRepository.findTopByEmpId_EmpIdOrderByEmpHealthIdDesc(empId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사원의 검진 데이터가 없습니다. empId=" + empId));
+
 
         if (test.getEmpId() == null || !empId.equals(test.getEmpId().getEmpId())) { // userId는 Emp PK 필드명에 맞게 수정
             throw new IllegalArgumentException("해당 사원의 검진 데이터가 아닙니다.");
@@ -132,7 +142,7 @@ public class HealthServiceImpl implements HealthService {
                 .empId(empId)
                 .empName(emp.getEmpName())
                 .startDate(emp.getStartDate())
-                .departmentName(emp.getDepartmentId().getDepartmentName())
+                .departmentName(emp.getDepartmentId() == null ? null : emp.getDepartmentId().getDepartmentName())
                 .job(emp.getJob())
                 .email(emp.getEmail())
                 .phone(emp.getPhone())
@@ -147,6 +157,7 @@ public class HealthServiceImpl implements HealthService {
                 .heartRate(test.getHeartRate())
                 .bmi(test.getBmi())
                 .bodyFat(test.getBodyFat())
+                .healthPoint(empHealth.getHealthPoint())
                 .build();
     }
 
@@ -156,6 +167,13 @@ public class HealthServiceImpl implements HealthService {
 
         posts = healthRepository.findByEmpId_EmpId(empId,pageable);
         return posts.map(HealthDto.PhysicalTestResponse::from);
+    }
+
+    @Override
+    public Page<HealthDto.AdminEmpHealthRow> getAllPhysicalTest(String empName,Pageable pageable) {
+        System.out.println("pageable = " + pageable);
+        
+        return empRepository.findAdminEmpHealthRows(empName.trim(), pageable);
     }
 
 

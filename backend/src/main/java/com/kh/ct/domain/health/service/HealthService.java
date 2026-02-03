@@ -12,7 +12,9 @@ public interface HealthService {
 
     public Long save(MultipartFile pdfFile, String empId, HealthDto.PhysicalTestRequest body);
 
-    public HealthDto.PhysicalTestDetailResponse getEmpPhysicalTestById(String empId, Long physicalTestId);
+    public HealthDto.PhysicalTestDetailResponse getEmpPhysicalTestById(String empId);
 
     public Page<HealthDto.PhysicalTestResponse> getPhysicalTestByEmpId(String empId, Pageable pageable);
+
+    public Page<HealthDto.AdminEmpHealthRow> getAllPhysicalTest(String empName, Pageable  pageable);
 }
