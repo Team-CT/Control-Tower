@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   MainContainer,
   ContentWrapper,
@@ -62,10 +62,11 @@ import {
 } from './EmployeeHealthDetail.styled';
 import { empPhysicalTestService } from '../../api/Health/healthService';
 
-const EmployeeHealthDetail = ({empId,physicalTestId}) => {
+const EmployeeHealthDetail = () => {
   const navigate = useNavigate();
   const [detail, setDetail] = useState(null);
-
+  const { empId } = useParams();
+  
   {/* TODO: Zustand state mapping */}
 
     useEffect(() => {
@@ -80,8 +81,8 @@ const EmployeeHealthDetail = ({empId,physicalTestId}) => {
       }
     };
     
-    if (empId && physicalTestId) fetchDetail();
-  }, [empId, physicalTestId]);
+    if (empId) fetchDetail();
+  }, [empId]);
   // const employeeData = {
   //   id: 'EMP-2024-0547',
   //   name: '김민수',
@@ -97,17 +98,18 @@ const EmployeeHealthDetail = ({empId,physicalTestId}) => {
   // };
   const employeeData = useMemo(() => {
     if (!detail) return null;
+    console.log(detail);
     return {
       id: detail.emp_id,
       name: detail.emp_name,
       avatar: (detail.emp_name || "?").slice(0, 1),
-      department: detail.DEPARTMENT_NAME,
-      role: detail.job,
-      joinDate: detail.START_DATE ? detail.START_DATE.slice(0, 10) : "-",
+      department_name: detail.department_name,
+      job: detail.job,
+      start_date: detail.start_date ? detail.start_date.slice(0, 10) : "-",
       email: detail.email,
       phone: detail.phone,
       address: detail.address,
-      healthStatus: "정상", // 없으면 임시 / 추후 로직
+      health_point: detail.health_point, // 없으면 임시 / 추후 로직
     };
   }, [detail]);
 
@@ -173,11 +175,8 @@ const EmployeeHealthDetail = ({empId,physicalTestId}) => {
           </div>
           <HeaderActions>
             <ActionButton>
-              📥 건강 기록 제출
+              📥 건강 기록 다운
             </ActionButton>
-            <PrimaryButton>
-              ✏️ 정보 수정
-            </PrimaryButton>
           </HeaderActions>
         </PageHeader>
 
@@ -202,7 +201,7 @@ const EmployeeHealthDetail = ({empId,physicalTestId}) => {
             <InfoItem>
               <InfoLabel>건강 상태</InfoLabel>
               <HealthStatusBadge status="normal">
-                정상
+                {employeeData?.health_point ?? "-"}
               </HealthStatusBadge>
             </InfoItem>
           </InfoGrid>
@@ -238,23 +237,6 @@ const EmployeeHealthDetail = ({empId,physicalTestId}) => {
           </InfoGrid>
         </EmployeeProfileCard>
 
-        <AlertSection>
-          <AlertBox>
-            <AlertIcon>⚠️</AlertIcon>
-            <AlertContent>
-              <AlertTitle>다음 정기 건강검진일: 2026년 1월 10일</AlertTitle>
-              <AlertDate>2025-01-14</AlertDate>
-            </AlertContent>
-          </AlertBox>
-
-          <SuccessBox>
-            <SuccessIcon>✅</SuccessIcon>
-            <SuccessContent>
-              <SuccessTitle>인플루엔자 예방접종 완료</SuccessTitle>
-              <SuccessDate>2024-10-15</SuccessDate>
-            </SuccessContent>
-          </SuccessBox>
-        </AlertSection>
 
         <>
                 <CheckupCard>

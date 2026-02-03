@@ -33,12 +33,10 @@ import {
   EmptyState,
   EmptyIcon,
   EmptyText,
-  Pagination,
-  PaginationButton,
-  PageNumber
 } from './HealthSubmissionHistory.styled';
 import { empPhysicalTestService } from '../../api/Health/healthService';
 import useAuthStore from '../../store/authStore';
+import { PageNumber, Pagination, PaginationButton } from '../../styles/GlobalStyle';
 
 const HealthSubmissionHistory = () => {
   const [searchQuery, setSearchQuery] = useState('');

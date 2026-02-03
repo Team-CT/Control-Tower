@@ -141,9 +141,9 @@ public class HealthDto {
         private String empId;
         @JsonProperty("emp_name")
         private String empName;
-        @JsonProperty("START_DATE")
+        @JsonProperty("start_date")
         private LocalDateTime startDate;
-        @JsonProperty("DEPARTMENT_NAME")
+        @JsonProperty("department_name")
         private String departmentName;
         private String job;
         private String email;
@@ -167,6 +167,9 @@ public class HealthDto {
         @JsonProperty("body_fat")
         private Integer bodyFat;
 
+        @JsonProperty("health_point")
+        private Integer healthPoint;
+
         public static PhysicalTestDetailResponse from(EmpPhysicalTest e) {
             return PhysicalTestDetailResponse.builder()
                     .testDate(e.getTestDate())
@@ -181,6 +184,28 @@ public class HealthDto {
                     .bodyFat(e.getBodyFat())
                     .build();
         }
+
+
+    }
+
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AdminEmpHealthRow {
+        @JsonProperty("emp_id")
+        private String empId;
+        @JsonProperty("emp_name")
+        private String empName;
+        @JsonProperty("department_name")
+        private String departmentName;  // 부서 엔티티에서 가져오는 값
+        private String job;
+        @JsonProperty("start_date")
+        private LocalDateTime startDate;
+        @JsonProperty("test_date")
+        private LocalDateTime testDate; // 최근 검진일
+        @JsonProperty("health_point")
+        private Integer healthPoint;          // 개인건강 점수
 
 
     }

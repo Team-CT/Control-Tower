@@ -58,13 +58,11 @@ public class HealthController {
     /**
      * 건강 정보 상세 보기
      * @param empId
-     * @param physicalTestId
      * @return
      */
     @GetMapping("/detail")
-    public ResponseEntity<HealthDto.PhysicalTestDetailResponse> getEmpPhysicalById(@RequestParam("empId") String empId,
-                                                                            @RequestParam("physicalTestId") Long physicalTestId) {
-        HealthDto.PhysicalTestDetailResponse result = healthService.getEmpPhysicalTestById(empId, physicalTestId);
+    public ResponseEntity<HealthDto.PhysicalTestDetailResponse> getEmpPhysicalById(@RequestParam("empId") String empId) {
+        HealthDto.PhysicalTestDetailResponse result = healthService.getEmpPhysicalTestById(empId);
         return ResponseEntity.ok(result);
     }
 
@@ -79,6 +77,18 @@ public class HealthController {
                                                                                       @PageableDefault(size = 4, sort = "testDate", direction = Sort.Direction.DESC) Pageable pageable) {
         
         return ResponseEntity.ok(healthService.getPhysicalTestByEmpId(empId,pageable));
+    }
+
+    /**
+     * 관리자 직원 건강 상세 조회
+     * @param pageable
+     * @return
+     */
+    @GetMapping("/getAllPhysicalTest")
+    public ResponseEntity<Page<HealthDto.AdminEmpHealthRow>> getAllPhysicalTest(@RequestParam(required = false) String empName,
+            @PageableDefault(size = 5) Pageable pageable) {
+        System.out.println(empName);
+        return ResponseEntity.ok(healthService.getAllPhysicalTest(empName,pageable));
     }
 
 }

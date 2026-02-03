@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
   :root {
@@ -114,6 +114,55 @@ const GlobalStyle = createGlobalStyle`
   ::selection {
     background-color: var(--primary-color);
     color: white;
+  }
+`;
+
+
+export const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 48px;
+`;
+
+export const PaginationButton = styled.button`
+  width: 40px;
+  height: 40px;
+  border: 1px solid #E5E8EB;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    border-color: ${props => props.theme.primary};
+    color: ${props => props.theme.primary};
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
+
+export const PageNumber = styled.button`
+  width: 40px;
+  height: 40px;
+  border: 1px solid ${props => props.active ? props.theme.primary : '#E5E8EB'};
+  background: ${props => props.active ? props.theme.primary : 'white'};
+  color: ${props => props.active ? 'white' : '#666'};
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: ${props => props.active ? '600' : '500'};
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: ${props => props.theme.primary};
+    color: ${props => props.active ? 'white' : props.theme.primary};
   }
 `;
 
