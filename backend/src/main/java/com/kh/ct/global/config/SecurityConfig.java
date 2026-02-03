@@ -44,6 +44,7 @@ public class SecurityConfig {
                         
                         //슈퍼 관리자 전용
                         .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers("/api/file/download/**").permitAll()
 
                         //관리자 전용
                         .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")
