@@ -7,7 +7,7 @@ import com.kh.ct.domain.attendance.entity.ProtestApplyFile;
 import com.kh.ct.domain.attendance.repository.AttendanceRepository;
 import com.kh.ct.domain.attendance.repository.ProtestApplyFileRepository;
 import com.kh.ct.domain.attendance.repository.ProtestApplyRepository;
-import com.kh.ct.domain.board.service.FileService;
+import com.kh.ct.global.service.FileService;
 import com.kh.ct.domain.emp.entity.Emp;
 import com.kh.ct.domain.emp.repository.EmpRepository;
 import com.kh.ct.global.common.CommonEnums;

@@ -1,6 +1,6 @@
 package com.kh.ct.domain.emp.controller;
 
-import com.kh.ct.domain.board.service.FileService;
+import com.kh.ct.global.service.FileService;
 import com.kh.ct.domain.emp.dto.AccountActivationDto;
 import com.kh.ct.domain.emp.service.AccountActivationService;
 import jakarta.validation.Valid;

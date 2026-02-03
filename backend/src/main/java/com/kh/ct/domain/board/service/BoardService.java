@@ -1,6 +1,5 @@
 package com.kh.ct.domain.board.service;
 
-import com.kh.ct.domain.board.dto.*;
 import com.kh.ct.domain.board.dto.Board_ListResponseDto;
 import com.kh.ct.domain.board.dto.Board_RequestDto;
 import com.kh.ct.domain.board.repository.BoardFileRepository;
@@ -9,6 +8,7 @@ import com.kh.ct.domain.board.repository.BoardRepository;
 import com.kh.ct.domain.board.entity.BoardFile;
 import com.kh.ct.domain.emp.repository.EmpRepository;
 import com.kh.ct.global.entity.File;
+import com.kh.ct.global.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
