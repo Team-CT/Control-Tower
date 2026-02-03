@@ -1,9 +1,7 @@
 package com.kh.ct.domain.board.service;
 
 
-import com.kh.ct.domain.board.dto.QuestionCreateRequest;
-import com.kh.ct.domain.board.dto.QuestionDetailResponse;
-import com.kh.ct.domain.board.dto.QuestionListResponse;
+import com.kh.ct.domain.board.dto.QuestionDto;
 import com.kh.ct.domain.board.entity.Question;
 import com.kh.ct.domain.board.repository.QuestionRepository;
 import com.kh.ct.domain.emp.entity.Emp;
@@ -11,9 +9,7 @@ import com.kh.ct.domain.emp.repository.EmpRepository;
 import com.kh.ct.global.common.CommonEnums;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,19 +24,18 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final EmpRepository empRepository;
 
-    public List<QuestionListResponse> getQuestionList() {
+    public List<QuestionDto.ListResponse> getQuestionList() {
         return questionRepository.findAllByOrderByCreateDateDesc().stream()
-                .map(QuestionListResponse::from)
+                .map(QuestionDto.ListResponse::from)
                 .collect(Collectors.toList());
     }
 
     @Transactional
-    public Long createQuestion(QuestionCreateRequest dto, String empId) {
-        // 1. 현재 활동 중(ACTIVE)인 사원인지 확인하며 조회
+    public Long createQuestion(QuestionDto.CreateRequest dto, String empId) {
+        // 사원 상태 확인 (Enums 설정에 따라 'Y' 또는 'ACTIVE' 확인)
         Emp questioner = empRepository.findByEmpIdAndEmpStatus(empId, CommonEnums.EmpStatus.Y)
                 .orElseThrow(() -> new RuntimeException("활동 중인 사원 정보를 찾을 수 없습니다."));
 
-        // 2. 질문 생성 및 저장
         Question question = Question.builder()
                 .questionTitle(dto.getTitle())
                 .questionContent(dto.getContent())
@@ -50,7 +45,7 @@ public class QuestionService {
         return questionRepository.save(question).getQuestionId();
     }
 
-    public Page<QuestionListResponse> getQuestions(Pageable pageable, String keyword) {
+    public Page<QuestionDto.ListResponse> getQuestions(Pageable pageable, String keyword) {
         Page<Question> questions;
         if (keyword != null && !keyword.isEmpty()) {
             questions = questionRepository.findByQuestionTitleContaining(keyword, pageable);
@@ -58,30 +53,54 @@ public class QuestionService {
             questions = questionRepository.findAll(pageable);
         }
 
-        // 이 부분이 핵심입니다. Page 객체의 map을 사용해야 합니다.
-        return questions.map(QuestionListResponse::from);
+        return questions.map(QuestionDto.ListResponse::from);
     }
 
 
-    @Transactional(readOnly = true)
-    public QuestionDetailResponse getQuestionDetail(Long id) {
+    public QuestionDto.DetailResponse getQuestionDetail(Long id) {
         Question question = questionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 질문입니다."));
 
-        return QuestionDetailResponse.builder()
-                .questionId(question.getQuestionId())
-                .questionTitle(question.getQuestionTitle())
-                .questionContent(question.getQuestionContent())
-                .questionerName(question.getQuestioner().getEmpName()) // Emp 엔티티에 getName()이 있다고 가정
-                .questionerId(question.getQuestioner().getEmpId())
-                .createDate(question.getCreateDate())
-                // 답변이 있으면 true, 없으면 false
-                .answered(question.getAnswerContent() != null)
-                .answerContent(question.getAnswerContent())
-                // 답변이 있다면 답변자 이름을 가져옴
-                .answererName(question.getAnswerer() != null ? question.getAnswerer().getEmpName() : null)
-                // 답변 등록 시점 혹은 수정 시점인 updateDate를 매핑
-                .answerDate(question.getUpdateDate())
-                .build();
+        // 정적 메서드 사용으로 코드 한 줄 요약
+        return QuestionDto.DetailResponse.from(question);
+    }
+
+    // 5. 답변 저장
+    @Transactional
+    public void saveAnswer(Long questionId, String content, String adminEmpId) {
+        Question question = questionRepository.findById(questionId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 질문입니다."));
+
+        Emp answerer = empRepository.findById(adminEmpId)
+                .orElseThrow(() -> new IllegalArgumentException("관리자 정보를 찾을 수 없습니다."));
+
+        // Question 엔티티 내부의 updateAnswer 메서드 호출
+        question.updateAnswer(content, answerer);
+    }
+
+    @Transactional
+    public void updateQuestion(Long id, QuestionDto.CreateRequest dto, String empId) {
+        Question question = questionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+
+        // 본인 확인 로직
+        if (!question.getQuestioner().getEmpId().equals(empId)) {
+            throw new RuntimeException("수정 권한이 없습니다.");
+        }
+
+        question.update(dto.getTitle(), dto.getContent());
+    }
+
+    @Transactional
+    public void deleteQuestion(Long id, String empId) {
+        Question question = questionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 없습니다."));
+
+        // 본인 확인 (또는 관리자인 경우 삭제 가능하도록 조건 추가 가능)
+        if (!question.getQuestioner().getEmpId().equals(empId)) {
+            throw new RuntimeException("삭제 권한이 없습니다.");
+        }
+
+        questionRepository.delete(question);
     }
 }

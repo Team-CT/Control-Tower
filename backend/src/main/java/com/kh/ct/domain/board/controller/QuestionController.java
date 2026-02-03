@@ -1,8 +1,6 @@
 package com.kh.ct.domain.board.controller;
 
-import com.kh.ct.domain.board.dto.QuestionCreateRequest;
-import com.kh.ct.domain.board.dto.QuestionDetailResponse;
-import com.kh.ct.domain.board.dto.QuestionListResponse;
+import com.kh.ct.domain.board.dto.QuestionDto;
 import com.kh.ct.domain.board.service.QuestionService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,8 +10,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/questions")
@@ -25,25 +21,56 @@ public class QuestionController {
 
     @PostMapping
     public ResponseEntity<Long> createQuestion(
-            @RequestBody QuestionCreateRequest dto,
-            @AuthenticationPrincipal String empId) { // 토큰을 파싱해서 나온 사번
+            @RequestBody QuestionDto.CreateRequest dto, // ✅ 수정
+            @AuthenticationPrincipal String empId) {
 
         Long questionId = questionService.createQuestion(dto, empId);
         return ResponseEntity.ok(questionId);
     }
 
     @GetMapping
-    public ResponseEntity<Page<QuestionListResponse>> getQuestions(
+    public ResponseEntity<Page<QuestionDto.ListResponse>> getQuestions(
             @PageableDefault(page = 0, size = 10, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam(required = false) String keyword) {
 
         return ResponseEntity.ok(questionService.getQuestions(pageable, keyword));
     }
-
+    // 3. 상세 조회
     @GetMapping("/{id}")
-    public ResponseEntity<QuestionDetailResponse> getQuestion(@PathVariable(name = "id") Long id) {
-        // Service에서 DTO로 변환된 상세 데이터를 가져옵니다.
+    public ResponseEntity<QuestionDto.DetailResponse> getQuestion(@PathVariable(name = "id") Long id) { // ✅ 수정
         return ResponseEntity.ok(questionService.getQuestionDetail(id));
+    }
+
+    // 4. 답변 등록
+    @PostMapping("/{id}/answers")
+    public ResponseEntity<Void> createAnswer(
+            @PathVariable(name = "id") Long id,
+            @RequestBody QuestionDto.AnswerRequest dto, // ✅ 수정
+            @AuthenticationPrincipal String adminEmpId) {
+
+        questionService.saveAnswer(id, dto.getContent(), adminEmpId);
+        return ResponseEntity.ok().build();
+    }
+
+    // 질문 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateQuestion(
+            @PathVariable(name = "id") Long id,
+            @RequestBody QuestionDto.CreateRequest dto,
+            @AuthenticationPrincipal String empId) {
+
+        questionService.updateQuestion(id, dto, empId);
+        return ResponseEntity.ok().build();
+    }
+
+    // 질문 삭제
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteQuestion(
+            @PathVariable(name = "id") Long id,
+            @AuthenticationPrincipal String empId) {
+
+        questionService.deleteQuestion(id, empId);
+        return ResponseEntity.ok().build();
     }
 
 }
