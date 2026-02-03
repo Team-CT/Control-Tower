@@ -14,9 +14,11 @@ import com.kh.ct.global.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -128,14 +130,14 @@ public class HealthServiceImpl implements HealthService {
 
         EmpPhysicalTest test = healthRepository
                 .findTopByEmpId_EmpIdOrderByTestDateDesc(empId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사원의 검진 데이터가 없습니다. empId=" + empId));
+                .orElse(null);
 
         EmpHealth empHealth = empHealthRepository.findTopByEmpId_EmpIdOrderByEmpHealthIdDesc(empId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사원의 검진 데이터가 없습니다. empId=" + empId));
+                .orElse(null);
 
 
-        if (test.getEmpId() == null || !empId.equals(test.getEmpId().getEmpId())) { // userId는 Emp PK 필드명에 맞게 수정
-            throw new IllegalArgumentException("해당 사원의 검진 데이터가 아닙니다.");
+        if (test != null && (test.getEmpId() == null || !empId.equals(test.getEmpId().getEmpId()))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 사원의 검진 데이터가 아닙니다.");
         }
 
         return HealthDto.PhysicalTestDetailResponse.builder()
@@ -147,17 +149,18 @@ public class HealthServiceImpl implements HealthService {
                 .email(emp.getEmail())
                 .phone(emp.getPhone())
                 .address(emp.getAddress())
-                .testDate(test.getTestDate() == null ? null : test.getTestDate())
-                .height(test.getHeight())
-                .weight(test.getWeight())
-                .bloodSugar(test.getBloodSugar())
-                .systolicBloodPressure(test.getSystolicBloodPressure())
-                .diastolicBloodPressure(test.getDiastolicBloodPressure())
-                .cholesterol(test.getCholesterol())
-                .heartRate(test.getHeartRate())
-                .bmi(test.getBmi())
-                .bodyFat(test.getBodyFat())
-                .healthPoint(empHealth.getHealthPoint())
+
+                .testDate(test == null ? null : test.getTestDate())
+                .height(test == null ? null : test.getHeight())
+                .weight(test == null ? null : test.getWeight())
+                .bloodSugar(test == null ? null : test.getBloodSugar())
+                .systolicBloodPressure(test == null ? null : test.getSystolicBloodPressure())
+                .diastolicBloodPressure(test == null ? null : test.getDiastolicBloodPressure())
+                .cholesterol(test == null ? null : test.getCholesterol())
+                .heartRate(test == null ? null : test.getHeartRate())
+                .bmi(test == null ? null : test.getBmi())
+                .bodyFat(test == null ? null : test.getBodyFat())
+                .healthPoint(empHealth == null ? null : empHealth.getHealthPoint())
                 .build();
     }
 

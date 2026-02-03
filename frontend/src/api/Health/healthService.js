@@ -20,9 +20,9 @@ export const empPhysicalTestService = {
         return uploadApi.post(`${API_ENDPOINTS.HEALTH.SAVE}?empId=${empId}`, fd);
     },
 
-    detail: (empId, physicalTestId) => {
+    detail: (empId) => {
         return api.get(API_ENDPOINTS.HEALTH.DETAIL, {
-            params: { empId, physicalTestId },
+            params: { empId },
         });
     },
     getPhysicalTest: (empId, page = 0, size = 10) => {

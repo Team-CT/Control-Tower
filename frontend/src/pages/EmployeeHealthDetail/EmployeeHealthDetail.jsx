@@ -73,7 +73,7 @@ const EmployeeHealthDetail = () => {
     const fetchDetail = async () => {
       try {
         //const res = await empPhysicalTestService.detail(empId, physicalTestId);
-        const res = await empPhysicalTestService.detail("TEST", 1);
+        const res = await empPhysicalTestService.detail(empId);
         setDetail(res.data);
       } catch (e) {
         console.error(e);
