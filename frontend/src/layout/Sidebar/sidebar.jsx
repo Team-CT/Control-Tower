@@ -66,7 +66,7 @@ const ADMIN_MENU = [
   {
     category: "메인",
     items: [
-      { label: "대시보드", icon: Home, id: "/admin-dashboard" }
+      { label: "대시보드", icon: Home, id: "/dashboard/admin" }
     ]
   },
   {

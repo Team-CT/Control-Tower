@@ -89,4 +89,103 @@ public class AttendanceDto {
         private CommonEnums.AttendanceStatus attendanceStatus;
         private Long workHours;
     }
+
+    /**
+     * 관리자 대시보드 전체 응답 DTO
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AdminDashResponse {
+        private SummaryDto summary;           // 오늘 기준 통계
+        private java.util.List<AttendanceDetailDto> yesterdayList;  // 어제 기준 상세 리스트
+        private java.util.List<PendingLeaveDto> pendingLeaves;
+        private java.util.List<DepartmentStatusDto> departmentStatus;
+    }
+
+    /**
+     * 근태 통계 DTO
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class SummaryDto {
+        private Long totalEmployees;
+        private Long presentCount;
+        private Long lateCount;
+        private Long absentCount;
+    }
+
+    /**
+     * 근태 상세 정보 DTO
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class AttendanceDetailDto {
+        private Long attendanceId;
+        private String empId;
+        private String empName;
+        private String departmentName;
+        private String job;
+        private LocalDate attendanceDate;
+        private LocalTime inTime;
+        private LocalTime outTime;
+        private String attendanceStatus;
+    }
+
+    /**
+     * 직원별 실시간 현황 DTO (Tab A용)
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class EmployeeStatusDto {
+        private String empId;
+        private String empName;
+        private String departmentName;
+        private String job;
+        private String currentStatus;  // 현재 근태 상태
+        private String todayInTime;
+        private String todayOutTime;
+    }
+
+    /**
+     * 휴가 승인 대기 목록 DTO
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class PendingLeaveDto {
+        private Long leaveId;
+        private String empId;
+        private String empName;
+        private String departmentName;
+        private String leaveType;
+        private String startDate;
+        private String endDate;
+        private String requestDate;
+        private Float leaveDays;
+    }
+
+    /**
+     * 부서별 근태 현황 DTO
+     */
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class DepartmentStatusDto {
+        private String departmentName;
+        private Long totalEmployees;
+        private Long presentCount;
+        private Long leaveCount;
+        private Long lateCount;
+        private Long absentCount;
+    }
 }
