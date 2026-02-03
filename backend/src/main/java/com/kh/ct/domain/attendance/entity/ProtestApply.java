@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,27 @@ public class ProtestApply extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private CommonEnums.AttendanceStatus protestAttendanceStatus;
 
-    @OneToMany(mappedBy = "protestApplyId", fetch = FetchType.LAZY,
-            cascade = CascadeType.ALL, orphanRemoval = true)
+    // 정정 요청 출근 시간
+    private LocalTime protestRequestInTime;
+
+    // 정정 요청 퇴근 시간
+    private LocalTime protestRequestOutTime;
+
+    // 정정 사유
+    @Lob
+    @Column(nullable = false)
+    private String protestReason;
+
+    // 정정 대상 근태
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "target_attendance_id", nullable = false)
+    private Attendance targetAttendance;
+
+    // 원래 근태 상태 (정정 신청 전 상태)
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.AttendanceStatus originalAttendanceStatus;
+
+    @OneToMany(mappedBy = "protestApplyId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProtestApplyFile> files = new ArrayList<>();
 }

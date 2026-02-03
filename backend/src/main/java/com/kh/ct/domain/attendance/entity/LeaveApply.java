@@ -26,8 +26,15 @@ public class LeaveApply extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Emp leaveApplyApplicant;
 
+    @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private CommonEnums.LeaveType leaveType;
+
     @Column(nullable = false)
     private LocalDateTime leaveStartDate;
+
+    @Column(nullable = false)
+    private Float leaveDays;
 
     @Lob
     private String leaveApplyReason;
@@ -44,6 +51,5 @@ public class LeaveApply extends BaseTimeEntity {
 
     @Lob
     private String leaveApplyCancelReason;
-
 
 }

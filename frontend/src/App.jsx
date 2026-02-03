@@ -42,6 +42,7 @@ import AccountActivation from './pages/AccountActivation/AccountActivation.jsx';
 import ServiceRegistration from './pages/ServiceRegistration/ServiceRegistration.jsx';
 import AdminAttendance from './pages/AdminAttendance/AdminAttendance.jsx';
 import EmployeeAttendance from './pages/EmployeeAttendance/EmployeeAttendance.jsx';
+import ProtestApply from './pages/ProtestApply/ProtestApply.jsx';
 import TenantManagement from './pages/SuperAdmin/Tenant/TenantManagement.jsx';
 import TenantDetail from './pages/SuperAdmin/Tenant/TenantDetail.jsx';
 import CompanyRegistrationManagement from './pages/SuperAdmin/CompanyRegistrationManagement/CompanyRegistrationManagement.jsx';
@@ -55,20 +56,20 @@ const SuperAdminDashboard = CompanyRegistrationManagement;
 // ThemeProvider 래퍼 컴포넌트
 const ThemedApp = () => {
   const { theme } = useAirlineTheme();
-  
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <Routes>
         {/* 1. 사이드바가 없는 페이지 (퍼블릭) */}
-        <Route path="/" element={<LandingPage />} /> 
+        <Route path="/" element={<LandingPage />} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/find-employee-id" element={<SelectId />} />
         <Route path="/find-password" element={<SelectPwd />} />
         <Route path="/work-login" element={<WorkLogin />} />
-        
+
         {/* 항공사 가입 신청 및 계정 활성화 */}
         <Route path="/service-registration" element={<ServiceRegistration />} />
         <Route path="/account-activation" element={<AccountActivation />} />
@@ -77,29 +78,29 @@ const ThemedApp = () => {
         <Route element={<MainLayout />}>
           {/* 기본 리다이렉트 */}
           <Route path="/dashboard" element={<EmployeeDashboard />} />
-          
+
           {/* 관리자/슈퍼관리자 대시보드 */}
           <Route path="/dashboard/admin" element={<AdmDashboard />} />
           <Route path="/super-admin-dashboard" element={<SuperAdminDashboard />} />
-          
+
           {/* [슈퍼 관리자 전용] */}
           <Route path="/super-admin/tenants" element={<TenantManagement />} />
           <Route path="/super-admin/tenants/:tenantId" element={<TenantDetail />} />
           <Route path="/super-admin/registrations" element={<CompanyRegistrationManagement />} />
           <Route path="/super-admin/airline-approval" element={<AirlineApprovalManagement />} />
-          
+
           {/* [게시판] */}
           <Route path="/board" element={<Board />} />
           <Route path="/board/detail/:boardId" element={<BoardDetail />} />
           <Route path="/board/edit/:boardId" element={<BoardEdit />} />
           <Route path="/qna" element={<QnA />} />
-          
+
           {/* [인사 관리] */}
           <Route path="/employee-list" element={<EmployeeManagement />} />
           <Route path="/employee-list/detail" element={<EmployeeDetail />} />
           <Route path="/dept-manage" element={<DepartmentManagement />} />
           <Route path="/dept-manage/detail" element={<DepartmentDetail />} />
-          
+
           {/* [운항 관리] */}
           <Route path="/flightschedule" element={<FlightSchedule />} />
           <Route path="/flightschedule/:flightId" element={<FlightScheduleDetail />} />
@@ -109,23 +110,26 @@ const ThemedApp = () => {
           <Route path="/my-attendance" element={<EmployeeAttendance />} />
           <Route path="/admin-attendance" element={<AdminAttendance />} />
           <Route path="/vacation" element={<LeaveApply />} />
+          <Route path="/leave-apply" element={<LeaveApply />} />
+          <Route path="/employee/leave-apply" element={<LeaveApply />} />
+          <Route path="/protest-apply" element={<ProtestApply />} />
           <Route path="/approval" element={<LeaveApproval />} />
-          
+
           {/* [건강 관리] */}
           <Route path="/health-dashboard" element={<Dashboard />} />
-          <Route path="/stress" element={<Stress/>} />
-          <Route path="/employeehealthmanagement" element={<EmployeeHealthManagement/>} />
-          <Route path="/employeehealthdetail" element={<EmployeeHealthDetail/>} />
-          <Route path="/healthinfosubmission" element={<HealthInfoSubmission/>} />
-          <Route path="/healthsubmissionhistory" element={<HealthSubmissionHistory/>} />
-          <Route path="/healthprogrammanagement" element={<HealthProgramManagement/>} />   
-          <Route path="/healthprogramapply" element={<HealthProgramApply/>} />  
-          
+          <Route path="/stress" element={<Stress />} />
+          <Route path="/employeehealthmanagement" element={<EmployeeHealthManagement />} />
+          <Route path="/employeehealthdetail" element={<EmployeeHealthDetail />} />
+          <Route path="/healthinfosubmission" element={<HealthInfoSubmission />} />
+          <Route path="/healthsubmissionhistory" element={<HealthSubmissionHistory />} />
+          <Route path="/healthprogrammanagement" element={<HealthProgramManagement />} />
+          <Route path="/healthprogramapply" element={<HealthProgramApply />} />
+
           {/* [시스템 관리] */}
           <Route path="/common-code" element={<CommonCodeManagement />} />
-          
+
           {/* [기타] */}
-          <Route path="/settings" element={<Settings/>} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
 
         {/* 404 페이지 */}

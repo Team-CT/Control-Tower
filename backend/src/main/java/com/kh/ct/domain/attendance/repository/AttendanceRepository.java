@@ -60,4 +60,14 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             @Param("empId") String empId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    /**
+     * 특정 직원의 특정 날짜 근태 기록 조회
+     */
+    Optional<Attendance> findByEmpId_EmpIdAndAttendanceDate(String empId, LocalDate date);
+
+    /**
+     * 특정 직원의 날짜 범위 내 근태 기록 삭제 (휴가 반려 시)
+     */
+    void deleteByEmpId_EmpIdAndAttendanceDateBetween(String empId, LocalDate startDate, LocalDate endDate);
 }
