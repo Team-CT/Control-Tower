@@ -55,4 +55,14 @@ public interface LeaveApplyRepository extends JpaRepository<LeaveApply, Long> {
     Float calculateUsedLeaveByYear(
             @Param("empId") String empId,
             @Param("year") int year);
+
+    /**
+     * 승인 대기 중인 휴가 신청 조회 (관리자용)
+     */
+    @Query("SELECT la FROM LeaveApply la " +
+           "JOIN FETCH la.leaveApplyApplicant e " +
+           "LEFT JOIN FETCH e.departmentId d " +
+           "WHERE la.leaveApplyStatus = 'PENDING' " +
+           "ORDER BY la.createDate DESC")
+    List<LeaveApply> findPendingLeavesWithDetails();
 }

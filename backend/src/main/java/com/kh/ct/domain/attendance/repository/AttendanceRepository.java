@@ -70,4 +70,68 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
      * 특정 직원의 날짜 범위 내 근태 기록 삭제 (휴가 반려 시)
      */
     void deleteByEmpId_EmpIdAndAttendanceDateBetween(String empId, LocalDate startDate, LocalDate endDate);
+
+    // ========== Admin Dashboard 관련 메서드 ==========
+
+    /**
+     * 특정 날짜의 상태별 카운트
+     */
+    @Query("SELECT COUNT(a) FROM Attendance a WHERE a.attendanceDate = :date AND a.attendanceStatus = :status")
+    Long countByDateAndStatus(@Param("date") LocalDate date, @Param("status") CommonEnums.AttendanceStatus status);
+
+    /**
+     * 특정 날짜의 전체 직원 수 (중복 제거)
+     */
+    @Query("SELECT COUNT(DISTINCT a.empId) FROM Attendance a WHERE a.attendanceDate = :date")
+    Long countDistinctEmployeesByDate(@Param("date") LocalDate date);
+
+    /**
+     * 특정 날짜의 전체 근태 기록 (Emp, Department JOIN)
+     */
+    @Query("SELECT a FROM Attendance a " +
+           "JOIN FETCH a.empId e " +
+           "LEFT JOIN FETCH e.departmentId d " +
+           "WHERE a.attendanceDate = :date " +
+           "ORDER BY e.empName ASC")
+    List<Attendance> findAllByDateWithEmpAndDept(@Param("date") LocalDate date);
+
+    /**
+     * 오늘 날짜 기준 전체 직원의 근태 상태 조회 (직원별 실시간 현황용)
+     */
+    @Query("SELECT a FROM Attendance a " +
+           "JOIN FETCH a.empId e " +
+           "LEFT JOIN FETCH e.departmentId d " +
+           "WHERE a.attendanceDate = :today " +
+           "ORDER BY e.empName ASC")
+    List<Attendance> findTodayAttendanceWithEmpAndDept(@Param("today") LocalDate today);
+
+    /**
+     * 특이사항(비정상 근태) 필터링 조회 - PRESENT 제외
+     */
+    @Query("SELECT a FROM Attendance a " +
+           "JOIN FETCH a.empId e " +
+           "LEFT JOIN FETCH e.departmentId d " +
+           "WHERE a.attendanceDate BETWEEN :startDate AND :endDate " +
+           "AND a.attendanceStatus IN ('LATE', 'ABSENT', 'EARLY_LEAVE', 'HALF_DAY', 'VACATION', 'LEAVE', 'LEAVE_PENDING', 'PROTEST_PENDING') " +
+           "ORDER BY a.attendanceDate DESC, e.empName ASC")
+    List<Attendance> findAbnormalAttendanceByDateRange(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    /**
+     * 부서별 오늘 근태 현황 집계
+     */
+    @Query("SELECT d.departmentName as departmentName, " +
+           "COUNT(DISTINCT e.empId) as totalEmployees, " +
+           "SUM(CASE WHEN a.attendanceStatus = 'PRESENT' THEN 1 ELSE 0 END) as presentCount, " +
+           "SUM(CASE WHEN a.attendanceStatus IN ('VACATION', 'LEAVE') THEN 1 ELSE 0 END) as leaveCount, " +
+           "SUM(CASE WHEN a.attendanceStatus = 'LATE' THEN 1 ELSE 0 END) as lateCount, " +
+           "SUM(CASE WHEN a.attendanceStatus = 'ABSENT' THEN 1 ELSE 0 END) as absentCount " +
+           "FROM Attendance a " +
+           "JOIN a.empId e " +
+           "LEFT JOIN e.departmentId d " +
+           "WHERE a.attendanceDate = :date " +
+           "GROUP BY d.departmentName " +
+           "ORDER BY d.departmentName ASC")
+    List<Object[]> findDepartmentStatusByDate(@Param("date") LocalDate date);
 }

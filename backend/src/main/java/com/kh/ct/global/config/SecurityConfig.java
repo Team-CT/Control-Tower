@@ -54,6 +54,7 @@ public class SecurityConfig {
 
                         //관리자 전용
                         .requestMatchers("/api/dashboard/admin/**").permitAll()
+                        .requestMatchers("/api/admin/attendance/**").permitAll()  // 관리자 근태 관리 API
                         //나머지경로
                         .anyRequest().authenticated()
                 )
