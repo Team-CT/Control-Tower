@@ -16,10 +16,6 @@ const InitialSetup = ({ token, initialData }) => {
   const [isSetupComplete, setIsSetupComplete] = useState(false); // 설정 완료 상태
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [setupResponse, setSetupResponse] = useState(null); // 초기 설정 완료 응답 데이터
 
   const handleLogoUpload = (e) => {
@@ -46,21 +42,8 @@ const InitialSetup = ({ token, initialData }) => {
 
     // 필수 필드 검증
     if (!airlineName || !airlineAddress || !representativeName || 
-        !representativePhone || !representativeEmail || !theme || !password || !passwordConfirm) {
+        !representativePhone || !representativeEmail || !theme) {
       alert('필수 항목을 모두 입력해주세요.');
-      return;
-    }
-
-    // 비밀번호 일치 확인
-    if (password !== passwordConfirm) {
-      alert('비밀번호가 일치하지 않습니다.');
-      return;
-    }
-
-    // 비밀번호 유효성 검증
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$/;
-    if (!passwordRegex.test(password)) {
-      alert('비밀번호는 영문 대소문자, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다.');
       return;
     }
 
@@ -75,9 +58,7 @@ const InitialSetup = ({ token, initialData }) => {
         representativePhone,
         representativeEmail,
         airlineDesc: airlineDesc || '',
-        theme,
-        password,
-        passwordConfirm
+        theme
       };
       
       const response = await accountActivationService.completeInitialSetup(token, formData, logoFile);
@@ -104,11 +85,11 @@ const InitialSetup = ({ token, initialData }) => {
       <S.ContentWrapper>
         <S.Header>
           <S.StepIndicator>
-            <S.Step completed>
+            <S.Step $completed>
               <S.StepNumber>✓</S.StepNumber>
               <S.StepLabel>계정 활성화</S.StepLabel>
             </S.Step>
-            <S.Step active>
+            <S.Step $active>
               <S.StepNumber>2</S.StepNumber>
               <S.StepLabel>초기 설정</S.StepLabel>
             </S.Step>
@@ -180,86 +161,10 @@ const InitialSetup = ({ token, initialData }) => {
             </S.InputField>
           </S.Section>
 
-          {/* Section 2: 비밀번호 설정 */}
+          {/* Section 2: 대표자 정보 및 항공사 정보 */}
           <S.Section>
             <S.SectionHeader>
               <S.SectionNumber>2</S.SectionNumber>
-              <S.SectionTitle>비밀번호 설정</S.SectionTitle>
-            </S.SectionHeader>
-
-            <S.InputField>
-              <S.Label>비밀번호</S.Label>
-              <div style={{ position: 'relative' }}>
-                <S.Input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="영문, 숫자, 특수문자 포함 8자 이상"
-                  style={{ paddingRight: '40px' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '18px'
-                  }}
-                >
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
-                </button>
-              </div>
-            </S.InputField>
-
-            <S.InputField style={{ marginTop: '20px' }}>
-              <S.Label>비밀번호 확인</S.Label>
-              <div style={{ position: 'relative' }}>
-                <S.Input
-                  type={showPasswordConfirm ? 'text' : 'password'}
-                  value={passwordConfirm}
-                  onChange={(e) => setPasswordConfirm(e.target.value)}
-                  placeholder="비밀번호를 다시 입력하세요"
-                  style={{ paddingRight: '40px' }}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
-                  style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    fontSize: '18px'
-                  }}
-                >
-                  {showPasswordConfirm ? '👁️' : '👁️‍🗨️'}
-                </button>
-              </div>
-              {passwordConfirm && password !== passwordConfirm && (
-                <div style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>
-                  비밀번호가 일치하지 않습니다.
-                </div>
-              )}
-              {passwordConfirm && password === passwordConfirm && (
-                <div style={{ color: '#16a34a', fontSize: '12px', marginTop: '4px' }}>
-                  ✓ 비밀번호가 일치합니다.
-                </div>
-              )}
-            </S.InputField>
-          </S.Section>
-
-          {/* Section 3: 대표자 정보 및 항공사 정보 */}
-          <S.Section>
-            <S.SectionHeader>
-              <S.SectionNumber>3</S.SectionNumber>
               <S.SectionTitle>대표자 정보 및 항공사 정보</S.SectionTitle>
             </S.SectionHeader>
 
@@ -351,10 +256,10 @@ const InitialSetup = ({ token, initialData }) => {
             </S.InputField>
           </S.Section>
 
-          {/* Section 4: 직원 초대 / 등록 (기능 구현 보류) */}
+          {/* Section 3: 직원 초대 / 등록 (기능 구현 보류) */}
           <S.Section>
             <S.SectionHeader>
-              <S.SectionNumber>4</S.SectionNumber>
+              <S.SectionNumber>3</S.SectionNumber>
               <S.SectionTitle>직원 초대 / 등록</S.SectionTitle>
             </S.SectionHeader>
 

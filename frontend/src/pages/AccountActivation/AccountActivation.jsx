@@ -60,7 +60,8 @@ const AccountActivation = () => {
     hasUpperCase: /[A-Z]/.test(password),
     hasLowerCase: /[a-z]/.test(password),
     hasNumber: /[0-9]/.test(password),
-    hasSpecialChar: /[!@#$%^&*]/.test(password)
+    hasSpecialChar: /[!@#$%^&*]/.test(password),
+    passwordsMatch: passwordConfirm && password === passwordConfirm
   };
 
   const handlePasswordChange = (e) => {
@@ -248,6 +249,9 @@ const AccountActivation = () => {
                 </S.HintItem>
                 <S.HintItem $valid={passwordValidations.hasSpecialChar}>
                   {passwordValidations.hasSpecialChar ? '✓' : '○'} 특수문자 포함 (!@#$%^&*)
+                </S.HintItem>
+                <S.HintItem $valid={passwordValidations.passwordsMatch}>
+                  {passwordValidations.passwordsMatch ? '✓' : '○'} 비밀번호 일치
                 </S.HintItem>
               </S.HintList>
             </S.PasswordHint>
