@@ -20,7 +20,7 @@ import java.util.List;
 public class Emp extends BaseTimeEntity {
 
     @Id
-    @Column(length = 50)
+    @Column(name = "emp_id", length = 50)
     private String empId;
 
     @JoinColumn(name = "airline_id")

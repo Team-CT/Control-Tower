@@ -24,4 +24,6 @@ public class EmpSchedule extends BaseTimeEntity {
     @JoinColumn(name = "emp_id")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Emp empId;
+
+    private String scheduleCode;
 }

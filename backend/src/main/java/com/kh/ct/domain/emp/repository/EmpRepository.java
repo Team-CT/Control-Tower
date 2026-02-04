@@ -24,6 +24,13 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
     
     Optional<Emp> findByEmailAndRole(String email, CommonEnums.Role role);
 
+    // 직원 상세 정보 조회 (JOIN FETCH로 LAZY 직렬화 문제 방지)
+    @Query("SELECT e FROM Emp e " +
+           "LEFT JOIN FETCH e.departmentId dept " +
+           "LEFT JOIN FETCH e.airlineId airline " +
+           "WHERE e.empId = :empId")
+    Optional<Emp> findByIdWithDetails(@Param("empId") String empId);
+
     boolean existsByEmpNo(String empNo);
 
     @Query("""
