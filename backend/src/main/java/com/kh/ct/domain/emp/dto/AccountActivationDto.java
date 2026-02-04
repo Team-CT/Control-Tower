@@ -80,14 +80,6 @@ public class AccountActivationDto {
         
         @NotBlank(message = "테마는 필수입니다")
         private String theme; // 테마 색깔
-        
-        @NotBlank(message = "비밀번호는 필수입니다")
-        @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,}$",
-                message = "비밀번호는 영문 대소문자, 숫자, 특수문자를 포함하여 8자 이상이어야 합니다")
-        private String password;
-        
-        @NotBlank(message = "비밀번호 확인은 필수입니다")
-        private String passwordConfirm;
         // 로고 파일은 multipart로 별도 처리
     }
 

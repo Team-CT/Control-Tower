@@ -41,7 +41,7 @@ export const Step = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  opacity: ${props => props.active ? 1 : props.completed ? 0.7 : 0.4};
+  opacity: ${props => props.$active ? 1 : props.$completed ? 0.7 : 0.4};
   transition: opacity 0.3s ease;
 `;
 
