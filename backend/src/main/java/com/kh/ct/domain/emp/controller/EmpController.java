@@ -6,6 +6,7 @@ import com.kh.ct.domain.emp.service.EmpNoService;
 import com.kh.ct.domain.emp.service.EmpService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import com.kh.ct.global.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -43,5 +44,14 @@ public class EmpController {
     ) {
         Emp created = empService.register(request);
         return ResponseEntity.ok(EmpDto.RegisterResponse.from(created));
+    }
+
+    /**
+     * 직원 상세 정보 조회
+     */
+    @GetMapping("/{empId}")
+    public ResponseEntity<ApiResponse<EmpDto>> getEmpDetail(@PathVariable String empId) {
+        EmpDto empDetail = empService.getEmpDetail(empId);
+        return ResponseEntity.ok(ApiResponse.success("직원 상세 정보 조회 성공", empDetail));
     }
 }

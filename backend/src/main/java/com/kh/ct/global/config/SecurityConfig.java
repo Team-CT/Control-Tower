@@ -48,11 +48,28 @@ public class SecurityConfig {
                         //인증
                         .requestMatchers("/api/file/**").permitAll()
 
+
                         //슈퍼 관리자 전용
                         .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers("/api/common/codes/**").permitAll()
+                        .requestMatchers("/api/airlines").permitAll()
+                        .requestMatchers("/api/airports").permitAll()
+                        .requestMatchers("/api/super-admin/**").permitAll()
+                        .requestMatchers("/api/file/download/**").permitAll()
+                        .requestMatchers("/api/flight-schedules/**").authenticated()
 
+                        .requestMatchers("/api/common/codes/**").permitAll()
+                        .requestMatchers("/api/airlines").permitAll()
+                        .requestMatchers("/api/airports").permitAll()
+                        .requestMatchers("/api/super-admin/**").permitAll()
+                        .requestMatchers("/api/file/download/**").permitAll()
+                        .requestMatchers("/api/flight-schedules/**").authenticated()
+                        .requestMatchers("/api/emp/**").authenticated()
 
                         //관리자 전용
+                        .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/members/search").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/members/**").hasRole("ADMIN")
                         .requestMatchers("/api/dashboard/admin/**").permitAll()
                         .requestMatchers("/api/admin/attendance/**").permitAll()  // 관리자 근태 관리 API
                         //나머지경로

@@ -3,15 +3,30 @@ package com.kh.ct.domain.emp.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kh.ct.domain.emp.entity.Emp;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class EmpDto {
 
+    private String empId;
+    private String empName;
+    private String empNo;
+    private String role;
+    private String job;
+    private String phone;
+    private String email;
+    private String address;
+    private String empStatus;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private Integer age;
+    private String departmentName;
+    private String airlineName;
 
     @Getter
     @NoArgsConstructor

@@ -23,7 +23,7 @@ public class FlyScheduleDto {
     private Integer crewCount;
     private CommonEnums.flightStatus flightStatus;
     private Integer seatCount;
-    private List<CrewMemberDto> crewMembers;
+    private List<FlyScheduleDto.CrewMemberResponse> crewMembers;
     
     // 항공사 정보
     private Long airlineId;
@@ -39,11 +39,14 @@ public class FlyScheduleDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
-    public static class CrewMemberDto {
+    public static class CrewMemberResponse {
         private String empId;
         private String empName;
         private String role;
         private String job;
+        private String departmentName;
+        private String empStatus;
+        private Long empFlyScheduleId;
     }
     
     @Getter

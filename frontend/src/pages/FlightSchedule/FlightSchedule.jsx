@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./FlightSchedule.styled";
 import { flightScheduleService } from "../../api/flightSchedule/services";
+import { airportService } from "../../api/airport/services";
 import useAuthStore from "../../store/authStore";
 
 const FlightSchedule = () => {
@@ -12,15 +13,23 @@ const FlightSchedule = () => {
   const airlineId = emp?.airlineId;
 
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [departureCity, setDepartureCity] = useState("");
-  const [arrivalCity, setArrivalCity] = useState("");
+  const [departureCity, setDepartureCity] = useState("all");
+  const [arrivalCity, setArrivalCity] = useState("all");
   const [flightList, setFlightList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [airports, setAirports] = useState([]);
+  const [availableDepartures, setAvailableDepartures] = useState([]);
+  const [availableDestinations, setAvailableDestinations] = useState([]);
 
-  // 비행편 목록 조회
+  // 비행편 목록 조회 (날짜 변경 시 자동 검색)
   useEffect(() => {
     loadFlightSchedules();
-  }, []);
+  }, [selectedDate]);
+
+  // 비행편 목록이 변경되면 출발지/도착지 목록 업데이트
+  useEffect(() => {
+    updateAvailableAirports();
+  }, [flightList]);
 
   const loadFlightSchedules = async () => {
     try {
@@ -32,11 +41,23 @@ const FlightSchedule = () => {
         params.airlineId = airlineId;
       }
       
-      // 출발지/도착지 필터
-      if (departureCity) {
+      // 날짜 필터 추가 (선택한 날짜의 00:00:00 ~ 23:59:59)
+      if (selectedDate) {
+        const startDate = new Date(selectedDate);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(selectedDate);
+        endDate.setHours(23, 59, 59, 999);
+        
+        // ISO 8601 형식으로 변환
+        params.startDate = startDate.toISOString();
+        params.endDate = endDate.toISOString();
+      }
+      
+      // 출발지/도착지 필터 ("all"이 아닐 때만 파라미터 추가)
+      if (departureCity && departureCity !== "all") {
         params.departure = departureCity;
       }
-      if (arrivalCity) {
+      if (arrivalCity && arrivalCity !== "all") {
         params.destination = arrivalCity;
       }
       
@@ -48,6 +69,36 @@ const FlightSchedule = () => {
       alert('비행편 목록을 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 비행편 목록에서 출발지/도착지 추출
+  const updateAvailableAirports = async () => {
+    try {
+      // 먼저 공항 목록 조회
+      const airportResponse = await airportService.getAirports();
+      const airportList = airportResponse.data?.data || airportResponse.data || [];
+      setAirports(airportList);
+
+      // 비행편 목록에서 출발지/도착지 추출
+      const departures = [...new Set(flightList.map(flight => flight.departure).filter(Boolean))];
+      const destinations = [...new Set(flightList.map(flight => flight.destination).filter(Boolean))];
+
+      // 공항 정보와 매칭하여 정렬
+      const departureAirports = departures
+        .map(code => airportList.find(airport => airport.airportCode === code))
+        .filter(Boolean)
+        .sort((a, b) => (a.airportName || a.airportCode).localeCompare(b.airportName || b.airportCode));
+
+      const destinationAirports = destinations
+        .map(code => airportList.find(airport => airport.airportCode === code))
+        .filter(Boolean)
+        .sort((a, b) => (a.airportName || a.airportCode).localeCompare(b.airportName || b.airportCode));
+
+      setAvailableDepartures(departureAirports);
+      setAvailableDestinations(destinationAirports);
+    } catch (error) {
+      console.error('공항 정보 업데이트 실패:', error);
     }
   };
 
@@ -124,7 +175,12 @@ const FlightSchedule = () => {
             value={departureCity}
             onChange={(e) => setDepartureCity(e.target.value)}
           >
-            <option value="ICN">ICN - 인천</option>
+            <option value="all">전체</option>
+            {availableDepartures.map((airport) => (
+              <option key={airport.airportCode} value={airport.airportCode}>
+                {airport.airportCode} - {airport.airportName || airport.cityName || airport.airportCode}
+              </option>
+            ))}
           </S.CitySelect>
         </S.FilterGroup>
 
@@ -134,9 +190,12 @@ const FlightSchedule = () => {
             value={arrivalCity}
             onChange={(e) => setArrivalCity(e.target.value)}
           >
-            <option value="LAX">LAX - 로스앤젤레스</option>
-            <option value="JFK">JFK - 뉴욕</option>
-            <option value="HND">HND - 도쿄</option>
+            <option value="all">전체</option>
+            {availableDestinations.map((airport) => (
+              <option key={airport.airportCode} value={airport.airportCode}>
+                {airport.airportCode} - {airport.airportName || airport.cityName || airport.airportCode}
+              </option>
+            ))}
           </S.CitySelect>
         </S.FilterGroup>
 
@@ -150,10 +209,19 @@ const FlightSchedule = () => {
             로딩 중...
           </div>
         ) : displayedFlights.length > 0 ? (
-          displayedFlights.map((flight) => (
+          displayedFlights.map((flight) => {
+            // flyScheduleId 확인 및 로그
+            if (!flight.flyScheduleId) {
+              console.warn('비행편에 flyScheduleId가 없습니다:', flight);
+            }
+            
+            return (
             <S.FlightCard
               key={flight.flyScheduleId}
-              onClick={() => navigate(`/flightschedule/${flight.flyScheduleId}`)}
+              onClick={() => {
+                console.log('비행편 클릭 - flyScheduleId:', flight.flyScheduleId);
+                navigate(`/flightschedule/${flight.flyScheduleId}`);
+              }}
               style={{ cursor: "pointer" }}
             >
               <S.CardHeader>
@@ -204,7 +272,8 @@ const FlightSchedule = () => {
                 </S.RoutePoint>
               </S.FlightRoute>
             </S.FlightCard>
-          ))
+            );
+          })
         ) : (
           <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
             배정된 비행 일정이 없거나 조회 결과가 없습니다.
