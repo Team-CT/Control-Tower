@@ -7,7 +7,7 @@ import { airportService } from "../../api/airport/services";
 const FlightScheduleDetail = () => {
   const navigate = useNavigate();
   const { flightId } = useParams();
-  
+
   const [flightDetail, setFlightDetail] = useState(null);
   const [airports, setAirports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,23 +25,23 @@ const FlightScheduleDetail = () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       // flightId를 숫자로 변환 (URL 파라미터는 문자열)
       const flyScheduleId = Number(flightId);
-      
+
       if (isNaN(flyScheduleId)) {
         throw new Error(`유효하지 않은 비행편 ID: ${flightId}`);
       }
-      
+
       console.log('비행편 상세 조회 요청 - flyScheduleId:', flyScheduleId);
-      
+
       const response = await flightScheduleService.getFlightScheduleDetail(flyScheduleId);
       const data = response.data?.data || response.data;
-      
+
       console.log('비행편 상세 조회 응답:', data);
       console.log('크루 멤버 데이터:', data?.crewMembers);
       console.log('크루 멤버 수:', data?.crewMembers?.length || 0);
-      
+
       setFlightDetail(data);
     } catch (error) {
       console.error('비행편 상세 조회 실패:', error);
@@ -62,7 +62,7 @@ const FlightScheduleDetail = () => {
       console.error('공항 목록 조회 실패:', error);
     }
   };
-console.log("현재 URL flightId =", flightId);
+  console.log("현재 URL flightId =", flightId);
   // 공항 코드로 공항명 찾기
   const getAirportName = (airportCode) => {
     if (!airportCode) return '';
@@ -122,17 +122,17 @@ console.log("현재 URL flightId =", flightId);
     if (!crewMembers || crewMembers.length === 0) return [];
 
     const roleGroups = {};
-    
+
     crewMembers.forEach((member) => {
       const role = member.role || '기타';
       const job = member.job || '';
       const roleStyle = getRoleStyle(role);
-      
+
       // 역할별 그룹화
       if (!roleGroups[role]) {
         roleGroups[role] = [];
       }
-      
+
       roleGroups[role].push({
         empId: member.empId,
         name: member.empName,
@@ -146,7 +146,7 @@ console.log("현재 URL flightId =", flightId);
     // 그룹을 배열로 변환 (우선순위: PILOT > CABIN_CREW > 기타)
     const groups = [];
     const priorityOrder = ['PILOT', 'CABIN_CREW', 'MAINTENANCE', 'GROUND_STAFF'];
-    
+
     // 우선순위 순서대로 그룹 추가
     priorityOrder.forEach((role) => {
       if (roleGroups[role] && roleGroups[role].length > 0) {
@@ -157,7 +157,7 @@ console.log("현재 URL flightId =", flightId);
         });
       }
     });
-    
+
     // 나머지 역할 추가
     Object.keys(roleGroups).forEach((role) => {
       if (!priorityOrder.includes(role) && roleGroups[role].length > 0) {
@@ -201,7 +201,6 @@ console.log("현재 URL flightId =", flightId);
       {/* 페이지 헤더 */}
       <S.PageHeader>
         <S.HeaderLeft>
-          <S.BreadcrumbText>홈 &gt; 비행편 정보 &gt; 상세 정보</S.BreadcrumbText>
           <S.PageTitle>비행편 코드 상세 정보</S.PageTitle>
           <S.PageSubtitle>
             비행편 정보 및 승무원 근무 배정을 관리합니다.

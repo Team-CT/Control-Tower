@@ -66,14 +66,14 @@ const TenantDetail = () => {
 
   // 현재 상태에 따라 동적으로 Quick Actions 생성
   const isInactive = tenantData?.status?.toUpperCase() === 'INACTIVE';
-  
+
   const quickActions = [
     { id: 1, label: '긴급 로그아웃', icon: '🔐', action: () => console.log('긴급 로그아웃') },
-    { 
-      id: 2, 
-      label: isInactive ? '계정 활성화' : '계정 정지', 
-      icon: isInactive ? '✅' : '🚫', 
-      action: isInactive ? handleActivateAccount : handleSuspendAccount 
+    {
+      id: 2,
+      label: isInactive ? '계정 활성화' : '계정 정지',
+      icon: isInactive ? '✅' : '🚫',
+      action: isInactive ? handleActivateAccount : handleSuspendAccount
     },
     { id: 3, label: '로그 보기', icon: '📄', action: () => console.log('로그 보기') }
   ];
@@ -164,7 +164,7 @@ const TenantDetail = () => {
             </S.TenantHeaderInfo>
           </S.TenantHeaderLeft>
           <S.TenantHeaderRight>
-            <S.StatusBadgeLarge status={tenantData.status}>
+            <S.StatusBadgeLarge $status={tenantData.status}>
               {getStatusIcon(tenantData.status)} {getStatusText(tenantData.status)}
             </S.StatusBadgeLarge>
           </S.TenantHeaderRight>
@@ -255,7 +255,7 @@ const TenantDetail = () => {
               <S.UsageItem>
                 <S.UsageLabel>스토리지 사용량</S.UsageLabel>
                 <S.ProgressBarContainer>
-                  <S.ProgressBar progress={tenantData.usageStats?.storageUsage || 0} />
+                  <S.ProgressBar $progress={tenantData.usageStats?.storageUsage || 0} />
                 </S.ProgressBarContainer>
                 <S.UsageValue>{tenantData.usageStats?.storageUsage || 0} / 100 GB</S.UsageValue>
               </S.UsageItem>

@@ -88,7 +88,8 @@ const ADMIN_MENU = [
     category: "근태 관리",
     items: [
       { label: "직원 근태 현황", icon: Clock, id: "/admin-attendance" },
-      { label: "휴가 승인 관리", icon: ClipboardCheck, id: "/approval" }
+      { label: "휴가 승인 관리", icon: ClipboardCheck, id: "/approval" },
+      { label: "근태 정정 승인", icon: FileText, id: "/protest-approval" }
     ]
   },
   {

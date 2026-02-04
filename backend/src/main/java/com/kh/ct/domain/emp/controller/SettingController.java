@@ -15,6 +15,15 @@ public class SettingController {
     private final SettingService settingService;
 
     /**
+     * 직원 프로필 정보 조회 (GET)
+     * @param empId : 조회할 직원의 ID (경로 변수)
+     */
+    @GetMapping("/profile/{empId}")
+    public ResponseEntity<SettingDto> getProfile(@PathVariable String empId) {
+        return ResponseEntity.ok(settingService.getEmpProfile(empId));
+    }
+
+    /**
      * 직원 프로필 정보 수정 (PUT)
      * @param empId : 수정할 직원의 ID (경로 변수)
      * @param settingDto : 프론트엔드에서 넘어온 수정 데이터 (JSON)

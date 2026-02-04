@@ -22,6 +22,7 @@ import DepartmentManagement from './pages/DepartmentManagement/DepartmentManagem
 import DepartmentDetail from './pages/DepartmentDetail/DepartmentDetail';
 import LeaveApply from './pages/EmployeeSchedule/LeaveApply';
 import LeaveApproval from './pages/AdminAttendance/LeaveApproval';
+import ProtestApproval from './pages/AdminAttendance/ProtestApproval';
 import Dashboard from './pages/HealthDashboard/HealthDashboard';
 import Stress from './pages/StressSurvey/StressSurvey';
 import EmployeeHealthManagement from './pages/EmployeeHealthManagement/EmployeeHealthManagement';
@@ -118,6 +119,7 @@ const ThemedApp = () => {
           <Route path="/employee/leave-apply" element={<LeaveApply />} />
           <Route path="/protest-apply" element={<ProtestApply />} />
           <Route path="/approval" element={<LeaveApproval />} />
+          <Route path="/protest-approval" element={<ProtestApproval />} />
 
           {/* [건강 관리] */}
           <Route path="/health-dashboard" element={<Dashboard />} />

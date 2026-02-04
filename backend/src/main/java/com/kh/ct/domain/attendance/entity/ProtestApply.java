@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class ProtestApply extends BaseTimeEntity {
 
     @Id
@@ -40,7 +40,7 @@ public class ProtestApply extends BaseTimeEntity {
     @Lob
     private String protestApplyCancelReason;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private CommonEnums.AttendanceStatus protestAttendanceStatus;
 
@@ -67,4 +67,33 @@ public class ProtestApply extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "protestApplyId", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProtestApplyFile> files = new ArrayList<>();
+
+    /**
+     * 정정 신청 승인 처리
+     * @param approver 승인자
+     */
+    public void approve(Emp approver) {
+        if (this.protestApplyStatus != CommonEnums.ApplyStatus.PENDING) {
+            throw new IllegalStateException("대기 중인 신청만 승인할 수 있습니다.");
+        }
+        this.protestApplyApprover = approver;
+        this.protestApplyStatus = CommonEnums.ApplyStatus.APPROVED;
+    }
+
+    /**
+     * 정정 신청 반려 처리
+     * @param approver 반려자
+     * @param cancelReason 반려 사유
+     */
+    public void reject(Emp approver, String cancelReason) {
+        if (this.protestApplyStatus != CommonEnums.ApplyStatus.PENDING) {
+            throw new IllegalStateException("대기 중인 신청만 반려할 수 있습니다.");
+        }
+        if (cancelReason == null || cancelReason.trim().isEmpty()) {
+            throw new IllegalArgumentException("반려 사유는 필수입니다.");
+        }
+        this.protestApplyApprover = approver;
+        this.protestApplyStatus = CommonEnums.ApplyStatus.REJECTED;
+        this.protestApplyCancelReason = cancelReason;
+    }
 }

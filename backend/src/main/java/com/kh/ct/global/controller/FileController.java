@@ -53,6 +53,44 @@ public class FileController {
         }
     }
 
+    /**
+     * 파일 미리보기 (inline으로 반환)
+     */
+    @GetMapping("/preview/{fileId}")
+    public ResponseEntity<Resource> previewFile(@PathVariable Long fileId) {
+        try {
+            File fileEntity = fileService.getFile(fileId);
+            Resource resource = fileService.loadAsResource(fileId);
+
+            // MIME 타입 판별 (확장자 기반)
+            String contentType = determineContentType(fileEntity.getFileName());
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + fileEntity.getFileOriName() + "\"")
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    /**
+     * 파일 확장자 기반 MIME 타입 판별
+     */
+    private String determineContentType(String fileName) {
+        String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        
+        return switch (extension) {
+            case "pdf" -> "application/pdf";
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "png" -> "image/png";
+            case "gif" -> "image/gif";
+            case "bmp" -> "image/bmp";
+            case "webp" -> "image/webp";
+            default -> "application/octet-stream";
+        };
+    }
+
     @DeleteMapping("/{fileId}")
     public ResponseEntity<Void> deleteFile(@PathVariable Long fileId) {
         try {

@@ -14,6 +14,8 @@ import com.kh.ct.global.common.CommonEnums;
 import com.kh.ct.global.entity.File;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +26,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 /**
  * 근태 정정 신청 Service 구현체
@@ -97,7 +100,7 @@ public class ProtestApplyServiceImpl implements ProtestApplyService {
                 .protestApplyDate(LocalDateTime.now())
                 .protestApplyApplicant(applicant)
                 .protestApplyStatus(CommonEnums.ApplyStatus.PENDING)
-                .protestAttendanceStatus(CommonEnums.AttendanceStatus.PROTEST_PENDING)
+                .protestAttendanceStatus(CommonEnums.AttendanceStatus.PRESENT)  // 정정 후 기대 상태: 정상 출석
                 .protestRequestInTime(requestInTime)
                 .protestRequestOutTime(requestOutTime)
                 .protestReason(request.getProtestReason())
@@ -116,17 +119,8 @@ public class ProtestApplyServiceImpl implements ProtestApplyService {
             protestApplyFileRepository.save(protestApplyFile);
         }
 
-        // 7. Attendance 상태를 PROTEST_PENDING으로 변경
-        Attendance updatedAttendance = Attendance.builder()
-                .attendanceId(targetAttendance.getAttendanceId())
-                .empId(targetAttendance.getEmpId())
-                .attendanceDate(targetAttendance.getAttendanceDate())
-                .inTime(targetAttendance.getInTime())
-                .outTime(targetAttendance.getOutTime())
-                .attendanceStatus(CommonEnums.AttendanceStatus.PROTEST_PENDING)
-                .build();
-        
-        attendanceRepository.save(updatedAttendance);
+        // 참고: Attendance 상태는 신청 시점에는 변경하지 않음
+        // 관리자가 승인했을 때만 변경됨 (approveProtestByAdmin 메서드 참조)
 
         log.info("근태 정정 신청 완료 - protestApplyId: {}", protestApply.getProtestApplyId());
 
@@ -308,6 +302,121 @@ public class ProtestApplyServiceImpl implements ProtestApplyService {
                 .cancelReason(entity.getProtestApplyCancelReason())
                 .createdDate(entity.getCreateDate())
                 .files(fileInfos)
+                .build();
+    }
+
+    // ===== 관리자용 메서드 구현 =====
+
+    /**
+     * 관리자용 - 전체 정정 신청 목록 조회 (페이징)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProtestDto.AdminListResponse> getAllProtestsForAdmin(Pageable pageable) {
+        log.info("관리자용 전체 정정 신청 목록 조회");
+
+        Page<ProtestApply> protestPage = protestApplyRepository.findAllByOrderByCreateDateDesc(pageable);
+
+        return protestPage.map(this::convertToAdminListResponse);
+    }
+
+    /**
+     * 관리자용 - 상태별 정정 신청 목록 조회 (페이징)
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public Page<ProtestDto.AdminListResponse> getProtestsByStatusForAdmin(String status, Pageable pageable) {
+        log.info("관리자용 상태별 정정 신청 목록 조회 - status: {}", status);
+
+        CommonEnums.ApplyStatus applyStatus = CommonEnums.ApplyStatus.valueOf(status.toUpperCase());
+        Page<ProtestApply> protestPage = protestApplyRepository
+                .findByProtestApplyStatusOrderByCreateDateDesc(applyStatus, pageable);
+
+        return protestPage.map(this::convertToAdminListResponse);
+    }
+
+    /**
+     * 관리자용 - 정정 신청 승인 처리 (트랜잭션)
+     * DDD 방식으로 엔티티의 비즈니스 메서드 활용
+     */
+    @Override
+    @Transactional
+    public void approveProtestByAdmin(Long protestId, String approverId) {
+        log.info("관리자용 정정 신청 승인 - protestId: {}, approverId: {}", protestId, approverId);
+
+        // 1. 정정 신청 조회
+        ProtestApply protestApply = protestApplyRepository.findById(protestId)
+                .orElseThrow(() -> new RuntimeException("정정 신청을 찾을 수 없습니다"));
+
+        // 2. 승인자 조회
+        Emp approver = empRepository.findById(approverId)
+                .orElseThrow(() -> new RuntimeException("승인자를 찾을 수 없습니다"));
+
+        // 3. 정정 신청 승인 처리 (엔티티 비즈니스 메서드 활용)
+        protestApply.approve(approver);
+
+        // 4. 실제 근태 기록 업데이트 (엔티티 비즈니스 메서드 활용)
+        Attendance attendance = protestApply.getTargetAttendance();
+        attendance.updateAttendance(
+                protestApply.getProtestRequestInTime(),
+                protestApply.getProtestRequestOutTime(),
+                protestApply.getProtestAttendanceStatus()
+        );
+
+        // 5. Dirty Checking으로 자동 저장
+        log.info("정정 신청 승인 완료 - protestId: {}", protestId);
+    }
+
+    /**
+     * 관리자용 - 정정 신청 반려 처리
+     */
+    @Override
+    @Transactional
+    public void rejectProtestByAdmin(Long protestId, String approverId, String cancelReason) {
+        log.info("관리자용 정정 신청 반려 - protestId: {}, approverId: {}", protestId, approverId);
+
+        // 1. 정정 신청 조회
+        ProtestApply protestApply = protestApplyRepository.findById(protestId)
+                .orElseThrow(() -> new RuntimeException("정정 신청을 찾을 수 없습니다"));
+
+        // 2. 승인자 조회
+        Emp approver = empRepository.findById(approverId)
+                .orElseThrow(() -> new RuntimeException("승인자를 찾을 수 없습니다"));
+
+        // 3. 정정 신청 반려 처리 (엔티티 비즈니스 메서드 활용)
+        protestApply.reject(approver, cancelReason);
+
+        // 4. 근태 기록 원상태로 복구
+        Attendance attendance = protestApply.getTargetAttendance();
+        attendance.updateAttendance(null, null, protestApply.getOriginalAttendanceStatus());
+
+        // 5. Dirty Checking으로 자동 저장
+        log.info("정정 신청 반려 완료 - protestId: {}, reason: {}", protestId, cancelReason);
+    }
+
+    /**
+     * Entity -> AdminListResponse 변환
+     */
+    private ProtestDto.AdminListResponse convertToAdminListResponse(ProtestApply entity) {
+        Emp applicant = entity.getProtestApplyApplicant();
+        
+        return ProtestDto.AdminListResponse.builder()
+                .protestApplyId(entity.getProtestApplyId())
+                .protestApplyDate(entity.getProtestApplyDate())
+                .applicantName(applicant.getEmpName())
+                .departmentName(applicant.getDepartmentId() != null ? applicant.getDepartmentId().getDepartmentName() : "부서 미지정")
+                .positionName(applicant.getJob())
+                .targetDate(entity.getTargetAttendance().getAttendanceDate())
+                .currentInTime(entity.getTargetAttendance().getInTime())
+                .currentOutTime(entity.getTargetAttendance().getOutTime())
+                .protestRequestInTime(entity.getProtestRequestInTime())
+                .protestRequestOutTime(entity.getProtestRequestOutTime())
+                .protestReason(entity.getProtestReason())
+                .status(entity.getProtestApplyStatus().name())
+                .approverName(entity.getProtestApplyApprover() != null ? 
+                        entity.getProtestApplyApprover().getEmpName() : null)
+                .fileCount(entity.getFiles() != null ? entity.getFiles().size() : 0)
+                .createdDate(entity.getCreateDate())
                 .build();
     }
 }

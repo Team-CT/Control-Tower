@@ -35,12 +35,12 @@ export const Tab = styled.button`
   background: ${(props) => (props.$active ? 'var(--bg-main)' : 'transparent')};
   border: none;
   border-bottom: ${(props) =>
-    props.active ? '3px solid var(--color-primary)' : '3px solid transparent'};
+    props.$active ? '3px solid var(--color-primary)' : '3px solid transparent'};
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${(props) => (props.active ? 'var(--bg-main)' : 'var(--bg-hover)')};
+    background: ${(props) => (props.$active ? 'var(--bg-main)' : 'var(--bg-hover)')};
     color: var(--color-primary);
   }
 

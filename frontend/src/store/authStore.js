@@ -77,6 +77,16 @@ const useAuthStore = create(
       getEmpId: () => get().emp?.empId ?? null,
       getEmpName: () => get().emp?.empName ?? null,
       getRole: () => get().emp?.role ?? null,
+
+      // Dev helper for updating role
+      updateRole: (newRole) => {
+        set((state) => ({
+          emp: {
+            ...state.emp,
+            role: newRole
+          }
+        }));
+      },
     }),
     {
       name: 'auth-storage',
