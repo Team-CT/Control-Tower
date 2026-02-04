@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   MainContainer,
   ContentWrapper,
   PageHeader,
@@ -36,19 +36,19 @@ import {
 import { empPhysicalTestService } from '../../api/Health/healthService';
 import { PageNumber, Pagination, PaginationButton } from '../../styles/GlobalStyle';
 
-  const formatDate = (iso) => {
-    if (!iso) return "-";
-    return String(iso).slice(0, 10);
-  };
+const formatDate = (iso) => {
+  if (!iso) return "-";
+  return String(iso).slice(0, 10);
+};
 
-  const getStatusByHealthPoint = (hp) => {
-    // 기준 확정 전 임시(원하면 값 조정)
-    if (hp == null) return { label: "-", type: "alert" };
-    if (hp >= 80) return { label: "정상", type: "normal" };
-    if (hp >= 60) return { label: "주의", type: "warning" };
-    return { label: "결과", type: "alert" };
-  };
-  
+const getStatusByHealthPoint = (hp) => {
+  // 기준 확정 전 임시(원하면 값 조정)
+  if (hp == null) return { label: "-", type: "alert" };
+  if (hp >= 80) return { label: "정상", type: "normal" };
+  if (hp >= 60) return { label: "주의", type: "warning" };
+  return { label: "결과", type: "alert" };
+};
+
 
 const EmployeeHealthManagement = () => {
   const navigate = useNavigate();
@@ -214,7 +214,7 @@ const EmployeeHealthManagement = () => {
   // const handleDetailClick = () => {
   //   navigate('/employeehealthdetail');
   // };
-console.log(employees);
+  console.log(employees);
   return (
     <MainContainer>
       <ContentWrapper>
@@ -233,11 +233,11 @@ console.log(employees);
           <SearchInputWrapper>
             <SearchIcon>🔍</SearchIcon>
             <SearchInput placeholder="이름 검색..."
-            value={empName}
-            onChange={(e) => setEmpName(e.target.value)} />
-          </SearchInputWrapper> 
+              value={empName}
+              onChange={(e) => setEmpName(e.target.value)} />
+          </SearchInputWrapper>
           <button type="submit" style={{ display: "none" }} >검색</button>
-          
+
           <FilterGroup>
             {filterOptions.map((filter, index) => (
               <React.Fragment key={filter}>
@@ -274,8 +274,8 @@ console.log(employees);
 
           <TableBody>
             {employees.map((employee) => (
-              <TableRow 
-                key={employee.id}
+              <TableRow
+                key={employee.emp_id}
                 onClick={handleDetailClick}
                 style={{ cursor: 'pointer' }}
               >
@@ -306,12 +306,12 @@ console.log(employees);
                 </td>
                 <td>
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                    <IconButton 
+                    <IconButton
                       title="상세보기"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/employeehealthdetail/${employee.emp_id}`);
-                       
+
                       }}
                     >
                       👁️
@@ -325,7 +325,7 @@ console.log(employees);
         </TableContainer>
 
         <Pagination>
-          <PaginationButton 
+          <PaginationButton
             onClick={() => fetchList(currentPage - 1)}
             disabled={currentPage === 0}
           >‹</PaginationButton>
@@ -338,7 +338,7 @@ console.log(employees);
             >{idx + 1}</PageNumber>
           ))}
 
-          <PaginationButton 
+          <PaginationButton
             onClick={() => fetchList(currentPage + 1)}
             disabled={currentPage + 1 >= totalPages}
           >›</PaginationButton>

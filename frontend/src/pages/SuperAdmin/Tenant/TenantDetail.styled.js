@@ -122,8 +122,8 @@ export const StatusBadgeLarge = styled.div`
   border-radius: 8px;
   font-size: 15px;
   font-weight: 600;
-  background-color: ${props => props.status === 'active' ? '#d4f4dd' : '#ffe4e6'};
-  color: ${props => props.status === 'active' ? '#0f7a35' : '#dc2626'};
+  background-color: ${props => props.$status === 'active' ? '#d4f4dd' : '#ffe4e6'};
+  color: ${props => props.$status === 'active' ? '#0f7a35' : '#dc2626'};
 `;
 
 export const PlanBadgeLarge = styled.div`
@@ -378,7 +378,7 @@ export const ProgressBarContainer = styled.div`
 `;
 
 export const ProgressBar = styled.div`
-  width: ${props => props.progress}%;
+  width: ${props => props.$progress}%;
   height: 100%;
   background: linear-gradient(90deg, #4c6fff 0%, #6b8aff 100%);
   border-radius: 4px;

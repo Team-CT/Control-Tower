@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   MainContainer,
   ContentWrapper,
@@ -32,6 +32,7 @@ import {
   PasswordInputGroup,
   PasswordInput,
   ChangePasswordButton,
+
   ThemeSelector,
   ThemeOption,
   ThemeRadio,
@@ -39,6 +40,7 @@ import {
   LanguageSelect,
   ToggleSwitch,
   ToggleSlider,
+
 } from './Settings.styled';
 import { useAirlineTheme } from '../../context/AirlineThemeContext';
 import { airlines } from '../../styles/theme';
@@ -48,178 +50,49 @@ const Settings = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [selectedLanguage, setSelectedLanguage] = useState('ko');
 
-  // 1. 상태 관리 (profileData)
-  const [profileData, setProfileData] = useState({
-    empName: '', age: '', email: '', phone: '', address: ''
-  });
-  const [loading, setLoading] = useState(true);
-  const [profileImage, setProfileImage] = useState(null);
-  const [profilePreview, setProfilePreview] = useState(null);
-
-  // 비밀번호 변경 상태
-  const [passwords, setPasswords] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
-
-  // 테마 시스템 & 권한 관리
+  // 테마 시스템
   const {
     theme,
     isDarkMode,
     toggleDarkMode,
     currentAirline,
+    approvalStatus,
     changeAirline,
+    updateApprovalStatus,
     airlineName,
+    getRole // 현재 role 확인용
   } = useAirlineTheme();
 
   const { updateRole } = useAuthStore(); // 권한 업데이트 함수
 
-  // 2. 헬퍼 함수
-  const getEmpId = () => {
-    try {
-      const storage = JSON.parse(localStorage.getItem('auth-storage'));
-      return storage?.state?.emp?.empId;
-    } catch (e) {
-      return null;
-    }
-  };
-  const empId = getEmpId();
+  // 프로필 이미지 업로드 관리
+  const [profileImage, setProfileImage] = useState(null);
+  const [profilePreview, setProfilePreview] = useState(null);
 
-  // 3. 데이터 로딩
-  useEffect(() => {
-    const fetchProfile = async () => {
-      // 토큰 가져오기 (localStorage 또는 store에서)
-      const storage = JSON.parse(localStorage.getItem('auth-storage'));
-      const token = storage?.state?.token;
-
-      if (!empId || !token) {
-        console.warn("⚠️ 인증 정보 또는 사원 정보를 찾을 수 없습니다.");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch(`http://localhost:8001/api/settings/profile/${empId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`, // 🔥 토큰 추가
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setProfileData({
-            empName: data?.empName || '',
-            age: data?.age || '',
-            email: data?.email || '',
-            phone: data?.phone || '',
-            address: data?.address || ''
-          });
-        } else {
-          if (response.status === 403 || response.status === 401) {
-            console.error("접근 권한이 없습니다.");
-          }
-        }
-      } catch (error) {
-        console.error("데이터 로드 실패:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [empId]);
-
-  // 핸들러들
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setProfileData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handlePasswordChange = (e) => {
-    const { name, value } = e.target;
-    setPasswords(prev => ({ ...prev, [name]: value }));
-  };
-
+  // 프로필 이미지 업로드 핸들러
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
       setProfileImage(file);
+      // 미리보기 생성
       const reader = new FileReader();
-      reader.onloadend = () => setProfilePreview(reader.result);
+      reader.onloadend = () => {
+        setProfilePreview(reader.result);
+      };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSave = async () => {
-    const storage = JSON.parse(localStorage.getItem('auth-storage'));
-    const token = storage?.state?.token;
-
-    if (!empId || !token) return alert("로그인 정보가 없습니다.");
-
-    try {
-      const response = await fetch(`http://localhost:8001/api/settings/profile/${empId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 🔥 토큰 추가
-        },
-        body: JSON.stringify(profileData),
-      });
-
-      if (response.ok) {
-        alert("성공적으로 저장되었습니다!");
-      } else {
-        alert("저장에 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("통신 에러:", error);
-    }
+  // TODO: Zustand state mapping
+  const userProfile = {
+    name: '김수현',
+    birthDate: '1990년 1월 1일',
+    email: 'test-id2@domaintest.com',
+    phone: '010-1234-5678',
+    city: '서울',
+    district: '강남구',
+    address: '역삼동 테헤란로 123',
   };
-
-  const handleUpdatePassword = async () => {
-    const { currentPassword, newPassword, confirmPassword } = passwords;
-    const storage = JSON.parse(localStorage.getItem('auth-storage'));
-    const token = storage?.state?.token;
-
-    // 유효성 검사
-    if (!currentPassword || !newPassword || !confirmPassword) {
-      return alert("모든 필드를 입력해주세요.");
-    }
-    if (newPassword !== confirmPassword) {
-      return alert("새 비밀번호가 일치하지 않습니다.");
-    }
-    if (newPassword.length < 8) {
-      return alert("비밀번호는 8자 이상이어야 합니다.");
-    }
-
-    try {
-      const response = await fetch(`http://localhost:8001/api/settings/password/${empId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}` // 🔥 토큰 추가
-        },
-        body: JSON.stringify({
-          currentPassword,
-          newPassword
-        }),
-      });
-
-      if (response.ok) {
-        alert("비밀번호가 성공적으로 변경되었습니다.");
-        setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
-      } else {
-        const errorMsg = await response.text();
-        alert(errorMsg || "비밀번호 변경에 실패했습니다. 현재 비밀번호를 확인하세요.");
-      }
-    } catch (error) {
-      console.error("비밀번호 변경 에러:", error);
-    }
-  };
-
-  if (loading) return <div style={{ color: 'white', padding: '20px' }}>로딩 중...</div>;
-  if (!empId) return <div style={{ color: 'white', padding: '20px' }}>로그인이 필요한 서비스입니다.</div>;
 
   return (
     <MainContainer>
@@ -242,15 +115,16 @@ const Settings = () => {
         {activeTab === 'profile' && (
           <TabContent>
             <ProfileSection>
-              <ProfileHeader><h2>프로필 정보</h2></ProfileHeader>
+              <ProfileHeader>
+                <h2>프로필 정보</h2>
+              </ProfileHeader>
 
-              {/* 프로필 이미지 섹션 */}
               <ProfileAvatar onClick={() => document.getElementById('settingsProfileImageInput').click()}>
                 <AvatarCircle>
                   {profilePreview ? (
                     <img src={profilePreview} alt="프로필" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
                   ) : (
-                    <AvatarInitial>{profileData.empName?.charAt(0) || '?'}</AvatarInitial>
+                    <AvatarInitial>김</AvatarInitial>
                   )}
                   <CameraIcon>📷</CameraIcon>
                 </AvatarCircle>
@@ -268,24 +142,20 @@ const Settings = () => {
                   <InfoLabel>이름</InfoLabel>
                   <InfoValue>
                     <FormInput
-                      name="empName"
                       type="text"
-                      value={profileData.empName}
-                      onChange={handleInputChange}
+                      defaultValue={userProfile.name}
                       placeholder="이름"
                     />
                   </InfoValue>
                 </InfoRow>
 
                 <InfoRow>
-                  <InfoLabel>나이</InfoLabel>
+                  <InfoLabel>생년월일</InfoLabel>
                   <InfoValue>
                     <FormInput
-                      name="age"
                       type="text"
-                      value={profileData.age}
-                      onChange={handleInputChange}
-                      placeholder="나이"
+                      defaultValue={userProfile.birthDate}
+                      placeholder="YYYY-MM-DD"
                     />
                   </InfoValue>
                 </InfoRow>
@@ -294,10 +164,8 @@ const Settings = () => {
                   <InfoLabel>이메일</InfoLabel>
                   <InfoValue>
                     <FormInput
-                      name="email"
                       type="email"
-                      value={profileData.email}
-                      onChange={handleInputChange}
+                      defaultValue={userProfile.email}
                       placeholder="example@domain.com"
                     />
                   </InfoValue>
@@ -307,22 +175,40 @@ const Settings = () => {
                   <InfoLabel>전화번호</InfoLabel>
                   <InfoValue>
                     <FormInput
-                      name="phone"
                       type="tel"
-                      value={profileData.phone}
-                      onChange={handleInputChange}
+                      defaultValue={userProfile.phone}
                       placeholder="010-0000-0000"
                     />
                   </InfoValue>
                 </InfoRow>
 
+                <InfoRow>
+                  <InfoLabel>도시</InfoLabel>
+                  <InfoValue>
+                    <FormInput
+                      type="text"
+                      defaultValue={userProfile.city}
+                      placeholder="도시 선택"
+                    />
+                  </InfoValue>
+                </InfoRow>
+
+                <InfoRow>
+                  <InfoLabel>구/군</InfoLabel>
+                  <InfoValue>
+                    <FormInput
+                      type="text"
+                      defaultValue={userProfile.district}
+                      placeholder="구/군 선택"
+                    />
+                  </InfoValue>
+                </InfoRow>
+
                 <InfoRow $fullWidth>
-                  <InfoLabel>주소</InfoLabel>
+                  <InfoLabel>주소/세부</InfoLabel>
                   <InfoValue>
                     <AddressTextarea
-                      name="address"
-                      value={profileData.address}
-                      onChange={handleInputChange}
+                      defaultValue={userProfile.address}
                       placeholder="상세 주소를 입력하세요"
                       rows={3}
                     />
@@ -331,9 +217,8 @@ const Settings = () => {
               </InfoGrid>
 
               <ActionButtons>
-                {/* 취소 시 페이지 새로고침하여 서버 데이터 다시 불러오기 */}
-                <CancelButton onClick={() => window.location.reload()}>취소</CancelButton>
-                <SaveButton onClick={handleSave}>변경사항 저장</SaveButton>
+                <CancelButton>취소</CancelButton>
+                <SaveButton>변경사항 저장</SaveButton>
               </ActionButtons>
             </ProfileSection>
           </TabContent>
@@ -358,10 +243,7 @@ const Settings = () => {
                     <SecurityItemRight>
                       <PasswordInputGroup>
                         <PasswordInput
-                          name="currentPassword"
                           type="password"
-                          value={passwords.currentPassword}
-                          onChange={handlePasswordChange}
                           placeholder="현재 비밀번호를 입력하세요"
                         />
                       </PasswordInputGroup>
@@ -378,10 +260,7 @@ const Settings = () => {
                     <SecurityItemRight>
                       <PasswordInputGroup>
                         <PasswordInput
-                          name="newPassword"
                           type="password"
-                          value={passwords.newPassword}
-                          onChange={handlePasswordChange}
                           placeholder="새 비밀번호를 입력하세요"
                         />
                       </PasswordInputGroup>
@@ -398,10 +277,7 @@ const Settings = () => {
                     <SecurityItemRight>
                       <PasswordInputGroup>
                         <PasswordInput
-                          name="confirmPassword"
                           type="password"
-                          value={passwords.confirmPassword}
-                          onChange={handlePasswordChange}
                           placeholder="비밀번호를 다시 입력하세요"
                         />
                       </PasswordInputGroup>
@@ -409,12 +285,11 @@ const Settings = () => {
                   </SecurityItem>
 
                   <ActionButtons style={{ borderTop: 'none', paddingTop: 0 }}>
-                    <ChangePasswordButton onClick={handleUpdatePassword}>
-                      비밀번호 변경
-                    </ChangePasswordButton>
+                    <ChangePasswordButton>비밀번호 변경</ChangePasswordButton>
                   </ActionButtons>
                 </SecurityCardBody>
               </SecurityCard>
+
 
               {/* 테마 설정 */}
               <SecurityCard>
@@ -485,16 +360,16 @@ const Settings = () => {
                     <SecurityItemLeft>
                       <SecurityItemTitle>사용자 권한 (개발용)</SecurityItemTitle>
                       <SecurityItemDescription>
-                        개발 테스트를 위한 권한 전환 (즉시 적용)
+                        개발 테스트를 위한 권한 전환 (페이지 새로고침 필요)
                       </SecurityItemDescription>
                     </SecurityItemLeft>
                     <SecurityItemRight>
                       <LanguageSelect
-                        value={localStorage.getItem('userRole') || 'EMP'}
+                        value={localStorage.getItem('userRole') || 'EMP'} // 초기값은 로컬스토리지에서 가져오되
                         onChange={(e) => {
                           const newRole = e.target.value;
-                          localStorage.setItem('userRole', newRole);
-                          updateRole(newRole); // 🔥 즉시 스토어 업데이트
+                          localStorage.setItem('userRole', newRole); // 영구 저장용
+                          updateRole(newRole); // 🔥 즉시 스토어 업데이트 (리렌더링 트리거)
                           alert(`권한이 ${newRole}로 변경되었습니다.`);
                         }}
                       >
@@ -506,6 +381,7 @@ const Settings = () => {
                   </SecurityItem>
                 </SecurityCardBody>
               </SecurityCard>
+
 
               <ActionButtons>
                 <CancelButton>취소</CancelButton>

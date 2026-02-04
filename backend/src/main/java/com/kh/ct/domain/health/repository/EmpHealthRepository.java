@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface EmpHealthRepository extends JpaRepository<EmpHealth, Long> {
+public interface EmpHealthRepository extends JpaRepository<EmpHealth, String> {
 
     Optional<EmpHealth> findTopByEmpId_EmpIdOrderByEmpHealthIdDesc(String empId);
 

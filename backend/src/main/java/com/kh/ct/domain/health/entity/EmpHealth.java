@@ -13,8 +13,8 @@ import lombok.*;
 public class EmpHealth extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long empHealthId;
+    @Column(name = "emp_health_id", length = 50)
+    private String empHealthId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "emp_id", nullable = false)
