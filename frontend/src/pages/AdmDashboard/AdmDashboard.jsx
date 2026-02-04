@@ -52,14 +52,18 @@ const Dashboard = () => {
 
         // 3. 받아온 data를 사용하여 출결 상태를 처리합니다.
         if (data.attendanceList && data.attendanceList.length > 0) {
-          const todayData = data.attendanceList[0];
-          const config = ATTENDANCE_CONFIG[todayData.attendanceStatus] || ATTENDANCE_CONFIG.DEFAULT;
-          setStatusInfo(config);
+    const todayData = data.attendanceList[0];
+    const config = ATTENDANCE_CONFIG[todayData.attendanceStatus] || ATTENDANCE_CONFIG.DEFAULT;
+    setStatusInfo(config);
 
-          if (todayData.inTime) {
-            setCurrentTime(todayData.inTime.substring(0, 5));
-          }
-        }
+    if (todayData.inTime) {
+        setCurrentTime(todayData.inTime.substring(0, 5));
+    }
+} else {
+    // 💡 데이터가 없을 때 기본값 설정
+    setStatusInfo(ATTENDANCE_CONFIG.DEFAULT || { label: '기본', color: '#ccc' });
+    setCurrentTime('--:--');
+}
         // 2. 알림(Notifications) 생성 로직
         const newNotifications = [];
         const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD

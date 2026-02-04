@@ -30,9 +30,9 @@ export const Tab = styled.button`
   flex: 1;
   padding: 20px 32px;
   font-size: 16px;
-  font-weight: ${(props) => (props.active ? '600' : '400')};
-  color: ${(props) => (props.active ? 'var(--color-primary)' : 'var(--text-secondary)')};
-  background: ${(props) => (props.active ? 'var(--bg-main)' : 'transparent')};
+  font-weight: ${(props) => (props.$active ? '600' : '400')};
+  color: ${(props) => (props.$active ? 'var(--color-primary)' : 'var(--text-secondary)')};
+  background: ${(props) => (props.$active ? 'var(--bg-main)' : 'transparent')};
   border: none;
   border-bottom: ${(props) =>
     props.active ? '3px solid var(--color-primary)' : '3px solid transparent'};
@@ -139,7 +139,7 @@ export const InfoRow = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  grid-column: ${(props) => (props.fullWidth ? '1 / -1' : 'auto')};
+  grid-column: ${(props) => (props.$fullWidth ? '1 / -1' : 'auto')};
 `;
 
 export const InfoLabel = styled.label`
