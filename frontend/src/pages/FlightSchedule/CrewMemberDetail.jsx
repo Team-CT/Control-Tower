@@ -141,7 +141,6 @@ const CrewMemberDetail = () => {
           <S.BackButton type="button" onClick={() => navigate(-1)}>←</S.BackButton>
 
           <div>
-            <S.BreadcrumbText>홈 &gt; 직원 페이지 &gt; 직원 상세페이지</S.BreadcrumbText>
             <S.PageTitle>직원 상세 정보</S.PageTitle>
             <S.PageSubtitle>직원 정보 관리</S.PageSubtitle>
           </div>

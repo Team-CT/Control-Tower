@@ -35,24 +35,24 @@ const FlightSchedule = () => {
     try {
       setLoading(true);
       const params = {};
-      
+
       // 관리자인 경우 항공사 ID 추가
       if (isAdmin && airlineId) {
         params.airlineId = airlineId;
       }
-      
+
       // 날짜 필터 추가 (선택한 날짜의 00:00:00 ~ 23:59:59)
       if (selectedDate) {
         const startDate = new Date(selectedDate);
         startDate.setHours(0, 0, 0, 0);
         const endDate = new Date(selectedDate);
         endDate.setHours(23, 59, 59, 999);
-        
+
         // ISO 8601 형식으로 변환
         params.startDate = startDate.toISOString();
         params.endDate = endDate.toISOString();
       }
-      
+
       // 출발지/도착지 필터 ("all"이 아닐 때만 파라미터 추가)
       if (departureCity && departureCity !== "all") {
         params.departure = departureCity;
@@ -60,7 +60,7 @@ const FlightSchedule = () => {
       if (arrivalCity && arrivalCity !== "all") {
         params.destination = arrivalCity;
       }
-      
+
       const response = await flightScheduleService.getFlightSchedules(params);
       const flights = response.data?.data || response.data || [];
       setFlightList(flights);
@@ -129,8 +129,8 @@ const FlightSchedule = () => {
   };
 
   // ✅ 필터링 로직: 관리자는 전체, 직원은 본인 배정 비행편만
-  const displayedFlights = isAdmin 
-    ? flightList 
+  const displayedFlights = isAdmin
+    ? flightList
     : flightList.filter(flight => flight.isAssignedToMe);
 
   return (
@@ -138,11 +138,10 @@ const FlightSchedule = () => {
       {/* Page Header */}
       <S.PageHeader>
         <S.HeaderLeft>
-          <S.BreadcrumbText>홈 &gt; {isAdmin ? '비행편 관리' : '나의 비행'}</S.BreadcrumbText>
           <S.PageTitle>{isAdmin ? '전체 비행편 및 크루 관리' : '나의 비행 일정'}</S.PageTitle>
           <S.PageSubtitle>
-            {isAdmin 
-              ? '모든 비행편의 운항 정보와 배정된 크루 현황을 관리합니다.' 
+            {isAdmin
+              ? '모든 비행편의 운항 정보와 배정된 크루 현황을 관리합니다.'
               : '내가 배정된 비행 일정을 확인하고 상세 정보를 조회합니다.'}
           </S.PageSubtitle>
         </S.HeaderLeft>
@@ -162,8 +161,8 @@ const FlightSchedule = () => {
 
         <S.FilterGroup>
           <S.FilterLabel>날짜 선택</S.FilterLabel>
-          <S.DateInput 
-            type="date" 
+          <S.DateInput
+            type="date"
             value={selectedDate.toISOString().split('T')[0]}
             onChange={(e) => setSelectedDate(new Date(e.target.value))}
           />
@@ -214,64 +213,64 @@ const FlightSchedule = () => {
             if (!flight.flyScheduleId) {
               console.warn('비행편에 flyScheduleId가 없습니다:', flight);
             }
-            
+
             return (
-            <S.FlightCard
-              key={flight.flyScheduleId}
-              onClick={() => {
-                console.log('비행편 클릭 - flyScheduleId:', flight.flyScheduleId);
-                navigate(`/flightschedule/${flight.flyScheduleId}`);
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <S.CardHeader>
-                <S.FlightBadge>
-                  <S.AirlineIcon>✈</S.AirlineIcon>
-                  <div>
-                    <S.FlightNumber>
-                      {flight.flightNumber}
-                      {!isAdmin && flight.isAssignedToMe && (
-                        <span style={{fontSize: '0.8em', marginLeft: '8px', color: '#4a90e2'}}>● 배정됨</span>
-                      )}
-                    </S.FlightNumber>
-                    <S.FlightDate>
-                      {formatDate(new Date(flight.flyStartTime))} • {flight.airlineName || '항공사'}
-                    </S.FlightDate>
-                  </div>
-                </S.FlightBadge>
+              <S.FlightCard
+                key={flight.flyScheduleId}
+                onClick={() => {
+                  console.log('비행편 클릭 - flyScheduleId:', flight.flyScheduleId);
+                  navigate(`/flightschedule/${flight.flyScheduleId}`);
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <S.CardHeader>
+                  <S.FlightBadge>
+                    <S.AirlineIcon>✈</S.AirlineIcon>
+                    <div>
+                      <S.FlightNumber>
+                        {flight.flightNumber}
+                        {!isAdmin && flight.isAssignedToMe && (
+                          <span style={{ fontSize: '0.8em', marginLeft: '8px', color: '#4a90e2' }}>● 배정됨</span>
+                        )}
+                      </S.FlightNumber>
+                      <S.FlightDate>
+                        {formatDate(new Date(flight.flyStartTime))} • {flight.airlineName || '항공사'}
+                      </S.FlightDate>
+                    </div>
+                  </S.FlightBadge>
 
-                <S.StatusBadgeGroup>
-                  <S.StatusBadge $status="normal">
-                    운항 {getStatusText(flight.flightStatus)}
-                  </S.StatusBadge>
-                  {flight.crewAssigned && (
-                    <S.StatusBadge $status="assigned">
-                      승무원 배정
+                  <S.StatusBadgeGroup>
+                    <S.StatusBadge $status="normal">
+                      운항 {getStatusText(flight.flightStatus)}
                     </S.StatusBadge>
-                  )}
-                </S.StatusBadgeGroup>
-              </S.CardHeader>
+                    {flight.crewAssigned && (
+                      <S.StatusBadge $status="assigned">
+                        승무원 배정
+                      </S.StatusBadge>
+                    )}
+                  </S.StatusBadgeGroup>
+                </S.CardHeader>
 
-              <S.FlightRoute>
-                <S.RoutePoint>
-                  <S.RouteTime>{flight.departureTime}</S.RouteTime>
-                  <S.RouteCode>{flight.departure}</S.RouteCode>
-                  <S.RouteAirport>{flight.departure}</S.RouteAirport>
-                </S.RoutePoint>
+                <S.FlightRoute>
+                  <S.RoutePoint>
+                    <S.RouteTime>{flight.departureTime}</S.RouteTime>
+                    <S.RouteCode>{flight.departure}</S.RouteCode>
+                    <S.RouteAirport>{flight.departure}</S.RouteAirport>
+                  </S.RoutePoint>
 
-                <S.RouteIndicator>
-                  <S.AirplaneIcon>✈</S.AirplaneIcon>
-                  <S.RouteLine />
-                  <S.RouteDuration>{flight.duration}</S.RouteDuration>
-                </S.RouteIndicator>
+                  <S.RouteIndicator>
+                    <S.AirplaneIcon>✈</S.AirplaneIcon>
+                    <S.RouteLine />
+                    <S.RouteDuration>{flight.duration}</S.RouteDuration>
+                  </S.RouteIndicator>
 
-                <S.RoutePoint>
-                  <S.RouteTime>{flight.arrivalTime}</S.RouteTime>
-                  <S.RouteCode>{flight.destination}</S.RouteCode>
-                  <S.RouteAirport>{flight.destination}</S.RouteAirport>
-                </S.RoutePoint>
-              </S.FlightRoute>
-            </S.FlightCard>
+                  <S.RoutePoint>
+                    <S.RouteTime>{flight.arrivalTime}</S.RouteTime>
+                    <S.RouteCode>{flight.destination}</S.RouteCode>
+                    <S.RouteAirport>{flight.destination}</S.RouteAirport>
+                  </S.RoutePoint>
+                </S.FlightRoute>
+              </S.FlightCard>
             );
           })
         ) : (

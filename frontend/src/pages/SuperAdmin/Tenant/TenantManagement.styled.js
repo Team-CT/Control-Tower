@@ -109,15 +109,15 @@ export const ViewButton = styled.button`
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  background-color: ${props => props.active ? '#4c6fff' : 'transparent'};
-  color: ${props => props.active ? '#ffffff' : '#6f767e'};
+  background-color: ${props => props.$active ? '#4c6fff' : 'transparent'};
+  color: ${props => props.$active ? '#ffffff' : '#6f767e'};
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: ${props => props.active ? '#3651e0' : '#f1f3f5'};
+    background-color: ${props => props.$active ? '#3651e0' : '#f1f3f5'};
   }
 `;
 

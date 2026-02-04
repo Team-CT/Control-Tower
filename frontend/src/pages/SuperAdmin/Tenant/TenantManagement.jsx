@@ -125,13 +125,13 @@ const TenantManagement = () => {
 
           <S.ViewToggle>
             <S.ViewButton
-              active={viewMode === 'grid'}
+              $active={viewMode === 'grid'}
               onClick={() => setViewMode('grid')}
             >
               ⊞
             </S.ViewButton>
             <S.ViewButton
-              active={viewMode === 'list'}
+              $active={viewMode === 'list'}
               onClick={() => setViewMode('list')}
             >
               ☰

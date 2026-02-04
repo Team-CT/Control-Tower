@@ -36,4 +36,21 @@ public class Attendance extends BaseTimeEntity {
     @JoinColumn(name = "emp_id")
     private Emp empId;
 
+    /**
+     * 근태 정정 처리 (승인된 정정 신청 내용 반영)
+     * @param inTime 정정된 출근 시간
+     * @param outTime 정정된 퇴근 시간
+     * @param status 정정된 근태 상태
+     */
+    public void updateAttendance(LocalTime inTime, LocalTime outTime, CommonEnums.AttendanceStatus status) {
+        if (inTime != null) {
+            this.inTime = inTime;
+        }
+        if (outTime != null) {
+            this.outTime = outTime;
+        }
+        if (status != null) {
+            this.attendanceStatus = status;
+        }
+    }
 }

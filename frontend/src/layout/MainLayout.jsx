@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Sidebar from './Sidebar/Sidebar';
 import Header from './Header/Header';
 import Footer from './Footer/Footer';
+import useAuthStore from '../store/authStore';
 
 // 전체 레이아웃 (화면 꽉 채움, 스크롤 없음)
 const LayoutContainer = styled.div`
@@ -42,21 +43,22 @@ const PageContent = styled.div`
 `;
 
 const MainLayout = () => {
-  // [수정 포인트] 로컬 스토리지에서 저장된 직책(Role) 가져오기
-  const userRole = localStorage.getItem('userRole') || 'EMP';
+  // ✅ authStore에서 올바른 사용자 role 가져오기
+  const { getRole } = useAuthStore();
+  const userRole = getRole();
 
   return (
     <LayoutContainer>
       {/* 1. 좌측 사이드바 (userRole 값 전달) */}
       <Sidebar userRole={userRole} />
-      
+
       <ContentArea>
         {/* 2. 상단 헤더 (고정) */}
         <Header />
-        
+
         {/* 3. 스크롤 가능한 메인 영역 */}
         <ScrollableContent>
-          
+
           {/* 실제 페이지 내용 (Outlet) */}
           <PageContent>
             <Outlet />
@@ -64,7 +66,7 @@ const MainLayout = () => {
 
           {/* 4. 하단 푸터 (공통) */}
           <Footer />
-          
+
         </ScrollableContent>
       </ContentArea>
     </LayoutContainer>

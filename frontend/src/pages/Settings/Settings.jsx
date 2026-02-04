@@ -32,7 +32,7 @@ import {
   PasswordInputGroup,
   PasswordInput,
   ChangePasswordButton,
- 
+
   ThemeSelector,
   ThemeOption,
   ThemeRadio,
@@ -44,23 +44,27 @@ import {
 } from './Settings.styled';
 import { useAirlineTheme } from '../../context/AirlineThemeContext';
 import { airlines } from '../../styles/theme';
+import useAuthStore from '../../store/authStore';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('profile');
   const [selectedLanguage, setSelectedLanguage] = useState('ko');
-  
+
   // 테마 시스템
-  const { 
-    theme, 
-    isDarkMode, 
-    toggleDarkMode, 
+  const {
+    theme,
+    isDarkMode,
+    toggleDarkMode,
     currentAirline,
     approvalStatus,
     changeAirline,
     updateApprovalStatus,
-    airlineName
+    airlineName,
+    getRole // 현재 role 확인용
   } = useAirlineTheme();
-  
+
+  const { updateRole } = useAuthStore(); // 권한 업데이트 함수
+
   // 프로필 이미지 업로드 관리
   const [profileImage, setProfileImage] = useState(null);
   const [profilePreview, setProfilePreview] = useState(null);
@@ -95,13 +99,13 @@ const Settings = () => {
       <ContentWrapper>
         <TabContainer>
           <Tab
-            active={activeTab === 'profile'}
+            $active={activeTab === 'profile'}
             onClick={() => setActiveTab('profile')}
           >
             프로필
           </Tab>
           <Tab
-            active={activeTab === 'security'}
+            $active={activeTab === 'security'}
             onClick={() => setActiveTab('security')}
           >
             보안 및 설정
@@ -200,7 +204,7 @@ const Settings = () => {
                   </InfoValue>
                 </InfoRow>
 
-                <InfoRow fullWidth>
+                <InfoRow $fullWidth>
                   <InfoLabel>주소/세부</InfoLabel>
                   <InfoValue>
                     <AddressTextarea
@@ -361,11 +365,12 @@ const Settings = () => {
                     </SecurityItemLeft>
                     <SecurityItemRight>
                       <LanguageSelect
-                        value={localStorage.getItem('userRole') || 'EMP'}
+                        value={localStorage.getItem('userRole') || 'EMP'} // 초기값은 로컬스토리지에서 가져오되
                         onChange={(e) => {
-                          localStorage.setItem('userRole', e.target.value);
-                          alert(`권한이 ${e.target.value}로 변경되었습니다. 페이지를 새로고침합니다.`);
-                          window.location.reload();
+                          const newRole = e.target.value;
+                          localStorage.setItem('userRole', newRole); // 영구 저장용
+                          updateRole(newRole); // 🔥 즉시 스토어 업데이트 (리렌더링 트리거)
+                          alert(`권한이 ${newRole}로 변경되었습니다.`);
                         }}
                       >
                         <option value="EMP">직원 (EMP)</option>
@@ -377,7 +382,7 @@ const Settings = () => {
                 </SecurityCardBody>
               </SecurityCard>
 
-              
+
               <ActionButtons>
                 <CancelButton>취소</CancelButton>
                 <SaveButton>변경사항 저장</SaveButton>
