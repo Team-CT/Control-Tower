@@ -94,4 +94,14 @@ public class Emp extends BaseTimeEntity {
     public void updateAirlineId(Airline airline) {
         this.airlineId = airline;
     }
+   //setting 업테이드 로직
+   public void updateProfile(String empName, Integer age, String email, String phone, String address) {
+       if (empName != null) this.empName = empName;
+       if (age != null) this.age = age;
+       if (email != null) this.email = email;
+       if (phone != null) this.phone = phone;
+       if (address != null) this.address = address;
+   }
+
+
 }
