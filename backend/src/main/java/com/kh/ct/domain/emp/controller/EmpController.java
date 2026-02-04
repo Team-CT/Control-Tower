@@ -22,7 +22,7 @@ public class EmpController {
     private final EmpNoService empNoService;
 
     /** 아이디 중복체크 */
-    @GetMapping("/check-id")
+    @GetMapping("/checkId")
     public ResponseEntity<EmpDto.IdCheckResponse> checkEmpId(
             @RequestParam @NotBlank(message = "empId는 필수입니다.") String empId
     ) {
@@ -31,7 +31,7 @@ public class EmpController {
     }
 
     /** ✅ 사번 미리보기: 가입 전에 화면에 보여주기 */
-    @GetMapping("/emp-no/preview")
+    @GetMapping("/empNo/preview")
     public ResponseEntity<EmpDto.EmpNoPreviewResponse> previewEmpNo() {
         String empNo = empNoService.previewEmpNo();
         return ResponseEntity.ok(EmpDto.EmpNoPreviewResponse.of(empNo));
