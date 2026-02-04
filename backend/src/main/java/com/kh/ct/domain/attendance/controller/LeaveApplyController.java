@@ -76,4 +76,28 @@ public class LeaveApplyController {
         LeaveDto.ListResponse response = leaveApplyService.approveLeave(leaveApplyId, approverId, request);
         return ResponseEntity.ok(response);
     }
+
+    /**
+     * 관리자용 전체 휴가 신청 목록 조회
+     */
+    @GetMapping("/admin/all")
+    public ResponseEntity<List<LeaveDto.ListResponse>> getAllLeaveApplications() {
+        log.info("관리자용 전체 휴가 신청 목록 조회 요청");
+
+        List<LeaveDto.ListResponse> response = leaveApplyService.getAllLeaveApplications();
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 관리자용 상태별 휴가 신청 목록 조회
+     */
+    @GetMapping("/admin/status/{status}")
+    public ResponseEntity<List<LeaveDto.ListResponse>> getLeaveApplicationsByStatus(
+            @PathVariable String status) {
+
+        log.info("관리자용 상태별 휴가 신청 목록 조회 요청 - status: {}", status);
+
+        List<LeaveDto.ListResponse> response = leaveApplyService.getLeaveApplicationsByStatus(status);
+        return ResponseEntity.ok(response);
+    }
 }

@@ -223,6 +223,8 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
                 .reason(entity.getLeaveApplyReason())
                 .status(entity.getLeaveApplyStatus().name())
                 .applicantName(entity.getLeaveApplyApplicant().getEmpName())
+                .departmentName(entity.getLeaveApplyApplicant().getDepartmentId() != null ?
+                        entity.getLeaveApplyApplicant().getDepartmentId().getDepartmentName() : null)
                 .approverName(entity.getLeaveApplyApprover() != null ?
                         entity.getLeaveApplyApprover().getEmpName() : null)
                 .createdDate(entity.getCreateDate())
@@ -266,7 +268,7 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
     }
 
     /**
-     * 휴가 승인 시 Attendance 상태 업데이트
+     * 휴가 승인 시 Attendance 상태 업데이트 또는 생성
      */
     private void updateAttendanceForApproval(LeaveApply leaveApply) {
         LocalDate startDate = leaveApply.getLeaveStartDate().toLocalDate();
@@ -275,30 +277,49 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
         log.info("Attendance 상태 업데이트 시작 - empId: {}, 기간: {} ~ {}", 
                 leaveApply.getLeaveApplyApplicant().getEmpId(), startDate, endDate);
         
-        List<Attendance> attendances = attendanceRepository
-            .findByEmpId_EmpIdAndAttendanceDateBetween(
-                leaveApply.getLeaveApplyApplicant().getEmpId(),
-                startDate,
-                endDate
-            );
+        int updatedCount = 0;
+        int createdCount = 0;
         
-        for (Attendance attendance : attendances) {
-            if (attendance.getAttendanceStatus() == CommonEnums.AttendanceStatus.LEAVE_PENDING) {
-                Attendance updated = Attendance.builder()
-                    .attendanceId(attendance.getAttendanceId())
-                    .empId(attendance.getEmpId())
-                    .attendanceDate(attendance.getAttendanceDate())
+        // 날짜 범위 반복
+        for (LocalDate date = startDate; !date.isAfter(endDate); date = date.plusDays(1)) {
+            Optional<Attendance> existingOpt = attendanceRepository
+                .findByEmpId_EmpIdAndAttendanceDate(
+                    leaveApply.getLeaveApplyApplicant().getEmpId(),
+                    date
+                );
+            
+            if (existingOpt.isPresent()) {
+                // 기존 레코드가 있으면 업데이트
+                Attendance existing = existingOpt.get();
+                if (existing.getAttendanceStatus() == CommonEnums.AttendanceStatus.LEAVE_PENDING) {
+                    Attendance updated = Attendance.builder()
+                        .attendanceId(existing.getAttendanceId())
+                        .empId(existing.getEmpId())
+                        .attendanceDate(existing.getAttendanceDate())
+                        .attendanceStatus(CommonEnums.AttendanceStatus.LEAVE)
+                        .inTime(existing.getInTime())
+                        .outTime(existing.getOutTime())
+                        .build();
+                    
+                    attendanceRepository.save(updated);
+                    updatedCount++;
+                    log.debug("Attendance 상태 변경 - date: {}, LEAVE_PENDING -> LEAVE", date);
+                }
+            } else {
+                // 레코드가 없으면 새로 생성
+                Attendance newAttendance = Attendance.builder()
+                    .empId(leaveApply.getLeaveApplyApplicant())
+                    .attendanceDate(date)
                     .attendanceStatus(CommonEnums.AttendanceStatus.LEAVE)
-                    .inTime(attendance.getInTime())
-                    .outTime(attendance.getOutTime())
                     .build();
                 
-                attendanceRepository.save(updated);
-                log.debug("Attendance 상태 변경 - date: {}, LEAVE_PENDING -> LEAVE", attendance.getAttendanceDate());
+                attendanceRepository.save(newAttendance);
+                createdCount++;
+                log.debug("Attendance 생성 - date: {}, status: LEAVE", date);
             }
         }
         
-        log.info("Attendance 상태 업데이트 완료 - {} 건", attendances.size());
+        log.info("Attendance 처리 완료 - 업데이트: {}건, 생성: {}건", updatedCount, createdCount);
     }
 
     /**
@@ -329,5 +350,36 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
         }
         
         log.info("Attendance 삭제 완료 - {} 건", deletedCount);
+    }
+
+    /**
+     * 관리자용 전체 휴가 신청 목록 조회
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<LeaveDto.ListResponse> getAllLeaveApplications() {
+        log.info("관리자용 전체 휴가 신청 목록 조회");
+
+        List<LeaveApply> leaveList = leaveApplyRepository.findAllWithDetails();
+
+        return leaveList.stream()
+                .map(this::convertToListResponse)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 관리자용 상태별 휴가 신청 목록 조회
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public List<LeaveDto.ListResponse> getLeaveApplicationsByStatus(String status) {
+        log.info("관리자용 상태별 휴가 신청 목록 조회 - status: {}", status);
+
+        CommonEnums.ApplyStatus applyStatus = CommonEnums.ApplyStatus.valueOf(status.toUpperCase());
+        List<LeaveApply> leaveList = leaveApplyRepository.findAllByStatusWithDetails(applyStatus);
+
+        return leaveList.stream()
+                .map(this::convertToListResponse)
+                .collect(Collectors.toList());
     }
 }

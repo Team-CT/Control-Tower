@@ -28,4 +28,14 @@ public interface LeaveApplyService {
      * 휴가 승인/반려
      */
     LeaveDto.ListResponse approveLeave(Long leaveApplyId, String approverId, LeaveDto.ApproveRequest request);
+    
+    /**
+     * 관리자용 전체 휴가 신청 목록 조회
+     */
+    List<LeaveDto.ListResponse> getAllLeaveApplications();
+    
+    /**
+     * 관리자용 상태별 휴가 신청 목록 조회
+     */
+    List<LeaveDto.ListResponse> getLeaveApplicationsByStatus(String status);
 }
