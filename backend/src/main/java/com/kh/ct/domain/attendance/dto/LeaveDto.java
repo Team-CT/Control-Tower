@@ -44,6 +44,7 @@ public class LeaveDto {
         private String reason;
         private String status;  // PENDING, APPROVED, REJECTED
         private String applicantName;
+        private String departmentName;  // 부서명 추가
         private String approverName;
         private LocalDateTime createdDate;
     }

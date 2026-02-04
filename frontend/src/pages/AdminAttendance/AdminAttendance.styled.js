@@ -133,12 +133,13 @@ export const StatsGrid = styled.div`
 `;
 
 // ===== 휴가 승인 대기 목록 테이블 스타일 =====
-export const LeaveTable = styled.div`
+export const LeaveTable = styled.table`
   width: 100%;
   background: white;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-collapse: collapse;
 `;
 
 export const LeaveTypeBadge = styled.span`

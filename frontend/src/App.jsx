@@ -21,7 +21,7 @@ import EmployeeDetail from './pages/EmployeeDetail/EmployeeDetail';
 import DepartmentManagement from './pages/DepartmentManagement/DepartmentManagement';
 import DepartmentDetail from './pages/DepartmentDetail/DepartmentDetail';
 import LeaveApply from './pages/EmployeeSchedule/LeaveApply';
-import LeaveApproval from './pages/EmployeeSchedule/LeaveApproval';
+import LeaveApproval from './pages/AdminAttendance/LeaveApproval';
 import Dashboard from './pages/HealthDashboard/HealthDashboard';
 import Stress from './pages/StressSurvey/StressSurvey';
 import EmployeeHealthManagement from './pages/EmployeeHealthManagement/EmployeeHealthManagement';
@@ -121,14 +121,14 @@ const ThemedApp = () => {
 
           {/* [건강 관리] */}
           <Route path="/health-dashboard" element={<Dashboard />} />
-          <Route path="/stress" element={<Stress/>} />
-          <Route path="/employeehealthmanagement" element={<EmployeeHealthManagement/>} />
-          <Route path="/employeehealthdetail/:empId" element={<EmployeeHealthDetail/>} />
-          <Route path="/healthinfosubmission" element={<HealthInfoSubmission/>} />
-          <Route path="/healthsubmissionhistory" element={<HealthSubmissionHistory/>} />
-          <Route path="/healthprogrammanagement" element={<HealthProgramManagement/>} />   
-          <Route path="/healthprogramapply" element={<HealthProgramApply/>} />  
-          
+          <Route path="/stress" element={<Stress />} />
+          <Route path="/employeehealthmanagement" element={<EmployeeHealthManagement />} />
+          <Route path="/employeehealthdetail/:empId" element={<EmployeeHealthDetail />} />
+          <Route path="/healthinfosubmission" element={<HealthInfoSubmission />} />
+          <Route path="/healthsubmissionhistory" element={<HealthSubmissionHistory />} />
+          <Route path="/healthprogrammanagement" element={<HealthProgramManagement />} />
+          <Route path="/healthprogramapply" element={<HealthProgramApply />} />
+
 
           {/* [시스템 관리] */}
           <Route path="/common-code" element={<CommonCodeManagement />} />

@@ -523,3 +523,204 @@ export const RejectButton = styled.button`
     transform: scale(0.98);
   }
 `;
+
+// ==================== 모달 ====================
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+`;
+
+export const ModalContent = styled.div`
+  background: #ffffff;
+  border-radius: 16px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+export const ModalHeader = styled.div`
+  padding: 24px 28px;
+  border-bottom: 2px solid #f3f4f6;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const ModalTitle = styled.h2`
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1d2838;
+  margin: 0;
+`;
+
+export const CloseButton = styled.button`
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 20px;
+  color: #6b7280;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+  }
+`;
+
+export const ModalBody = styled.div`
+  padding: 28px;
+`;
+
+export const DetailSection = styled.div`
+  margin-bottom: 24px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+export const DetailLabel = styled.div`
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+`;
+
+export const DetailValue = styled.div`
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1d2838;
+  line-height: 1.6;
+`;
+
+export const ApplicantInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 10px;
+  margin-bottom: 24px;
+`;
+
+export const ReasonBox = styled.div`
+  padding: 16px;
+  background: #f9fafb;
+  border-left: 4px solid #0284c7;
+  border-radius: 8px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #374151;
+  line-height: 1.6;
+  white-space: pre-wrap;
+`;
+
+export const StatusBadge = styled.span`
+  display: inline-block;
+  padding: 6px 16px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  background: ${props => {
+    if (props.$status === 'PENDING') return '#f59e0b';
+    if (props.$status === 'APPROVED') return '#10b981';
+    if (props.$status === 'REJECTED') return '#ef4444';
+    return '#6b7280';
+  }};
+  border-radius: 8px;
+`;
+
+export const ModalFooter = styled.div`
+  padding: 20px 28px;
+  border-top: 2px solid #f3f4f6;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
+`;
+
+export const RejectReasonInput = styled.textarea`
+  width: 100%;
+  padding: 12px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  color: #1d2838;
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+  transition: all 0.2s ease;
+
+  &:focus {
+    border-color: #0284c7;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+`;
+
+export const CancelButton = styled.button`
+  padding: 10px 20px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #6b7280;
+  background: #f3f4f6;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #e5e7eb;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
