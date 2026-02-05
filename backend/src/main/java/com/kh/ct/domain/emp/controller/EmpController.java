@@ -54,4 +54,12 @@ public class EmpController {
         EmpDto empDetail = empService.getEmpDetail(empId);
         return ResponseEntity.ok(ApiResponse.success("직원 상세 정보 조회 성공", empDetail));
     }
+    /**
+     * 관리자(담당자) 후보 리스트 조회
+     */
+    @GetMapping("/managers")
+    public ResponseEntity<ApiResponse<java.util.List<EmpDto>>> getManagerCandidates() {
+        java.util.List<EmpDto> managers = empService.getManagerCandidates();
+        return ResponseEntity.ok(ApiResponse.success("관리자 후보 조회 성공", managers));
+    }
 }

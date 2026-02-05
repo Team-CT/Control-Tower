@@ -131,4 +131,20 @@ public class EmpServiceImpl implements EmpService {
                 .airlineName(airlineName)
                 .build();
     }
+
+    @Override
+    public java.util.List<EmpDto> getManagerCandidates() {
+        // 모든 활성 직원 조회 (또는 특정 부서/직책 필터링 가능)
+        return empRepository.findByEmpStatus(CommonEnums.EmpStatus.Y).stream()
+                .map(emp -> {
+                    String deptName = (emp.getDepartmentId() != null) ? emp.getDepartmentId().getDepartmentName() : "";
+                    return EmpDto.builder()
+                            .empId(emp.getEmpId())
+                            .empName(emp.getEmpName())
+                            .departmentName(deptName)
+                            .role(emp.getRole() != null ? emp.getRole().name() : "")
+                            .build();
+                })
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

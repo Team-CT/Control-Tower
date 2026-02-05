@@ -14,4 +14,7 @@ export const empService = {
 
   // POST /api/emps
   register: (payload) => api.post(API_ENDPOINTS.EMP.REGISTER, payload),
+
+  // GET /api/emps/managers
+  getManagerCandidates: () => api.get(API_ENDPOINTS.EMP.MANAGERS),
 };

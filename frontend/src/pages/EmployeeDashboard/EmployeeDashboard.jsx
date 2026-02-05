@@ -140,7 +140,7 @@ const EmployeeDashboard = () => {
                     date: g.scheduleStartDate,
                     type: 'ground',
                     title: g.workCode === 'SAFETY_TRAIN' ? '안전 교육' :
-                           g.workCode === 'NIGHT_SHIFT' ? '야간 근무' : '지상 업무',
+                        g.workCode === 'NIGHT_SHIFT' ? '야간 근무' : '지상 업무',
                     subtitle: `${g.scheduleStartTime} ~ ${g.scheduleEndTime}`,
                     status: g.scheduleStatus === 'Y' ? '확정' : '대기',
                     statusColor: '#F39C12'
@@ -320,11 +320,11 @@ const EmployeeDashboard = () => {
                                 <S.ScoreValue>{healthData.healthPoint}</S.ScoreValue>
                                 <S.ScoreGrid>
                                     <S.ScoreItem>
-                                        <S.ScoreGrade grade="A">{healthData.physicalPoint}</S.ScoreGrade>
+                                        <S.ScoreGrade $grade="A">{healthData.physicalPoint}</S.ScoreGrade>
                                         <S.ScoreLabel>체력</S.ScoreLabel>
                                     </S.ScoreItem>
                                     <S.ScoreItem>
-                                        <S.ScoreGrade grade="B+">{healthData.stressPoint}</S.ScoreGrade>
+                                        <S.ScoreGrade $grade="B+">{healthData.stressPoint}</S.ScoreGrade>
                                         <S.ScoreLabel>스트레스</S.ScoreLabel>
                                     </S.ScoreItem>
                                 </S.ScoreGrid>

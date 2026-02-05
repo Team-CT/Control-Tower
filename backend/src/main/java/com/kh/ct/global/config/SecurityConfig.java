@@ -74,6 +74,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/members/**").hasRole("ADMIN")
                         .requestMatchers("/api/dashboard/admin/**").permitAll()
                         .requestMatchers("/api/admin/attendance/**").permitAll()  // 관리자 근태 관리 API
+                        .requestMatchers("/api/health/admin/**").permitAll() // 건강 관리자 API
                         //나머지경로
                         .requestMatchers("/api/settings/**").permitAll()
                         .anyRequest().authenticated()
@@ -87,7 +88,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));
-        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(true); //인증정보를 포함한 cors요청 허용
         corsConfiguration.setMaxAge(3600L); //1시간
