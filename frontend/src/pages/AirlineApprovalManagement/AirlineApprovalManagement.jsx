@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { 
-  Building2, CheckCircle, XCircle, Mail, Phone, 
+import {
+  Building2, CheckCircle, XCircle, Mail, Phone,
   Calendar, FileText, Search, Filter
 } from 'lucide-react';
 
@@ -147,6 +147,20 @@ const DetailLabel = styled.span`
   color: var(--text-primary);
 `;
 
+const ThemeColorBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const ColorSwatch = styled.div`
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background-color: ${props => props.$color};
+  border: 1px solid var(--border-color);
+`;
+
 const ActionButtons = styled.div`
   display: flex;
   gap: 12px;
@@ -283,7 +297,7 @@ const AirlineApprovalManagement = () => {
   const filteredRequests = approvalRequests.filter(request => {
     const matchesFilter = filter === 'all' || request.status === filter;
     const matchesSearch = request.airlineName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         request.managerEmail.toLowerCase().includes(searchQuery.toLowerCase());
+      request.managerEmail.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesFilter && matchesSearch;
   });
 
@@ -301,25 +315,25 @@ const AirlineApprovalManagement = () => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <FilterButton 
+        <FilterButton
           $active={filter === 'all'}
           onClick={() => setFilter('all')}
         >
           전체
         </FilterButton>
-        <FilterButton 
+        <FilterButton
           $active={filter === 'pending'}
           onClick={() => setFilter('pending')}
         >
           대기 중
         </FilterButton>
-        <FilterButton 
+        <FilterButton
           $active={filter === 'approved'}
           onClick={() => setFilter('approved')}
         >
           승인됨
         </FilterButton>
-        <FilterButton 
+        <FilterButton
           $active={filter === 'rejected'}
           onClick={() => setFilter('rejected')}
         >

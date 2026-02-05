@@ -134,13 +134,13 @@ export const SUPER_ADMIN_MENU = [
             { label: "테넌트 목록", icon: Building2, id: "/super-admin/tenants" }
         ]
     },
-    {
-        category: "승인 관리",
-        items: [
-            { label: "가입 신청 관리", icon: UserCheck, id: "/super-admin/registrations" },
-            { label: "항공사 승인 관리", icon: ClipboardCheck, id: "/super-admin/airline-approval" }
-        ]
-    },
+    // {
+    //     category: "승인 관리",
+    //     items: [
+    //         { label: "가입 신청 관리", icon: UserCheck, id: "/super-admin/registrations" },
+    //         { label: "항공사 승인 관리", icon: ClipboardCheck, id: "/super-admin/airline-approval" }
+    //     ]
+    // },
     {
         category: "시스템 관리",
         items: [

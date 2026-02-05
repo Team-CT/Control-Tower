@@ -17,7 +17,7 @@ public class CtApplication {
 	@Bean
 	public CommandLineRunner passwordEncodeRunner(PasswordEncoder passwordEncoder) {
 		return args -> {
-			String rawPassword = "admin123";   // 👉 변경할 비밀번호
+			String rawPassword = "1234"; // 👉 변경할 비밀번호
 			String encodedPassword = passwordEncoder.encode(rawPassword);
 
 			System.out.println("=================================");

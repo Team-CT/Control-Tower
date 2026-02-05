@@ -27,8 +27,7 @@ public class Admin_Dashboard_RepositoryImpl implements Admin_Dashboard_Repositor
         public List<Attendance> findByEmp_Leave_Apply(String empId) {
 
                 // JPQL을 사용하여 Emp 엔티티의 empId 필드를 조건으로 조회
-                // JPQL을 사용하여 Emp 엔티티의 empNo 필드를 조건으로 조회
-                String jpql = "SELECT a FROM Attendance a WHERE a.empId.empNo = :empId ORDER BY a.createDate DESC";
+                String jpql = "SELECT a FROM Attendance a WHERE a.empId.empId = :empId ORDER BY a.createDate DESC";
 
                 return em.createQuery(jpql, Attendance.class)
                                 .setParameter("empId", empId)
@@ -57,10 +56,8 @@ public class Admin_Dashboard_RepositoryImpl implements Admin_Dashboard_Repositor
 
         @Override
         public Optional<Emp> findByEmp_Emp(String empId) {
-                // empId 파라미터로 넘어오는 값이 실제로는 empNo("EMP001" 등)일 가능성이 높음
-                // 따라서 PK(uuid) 조회가 아닌 empNo로 조회하도록 변경
                 try {
-                        Emp emp = em.createQuery("SELECT e FROM Emp e WHERE e.empNo = :id", Emp.class)
+                        Emp emp = em.createQuery("SELECT e FROM Emp e WHERE e.empId = :id", Emp.class)
                                         .setParameter("id", empId)
                                         .getSingleResult();
                         return Optional.of(emp);
@@ -103,7 +100,7 @@ public class Admin_Dashboard_RepositoryImpl implements Admin_Dashboard_Repositor
         public Long find_Working(String empId) {
                 // JPQL: 결석(ABSENT)이 아닌 데이터의 개수만 조회
                 String jpql = "SELECT COUNT(a) FROM Attendance a " +
-                                "WHERE a.empId.empNo = :empId " +
+                                "WHERE a.empId.empId = :empId " +
                                 "AND a.attendanceStatus <> :status";
 
                 return em.createQuery(jpql, Long.class)
@@ -117,7 +114,7 @@ public class Admin_Dashboard_RepositoryImpl implements Admin_Dashboard_Repositor
                 // DB 종속적인 함수(TIMESTAMPDIFF) 대신, Application 레벨에서 계산하여 호환성 확보
                 String jpql = "SELECT f FROM FlySchedule f " +
                                 "JOIN EmpSchedule es ON f.flyScheduleId = es.empScheduleId " +
-                                "WHERE es.empId.empNo = :empId " +
+                                "WHERE es.empId.empId = :empId " +
                                 "AND f.flightStatus = :status";
 
                 List<FlySchedule> schedules = em.createQuery(jpql, FlySchedule.class)
@@ -140,7 +137,7 @@ public class Admin_Dashboard_RepositoryImpl implements Admin_Dashboard_Repositor
         public Long findTotalFlightCount(String empId) {
                 String jpql = "SELECT COUNT(f) FROM FlySchedule f " +
                                 "JOIN EmpSchedule es ON f.flyScheduleId = es.empScheduleId " +
-                                "WHERE es.empId.empNo = :empId " +
+                                "WHERE es.empId.empId = :empId " +
                                 "AND f.flightStatus = :status";
 
                 // COUNT는 보통 Long을 반환하지만, 안전하게 Number로 처리 가능
@@ -177,11 +174,11 @@ public class Admin_Dashboard_RepositoryImpl implements Admin_Dashboard_Repositor
         @Override
         public List<FlySchedule> findFlySchedulesByEmpId(String empId) {
                 // [FlySchedule] -> [FlySchedule_ID (MapsId)] -> [AllSchedule (es)] -> [Emp
-                // (empNo)]
-                // 엔티티 구조에 따라 es.empId.empNo 경로로 접근합니다.
+                // (empId)]
+                // 엔티티 구조에 따라 es.empId.empId 경로로 접근합니다.
                 String jpql = "SELECT f FROM FlySchedule f " +
                                 "JOIN EmpSchedule es ON f.flyScheduleId = es.empScheduleId " +
-                                "WHERE es.empId.empNo = :empId " +
+                                "WHERE es.empId.empId = :empId " +
                                 "ORDER BY f.flyStartTime ASC"; // 시간순 정렬 (대시보드용)
 
                 return em.createQuery(jpql, FlySchedule.class)
@@ -192,7 +189,7 @@ public class Admin_Dashboard_RepositoryImpl implements Admin_Dashboard_Repositor
         @Override
         public List<GroundSchedule> findGroundSchedulesByEmpId(String empId) {
                 return em.createQuery(
-                                "select g from GroundSchedule g where g.empId.empNo = :empId " +
+                                "select g from GroundSchedule g where g.empId.empId = :empId " +
                                                 "order by g.scheduleStartDate asc",
                                 GroundSchedule.class)
                                 .setParameter("empId", empId)
@@ -205,7 +202,7 @@ public class Admin_Dashboard_RepositoryImpl implements Admin_Dashboard_Repositor
                         java.time.LocalDateTime end) {
                 // 🚩 날짜와 상태 필터를 제거하고 empId로만 전체 조회
                 String jpql = "SELECT pa FROM ProgramApply pa " +
-                                "WHERE pa.programApplyApplicant.empNo = :empId " +
+                                "WHERE pa.programApplyApplicant.empId = :empId " +
                                 "ORDER BY pa.programApplyDate DESC"; // 최신 신청 건부터 보이게 DESC로 변경
 
                 return em.createQuery(jpql, ProgramApply.class)

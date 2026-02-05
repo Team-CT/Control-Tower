@@ -154,7 +154,7 @@ const TenantManagement = () => {
                 </S.CardBody>
 
                 <S.CardFooter>
-                  <S.StatusBadge status={tenant.status}>
+                  <S.StatusBadge $status={tenant.status}>
                     <S.StatusIcon>{getStatusIcon(tenant.status)}</S.StatusIcon>
                     {getStatusText(tenant.status)}
                   </S.StatusBadge>
@@ -194,7 +194,7 @@ const TenantManagement = () => {
                     <S.TableCell>{tenant.id}</S.TableCell>
                     <S.TableCell>{(tenant.employeeCount || 0).toLocaleString()}명</S.TableCell>
                     <S.TableCell>
-                      <S.StatusBadge status={tenant.status}>
+                      <S.StatusBadge $status={tenant.status}>
                         <S.StatusIcon>{getStatusIcon(tenant.status)}</S.StatusIcon>
                         {getStatusText(tenant.status)}
                       </S.StatusBadge>

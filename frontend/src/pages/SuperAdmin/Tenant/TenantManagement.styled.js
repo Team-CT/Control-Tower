@@ -230,15 +230,15 @@ export const StatusBadge = styled.div`
   font-size: 13px;
   font-weight: 500;
   background-color: ${props => {
-    if (props.status === 'active') return '#d4f4dd';
-    if (props.status === 'payment-pending') return '#fff3cd';
-    if (props.status === 'inactive') return '#ffe4e6';
+    if (props.$status === 'active') return '#d4f4dd';
+    if (props.$status === 'payment-pending') return '#fff3cd';
+    if (props.$status === 'inactive') return '#ffe4e6';
     return '#f1f3f5';
   }};
   color: ${props => {
-    if (props.status === 'active') return '#0f7a35';
-    if (props.status === 'payment-pending') return '#856404';
-    if (props.status === 'inactive') return '#dc2626';
+    if (props.$status === 'active') return '#0f7a35';
+    if (props.$status === 'payment-pending') return '#856404';
+    if (props.$status === 'inactive') return '#dc2626';
     return '#6f767e';
   }};
 `;

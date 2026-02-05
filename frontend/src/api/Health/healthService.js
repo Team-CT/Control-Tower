@@ -58,6 +58,18 @@ const healthService = {
     },
 
     /**
+     * 개인 건강 정보 제출 이력
+     * @param {string} empId
+     * @param {number} page
+     * @param {number} size
+     */
+    getPhysicalTest: (empId, page, size) => {
+        return axios.get('/api/health/getPhysicalTest', {
+            params: { empId, page, size },
+        });
+    },
+
+    /**
      * 프로그램 신청 내역 조회 (HealthProgramHistory.jsx에서 사용)
      * @param {string} empId
      */
