@@ -7,6 +7,9 @@ import * as S from './Register.styled';
 import { empService } from '../../api/emp/empService';
 import { fileService } from '../../api/emp/fileService';
 
+// ✅ 추가: 이메일 인증 백엔드 연결 서비스
+import { passwordCodeService } from '../../api/emp/passwordCodeService';
+
 const Register = () => {
   const navigate = useNavigate();
   const { currentAirline, theme } = useAirlineTheme();
@@ -98,7 +101,6 @@ const Register = () => {
     return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
   };
 
-
   /* ==========================
    * ✅ 업로드 파일 삭제(회원가입 실패/이전 단계 등)
    * ========================== */
@@ -137,7 +139,6 @@ const Register = () => {
     reader.readAsDataURL(file);
 
     // 2) 이미 업로드된 파일이 있으면(교체) 먼저 삭제 시도(선택)
-    //    최소 구현에서는 "교체 시 고아파일 줄이기"에 도움이 됨
     if (formData.profileImageId) {
       await deleteUploadedFileIfExists();
     }
@@ -161,30 +162,49 @@ const Register = () => {
   };
 
   /* ==========================
-   * [Step 1] 이메일 인증 로직(현재는 더미)
+   * ✅ [Step 1] 이메일 인증 로직(백엔드 연결)
    * ========================== */
-  const handleSendEmailCode = () => {
+  const handleSendEmailCode = async () => {
     if (!formData.email) return alert('이메일을 입력해주세요.');
 
-    alert('인증번호 발송(테스트)');
+    try {
+      // ✅ 백엔드로 발송 요청
+      await passwordCodeService.send(formData.email);
 
-    // ✅ 타이머 리셋 + 시작
-    setEmailSecondsLeft(EMAIL_EXPIRE_SECONDS);
-    setEmailTimerRunning(true);
+      alert('인증번호가 발송되었습니다.');
 
-    // 입력값/상태 초기화(선택)
-    setFormData((prev) => ({ ...prev, emailCode: '' }));
-    setVerified((prev) => ({ ...prev, email: false }));
+      // ✅ 타이머 리셋 + 시작
+      setEmailSecondsLeft(EMAIL_EXPIRE_SECONDS);
+      setEmailTimerRunning(true);
+
+      // 입력값/상태 초기화(선택)
+      setFormData((prev) => ({ ...prev, emailCode: '' }));
+      setVerified((prev) => ({ ...prev, email: false }));
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || '인증번호 발송에 실패했습니다.');
+    }
   };
 
-  const handleEmailVerify = () => {
+  const handleEmailVerify = async () => {
     if (!formData.email) return alert('이메일을 입력해주세요.');
     if (emailSecondsLeft <= 0) return alert('인증번호가 만료되었습니다. 다시 전송해주세요.');
     if (!formData.emailCode) return alert('인증번호를 입력해주세요.');
 
-    alert('인증 완료 처리됨(테스트)');
-    setVerified((prev) => ({ ...prev, email: true }));
-    setStep(2);
+    try {
+      // ✅ 백엔드로 검증 요청
+      await passwordCodeService.verify({
+        email: formData.email,
+        code: formData.emailCode,
+      });
+
+      alert('인증이 완료되었습니다.');
+      setVerified((prev) => ({ ...prev, email: true }));
+      setStep(2);
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || '인증번호가 올바르지 않습니다.');
+    }
   };
 
   /* ==========================
@@ -269,7 +289,6 @@ const Register = () => {
 
   // ✅ Step3에서 "이전 단계"로 돌아갈 때도 파일 정리(선택)
   const handlePrevToStep2 = async () => {
-    // 최소 구현에서 고아 파일을 줄이는 현실적인 방법
     await deleteUploadedFileIfExists();
     setStep(2);
   };
@@ -348,7 +367,11 @@ const Register = () => {
                   </S.InputRow>
                 </S.InputGroup>
 
-                <S.SubmitButton type="button" onClick={handleEmailVerify} disabled={emailSecondsLeft <= 0}>
+                <S.SubmitButton
+                  type="button"
+                  onClick={handleEmailVerify}
+                  disabled={emailSecondsLeft <= 0}
+                >
                   인증 확인 후 다음
                 </S.SubmitButton>
               </S.RegisterForm>
@@ -529,7 +552,9 @@ const Register = () => {
               </S.RegisterForm>
             )}
 
-            <S.LoginLink onClick={() => navigate('/login')}>로그인 화면으로 돌아가기</S.LoginLink>
+            <S.LoginLink onClick={() => navigate('/login')}>
+              로그인 화면으로 돌아가기
+            </S.LoginLink>
           </S.RegisterCard>
         </S.RegisterSection>
       </S.ContentWrapper>

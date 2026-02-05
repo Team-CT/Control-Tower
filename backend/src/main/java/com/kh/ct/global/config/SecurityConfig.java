@@ -37,8 +37,10 @@ public class SecurityConfig {
                         //인증없이 가능한 경우
                         .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/emps").permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/emps/check-id").permitAll()
-                        .requestMatchers(HttpMethod.GET,  "/api/emps/emp-no/preview").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/emps/checkId").permitAll()
+                        .requestMatchers(HttpMethod.GET,  "/api/emps/empNo/preview").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/passwordCode/**").permitAll()
+
 
                         .requestMatchers(HttpMethod.POST,"/api/health/preview").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/health/save").permitAll()
