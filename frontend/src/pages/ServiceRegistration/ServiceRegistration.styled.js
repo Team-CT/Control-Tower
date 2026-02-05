@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -41,13 +41,13 @@ export const PageHeader = styled.div`
 export const HeaderIcon = styled.div`
   width: 72px;
   height: 72px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 24px;
-  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 `;
 
 export const PageTitle = styled.h1`
@@ -90,7 +90,7 @@ export const SectionHeader = styled.div`
 export const SectionNumber = styled.div`
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
   color: white;
   border-radius: 12px;
   display: flex;
@@ -144,7 +144,7 @@ export const Label = styled.label`
 `;
 
 export const RequiredMark = styled.span`
-  color: #ef4444;
+  color: #000000;
   font-size: 15px;
 `;
 
@@ -164,8 +164,8 @@ export const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #4a4a4a;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
   }
 
   &:hover {
@@ -186,8 +186,8 @@ export const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #4a4a4a;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
   }
 
   &:hover {
@@ -213,8 +213,8 @@ export const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #4a4a4a;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
   }
 
   &:hover {
@@ -244,8 +244,8 @@ export const FileUploadArea = styled.div`
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #3b82f6;
-    background: #eff6ff;
+    border-color: #4a4a4a;
+    background: #f5f5f5;
   }
 `;
 
@@ -269,8 +269,8 @@ export const UploadHint = styled.p`
 `;
 
 export const InfoBox = styled.div`
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-  border: 1px solid #bfdbfe;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
+  border: 1px solid #d1d1d1;
   border-radius: 16px;
   padding: 32px;
   margin: 48px 0;
@@ -283,7 +283,7 @@ export const InfoBox = styled.div`
 export const InfoTitle = styled.h3`
   font-size: 18px;
   font-weight: 600;
-  color: #1e40af;
+  color: #1a1a1a;
   margin: 0 0 16px 0;
 `;
 
@@ -298,7 +298,7 @@ export const InfoList = styled.ul`
 
 export const InfoItem = styled.li`
   font-size: 14px;
-  color: #1e40af;
+  color: #4a4a4a;
   line-height: 1.6;
 `;
 
@@ -308,7 +308,7 @@ export const SubmitButton = styled.button`
   display: block;
   margin: 0 auto;
   padding: 18px 32px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
   color: white;
   font-size: 17px;
   font-weight: 600;
@@ -316,11 +316,11 @@ export const SubmitButton = styled.button`
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   }
 
   &:active {
