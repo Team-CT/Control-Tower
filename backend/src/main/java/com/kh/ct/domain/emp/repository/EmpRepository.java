@@ -71,5 +71,9 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
   """
     )
     Page<HealthDto.AdminEmpHealthRow> findAdminEmpHealthRows(@Param("empName") String empName, Pageable pageable);
+
+    // 항공사 관리자 조회 (airline_id와 job으로 필터링)
+    @Query("SELECT e FROM Emp e WHERE e.airlineId.airlineId = :airlineId AND e.job = :job")
+    List<Emp> findByAirlineIdAndJob(@Param("airlineId") Long airlineId, @Param("job") String job);
 }
 
