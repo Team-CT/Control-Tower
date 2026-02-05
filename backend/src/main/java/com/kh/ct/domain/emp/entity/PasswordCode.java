@@ -28,7 +28,7 @@ public class PasswordCode extends BaseTimeEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private CommonEnums.CommonStatus leaveApplyStatus;
+    private CommonEnums.CommonStatus passwordCodeStatus;
 
 
 }
