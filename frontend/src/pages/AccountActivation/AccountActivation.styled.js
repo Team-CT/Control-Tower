@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
   padding: 60px 40px;
   display: flex;
   justify-content: center;
@@ -49,7 +49,7 @@ export const StepNumber = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: ${props => props.theme?.primary || '#2563eb'};
+  background: ${props => props.theme?.primary || '#4a4a4a'};
   color: white;
   display: flex;
   align-items: center;
@@ -83,7 +83,7 @@ export const IconWrapper = styled.div`
   width: 80px;
   height: 80px;
   margin: 0 auto 24px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -132,7 +132,7 @@ export const SectionNumber = styled.div`
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: #4a4a4a;
   color: white;
   display: flex;
   align-items: center;
@@ -208,8 +208,8 @@ export const Input = styled.input`
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #4a4a4a;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
   }
 
   &::placeholder {
@@ -246,7 +246,7 @@ export const PasswordHint = styled.div`
 export const HintTitle = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #1e40af;
+  color: #1a1a1a;
   margin-bottom: 8px;
 `;
 
@@ -294,7 +294,7 @@ export const Checkbox = styled.input`
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #3b82f6;
+  accent-color: #4a4a4a;
 `;
 
 export const TermLabel = styled.label`
@@ -332,7 +332,7 @@ export const SubmitButton = styled.button`
   height: 56px;
   background: ${props => props.disabled 
     ? '#d1d5db' 
-    : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'};
+    : 'linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%)'};
   color: white;
   font-size: 16px;
   font-weight: 600;
@@ -346,7 +346,7 @@ export const SubmitButton = styled.button`
     transform: ${props => props.disabled ? 'none' : 'translateY(-2px)'};
     box-shadow: ${props => props.disabled 
       ? 'none' 
-      : '0 8px 24px rgba(59, 130, 246, 0.3)'};
+      : '0 8px 24px rgba(0, 0, 0, 0.3)'};
   }
 
   &:active {
