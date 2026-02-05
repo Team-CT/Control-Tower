@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
   padding: 60px 40px;
   display: flex;
   justify-content: center;
@@ -147,7 +147,7 @@ export const StatusIcon = styled.span`
 export const ActionButton = styled.button`
   width: 100%;
   height: 56px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
   color: white;
   font-size: 16px;
   font-weight: 600;
@@ -158,7 +158,7 @@ export const ActionButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   }
 
   &:active {

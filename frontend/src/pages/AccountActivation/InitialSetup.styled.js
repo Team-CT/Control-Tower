@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
   padding: 60px 40px;
   display: flex;
   justify-content: center;
@@ -49,7 +49,7 @@ export const StepNumber = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: ${props => props.theme?.primary || '#2563eb'};
+  background: ${props => props.theme?.primary || '#4a4a4a'};
   color: white;
   display: flex;
   align-items: center;
@@ -83,7 +83,7 @@ export const IconWrapper = styled.div`
   width: 80px;
   height: 80px;
   margin: 0 auto 24px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -132,7 +132,7 @@ export const SectionNumber = styled.div`
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #3b82f6;
+  background: #4a4a4a;
   color: white;
   display: flex;
   align-items: center;
@@ -189,8 +189,8 @@ export const UploadBox = styled.div`
   background: #f9fafb;
 
   &:hover {
-    border-color: #3b82f6;
-    background: #eff6ff;
+    border-color: #4a4a4a;
+    background: #f5f5f5;
   }
 
   @media (max-width: 768px) {
@@ -280,8 +280,8 @@ export const Select = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: #4a4a4a;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
   }
 `;
 
@@ -295,7 +295,7 @@ export const DepartmentInputWrapper = styled.div`
 export const DepartmentIconWrapper = styled.div`
   width: 48px;
   height: 48px;
-  background: #eff6ff;
+  background: #f5f5f5;
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -309,7 +309,7 @@ export const DepartmentIcon = styled.div`
 export const AddButton = styled.button`
   height: 48px;
   padding: 0 24px;
-  background: #3b82f6;
+  background: #4a4a4a;
   color: white;
   border: none;
   border-radius: 8px;
@@ -320,7 +320,7 @@ export const AddButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #2563eb;
+    background: #2a2a2a;
   }
 `;
 
@@ -338,7 +338,7 @@ export const PositionDropdown = styled.select`
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: #4a4a4a;
   }
 `;
 
@@ -350,8 +350,8 @@ export const Description = styled.p`
 `;
 
 export const BulkUploadInfo = styled.div`
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
+  background: #f5f5f5;
+  border: 1px solid #d1d1d1;
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
@@ -365,7 +365,7 @@ export const InfoIcon = styled.div`
 export const InfoTitle = styled.div`
   font-size: 15px;
   font-weight: 600;
-  color: #1e40af;
+  color: #1a1a1a;
   margin-bottom: 12px;
 `;
 
@@ -375,7 +375,7 @@ export const InfoList = styled.div`
 
 export const InfoItem = styled.div`
   font-size: 13px;
-  color: #3b82f6;
+  color: #4a4a4a;
   margin-bottom: 6px;
 
   &:last-child {
@@ -386,8 +386,8 @@ export const InfoItem = styled.div`
 export const TemplateButton = styled.button`
   padding: 8px 16px;
   background: white;
-  border: 1px solid #3b82f6;
-  color: #3b82f6;
+  border: 1px solid #4a4a4a;
+  color: #4a4a4a;
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
@@ -395,7 +395,7 @@ export const TemplateButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #eff6ff;
+    background: #f5f5f5;
   }
 `;
 
@@ -418,8 +418,8 @@ export const UploadDropZone = styled.div`
   padding: 40px 20px;
 
   &:hover {
-    border-color: #3b82f6;
-    background: #eff6ff;
+    border-color: #4a4a4a;
+    background: #f5f5f5;
   }
 `;
 
@@ -483,7 +483,7 @@ export const WarningItem = styled.li`
 export const SubmitButton = styled.button`
   width: 100%;
   height: 56px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
   color: white;
   font-size: 16px;
   font-weight: 600;
@@ -495,7 +495,7 @@ export const SubmitButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
   }
 
   &:active {
