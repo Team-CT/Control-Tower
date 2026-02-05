@@ -61,8 +61,8 @@ export const ActionBar = styled.div`
 
 export const ActionButton = styled.button`
   padding: 10px 20px;
-  background: ${props => props.active ? '#4F46E5' : '#F3F4F6'};
-  color: ${props => props.active ? 'white' : '#4B5563'};
+  background: ${props => props.$active ? '#4F46E5' : '#F3F4F6'};
+  color: ${props => props.$active ? 'white' : '#4B5563'};
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -74,7 +74,7 @@ export const ActionButton = styled.button`
   white-space: nowrap;
 
   &:hover {
-    background: ${props => props.active ? '#4338CA' : '#E5E7EB'};
+    background: ${props => props.$active ? '#4338CA' : '#E5E7EB'};
   }
 `;
 
@@ -223,7 +223,7 @@ export const StatusBadge = styled.div`
   font-weight: 600;
   white-space: nowrap;
   background: ${props => {
-    switch (props.statusType) {
+    switch (props.$statusType) {
       case 'warning':
         return '#FEF3C7';
       case 'success':
@@ -235,7 +235,7 @@ export const StatusBadge = styled.div`
     }
   }};
   color: ${props => {
-    switch (props.statusType) {
+    switch (props.$statusType) {
       case 'warning':
         return '#92400E';
       case 'success':
@@ -392,4 +392,169 @@ export const EmptyText = styled.p`
   font-size: 16px;
   color: #6B7280;
   margin: 0;
+`;
+
+// === Modal Components ===
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+`;
+
+export const ModalContainer = styled.div`
+  background: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 600px; // 상세 모달 크기 적절히 조절
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  animation: modalFadeIn 0.2s ease-out;
+
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+`;
+
+export const ModalHeader = styled.div`
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const ModalTitle = styled.h2`
+  font-size: 20px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+`;
+
+export const ModalCloseButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #9CA3AF;
+  cursor: pointer;
+  padding: 4px;
+  
+  &:hover {
+    color: #4B5563;
+  }
+`;
+
+export const ModalBody = styled.div`
+  padding: 24px;
+`;
+
+export const ModalSection = styled.div`
+  margin-bottom: 24px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+export const ModalLabel = styled.label`
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+`;
+
+export const ModalValue = styled.div`
+  font-size: 15px;
+  color: #111827;
+  padding: 10px 12px;
+  background: ${props => props.$isBox ? '#F9FAFB' : 'transparent'};
+  border: ${props => props.$isBox ? '1px solid #E5E7EB' : 'none'};
+  border-radius: 6px;
+  
+  ${props => props.$grid && `
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  `}
+`;
+
+export const InputTextarea = styled.textarea`
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 15px;
+  min-height: 100px;
+  resize: vertical;
+  
+  &:focus {
+    outline: none;
+    border-color: #4F46E5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+  }
+`;
+
+export const SelectBox = styled.select`
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: white;
+  
+  &:focus {
+    outline: none;
+    border-color: #4F46E5;
+  }
+`;
+
+export const ModalFooter = styled.div`
+  padding: 16px 24px 24px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid #E5E7EB;
+`;
+
+export const ModalActionButton = styled.button`
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  ${props => props.$variant === 'primary' && `
+    background: #4F46E5;
+    color: white;
+    border: none;
+    &:hover { background: #4338CA; }
+    &:disabled { background: #9CA3AF; cursor: not-allowed; }
+  `}
+
+  ${props => props.$variant === 'danger' && `
+    background: #DC2626;
+    color: white;
+    border: none;
+    &:hover { background: #B91C1C; }
+    &:disabled { background: #F87171; cursor: not-allowed; }
+  `}
+
+  ${props => props.$variant === 'secondary' && `
+    background: white;
+    color: #374151;
+    border: 1px solid #D1D5DB;
+    &:hover { background: #F3F4F6; }
+  `}
 `;

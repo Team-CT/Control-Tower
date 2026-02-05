@@ -31,6 +31,7 @@ import HealthInfoSubmission from './pages/HealthInfoSubmission/HealthInfoSubmiss
 import HealthSubmissionHistory from './pages/HealthSubmissionHistory/HealthSubmissionHistory';
 import HealthProgramManagement from './pages/HealthProgramManagement/HealthProgramManagement';
 import HealthProgramApply from './pages/HealthProgramApply/HealthProgramApply.jsx';
+import HealthProgramHistory from './pages/HealthProgramHistory/HealthProgramHistory.jsx';
 import Settings from './pages/Settings/Settings';
 import NotFound from './pages/NotFound/NotFound';
 import CommonCodeManagement from './pages/CommonCodeManagement/CommonCodeManagement';
@@ -130,6 +131,7 @@ const ThemedApp = () => {
           <Route path="/healthsubmissionhistory" element={<HealthSubmissionHistory />} />
           <Route path="/healthprogrammanagement" element={<HealthProgramManagement />} />
           <Route path="/healthprogramapply" element={<HealthProgramApply />} />
+          <Route path="/health-program-history" element={<HealthProgramHistory />} />
 
 
           {/* [시스템 관리] */}

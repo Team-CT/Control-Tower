@@ -288,8 +288,8 @@ export const ScoreGrade = styled.div`
   height: 56px;
   border-radius: 12px;
   background: ${props => {
-    if (props.grade === 'A') return '#27ae60';
-    if (props.grade === 'B+') return '#f39c12';
+    if (props.$grade === 'A') return '#27ae60';
+    if (props.$grade === 'B+') return '#f39c12';
     return '#95a5a6';
   }};
   color: white;
