@@ -27,8 +27,9 @@ const AUTH_EXCLUDE = [
 
   // 회원가입/사전검증(공개)
   { method: 'post', path: '/api/emps' },
-  { method: 'get', path: '/api/emps/check-id' },
-  { method: 'get', path: '/api/emps/emp-no/preview' },
+  { method: 'post', path: '/api//api/passwordCode' },
+  { method: 'get', path: '/api/emps/checkId' },
+  { method: 'get', path: '/api/emps/empNo/preview' },
 
   // 파일 업로드/삭제(회원가입 전 사용 가능하게 하려면 공개로 둠)
   { method: 'post', path: '/api/file/upload' },
