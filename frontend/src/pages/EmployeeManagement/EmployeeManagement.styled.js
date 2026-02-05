@@ -220,7 +220,7 @@ export const StatusBadge = styled.span`
   font-weight: 600;
   
   ${props => {
-    switch(props.status) {
+    switch (props.$status) {
       case '재직':
         return 'background: #e6fcf5; color: #20c997;';
       case '휴직':

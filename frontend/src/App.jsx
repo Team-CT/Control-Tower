@@ -21,6 +21,7 @@ import EmployeeDetail from './pages/EmployeeDetail/EmployeeDetail';
 import DepartmentManagement from './pages/DepartmentManagement/DepartmentManagement';
 import DepartmentDetail from './pages/DepartmentDetail/DepartmentDetail';
 import LeaveApply from './pages/EmployeeSchedule/LeaveApply';
+import EmployeeSchedule from './pages/EmployeeSchedule/EmployeeSchedule';
 import LeaveApproval from './pages/AdminAttendance/LeaveApproval';
 import ProtestApproval from './pages/AdminAttendance/ProtestApproval';
 import Dashboard from './pages/HealthDashboard/HealthDashboard';
@@ -113,6 +114,7 @@ const ThemedApp = () => {
 
           {/* [근태 관리] */}
           <Route path="/my-attendance" element={<EmployeeAttendance />} />
+          <Route path="/employee-schedule" element={<EmployeeSchedule />} />
           <Route path="/admin-attendance" element={<AdminAttendance />} />
           <Route path="/staff-schedule-assignment" element={<StaffScheduleAssignment />} />
           <Route path="/vacation" element={<LeaveApply />} />

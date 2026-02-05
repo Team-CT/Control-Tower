@@ -64,7 +64,7 @@ const CommonCodeManagement = () => {
   const [selectedCodeName, setSelectedCodeName] = useState('');
   const [codeDetails, setCodeDetails] = useState([]);
   const [loading, setLoading] = useState(false);
-  
+
   // 항공사 필터 관련 (최상위관리자만)
   const [airlines, setAirlines] = useState([]);
   const [selectedAirlineId, setSelectedAirlineId] = useState(null);
@@ -123,7 +123,7 @@ const CommonCodeManagement = () => {
       const response = await commonCodeService.getCodes();
       const codes = response.data?.data || response.data || [];
       setAllCodeGroups(codes);
-      
+
       // 최상위관리자가 아니면 바로 필터링 없이 표시
       if (!isSuperAdmin) {
         setCodeGroups(codes);
@@ -147,7 +147,7 @@ const CommonCodeManagement = () => {
   const filterCodeGroupsByAirline = (codesToFilter = null) => {
     const codes = codesToFilter || allCodeGroups;
     let filteredCodes;
-    
+
     if (!selectedAirlineId) {
       // 전체 선택
       filteredCodes = codes;
@@ -155,9 +155,9 @@ const CommonCodeManagement = () => {
       // 선택한 항공사 필터링
       filteredCodes = codes.filter(code => code.airlineId === selectedAirlineId);
     }
-    
+
     setCodeGroups(filteredCodes);
-    
+
     // 필터링 후 첫 번째 코드 그룹 자동 선택 (선택된 코드가 없거나 선택된 코드가 필터링 결과에 없을 때)
     if (filteredCodes.length > 0) {
       const currentSelectedExists = filteredCodes.some(code => code.codeId === selectedCodeId);
@@ -216,7 +216,7 @@ const CommonCodeManagement = () => {
       const codeDto = {
         codeName: codeGroupForm.codeName.trim()
       };
-      
+
       // 관리자인 경우 airlineId 자동 추가
       if (isAdmin && airlineId) {
         codeDto.airlineId = airlineId;
@@ -330,25 +330,25 @@ const CommonCodeManagement = () => {
   const handleDeleteCodeGroup = async (codeId, codeName, e) => {
     // 카드 클릭 이벤트와 버튼 클릭 이벤트 분리
     e.stopPropagation();
-    
+
     if (isSuperAdmin) {
       alert('최상위관리자는 코드 그룹을 삭제할 수 없습니다.');
       return;
     }
-    
+
     if (!confirm(`정말로 "${codeName}" 코드 그룹을 삭제하시겠습니까?\n코드 그룹에 포함된 모든 코드도 함께 삭제됩니다.`)) return;
 
     try {
       await commonCodeService.deleteCode(codeId);
       alert('코드 그룹이 삭제되었습니다.');
-      
+
       // 삭제된 코드 그룹이 선택되어 있었다면 선택 해제
       if (selectedCodeId === codeId) {
         setSelectedCodeId(null);
         setSelectedCodeName('');
         setCodeDetails([]);
       }
-      
+
       loadCodeGroups();
     } catch (error) {
       console.error('코드 그룹 삭제 실패:', error);
@@ -402,10 +402,10 @@ const CommonCodeManagement = () => {
           )}
 
           {codeGroups.map((group) => (
-            <CodeGroupCard 
-              key={group.codeId} 
+            <CodeGroupCard
+              key={group.codeId}
               onClick={() => handleCodeGroupClick(group.codeId, group.codeName)}
-              style={{ 
+              style={{
                 cursor: 'pointer',
                 backgroundColor: selectedCodeId === group.codeId ? '#e3f2fd' : 'white'
               }}
@@ -490,7 +490,7 @@ const CommonCodeManagement = () => {
                       <TableCell>{detail.codeDetailName}</TableCell>
                       <TableCell>{detail.codeDesc || '-'}</TableCell>
                       <TableCell>
-                        <StatusBadge status="사용">
+                        <StatusBadge $status="사용">
                           사용
                         </StatusBadge>
                       </TableCell>

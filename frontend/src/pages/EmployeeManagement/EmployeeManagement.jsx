@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // ✅ useNavigate 추가
-import * as S from './EmployeeManagement.Styled';
+import * as S from './EmployeeManagement.styled';
 import { Search, Plus, MoreHorizontal, Phone } from 'lucide-react';
 
 const EmployeeManagement = () => {
@@ -77,7 +77,7 @@ const EmployeeManagement = () => {
 
   // ✅ 직원 클릭 시 상세 페이지로 이동
   const handleRowClick = (id) => {
-    navigate('/employee-list/detail'); 
+    navigate('/employee-list/detail');
     // 실제로는 navigate(`/employee-list/detail/${id}`) 처럼 ID를 함께 넘겨야 합니다.
   };
 
@@ -99,17 +99,17 @@ const EmployeeManagement = () => {
         <S.FilterSection>
           <S.SearchForm onSubmit={handleSearch}>
             <Search size={20} color="#999" />
-            <S.SearchInput 
-              placeholder="이름, 사번, 부서 검색..." 
+            <S.SearchInput
+              placeholder="이름, 사번, 부서 검색..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </S.SearchForm>
-          
+
           <S.FilterGroup>
             {departments.map(dept => (
-              <S.FilterButton 
-                key={dept} 
+              <S.FilterButton
+                key={dept}
                 $active={selectedDept === dept}
                 onClick={() => setSelectedDept(dept)}
               >
@@ -137,8 +137,8 @@ const EmployeeManagement = () => {
             </thead>
             <tbody>
               {employees.map((emp) => (
-                <S.Tr 
-                  key={emp.id} 
+                <S.Tr
+                  key={emp.id}
                   onClick={() => handleRowClick(emp.id)} // ✅ 클릭 이벤트 추가
                   style={{ cursor: 'pointer' }} // 커서 모양 변경
                 >
@@ -164,7 +164,7 @@ const EmployeeManagement = () => {
                     </S.ContactInfo>
                   </S.Td>
                   <S.Td>
-                    <S.StatusBadge status={emp.status}>
+                    <S.StatusBadge $status={emp.status}>
                       {emp.status}
                     </S.StatusBadge>
                   </S.Td>

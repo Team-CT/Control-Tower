@@ -310,8 +310,8 @@ export const StatusBadge = styled.span`
   border-radius: 12px;
   font-size: 13px;
   font-weight: 600;
-  background-color: ${props => props.status === '사용' ? '#d1fae5' : '#fee2e2'};
-  color: ${props => props.status === '사용' ? '#059669' : '#dc2626'};
+  background-color: ${props => props.$status === '사용' ? '#d1fae5' : '#fee2e2'};
+  color: ${props => props.$status === '사용' ? '#059669' : '#dc2626'};
 `;
 
 export const ActionButton = styled.button`
