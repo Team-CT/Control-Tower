@@ -24,7 +24,7 @@ const Header = () => {
   // 현재 역할에 맞는 메뉴 리스트 가져오기
   const currentMenu = useMemo(() => {
     if (emp?.role === 'SUPER_ADMIN') return SUPER_ADMIN_MENU;
-    if (emp?.role === 'ADMIN') return ADMIN_MENU;
+    if (emp?.role === 'AIRLINE_ADMIN') return ADMIN_MENU;
     return USER_MENU;
   }, [emp?.role]);
 
@@ -60,10 +60,8 @@ const Header = () => {
     <S.HeaderContainer>
       {/* 왼쪽: 브레드크럼 (홈 > 카테고리 > 현재페이지) */}
       <S.Breadcrumb>
-        <S.BreadcrumbItem>홈</S.BreadcrumbItem>
         {breadcrumbInfo.category && breadcrumbInfo.category !== '메인' && (
           <>
-            <S.BreadcrumbSeparator>›</S.BreadcrumbSeparator>
             <S.BreadcrumbItem>{breadcrumbInfo.category}</S.BreadcrumbItem>
           </>
         )}
@@ -92,7 +90,7 @@ const Header = () => {
           <S.UserAvatar>{emp?.empName ? emp.empName.charAt(0) : 'G'}</S.UserAvatar>
           <S.UserInfo>
             <S.UserName>{emp?.empName || 'Guest'}</S.UserName>
-            <S.UserRole>{theme.name} {emp?.role === 'SUPER_ADMIN' ? '슈퍼 관리자' : emp?.role === 'ADMIN' ? '관리자' : '직원'}</S.UserRole>
+            <S.UserRole>{theme.name} {emp?.role === 'SUPER_ADMIN' ? '슈퍼 관리자' : emp?.role === 'AIRLINE_ADMIN' ? '관리자' : '직원'}</S.UserRole>
           </S.UserInfo>
         </S.UserProfile>
 
