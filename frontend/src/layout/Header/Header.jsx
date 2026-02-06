@@ -6,13 +6,20 @@ import { getPageTitle } from '../../constants/pageTitles';
 import * as S from './Header.styled';
 import useAuthStore from '../../store/authStore';
 import { USER_MENU, ADMIN_MENU, SUPER_ADMIN_MENU } from '../../constants/menu';
+import { useNavigate } from 'react-router-dom';
+
 
 const Header = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { theme } = useAirlineTheme();
+  const { emp, logout } = useAuthStore();
 
-  // Auth Store에서 사용자 정보 가져오기
-  const { emp } = useAuthStore();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login', { replace: true });
+  };
 
   // 현재 역할에 맞는 메뉴 리스트 가져오기
   const currentMenu = useMemo(() => {
@@ -76,10 +83,6 @@ const Header = () => {
 
       {/* 오른쪽: 검색, 알림, 프로필 */}
       <S.HeaderRight>
-        <S.SearchIconButton>
-          <Search size={20} />
-        </S.SearchIconButton>
-
         <S.NotificationBadge>
           <S.NotificationIcon>🔔</S.NotificationIcon>
           <S.Badge>1</S.Badge>
@@ -92,6 +95,10 @@ const Header = () => {
             <S.UserRole>{theme.name} {emp?.role === 'SUPER_ADMIN' ? '슈퍼 관리자' : emp?.role === 'ADMIN' ? '관리자' : '직원'}</S.UserRole>
           </S.UserInfo>
         </S.UserProfile>
+
+        <S.LogoutButton onClick={handleLogout}>
+          로그아웃
+        </S.LogoutButton>
       </S.HeaderRight>
     </S.HeaderContainer>
   );
