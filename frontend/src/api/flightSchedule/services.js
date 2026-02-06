@@ -10,6 +10,16 @@ export const flightScheduleService = {
   getFlightScheduleDetail: (flyScheduleId) => {
     return api.get(`/api/flight-schedules/${flyScheduleId}`);
   },
+  
+  // 승무원 추가
+  addCrewMember: (flyScheduleId, empId) => {
+    return api.post(`/api/flight-schedules/${flyScheduleId}/crew`, { empId });
+  },
+  
+  // 승무원 삭제
+  removeCrewMember: (flyScheduleId, empId) => {
+    return api.delete(`/api/flight-schedules/${flyScheduleId}/crew/${empId}`);
+  },
 };
 
 export default { flightScheduleService };

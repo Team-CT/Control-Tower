@@ -104,4 +104,9 @@ public class Emp extends BaseTimeEntity {
    }
 
 
+
+    public void updateRoleAndJob(CommonEnums.Role role, String job) {
+        this.role = role;
+        this.job = job;
+    }
 }

@@ -131,4 +131,45 @@ public class EmpDto {
             return EmpNoPreviewResponse.builder().empNo(empNo).build();
         }
     }
+    
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class EmployeeListItem {
+        @JsonProperty("emp_id")
+        private String empId;
+        
+        @JsonProperty("emp_name")
+        private String empName;
+        
+        @JsonProperty("role")
+        private String role;
+        
+        @JsonProperty("job")
+        private String job;
+        
+        @JsonProperty("department_name")
+        private String departmentName;
+        
+        @JsonProperty("airline_name")
+        private String airlineName;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class UpdateRoleAndJobRequest {
+        @JsonProperty("role")
+        @NotBlank(message = "직급(role)은 필수입니다.")
+        private String role;
+
+        @JsonProperty("job")
+        @NotBlank(message = "직책(job)은 필수입니다.")
+        @Size(max = 50, message = "직책은 50자 이하여야 합니다.")
+        private String job;
+    }
 }

@@ -312,4 +312,44 @@ public class FlyScheduleServiceImpl implements FlyScheduleService {
             return ZoneId.systemDefault();
         }
     }
+    
+    @Override
+    @Transactional
+    public void addCrewMember(Long flyScheduleId, String empId) {
+        // 비행편 존재 확인
+        FlySchedule flySchedule = flyScheduleRepository.findByFlyScheduleId(flyScheduleId)
+                .orElseThrow(() -> new IllegalArgumentException("비행편을 찾을 수 없습니다. (flyScheduleId: " + flyScheduleId + ")"));
+        
+        // 직원 존재 확인
+        Emp emp = empRepository.findById(empId)
+                .orElseThrow(() -> new IllegalArgumentException("직원을 찾을 수 없습니다. (empId: " + empId + ")"));
+        
+        // 이미 배정되어 있는지 확인
+        List<EmpFlySchedule> existing = empFlyScheduleRepository.findByFlyScheduleIdAndEmpId(flyScheduleId, empId);
+        if (!existing.isEmpty()) {
+            throw new IllegalArgumentException("이미 해당 비행편에 배정된 직원입니다.");
+        }
+        
+        // 승무원 배정 생성
+        EmpFlySchedule empFlySchedule = EmpFlySchedule.builder()
+                .emp(emp)
+                .flySchedule(flySchedule)
+                .build();
+        
+        empFlyScheduleRepository.save(empFlySchedule);
+    }
+    
+    @Override
+    @Transactional
+    public void removeCrewMember(Long flyScheduleId, String empId) {
+        // 배정 정보 조회
+        List<EmpFlySchedule> empFlySchedules = empFlyScheduleRepository.findByFlyScheduleIdAndEmpId(flyScheduleId, empId);
+        
+        if (empFlySchedules.isEmpty()) {
+            throw new IllegalArgumentException("해당 비행편에 배정된 직원을 찾을 수 없습니다.");
+        }
+        
+        // 배정 정보 삭제
+        empFlyScheduleRepository.deleteAll(empFlySchedules);
+    }
 }

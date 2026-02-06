@@ -3,6 +3,8 @@ package com.kh.ct.domain.emp.service;
 import com.kh.ct.domain.emp.dto.EmpDto;
 import com.kh.ct.domain.emp.entity.Emp;
 
+import java.util.List;
+
 public interface EmpService {
     boolean isEmpIdAvailable(String empId);
     Emp register(EmpDto.RegisterRequest request);
@@ -12,4 +14,6 @@ public interface EmpService {
      * 관리자(담당자) 후보 리스트 조회
      */
     java.util.List<EmpDto> getManagerCandidates();
+    List<EmpDto.EmployeeListItem> getEmployees(String role, Long airlineId);
+    EmpDto updateEmpRoleAndJob(String empId, EmpDto.UpdateRoleAndJobRequest request);
 }

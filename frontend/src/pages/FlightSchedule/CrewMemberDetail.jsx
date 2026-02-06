@@ -10,11 +10,16 @@ const CrewMemberDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("정보");
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editRole, setEditRole] = useState('');
+  const [editJob, setEditJob] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     if (crewId) {
       loadEmpDetail();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [crewId]);
 
   const loadEmpDetail = async () => {
@@ -30,6 +35,41 @@ const CrewMemberDetail = () => {
       alert('직원 정보를 불러오는데 실패했습니다.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOpenEditModal = () => {
+    if (empDetail) {
+      setEditRole(empDetail.role || '');
+      setEditJob(empDetail.job || '');
+      setShowEditModal(true);
+    }
+  };
+
+  const handleCloseEditModal = () => {
+    setShowEditModal(false);
+    setEditRole('');
+    setEditJob('');
+  };
+
+  const handleUpdateRoleAndJob = async () => {
+    if (!editRole || !editJob) {
+      alert('직급과 직책을 모두 입력해주세요.');
+      return;
+    }
+
+    try {
+      setIsUpdating(true);
+      await empService.updateEmpRoleAndJob(crewId, editRole, editJob);
+      alert('직급/직책이 성공적으로 수정되었습니다.');
+      handleCloseEditModal();
+      loadEmpDetail(); // 데이터 다시 로드
+    } catch (error) {
+      console.error('직급/직책 수정 실패:', error);
+      const errorMessage = error.response?.data?.message || '직급/직책 수정에 실패했습니다.';
+      alert(errorMessage);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -173,7 +213,7 @@ const CrewMemberDetail = () => {
           </S.ProfileLeft>
 
           <S.ProfileRight>
-            <S.EditButton type="button">✏️ 정보 수정</S.EditButton>
+            <S.EditButton type="button" onClick={handleOpenEditModal}>✏️ 정보 수정</S.EditButton>
           </S.ProfileRight>
         </S.ProfileHeader>
 
@@ -270,6 +310,54 @@ const CrewMemberDetail = () => {
           </S.LeaveCard>
         ))}
       </S.HistorySection>
+
+      {/* 정보 수정 모달 */}
+      {showEditModal && (
+        <S.ModalOverlay onClick={handleCloseEditModal}>
+          <S.ModalContainer onClick={(e) => e.stopPropagation()}>
+            <S.ModalHeader>
+              <S.ModalTitle>직급/직책 수정</S.ModalTitle>
+              <S.CloseButton onClick={handleCloseEditModal}>×</S.CloseButton>
+            </S.ModalHeader>
+            <S.ModalContent>
+              <S.FormGroup>
+                <S.FormLabel>직급 *</S.FormLabel>
+                <S.FormSelect
+                  value={editRole}
+                  onChange={(e) => setEditRole(e.target.value)}
+                >
+                  <option value="">직급을 선택하세요</option>
+                  <option value="PILOT">조종사</option>
+                  <option value="CABIN_CREW">객실승무원</option>
+                  <option value="MAINTENANCE">정비사</option>
+                  <option value="GROUND_STAFF">지상직</option>
+                  <option value="AIRLINE_ADMIN">항공사 관리자</option>
+                  <option value="ADMIN">관리자</option>
+                  <option value="SUPER_ADMIN">최상위 관리자</option>
+                </S.FormSelect>
+              </S.FormGroup>
+              <S.FormGroup>
+                <S.FormLabel>직책 *</S.FormLabel>
+                <S.FormInput
+                  type="text"
+                  value={editJob}
+                  onChange={(e) => setEditJob(e.target.value)}
+                  placeholder="직책을 입력하세요"
+                  maxLength={50}
+                />
+              </S.FormGroup>
+            </S.ModalContent>
+            <S.FormActions>
+              <S.CancelButton onClick={handleCloseEditModal} disabled={isUpdating}>
+                취소
+              </S.CancelButton>
+              <S.SubmitButton onClick={handleUpdateRoleAndJob} disabled={isUpdating || !editRole || !editJob}>
+                {isUpdating ? '수정 중...' : '수정'}
+              </S.SubmitButton>
+            </S.FormActions>
+          </S.ModalContainer>
+        </S.ModalOverlay>
+      )}
     </S.PageContainer>
   );
 };
