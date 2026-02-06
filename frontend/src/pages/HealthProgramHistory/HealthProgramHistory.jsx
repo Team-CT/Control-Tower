@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import useAuthStore from '../../store/authStore';
 import { empPhysicalTestService } from '../../api/Health/healthService';
 import * as S from './HealthProgramHistory.styled';
 
@@ -14,8 +15,8 @@ const HealthProgramHistory = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // 로그인한 사용자의 empNo (실제로는 Context나 Redux에서 가져와야 함)
-    // 임시로 하드코딩 (실제 구현 시 수정 필요)
-    const currentEmpNo = 'EMP001';
+    const { getEmpId } = useAuthStore();
+    const currentEmpNo = getEmpId();
 
     /**
      * 신청 내역 데이터 로드
