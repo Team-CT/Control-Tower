@@ -26,6 +26,16 @@ const healthService = {
         });
     },
 
+     getPhysicalTest: (empId, page = 0, size = 10) => {
+        return axios.get("/api/health/getPhysicalTest", {
+            params: { empId, page, size, sort: "testDate,desc" },
+
+        });
+
+    },
+
+    
+
     /**
      * 나의 프로그램 신청 내역 조회
      * @param {string} empId 
