@@ -399,3 +399,181 @@ export const LeaveReasonText = styled.p`
   margin: 0;
   line-height: 1.6;
 `;
+
+/* ==================== Modal ==================== */
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+`;
+
+export const ModalContainer = styled.div`
+  background-color: #ffffff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+`;
+
+export const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #e5e7eb;
+`;
+
+export const ModalTitle = styled.h2`
+  font-size: 20px;
+  font-weight: 800;
+  color: #111827;
+  margin: 0;
+`;
+
+export const CloseButton = styled.button`
+  width: 32px;
+  height: 32px;
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  color: #6b7280;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+  }
+`;
+
+export const ModalContent = styled.div`
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+export const FormGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+export const FormLabel = styled.label`
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+`;
+
+export const FormSelect = styled.select`
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #111827;
+  cursor: pointer;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  &:disabled {
+    background-color: #f9fafb;
+    cursor: not-allowed;
+  }
+`;
+
+export const FormInput = styled.input`
+  padding: 10px 14px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #ffffff;
+  color: #111827;
+  transition: border-color 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+
+  &:disabled {
+    background-color: #f9fafb;
+    cursor: not-allowed;
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+`;
+
+export const FormActions = styled.div`
+  display: flex;
+  gap: 12px;
+  padding: 24px;
+  border-top: 1px solid #e5e7eb;
+  justify-content: flex-end;
+`;
+
+export const CancelButton = styled.button`
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #6b7280;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+export const SubmitButton = styled.button`
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 18px rgba(59, 130, 246, 0.22);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+`;

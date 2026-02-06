@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/emps")
 @RequiredArgsConstructor
@@ -61,5 +63,29 @@ public class EmpController {
     public ResponseEntity<ApiResponse<java.util.List<EmpDto>>> getManagerCandidates() {
         java.util.List<EmpDto> managers = empService.getManagerCandidates();
         return ResponseEntity.ok(ApiResponse.success("관리자 후보 조회 성공", managers));
+    }
+
+    /**
+     * 직원 목록 조회 (역할별 필터링 가능)
+     */
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<EmpDto.EmployeeListItem>>> getEmployees(
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) Long airlineId
+    ) {
+        List<EmpDto.EmployeeListItem> employees = empService.getEmployees(role, airlineId);
+        return ResponseEntity.ok(ApiResponse.success("직원 목록 조회 성공", employees));
+    }
+
+    /**
+     * 직원 직급/직책 수정
+     */
+    @PatchMapping("/{empId}/role-job")
+    public ResponseEntity<ApiResponse<EmpDto>> updateEmpRoleAndJob(
+            @PathVariable String empId,
+            @Valid @RequestBody EmpDto.UpdateRoleAndJobRequest request
+    ) {
+        EmpDto updatedEmp = empService.updateEmpRoleAndJob(empId, request);
+        return ResponseEntity.ok(ApiResponse.success("직급/직책 수정 성공", updatedEmp));
     }
 }

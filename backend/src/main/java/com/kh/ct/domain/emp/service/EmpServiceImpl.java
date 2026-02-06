@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -146,5 +147,107 @@ public class EmpServiceImpl implements EmpService {
                             .build();
                 })
                 .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public List<EmpDto.EmployeeListItem> getEmployees(String role, Long airlineId) {
+        try {
+            List<Emp> employees;
+
+            CommonEnums.Role roleEnum = null;
+            if (role != null && !role.isEmpty()) {
+                try {
+                    roleEnum = CommonEnums.Role.valueOf(role.toUpperCase());
+                    System.out.println("역할 필터링: " + roleEnum);
+                } catch (IllegalArgumentException e) {
+                    // 잘못된 역할 값이면 null로 처리하여 전체 조회
+                    System.out.println("잘못된 역할 값: " + role + ", 전체 조회로 처리");
+                    roleEnum = null;
+                }
+            }
+
+            System.out.println("직원 조회 파라미터 - role: " + roleEnum + ", airlineId: " + airlineId);
+
+            // JOIN FETCH를 사용한 쿼리로 조회 (LAZY 직렬화 문제 방지)
+            employees = empRepository.findByRoleAndAirlineId(roleEnum, airlineId);
+
+            System.out.println("조회된 직원 수: " + employees.size());
+
+            // DTO로 변환
+            return employees.stream()
+                    .map(emp -> {
+                        String departmentName = null;
+                        if (emp.getDepartmentId() != null) {
+                            departmentName = emp.getDepartmentId().getDepartmentName();
+                        }
+
+                        String airlineName = null;
+                        if (emp.getAirlineId() != null) {
+                            airlineName = emp.getAirlineId().getAirlineName();
+                        }
+
+                        return EmpDto.EmployeeListItem.builder()
+                                .empId(emp.getEmpId())
+                                .empName(emp.getEmpName())
+                                .role(emp.getRole() != null ? emp.getRole().name() : null)
+                                .job(emp.getJob())
+                                .departmentName(departmentName)
+                                .airlineName(airlineName)
+                                .build();
+                    })
+                    .collect(java.util.stream.Collectors.toList());
+        } catch (Exception e) {
+            System.err.println("직원 목록 조회 중 오류 발생: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("직원 목록 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public EmpDto updateEmpRoleAndJob(String empId, EmpDto.UpdateRoleAndJobRequest request) {
+        Emp emp = empRepository.findByIdWithDetails(empId)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "직원을 찾을 수 없습니다. (empId: " + empId + ")"));
+
+        // Role enum 변환
+        CommonEnums.Role roleEnum;
+        try {
+            roleEnum = CommonEnums.Role.valueOf(request.getRole().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "유효하지 않은 직급(role)입니다: " + request.getRole());
+        }
+
+        // 직급과 직책 업데이트
+        emp.updateRoleAndJob(roleEnum, request.getJob());
+        emp = empRepository.save(emp);
+
+        // Department와 Airline 정보 가져오기
+        String departmentName = null;
+        if (emp.getDepartmentId() != null) {
+            departmentName = emp.getDepartmentId().getDepartmentName();
+        }
+
+        String airlineName = null;
+        if (emp.getAirlineId() != null) {
+            airlineName = emp.getAirlineId().getAirlineName();
+        }
+
+        // DTO로 변환하여 반환
+        return EmpDto.builder()
+                .empId(emp.getEmpId())
+                .empName(emp.getEmpName())
+                .empNo(emp.getEmpNo())
+                .role(emp.getRole() != null ? emp.getRole().name() : null)
+                .job(emp.getJob())
+                .phone(emp.getPhone())
+                .email(emp.getEmail())
+                .address(emp.getAddress())
+                .empStatus(emp.getEmpStatus() != null ? emp.getEmpStatus().name() : null)
+                .startDate(emp.getStartDate())
+                .endDate(emp.getEndDate())
+                .age(emp.getAge())
+                .departmentName(departmentName)
+                .airlineName(airlineName)
+                .build();
     }
 }

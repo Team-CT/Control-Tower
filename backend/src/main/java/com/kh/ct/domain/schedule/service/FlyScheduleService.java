@@ -25,4 +25,14 @@ public interface FlyScheduleService {
      * 비행편 상세 조회 (크루 정보 포함)
      */
     FlyScheduleDto getFlightScheduleDetail(Long flyScheduleId, String empId);
+    
+    /**
+     * 승무원 추가
+     */
+    void addCrewMember(Long flyScheduleId, String empId);
+    
+    /**
+     * 승무원 삭제
+     */
+    void removeCrewMember(Long flyScheduleId, String empId);
 }

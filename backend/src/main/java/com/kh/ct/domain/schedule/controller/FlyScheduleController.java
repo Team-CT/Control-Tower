@@ -86,4 +86,43 @@ public class FlyScheduleController {
         FlyScheduleDto schedule = flyScheduleService.getFlightScheduleDetail(flyScheduleId, empId);
         return ResponseEntity.ok(ApiResponse.success("비행편 상세 조회 성공", schedule));
     }
+    
+    /**
+     * 승무원 추가
+     */
+    @PostMapping("/{flyScheduleId}/crew")
+    public ResponseEntity<ApiResponse<Void>> addCrewMember(
+            @PathVariable Long flyScheduleId,
+            @RequestBody CrewMemberRequest request
+    ) {
+        flyScheduleService.addCrewMember(flyScheduleId, request.getEmpId());
+        return ResponseEntity.ok(ApiResponse.success("승무원 추가 성공", null));
+    }
+    
+    /**
+     * 승무원 삭제
+     */
+    @DeleteMapping("/{flyScheduleId}/crew/{empId}")
+    public ResponseEntity<ApiResponse<Void>> removeCrewMember(
+            @PathVariable Long flyScheduleId,
+            @PathVariable String empId
+    ) {
+        flyScheduleService.removeCrewMember(flyScheduleId, empId);
+        return ResponseEntity.ok(ApiResponse.success("승무원 삭제 성공", null));
+    }
+    
+    /**
+     * 승무원 추가 요청 DTO
+     */
+    public static class CrewMemberRequest {
+        private String empId;
+        
+        public String getEmpId() {
+            return empId;
+        }
+        
+        public void setEmpId(String empId) {
+            this.empId = empId;
+        }
+    }
 }

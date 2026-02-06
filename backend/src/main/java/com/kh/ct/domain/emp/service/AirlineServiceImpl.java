@@ -59,7 +59,8 @@ public class AirlineServiceImpl implements AirlineService {
         airline.updateStatus(newStatus);
         
         // 항공사 관리자 계정 상태 업데이트
-        List<Emp> adminEmployees = empRepository.findByAirlineIdAndJob(id, "항공사 관리자");
+        List<Emp> adminEmployees =
+                empRepository.findByAirlineId_AirlineIdAndJob(id, "항공사 관리자");
         
         if (newStatus == AirlineStatus.INACTIVE) {
             // 계정 정지: 관리자 emp_status를 'S'로 변경

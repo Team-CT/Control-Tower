@@ -376,3 +376,189 @@ export const ActionButton = styled.button`
     border-color: #cbd5e1;
   }
 `;
+
+// 승무원 추가/삭제 버튼
+export const AddCrewButton = styled.button`
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #3b82f6;
+  background: #3b82f6;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+  }
+`;
+
+export const DeleteCrewButton = styled.button`
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid #ef4444;
+  background: #ffffff;
+  color: #ef4444;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 8px;
+
+  &:hover {
+    background: #fee2e2;
+    border-color: #dc2626;
+  }
+`;
+
+// 모달 스타일
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+`;
+
+export const ModalContainer = styled.div`
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+`;
+
+export const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
+export const ModalTitle = styled.h2`
+  font-size: 20px;
+  font-weight: 900;
+  color: #111827;
+  margin: 0;
+`;
+
+export const CloseButton = styled.button`
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background: #e5e7eb;
+    color: #111827;
+  }
+`;
+
+export const ModalContent = styled.div`
+  margin-bottom: 20px;
+`;
+
+export const FormGroup = styled.div`
+  margin-bottom: 16px;
+`;
+
+export const FormLabel = styled.label`
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 8px;
+`;
+
+export const EmployeeSelect = styled.select`
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+`;
+
+export const EmptyMessage = styled.p`
+  padding: 16px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+  background: #f9fafb;
+  border-radius: 8px;
+  margin: 0;
+`;
+
+export const FormActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+`;
+
+export const CancelButton = styled.button`
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+  }
+`;
+
+export const SubmitButton = styled.button`
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #3b82f6;
+  background: #3b82f6;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #2563eb;
+    border-color: #2563eb;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;

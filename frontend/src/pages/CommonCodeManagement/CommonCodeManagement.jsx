@@ -422,7 +422,7 @@ const CommonCodeManagement = () => {
                 )}
               </CodeGroupCardHeader>
               <CodeGroupSubtitle>{group.airlineName || '공통 코드'}</CodeGroupSubtitle>
-              <CodeGroupLabel>{group.airlineName ? `${group.airlineName} 코드` : '공통 코드'}</CodeGroupLabel>
+              <CodeGroupLabel>{group.airlineName ? `${group.airlineName} ` : '공통'}</CodeGroupLabel>
               <CodeCountBadge>{group.count || 0}개 항목</CodeCountBadge>
             </CodeGroupCard>
           ))}
