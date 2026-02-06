@@ -1,5 +1,32 @@
 import styled from 'styled-components';
 
+
+export const LogoutButton = styled.button`
+  margin-left: 16px;
+  padding: 8px 14px;
+
+  font-size: 13px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.textSecondary};
+
+  background: transparent;
+  border: 1px solid ${({ theme }) => theme.colors.border};
+  border-radius: 6px;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.danger || '#e53935'};
+    border-color: ${({ theme }) => theme.colors.danger || '#e53935'};
+    background-color: rgba(229, 57, 53, 0.06);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+`;
+
 export const HeaderContainer = styled.header`
   background: var(--bg-main);
   padding: 16px 40px;
