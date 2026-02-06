@@ -1,4 +1,5 @@
-import axios from '../axios';
+import axios, { uploadApi } from '../axios';
+import { API_ENDPOINTS } from '../config';
 
 /**
  * 건강 프로그램 관련 API 서비스
@@ -18,12 +19,16 @@ const healthService = {
     /**
      * 건강 정보 저장 (기존 기능)
      */
-    save: (formData) => {
-        return axios.post('/api/health/save', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-        });
+    save: (empId, file, data) => {
+        const fd = new FormData();
+        fd.append("file", file);
+
+        // data는 JSON Blob으로 넣어야 @RequestPart("data")로 매핑됩니다
+        fd.append(
+            "data",
+            new Blob([JSON.stringify(data)], { type: "application/json" })
+        );
+        return uploadApi.post(`${API_ENDPOINTS.HEALTH.SAVE}?empId=${empId}`, fd);
     },
 
      getPhysicalTest: (empId, page = 0, size = 10) => {

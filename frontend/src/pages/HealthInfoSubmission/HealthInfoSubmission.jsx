@@ -42,10 +42,12 @@ import {
 import axios from 'axios';
 import { empPhysicalTestService} from '../../api/Health/healthService';
 import useAuthStore from '../../store/authStore';
+import { useNavigate } from 'react-router-dom';
 
 const HealthInfoSubmission = () => {
   const [selectedMethod, setSelectedMethod] = useState('text');
   const [uploadedFile, setUploadedFile] = useState(null);
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     classification: '',
     memo: ''
@@ -242,7 +244,7 @@ const callSave = async () => {
     {/* TODO: Submit with Zustand */}
     console.log('Submitting:', { formData, uploadedFile, selectedMethod });
     alert('건강 정보가 제출되었습니다.');
-    
+    navigate("/healthsubmissionhistory")
   };
 
   return (
