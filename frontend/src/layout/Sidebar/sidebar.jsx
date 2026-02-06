@@ -18,7 +18,7 @@ const Sidebar = ({ userRole }) => {
   if (userRole === 'SUPER_ADMIN') {
     currentMenuItems = SUPER_ADMIN_MENU;
     roleLabel = '슈퍼 관리자';
-  } else if (userRole === 'ADMIN') {
+  } else if (userRole === 'AIRLINE_ADMIN') {
     currentMenuItems = ADMIN_MENU;
     roleLabel = '관리자';
   } else {
