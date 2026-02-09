@@ -31,6 +31,12 @@ const healthService = {
         return uploadApi.post(`${API_ENDPOINTS.HEALTH.SAVE}?empId=${empId}`, fd);
     },
 
+    detail: (empId) => {
+        return axios.get(API_ENDPOINTS.HEALTH.DETAIL, {
+                     params: { empId },
+        });
+    },
+
      getPhysicalTest: (empId, page = 0, size = 10) => {
         return axios.get("/api/health/getPhysicalTest", {
             params: { empId, page, size, sort: "testDate,desc" },
