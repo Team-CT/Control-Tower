@@ -1,22 +1,83 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import * as S from './StressSurvey.styled';
+import useAuthStore from '../../store/authStore';
+import healthService from '../../api/Health/healthService';
 
 const StressSurvey = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState({});
   const [additionalComment, setAdditionalComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const totalSteps = 5;
 
   // {/* TODO: Zustand state mapping - 직원 정보, 비행 데이터 등 */}
-  const employeeInfo = {
-    name: '김민수',
-    employeeId: 'EMP001',
-    department: '객실 승무원',
-    position: '선임 승무원',
-    hireDate: '2020-03-15',
-    lastSurveyDate: '2025-12-15'
+
+  const empId = useAuthStore((s) => s.getEmpId());
+  const [employeeInfo, setEmployeeInfo] = useState({
+    name: "-",
+    employeeId: "-",
+    department: "-",
+    position: "-",
+    hireDate: "-",
+    lastSurveyDate: "-",
+  });
+
+  const [loadingEmp, setLoadingEmp] = useState(false);
+
+useEffect(() => {
+  const fetchSurveyInfo = async () => {
+    if (!empId) return;
+
+    setLoadingEmp(true);
+    try {
+      const res = await healthService.surveyInfo(empId);
+      const d = res.data;
+
+      const rawCreateDate = d?.createDate; // ex) "2026-02-10T09:12:34" 또는 "2026-02-10"
+      const createDateStr = rawCreateDate ? String(rawCreateDate) : "";
+      const lastSurveyYMD = createDateStr ? createDateStr.slice(0, 10) : null;
+
+      // ✅ 이번 달 제출 여부 판단 (YYYY-MM 비교)
+      const now = new Date();
+      const nowYM = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+      const lastYM = lastSurveyYMD ? lastSurveyYMD.slice(0, 7) : null;
+
+      if (lastYM && lastYM === nowYM) {
+        alert("이번 달 설문은 이미 제출하셨습니다.");
+        window.location.href = "/dashboard";
+        return; // 리다이렉트 후 아래 setState 방지
+      }
+
+      setEmployeeInfo({
+        name: d?.empName ?? "-",
+        employeeId: d?.empId ?? empId,
+        department: d?.departmentName ?? "-",
+        position: d?.job ?? "-",
+        hireDate: d?.startDate ? String(d.startDate).slice(0, 10) : "-",
+        lastSurveyDate: lastSurveyYMD ?? "-",
+      });
+    } catch (e) {
+      console.error(e);
+      // 실패해도 화면은 떠야 하니 값은 "-" 유지
+    } finally {
+      setLoadingEmp(false);
+    }
   };
+
+  fetchSurveyInfo();
+}, [empId]);
+
+
+
+  // const employeeInfo = {
+  //   name: '김민수',
+  //   employeeId: 'EMP001',
+  //   department: '객실 승무원',
+  //   position: '선임 승무원',
+  //   hireDate: '2020-03-15',
+  //   lastSurveyDate: '2025-12-15'
+  // };
 
   const flightStats = {
     week7Hours: 48,
@@ -26,30 +87,127 @@ const StressSurvey = () => {
     workDays30: 22,
     consecutiveDays: 4
   };
+  
+  const section_config = [
+    { key: "A", label: "업무량·업무명확성", ids: ["q1","q2","q3"], reverse: false },
+    { key: "B", label: "관계·소통",         ids: ["q4","q5","q6"], reverse: false },
+    { key: "C", label: "회복·번아웃",       ids: ["q7","q8","q9"], reverse: true  },
+  ];
+
+  //점수 3~15점
+  const normalizeTo100 = (raw, min=3, max=15) => {
+    if (raw == null) return null;
+    const v = ((raw - min) / (max - min)) * 100;
+    return Math.round(v);
+  };
+
+  const reverseScore = (v) => (v == null ? null : 6 - v);
+
+  const calculateSurveyResults = (answers) => {
+  const sections = section_config.map(sec => {
+    // 각 문항 점수 (reverse면 변환)
+    const vals = sec.ids.map(id => {
+      const v = answers[id];
+      if (v == null) return null;
+      return sec.reverse ? reverseScore(v) : v;
+    });
+
+    const isComplete = vals.every(v => v != null);
+    const raw = isComplete ? vals.reduce((a,b) => a + b, 0) : null;
+    const score100 = raw != null ? normalizeTo100(raw) : null;
+
+    // 섹션 상태(색상 등)
+    const grade =
+      score100 == null ? "none" :
+      score100 >= 80 ? "good" :
+      score100 >= 60 ? "normal" : "alert";
+
+    
+
+    return {
+      key: sec.key,
+      label: sec.label,
+      raw,           // 3~15
+      score: score100, // 0~100
+      grade,
+      complete: isComplete,
+    };
+  });
+
+  const completedSections = sections.filter(s => s.score != null);
+  const total =
+    completedSections.length === sections.length
+      ? Math.round(completedSections.reduce((sum, s) => sum + s.score, 0) / sections.length)
+      : null;
+
+  const gradeType =
+    total == null ? "none" :
+    total >= 80 ? "normal" :
+    total >= 60 ? "warning" : "alert";
+
+  const gradeText =
+    total == null ? "-" :
+    total >= 80 ? "양호" :
+    total >= 60 ? "주의" : "위험";
+
+
+  const buildRecommendations = (total) => {
+  if (total == null) return [];
+
+  if (total >= 80) {
+    return [
+      { icon: "bed", title: "수면 유지 프로그램", desc: "현재 루틴을 유지하며 수면 질을 지켜요" },
+      { icon: "spa", title: "가벼운 회복 루틴", desc: "스트레칭/호흡으로 피로 누적을 예방" },
+    ];
+  }
+
+  if (total >= 60) {
+    return [
+      { icon: "spa", title: "휴식 프로그램 (명상/요가)", desc: "긴장 완화와 회복 속도 개선" },
+      { icon: "bed", title: "수면 개선 프로그램", desc: "수면 시간/질을 안정적으로 확보" },
+      { icon: "comments", title: "1:1 상담(선택)", desc: "스트레스 요인을 정리하고 대응 전략 수립" },
+    ];
+  }
+
+  return [
+    { icon: "comments", title: "1:1 심리 상담", desc: "전문 상담사와 함께 우선순위와 부담 요인 정리" },
+    { icon: "spa", title: "회복 집중 프로그램", desc: "번아웃 예방을 위한 회복 루틴 구축" },
+    { icon: "bed", title: "수면·근무 패턴 점검", desc: "수면 부족/회복 문제를 우선 개선" },
+  ];
+};
+
+  return {
+    total,
+    grade: total == null ? "-" : `${gradeText}`,
+    gradeType,
+    sections,
+    recommendations: buildRecommendations(total),
+  };
+};
 
   const surveySteps = [
     { id: 1, label: '기본 정보', icon: 'user' },
-    { id: 2, label: '비행 스트레스', icon: 'plane-departure' },
-    { id: 3, label: '시차 영향', icon: 'clock' },
-    { id: 4, label: '근무 패턴', icon: 'calendar-check' },
+    { id: 2, label: '업무 스트레스', icon: 'plane-departure' },
+    { id: 3, label: '관계 영향', icon: 'clock' },
+    { id: 4, label: '회복ㆍ번아웃', icon: 'calendar-check' },
     { id: 5, label: '결과 확인', icon: 'chart-pie' }
   ];
 
   const questions = {
     section1: [
-      { id: 'q1', text: '최근 비행 시간으로 인해 피로 또는 스트레스를 느끼고 있습니까?' },
-      { id: 'q2', text: '비행 후 충분한 휴식을 취하고 있다고 생각하십니까?' },
-      { id: 'q3', text: '비행 중 긴장감이나 불안감을 느끼는 경우가 있습니까?' }
+      { id: 'q1', text: '최근 2주 동안 업무량이 감당 가능한 수준이었다.' },
+      { id: 'q2', text: '내 역할과 우선순위가 명확하게 정해져 있다.' },
+      { id: 'q3', text: '업무를 수행하는 데 필요한 정보/자원이 충분히 제공된다.' }
     ],
     section2: [
-      { id: 'q4', text: '시차 변경 후 정상적인 수면 패턴을 회복하는 데 어려움을 겪고 계십니까?' },
-      { id: 'q5', text: '최근 7일간 평균 수면 시간은 어떻게 되십니까?', type: 'sleep' },
-      { id: 'q6', text: '시차로 인해 두통, 소화불량 등 신체적 증상을 경험하십니까?' }
+      { id: 'q4', text: '팀 내에서 의견을 말할 때 심리적으로 안전하다고 느낀다.' },
+      { id: 'q5', text: '상사/동료와의 의사소통이 원활하다(요구사항, 피드백, 협의 등).' },
+      { id: 'q6', text: '갈등이 생겼을 때 건설적으로 해결되는 문화가 있다.' }
     ],
     section3: [
-      { id: 'q7', text: '현재 근무 스케줄이 개인 생활과 균형을 이루고 있다고 생각하십니까?' },
-      { id: 'q8', text: '업무량이나 업무 강도가 과도하다고 느끼십니까?' },
-      { id: 'q9', text: '동료 및 상사와의 관계에서 스트레스를 느끼십니까?' }
+      { id: 'q7', text: '최근 2주 동안 일 때문에 수면/휴식의 질이 떨어졌다.' },
+      { id: 'q8', text: '출근이나 업무를 생각하면 무기력·불안·짜증이 늘었다.' },
+      { id: 'q9', text: '업무 후에도 스트레스가 남아 회복이 잘 안 된다고 느낀다.' }
     ]
   };
 
@@ -94,11 +252,45 @@ const StressSurvey = () => {
     }
   };
 
-  const handleSubmit = () => {
-    // {/* TODO: Zustand action - 설문 제출 로직 */}
-    alert('설문이 제출되었습니다!\n\n결과는 건강 현황 페이지에서 확인하실 수 있습니다.');
-    window.location.href = '/health';
-  };
+const handleSubmit = async () => {
+  // 1) empId 확인
+  if (!empId) {
+    alert("로그인 정보(empId)가 없습니다.");
+    return;
+  }
+
+  // 2) 설문 완료 여부 확인 (점수 null이면 아직 미완료)
+  if (results.total == null) {
+    alert("모든 문항에 답변해야 제출할 수 있습니다.");
+    return;
+  }
+
+  // 3) 섹션 점수 추출
+  const a = results.sections.find(s => s.key === "A")?.score ?? null;
+  const b = results.sections.find(s => s.key === "B")?.score ?? null;
+  const c = results.sections.find(s => s.key === "C")?.score ?? null;
+
+  if (a == null || b == null || c == null) {
+    alert("섹션 점수 계산에 실패했습니다. 답변을 다시 확인해 주세요.");
+    return;
+  }
+
+  // 4) 백 호출
+  setSubmitting(true);
+  try {
+    await healthService.saveSurvey(empId, a, b, c); // GET 버전일 때
+    // POST 버전이면:
+    // await healthService.saveSurvey({ empId, workStressPoint: a, commuStressPoint: b, recoveryStressPoint: c });
+
+    alert("설문이 제출되었습니다!\n\n결과는 건강 현황 페이지에서 확인하실 수 있습니다.");
+    window.location.href = "/dashboard";
+  } catch (e) {
+    console.error(e);
+    alert("설문 제출 실패");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   const calculateResults = () => {
     // {/* TODO: 실제 점수 계산 로직 구현 */}
@@ -119,7 +311,11 @@ const StressSurvey = () => {
     };
   };
 
-  const results = calculateResults();
+  const results = useMemo(() => calculateSurveyResults(answers), [answers]);
+
+  //const results = calculateResults();
+
+  console.log(results);
 
   return (
     <S.MainContainer>
@@ -223,22 +419,18 @@ const StressSurvey = () => {
       {/* Step 2: 비행 스트레스 */}
       {currentStep === 2 && (
         <S.SurveyCard>
-          <S.RoleBadge>
-            <i className="fas fa-plane" />
-            객실 승무원 / 기장 전용 설문
-          </S.RoleBadge>
 
           <S.SectionHeader>
             <S.SectionIcon $color="blue">
               <i className="fas fa-plane-departure" />
             </S.SectionIcon>
             <S.SectionInfo>
-              <S.SectionTitle>A. 비행시간 기반 스트레스 지수</S.SectionTitle>
-              <S.SectionDescription>최근 비행 데이터를 기반으로 스트레스 수준을 측정합니다</S.SectionDescription>
+              <S.SectionTitle>A. 업무량·업무명확성 스트레스 지수</S.SectionTitle>
+              <S.SectionDescription>최근 업무 기반으로 스트레스 수준을 측정합니다</S.SectionDescription>
             </S.SectionInfo>
           </S.SectionHeader>
 
-          <S.StatsGrid>
+          {/* <S.StatsGrid>
             <S.StatBox>
               <S.StatValue>
                 {flightStats.week7Hours}<S.StatUnit>시간</S.StatUnit>
@@ -251,7 +443,7 @@ const StressSurvey = () => {
               </S.StatValue>
               <S.StatLabel>최근 30일 비행시간</S.StatLabel>
             </S.StatBox>
-          </S.StatsGrid>
+          </S.StatsGrid> */}
 
           {questions.section1.map((question, index) => (
             <S.QuestionItem key={question.id}>
@@ -297,18 +489,14 @@ const StressSurvey = () => {
       {/* Step 3: 시차 영향 */}
       {currentStep === 3 && (
         <S.SurveyCard>
-          <S.RoleBadge>
-            <i className="fas fa-globe" />
-            국제선 비행 승무원 전용
-          </S.RoleBadge>
 
           <S.SectionHeader>
             <S.SectionIcon $color="green">
               <i className="fas fa-clock" />
             </S.SectionIcon>
             <S.SectionInfo>
-              <S.SectionTitle>B. 시차 적응 및 수면 영향</S.SectionTitle>
-              <S.SectionDescription>시차로 인한 신체 리듬 변화와 수면의 질을 측정합니다</S.SectionDescription>
+              <S.SectionTitle>B. 관계·소통</S.SectionTitle>
+              <S.SectionDescription>팀원과의 관계 및 소통을 기반으로 스트레스 수준을 측정합니다.</S.SectionDescription>
             </S.SectionInfo>
           </S.SectionHeader>
 
@@ -376,8 +564,8 @@ const StressSurvey = () => {
               <i className="fas fa-calendar-check" />
             </S.SectionIcon>
             <S.SectionInfo>
-              <S.SectionTitle>C. 근무 패턴 및 업무 스트레스</S.SectionTitle>
-              <S.SectionDescription>근무 일정과 업무 환경으로 인한 스트레스를 측정합니다</S.SectionDescription>
+              <S.SectionTitle>C. 회복·번아웃</S.SectionTitle>
+              <S.SectionDescription>스트레스에 따른 회복을 기준으로 현 상황을 판단합니다.</S.SectionDescription>
             </S.SectionInfo>
           </S.SectionHeader>
 

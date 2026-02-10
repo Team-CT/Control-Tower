@@ -45,8 +45,20 @@ const healthService = {
 
     },
 
-    
+    surveyInfo: (empId) => {
+        return axios.get("/api/survey/surveyInfo", {
+            params: {empId}
+        });
+    },
 
+    saveSurvey: (empId,workStressPoint,commuStressPoint,recoveryStressPoint) => {
+        return axios.post(
+            "/api/survey/saveSurvey",
+            null, // body 없음
+            { params: { empId, workStressPoint, commuStressPoint, recoveryStressPoint } }
+        );
+    },
+ 
     /**
      * 나의 프로그램 신청 내역 조회
      * @param {string} empId 
