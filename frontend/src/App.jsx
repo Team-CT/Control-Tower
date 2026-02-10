@@ -47,6 +47,7 @@ import AdminAttendance from './pages/AdminAttendance/AdminAttendance.jsx';
 import StaffScheduleAssignment from './pages/StaffScheduleAssignment/StaffScheduleAssignment.jsx';
 import EmployeeAttendance from './pages/EmployeeAttendance/EmployeeAttendance.jsx';
 import ProtestApply from './pages/ProtestApply/ProtestApply.jsx';
+import MyApplicationHistory from './pages/MyApplicationHistory/MyApplicationHistory';
 import TenantManagement from './pages/SuperAdmin/Tenant/TenantManagement.jsx';
 import TenantDetail from './pages/SuperAdmin/Tenant/TenantDetail.jsx';
 import CompanyRegistrationManagement from './pages/SuperAdmin/CompanyRegistrationManagement/CompanyRegistrationManagement.jsx';
@@ -121,6 +122,7 @@ const ThemedApp = () => {
           <Route path="/leave-apply" element={<LeaveApply />} />
           <Route path="/employee/leave-apply" element={<LeaveApply />} />
           <Route path="/protest-apply" element={<ProtestApply />} />
+          <Route path="/my-application-history" element={<MyApplicationHistory />} />
           <Route path="/approval" element={<LeaveApproval />} />
           <Route path="/protest-approval" element={<ProtestApproval />} />
 

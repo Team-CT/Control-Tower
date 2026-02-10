@@ -16,6 +16,7 @@ const ProtestApply = () => {
     const selectedDate = location.state?.selectedDate;
 
     const [formData, setFormData] = useState({
+        attendanceType: 'NORMAL',  // 기본값: 정상출근
         protestRequestInTime: '',
         protestRequestOutTime: '',
         protestReason: '',
@@ -23,14 +24,50 @@ const ProtestApply = () => {
     const [files, setFiles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [availableOptions, setAvailableOptions] = useState([]);
 
-    // 날짜 데이터가 없으면 근태 현황 페이지로 리다이렉트
+    // 전체 근무 유형 옵션
+    const allOptions = [
+        { value: 'NORMAL', label: '정상출근' },
+        { value: 'LATE', label: '지각' },
+        { value: 'EARLY_LEAVE', label: '조퇴' },
+        { value: 'ABSENT', label: '결근' },
+        { value: 'LEAVE', label: '휴가' },
+        { value: 'HALF_LEAVE', label: '반차' }
+    ];
+
+    // 휴가 관련 옵션만
+    const leaveOnlyOptions = [
+        { value: 'LEAVE', label: '휴가' },
+        { value: 'HALF_LEAVE', label: '반차' }
+    ];
+
+    // 날짜에 따라 근무 유형 옵션 필터링
     useEffect(() => {
-        if (!selectedDailyData || !selectedDate) {
-            alert('정정할 근태 기록을 선택해주세요');
+        if (!selectedDate) {
+            alert('정정할 날짜를 선택해주세요');
             navigate('/my-attendance');
+            return;
         }
-    }, [selectedDailyData, selectedDate, navigate]);
+
+        // 선택한 날짜와 오늘 날짜 비교
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // 시간 제거하고 날짜만 비교
+
+        const targetDate = new Date(selectedDate);
+        targetDate.setHours(0, 0, 0, 0);
+
+        // 미래 날짜면 휴가/반차만, 과거/오늘이면 전체 옵션
+        if (targetDate > today) {
+            setAvailableOptions(leaveOnlyOptions);
+            // 미래 날짜인 경우 기본값을 휴가로 변경
+            setFormData(prev => ({ ...prev, attendanceType: 'LEAVE' }));
+        } else {
+            setAvailableOptions(allOptions);
+            // 과거/오늘인 경우 기본값을 정상출근으로 유지
+            setFormData(prev => ({ ...prev, attendanceType: 'NORMAL' }));
+        }
+    }, [selectedDate, navigate]);
 
     // 시간 포맷팅 (HH:MM:SS -> HH:MM)
     const formatTime = (time) => {
@@ -98,7 +135,15 @@ const ProtestApply = () => {
             // FormData 생성
             const formDataToSend = new FormData();
             formDataToSend.append('empId', empId);
-            formDataToSend.append('attendanceId', selectedDailyData.attendanceId);
+
+            // attendanceId가 있으면 전송, 없으면 attendanceDate 전송
+            if (selectedDailyData?.attendanceId) {
+                formDataToSend.append('attendanceId', selectedDailyData.attendanceId);
+            } else {
+                formDataToSend.append('attendanceDate', selectedDate);
+            }
+
+            formDataToSend.append('attendanceType', formData.attendanceType);
 
             if (formData.protestRequestInTime) {
                 formDataToSend.append('protestRequestInTime', formData.protestRequestInTime);
@@ -151,7 +196,7 @@ const ProtestApply = () => {
         navigate('/my-attendance');
     };
 
-    if (!selectedDailyData || !selectedDate) {
+    if (!selectedDate) {
         return null;
     }
 
@@ -173,25 +218,56 @@ const ProtestApply = () => {
                         <S.SectionTitle>정정 대상 근태</S.SectionTitle>
                         <S.CurrentRecordSection>
                             <S.RecordTitle>📅 {selectedDate}</S.RecordTitle>
-                            <S.RecordItem>
-                                <S.RecordLabel>출근 시간</S.RecordLabel>
-                                <S.RecordValue>{formatTime(selectedDailyData.inTime)}</S.RecordValue>
-                            </S.RecordItem>
-                            <S.RecordItem>
-                                <S.RecordLabel>퇴근 시간</S.RecordLabel>
-                                <S.RecordValue>{formatTime(selectedDailyData.outTime)}</S.RecordValue>
-                            </S.RecordItem>
-                            <S.RecordItem>
-                                <S.RecordLabel>근무 시간</S.RecordLabel>
-                                <S.RecordValue>
-                                    {selectedDailyData.workHours !== null ? `${selectedDailyData.workHours}시간` : '계산 불가'}
-                                </S.RecordValue>
-                            </S.RecordItem>
+                            {selectedDailyData ? (
+                                <>
+                                    <S.RecordItem>
+                                        <S.RecordLabel>출근 시간</S.RecordLabel>
+                                        <S.RecordValue>{formatTime(selectedDailyData.inTime)}</S.RecordValue>
+                                    </S.RecordItem>
+                                    <S.RecordItem>
+                                        <S.RecordLabel>퇴근 시간</S.RecordLabel>
+                                        <S.RecordValue>{formatTime(selectedDailyData.outTime)}</S.RecordValue>
+                                    </S.RecordItem>
+                                    <S.RecordItem>
+                                        <S.RecordLabel>근무 시간</S.RecordLabel>
+                                        <S.RecordValue>
+                                            {selectedDailyData.workHours !== null ? `${selectedDailyData.workHours}시간` : '계산 불가'}
+                                        </S.RecordValue>
+                                    </S.RecordItem>
+                                    <S.RecordItem>
+                                        <S.RecordLabel>근태 상태</S.RecordLabel>
+                                        <S.RecordValue>{selectedDailyData.attendanceStatus || '-'}</S.RecordValue>
+                                    </S.RecordItem>
+                                </>
+                            ) : (
+                                <S.RecordItem>
+                                    <S.RecordLabel style={{ color: '#f59e0b' }}>⚠️ 출근 기록 없음</S.RecordLabel>
+                                    <S.RecordValue style={{ color: '#6b7280' }}>
+                                        정정 신청을 통해 근태를 등록할 수 있습니다.
+                                    </S.RecordValue>
+                                </S.RecordItem>
+                            )}
                         </S.CurrentRecordSection>
                     </S.SectionCard>
 
                     <S.SectionCard>
                         <S.SectionTitle>정정 요청 시간</S.SectionTitle>
+                        {/* 근무 유형 선택 */}
+                        <S.FormGroup>
+                            <S.Label>근무 유형 *</S.Label>
+                            <S.Select
+                                name="attendanceType"
+                                value={formData.attendanceType}
+                                onChange={handleInputChange}
+                                required
+                            >
+                                {availableOptions.map(option => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </S.Select>
+                        </S.FormGroup>
                         <S.TimeInputGroup>
                             <S.InputWrapper>
                                 <S.InputLabel>출근 시간</S.InputLabel>

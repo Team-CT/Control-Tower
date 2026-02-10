@@ -71,6 +71,8 @@ const LeaveApply = () => {
   const leaveTypes = [
     { id: 'ANNUAL', name: '연차', icon: '☀️' },
     { id: 'HALF_DAY', name: '반차', icon: '🕐' },
+    { id: 'SICK', name: '병가', icon: '🏥' },
+    { id: 'UNPAID', name: '무급휴가', icon: '💼' },
   ];
 
   // 최소 신청 가능 날짜 계산 (오늘 + 3일)

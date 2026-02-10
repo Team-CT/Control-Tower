@@ -150,22 +150,22 @@ const EmployeeAttendance = () => {
 
   /**
    * 근태 정정 신청 페이지로 이동
+   * 출근 기록이 없는 날에도 정정 신청 가능
    */
   const handleCorrectionModalOpen = () => {
-    if (selectedDailyData) {
-      const year = selectedDate.getFullYear();
-      const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-      const day = String(selectedDate.getDate()).padStart(2, '0');
-      const dateString = `${year}-${month}-${day}`;
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
 
-      // 선택된 날짜와 근태 데이터를 state로 전달하여 정정 신청 페이지로 이동
-      navigate('/protest-apply', {
-        state: {
-          selectedDate: dateString,
-          selectedDailyData: selectedDailyData
-        }
-      });
-    }
+    // 선택된 날짜와 근태 데이터를 state로 전달하여 정정 신청 페이지로 이동
+    // selectedDailyData가 없어도 날짜 정보만으로 정정 신청 가능
+    navigate('/protest-apply', {
+      state: {
+        selectedDate: dateString,
+        selectedDailyData: selectedDailyData || null
+      }
+    });
   };
 
   /**
@@ -389,21 +389,24 @@ const EmployeeAttendance = () => {
                       {getStatusText(selectedDailyData.attendanceStatus)}
                     </S.ScheduleStatus>
                   </S.ScheduleItem>
-                  <S.ActionButton
-                    onClick={handleCorrectionModalOpen}
-                    disabled={!selectedDailyData}
-                  >
-                    근태 정정 신청하기
-                  </S.ActionButton>
                 </>
               ) : (
                 <S.ScheduleItem>
-                  <S.ScheduleName>일정이 없습니다</S.ScheduleName>
+                  <S.ScheduleName>근태 기록 없음</S.ScheduleName>
                   <S.ScheduleDate>
                     {selectedDate.getFullYear()}-{String(selectedDate.getMonth() + 1).padStart(2, '0')}-{String(selectedDate.getDate()).padStart(2, '0')}
                   </S.ScheduleDate>
+                  <S.ScheduleDate style={{ color: '#f59e0b', marginTop: '8px' }}>
+                    출근 기록이 없는 날입니다. 정정 신청을 통해 근태를 등록할 수 있습니다.
+                  </S.ScheduleDate>
                 </S.ScheduleItem>
               )}
+
+              <S.ActionButton
+                onClick={handleCorrectionModalOpen}
+              >
+                근태 정정 신청하기
+              </S.ActionButton>
 
               <S.ActionButton
                 $primary

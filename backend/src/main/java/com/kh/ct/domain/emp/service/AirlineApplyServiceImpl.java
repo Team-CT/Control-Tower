@@ -133,7 +133,7 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                 .email(application.getAirlineApplyEmail())
                 .empStatus(CommonEnums.EmpStatus.Y)
                 .startDate(LocalDateTime.now())
-                .leaveCount(15.0f)
+                .leaveCount(15.0)
                 .empNo(generateEmpNo(application.getAirlineName()))
                 .build();
         
@@ -236,7 +236,7 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                 .email(application.getAirlineApplyEmail())
                 .empStatus(CommonEnums.EmpStatus.S) // 초기 상태: S (활성화 대기)
                 .startDate(LocalDateTime.now())
-                .leaveCount(15.0f)
+                .leaveCount(15.0)
                 .empNo(generateEmpNo(application.getAirlineName()))
                 .build();
         
