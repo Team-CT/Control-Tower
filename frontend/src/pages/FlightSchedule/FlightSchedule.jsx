@@ -26,10 +26,26 @@ const FlightSchedule = () => {
     loadFlightSchedules();
   }, [selectedDate]);
 
+  // 공항 목록 조회 (초기 로드 시)
+  useEffect(() => {
+    loadAirports();
+  }, []);
+
   // 비행편 목록이 변경되면 출발지/도착지 목록 업데이트
   useEffect(() => {
     updateAvailableAirports();
   }, [flightList]);
+
+  // 공항 목록 조회
+  const loadAirports = async () => {
+    try {
+      const response = await airportService.getAirports();
+      const airportList = response.data?.data || response.data || [];
+      setAirports(airportList);
+    } catch (error) {
+      console.error('공항 목록 조회 실패:', error);
+    }
+  };
 
   const loadFlightSchedules = async () => {
     try {
@@ -41,12 +57,14 @@ const FlightSchedule = () => {
         params.airlineId = airlineId;
       }
 
-      // 날짜 필터 추가 (선택한 날짜의 00:00:00 ~ 23:59:59)
+      // 날짜 필터 추가 (선택한 날짜의 00:00:00 ~ 다음 날 00:00:00)
+      // 출발 시간(flyStartTime)을 기준으로 해당 날짜의 모든 비행편 조회
       if (selectedDate) {
         const startDate = new Date(selectedDate);
         startDate.setHours(0, 0, 0, 0);
         const endDate = new Date(selectedDate);
-        endDate.setHours(23, 59, 59, 999);
+        endDate.setDate(endDate.getDate() + 1); // 다음 날 00:00:00
+        endDate.setHours(0, 0, 0, 0);
 
         // ISO 8601 형식으로 변환
         params.startDate = startDate.toISOString();
@@ -63,6 +81,16 @@ const FlightSchedule = () => {
 
       const response = await flightScheduleService.getFlightSchedules(params);
       const flights = response.data?.data || response.data || [];
+      
+      // 디버깅: 응답 데이터 확인
+      console.log('비행편 목록 응답:', response.data);
+      console.log('비행편 목록:', flights);
+      if (flights.length > 0) {
+        console.log('첫 번째 비행편 데이터:', flights[0]);
+        console.log('첫 번째 비행편 flyScheduleId:', flights[0].flyScheduleId || flights[0].fly_schedule_id);
+        console.log('첫 번째 비행편 airlineName:', flights[0].airlineName || flights[0].airline_name);
+      }
+      
       setFlightList(flights);
     } catch (error) {
       console.error('비행편 목록 조회 실패:', error);
@@ -106,13 +134,31 @@ const FlightSchedule = () => {
     loadFlightSchedules();
   };
 
-  // 날짜 포맷팅
-  const formatDate = (date) => {
-    const days = ['일', '월', '화', '수', '목', '금', '토'];
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    const dayName = days[date.getDay()];
-    return `${month}월 ${day}일 (${dayName})`;
+  // 날짜 포맷팅 (안전하게 처리)
+  const formatDate = (dateTimeString) => {
+    if (!dateTimeString) return '';
+    try {
+      const date = new Date(dateTimeString);
+      // 유효한 날짜인지 확인
+      if (isNaN(date.getTime())) {
+        return '';
+      }
+      const days = ['일', '월', '화', '수', '목', '금', '토'];
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const dayName = days[date.getDay()];
+      return `${month}월 ${day}일 (${dayName})`;
+    } catch (error) {
+      console.error('날짜 포맷팅 오류:', error);
+      return '';
+    }
+  };
+
+  // 공항 코드로 공항명 찾기
+  const getAirportName = (airportCode) => {
+    if (!airportCode) return '';
+    const airport = airports.find(a => a.airportCode === airportCode);
+    return airport ? (airport.airportName || airport.cityName || airportCode) : airportCode;
   };
 
   // 비행 상태 한글 변환
@@ -149,16 +195,6 @@ const FlightSchedule = () => {
 
       {/* Search Filter Section */}
       <S.FilterSection>
-        <S.FilterGroup>
-          <S.FilterLabel>조회 기준</S.FilterLabel>
-          <S.FilterButtonGroup>
-            <S.FilterButton type="button" $active>
-              날짜별
-            </S.FilterButton>
-            <S.FilterButton type="button">노선별</S.FilterButton>
-          </S.FilterButtonGroup>
-        </S.FilterGroup>
-
         <S.FilterGroup>
           <S.FilterLabel>날짜 선택</S.FilterLabel>
           <S.DateInput
@@ -209,17 +245,22 @@ const FlightSchedule = () => {
           </div>
         ) : displayedFlights.length > 0 ? (
           displayedFlights.map((flight) => {
-            // flyScheduleId 확인 및 로그
-            if (!flight.flyScheduleId) {
+            // flyScheduleId 확인 (snake_case 또는 camelCase 모두 지원)
+            const flyScheduleId = flight.flyScheduleId || flight.fly_schedule_id;
+            const airlineName = flight.airlineName || flight.airline_name;
+            
+            if (!flyScheduleId) {
               console.warn('비행편에 flyScheduleId가 없습니다:', flight);
             }
 
             return (
               <S.FlightCard
-                key={flight.flyScheduleId}
+                key={flyScheduleId}
                 onClick={() => {
-                  console.log('비행편 클릭 - flyScheduleId:', flight.flyScheduleId);
-                  navigate(`/flightschedule/${flight.flyScheduleId}`);
+                  console.log('비행편 클릭 - flyScheduleId:', flyScheduleId);
+                  if (flyScheduleId) {
+                    navigate(`/flightschedule/${flyScheduleId}`);
+                  }
                 }}
                 style={{ cursor: "pointer" }}
               >
@@ -228,22 +269,22 @@ const FlightSchedule = () => {
                     <S.AirlineIcon>✈</S.AirlineIcon>
                     <div>
                       <S.FlightNumber>
-                        {flight.flightNumber}
-                        {!isAdmin && flight.isAssignedToMe && (
+                        {flight.flightNumber || flight.flight_number}
+                        {!isAdmin && (flight.isAssignedToMe || flight.is_assigned_to_me) && (
                           <span style={{ fontSize: '0.8em', marginLeft: '8px', color: '#4a90e2' }}>● 배정됨</span>
                         )}
                       </S.FlightNumber>
                       <S.FlightDate>
-                        {formatDate(new Date(flight.flyStartTime))} • {flight.airlineName || '항공사'}
+                        {formatDate(flight.flyStartTime || flight.fly_start_time)} • {airlineName && airlineName !== '.' ? airlineName : '항공사'}
                       </S.FlightDate>
                     </div>
                   </S.FlightBadge>
 
                   <S.StatusBadgeGroup>
                     <S.StatusBadge $status="normal">
-                      운항 {getStatusText(flight.flightStatus)}
+                      운항 {getStatusText(flight.flightStatus || flight.flight_status)}
                     </S.StatusBadge>
-                    {flight.crewAssigned && (
+                    {(flight.crewAssigned || flight.crew_assigned) && (
                       <S.StatusBadge $status="assigned">
                         승무원 배정
                       </S.StatusBadge>
@@ -253,21 +294,21 @@ const FlightSchedule = () => {
 
                 <S.FlightRoute>
                   <S.RoutePoint>
-                    <S.RouteTime>{flight.departureTime}</S.RouteTime>
+                    <S.RouteTime>{flight.departureTime || flight.departure_time || ''}</S.RouteTime>
                     <S.RouteCode>{flight.departure}</S.RouteCode>
-                    <S.RouteAirport>{flight.departure}</S.RouteAirport>
+                    <S.RouteAirport>{getAirportName(flight.departure)}</S.RouteAirport>
                   </S.RoutePoint>
 
                   <S.RouteIndicator>
                     <S.AirplaneIcon>✈</S.AirplaneIcon>
                     <S.RouteLine />
-                    <S.RouteDuration>{flight.duration}</S.RouteDuration>
+                    <S.RouteDuration>{flight.duration || ''}</S.RouteDuration>
                   </S.RouteIndicator>
 
                   <S.RoutePoint>
-                    <S.RouteTime>{flight.arrivalTime}</S.RouteTime>
+                    <S.RouteTime>{flight.arrivalTime || flight.arrival_time || ''}</S.RouteTime>
                     <S.RouteCode>{flight.destination}</S.RouteCode>
-                    <S.RouteAirport>{flight.destination}</S.RouteAirport>
+                    <S.RouteAirport>{getAirportName(flight.destination)}</S.RouteAirport>
                   </S.RoutePoint>
                 </S.FlightRoute>
               </S.FlightCard>

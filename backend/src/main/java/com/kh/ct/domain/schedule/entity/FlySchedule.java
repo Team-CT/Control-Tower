@@ -21,7 +21,7 @@ public class FlySchedule extends BaseTimeEntity {
 
     /**
      * ALL_SCHEDULE 과 1:1
-     * 같은 PK를 공유하지만 MapsId는 쓰지 않음 (지금 구조에선 불필요 + 위험)
+     * 같은 PK를 공유하지만 MapsId는 쓰지 않음
      */
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fly_schedule_id", referencedColumnName = "schedule_id")

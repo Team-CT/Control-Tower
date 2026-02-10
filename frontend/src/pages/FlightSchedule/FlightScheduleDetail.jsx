@@ -24,6 +24,7 @@ const FlightScheduleDetail = () => {
   const [selectedRole, setSelectedRole] = useState('');
   const [availableEmployees, setAvailableEmployees] = useState([]);
   const [selectedEmployeeId, setSelectedEmployeeId] = useState('');
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
 
   // 비행편 상세 정보 조회
   useEffect(() => {
@@ -51,8 +52,14 @@ const FlightScheduleDetail = () => {
       const data = response.data?.data || response.data;
 
       console.log('비행편 상세 조회 응답:', data);
-      console.log('크루 멤버 데이터:', data?.crewMembers);
-      console.log('크루 멤버 수:', data?.crewMembers?.length || 0);
+      console.log('크루 멤버 데이터 (crewMembers):', data?.crewMembers);
+      console.log('크루 멤버 데이터 (crew_members):', data?.crew_members);
+      console.log('크루 멤버 수:', (data?.crewMembers || data?.crew_members)?.length || 0);
+
+      // crewMembers 필드명 매핑 (snake_case 또는 camelCase 모두 지원)
+      if (data && !data.crewMembers && data.crew_members) {
+        data.crewMembers = data.crew_members;
+      }
 
       setFlightDetail(data);
     } catch (error) {
@@ -138,6 +145,8 @@ const FlightScheduleDetail = () => {
     setSelectedRole(role);
     setShowAddCrewModal(true);
     setSelectedEmployeeId('');
+    setAvailableEmployees([]);
+    setLoadingEmployees(true);
     
     try {
       // role이 대문자로 전달되어야 함 (PILOT, CABIN_CREW 등)
@@ -147,17 +156,39 @@ const FlightScheduleDetail = () => {
       // 해당 역할의 직원 목록 조회 (role 필드로 조회)
       const response = await empService.getEmployees({ role: roleUpper });
       console.log('직원 목록 조회 응답:', response);
+      console.log('직원 목록 조회 응답 전체:', JSON.stringify(response.data, null, 2));
       
       const employees = response.data?.data || response.data || [];
       console.log('직원 목록:', employees);
       console.log('직원 수:', employees.length);
-      console.log('각 직원의 role 필드:', employees.map(e => ({ empId: e.empId, role: e.role, job: e.job })));
+      if (employees.length > 0) {
+        console.log('첫 번째 직원 데이터:', employees[0]);
+        console.log('각 직원의 필드:', employees.map(e => ({ 
+          empId: e.empId || e.emp_id, 
+          empName: e.empName || e.emp_name,
+          role: e.role, 
+          job: e.job 
+        })));
+      }
       
-      // 이미 배정된 직원 제외
-      const assignedEmpIds = (flightDetail?.crewMembers || []).map(m => m.empId);
+      // 이미 배정된 직원 제외 (필드명 매핑 처리)
+      const crewMembers = flightDetail?.crewMembers || flightDetail?.crew_members || [];
+      console.log('배정된 크루 멤버:', crewMembers);
+      
+      const assignedEmpIds = crewMembers.map(m => {
+        const id = m.empId || m.emp_id;
+        console.log('배정된 멤버 ID 추출:', { 원본: m, 추출된ID: id });
+        return id;
+      }).filter(Boolean);
       console.log('배정된 직원 ID 목록:', assignedEmpIds);
       
-      const available = employees.filter(emp => !assignedEmpIds.includes(emp.empId));
+      // 필드명 매핑 처리 (snake_case 또는 camelCase 모두 지원)
+      const available = employees.filter(emp => {
+        const empId = emp.empId || emp.emp_id;
+        const isAssigned = assignedEmpIds.includes(empId);
+        console.log('직원 필터링:', { empId, isAssigned, emp });
+        return empId && !isAssigned;
+      });
       console.log('추가 가능한 직원:', available);
       console.log('추가 가능한 직원 수:', available.length);
       
@@ -165,7 +196,11 @@ const FlightScheduleDetail = () => {
     } catch (error) {
       console.error('직원 목록 조회 실패:', error);
       console.error('에러 상세:', error.response?.data || error.message);
+      console.error('에러 스택:', error.stack);
       alert(`직원 목록을 불러오는데 실패했습니다: ${error.response?.data?.message || error.message}`);
+      setAvailableEmployees([]);
+    } finally {
+      setLoadingEmployees(false);
     }
   };
   
@@ -178,14 +213,19 @@ const FlightScheduleDetail = () => {
     
     try {
       const flyScheduleId = Number(flightId);
+      console.log('승무원 추가 요청:', { flyScheduleId, selectedEmployeeId });
+      
       await flightScheduleService.addCrewMember(flyScheduleId, selectedEmployeeId);
+      
       alert('승무원이 추가되었습니다.');
       setShowAddCrewModal(false);
       setSelectedEmployeeId('');
       loadFlightDetail(); // 목록 새로고침
     } catch (error) {
       console.error('승무원 추가 실패:', error);
-      alert(error.response?.data?.message || '승무원 추가에 실패했습니다.');
+      console.error('에러 응답:', error.response?.data);
+      const errorMessage = error.response?.data?.message || error.response?.data?.errors?.empId?.[0] || '승무원 추가에 실패했습니다.';
+      alert(errorMessage);
     }
   };
   
@@ -210,27 +250,29 @@ const FlightScheduleDetail = () => {
   
   // 크루 멤버를 역할별로 그룹화
   const groupCrewByRole = (crewMembers) => {
-    if (!crewMembers || crewMembers.length === 0) return [];
+    if (!crewMembers || crewMembers.length === 0) {
+      console.log('크루 멤버가 없습니다:', crewMembers);
+      return [];
+    }
 
     const roleGroups = {};
 
-    
     console.log('크루 멤버 그룹화 시작 - crewMembers:', crewMembers);
     
     crewMembers.forEach((member) => {
-      // member.role은 실제 역할 필드 (PILOT, CABIN_CREW 등) - 백엔드에서 emp.getRole().name()으로 설정됨
-      // member.job은 직업 필드 (예: "기장", "부기장", "승무원" 등)
+      // 필드명 매핑 (snake_case 또는 camelCase 모두 지원)
+      const empId = member.empId || member.emp_id;
+      const empName = member.empName || member.emp_name;
       const role = member.role || '기타'; // 실제 역할 필드 사용
       const job = member.job || '';
       const roleStyle = getRoleStyle(role);
 
-      // 역할별 그룹화
-      
       console.log('멤버 처리:', {
-        empId: member.empId,
-        empName: member.empName,
-        role: member.role, // 실제 역할 필드 (PILOT, CABIN_CREW 등)
-        job: member.job // 직업 필드
+        empId,
+        empName,
+        role,
+        job,
+        원본데이터: member
       });
       
       // 역할별 그룹화 (role 필드 사용 - job이 아님!)
@@ -239,8 +281,8 @@ const FlightScheduleDetail = () => {
       }
 
       roleGroups[role].push({
-        empId: member.empId,
-        name: member.empName,
+        empId,
+        name: empName,
         role: job || getRoleName(role), // 화면에 표시할 역할명 (job 또는 한글 역할명)
         roleKey: role, // 실제 역할 키 (PILOT, CABIN_CREW 등) - API 호출에 사용
         status: '근무 가능',
@@ -300,7 +342,12 @@ const FlightScheduleDetail = () => {
     );
   }
 
-  const crewPositions = groupCrewByRole(flightDetail.crewMembers || []);
+  // crewMembers 필드명 매핑 (snake_case 또는 camelCase 모두 지원)
+  const crewMembers = flightDetail.crewMembers || flightDetail.crew_members || [];
+  console.log('직원 목록 렌더링 - crewMembers:', crewMembers);
+  console.log('직원 목록 길이:', crewMembers.length);
+  
+  const crewPositions = groupCrewByRole(crewMembers);
   const departureAirportName = getAirportName(flightDetail.departure);
   const destinationAirportName = getAirportName(flightDetail.destination);
 
@@ -434,25 +481,32 @@ const FlightScheduleDetail = () => {
             <S.ModalContent>
               <S.FormGroup>
                 <S.FormLabel>직원 선택 *</S.FormLabel>
-                <S.EmployeeSelect
-                  value={selectedEmployeeId}
-                  onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                >
-                  <option value="">직원을 선택하세요</option>
-                  {availableEmployees.map((emp) => {
-                    // @JsonProperty("emp_name")로 인해 JSON에서는 emp_name으로 옴
-                    const empName = emp.emp_name || emp.empName || '이름 없음';
-                    const job = emp.job || getRoleName(emp.role) || '직급 없음';
-                    console.log('직원 옵션 렌더링:', { empId: emp.emp_id || emp.empId, empName, job, emp });
-                    return (
-                      <option key={emp.emp_id || emp.empId} value={emp.emp_id || emp.empId}>
-                        {job} / {empName}
-                      </option>
-                    );
-                  })}
-                </S.EmployeeSelect>
+                {loadingEmployees ? (
+                  <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                    직원 목록을 불러오는 중...
+                  </div>
+                ) : (
+                  <S.EmployeeSelect
+                    value={selectedEmployeeId}
+                    onChange={(e) => setSelectedEmployeeId(e.target.value)}
+                  >
+                    <option value="">직원을 선택하세요</option>
+                    {availableEmployees.map((emp) => {
+                      // 필드명 매핑 처리 (snake_case 또는 camelCase 모두 지원)
+                      const empId = emp.empId || emp.emp_id;
+                      const empName = emp.empName || emp.emp_name || '이름 없음';
+                      const job = emp.job || getRoleName(emp.role) || '직급 없음';
+                      console.log('직원 옵션 렌더링:', { empId, empName, job, 원본: emp });
+                      return (
+                        <option key={empId} value={empId}>
+                          {job} / {empName}
+                        </option>
+                      );
+                    })}
+                  </S.EmployeeSelect>
+                )}
               </S.FormGroup>
-              {availableEmployees.length === 0 && (
+              {!loadingEmployees && availableEmployees.length === 0 && (
                 <S.EmptyMessage>
                   추가 가능한 직원이 없습니다.
                 </S.EmptyMessage>

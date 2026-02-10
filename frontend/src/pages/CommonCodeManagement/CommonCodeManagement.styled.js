@@ -86,7 +86,6 @@ export const CodeGroupCard = styled.div`
   padding: 20px;
   cursor: pointer;
   transition: all 0.2s;
-  position: relative;
 
   &:hover {
     border-color: #4d7cfe;
@@ -99,26 +98,6 @@ export const CodeGroupCardHeader = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 8px;
-`;
-
-export const CodeGroupDeleteButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px 8px;
-  font-size: 16px;
-  color: #ef4444;
-  opacity: 0.6;
-  transition: opacity 0.2s;
-  z-index: 10;
-
-  &:hover {
-    opacity: 1;
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
 `;
 
 export const CodeGroupTitle = styled.h3`
@@ -151,43 +130,6 @@ export const CodeCountBadge = styled.div`
   border-radius: 12px;
   font-size: 13px;
   font-weight: 600;
-`;
-
-export const AirlineFilterWrapper = styled.div`
-  margin-bottom: 16px;
-`;
-
-export const AirlineSelectWrapper = styled.div`
-  position: relative;
-  width: 100%;
-`;
-
-export const AirlineSelect = styled.select`
-  width: 100%;
-  padding: 10px 12px;
-  padding-right: 40px;
-  border: 1px solid #e0e6ed;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #1a1a1a;
-  background-color: #ffffff;
-  cursor: pointer;
-  transition: border-color 0.2s;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-
-  &:focus {
-    outline: none;
-    border-color: #4d7cfe;
-  }
-
-  &:disabled {
-    background-color: #f9fafb;
-    color: #6b7280;
-    cursor: not-allowed;
-  }
 `;
 
 export const SearchInputWrapper = styled.div`
@@ -310,8 +252,8 @@ export const StatusBadge = styled.span`
   border-radius: 12px;
   font-size: 13px;
   font-weight: 600;
-  background-color: ${props => props.$status === '사용' ? '#d1fae5' : '#fee2e2'};
-  color: ${props => props.$status === '사용' ? '#059669' : '#dc2626'};
+  background-color: ${props => props.status === '사용' ? '#d1fae5' : '#fee2e2'};
+  color: ${props => props.status === '사용' ? '#059669' : '#dc2626'};
 `;
 
 export const ActionButton = styled.button`
@@ -334,9 +276,10 @@ export const EditIcon = styled.span`
 `;
 
 export const DeleteIcon = styled.span`
-  color: #ef4444;
+  color: #d36060;
 `;
 
+// Modal Styles
 export const ModalOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -348,81 +291,71 @@ export const ModalOverlay = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
 `;
 
 export const ModalContainer = styled.div`
   background-color: #ffffff;
-  border-radius: 16px;
-  width: 100%;
+  border-radius: 12px;
+  width: 90%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 `;
 
 export const ModalHeader = styled.div`
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e4e7eb;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #e0e6ed;
 `;
 
 export const ModalTitle = styled.h2`
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 700;
-  color: #1a1d1f;
+  color: #1a1a1a;
   margin: 0;
 `;
 
 export const CloseButton = styled.button`
-  width: 28px;
-  height: 28px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: transparent;
-  border: none;
-  border-radius: 6px;
-  font-size: 18px;
-  color: #6f767e;
-  cursor: pointer;
-  transition: all 0.2s;
+  transition: color 0.2s;
 
   &:hover {
-    background-color: #f1f3f5;
-    color: #1a1d1f;
+    color: #1a1a1a;
   }
 `;
 
-export const ModalContent = styled.div`
+export const ModalBody = styled.div`
   padding: 24px;
-  flex-grow: 1;
-  overflow-y: auto;
 `;
 
 export const FormGroup = styled.div`
-  margin-bottom: 16px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  margin-bottom: 20px;
 `;
 
-export const FormLabel = styled.label`
+export const Label = styled.label`
   display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: #4b5563;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
   margin-bottom: 8px;
 `;
 
-export const FormInput = styled.input`
+export const Input = styled.input`
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 16px;
   border: 1px solid #e0e6ed;
   border-radius: 8px;
   font-size: 14px;
@@ -435,24 +368,21 @@ export const FormInput = styled.input`
     border-color: #4d7cfe;
   }
 
-  &:disabled {
-    background-color: #f9fafb;
-    color: #6b7280;
-    cursor: not-allowed;
+  &::placeholder {
+    color: #9ca3af;
   }
 `;
 
-export const FormTextarea = styled.textarea`
+export const Select = styled.select`
   width: 100%;
-  padding: 10px 12px;
+  padding: 12px 16px;
   border: 1px solid #e0e6ed;
   border-radius: 8px;
   font-size: 14px;
   color: #1a1a1a;
   box-sizing: border-box;
-  min-height: 80px;
-  resize: vertical;
   transition: border-color 0.2s;
+  background-color: #ffffff;
 
   &:focus {
     outline: none;
@@ -460,18 +390,30 @@ export const FormTextarea = styled.textarea`
   }
 `;
 
-export const FormActions = styled.div`
+export const CheckboxWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const Checkbox = styled.input`
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+`;
+
+export const ModalFooter = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding: 20px 24px;
-  border-top: 1px solid #e4e7eb;
+  padding: 24px;
+  border-top: 1px solid #e0e6ed;
 `;
 
 export const CancelButton = styled.button`
   padding: 10px 20px;
-  background-color: #f1f3f5;
-  color: #4b5563;
+  background-color: #f3f4f6;
+  color: #374151;
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -479,8 +421,13 @@ export const CancelButton = styled.button`
   cursor: pointer;
   transition: background-color 0.2s;
 
-  &:hover {
-    background-color: #e4e7eb;
+  &:hover:not(:disabled) {
+    background-color: #e5e7eb;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
@@ -495,12 +442,118 @@ export const SubmitButton = styled.button`
   cursor: pointer;
   transition: background-color 0.2s;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background-color: #3a63e0;
   }
 
   &:disabled {
-    background-color: #a0c3ff;
+    opacity: 0.5;
     cursor: not-allowed;
   }
 `;
+
+export const DeleteCodeGroupButton = styled.button`
+  width: 500px;
+  align-items: end;
+  padding: 12px 24px;
+  background-color: #ef4444;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 24px;
+
+  &:hover {
+    background-color: #dc2626;
+  }
+
+  &:active {
+    background-color: #b91c1c;
+  }
+`;
+
+export const TextArea = styled.textarea`
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+`;
+
+// 항공사 필터 관련 스타일
+export const AirlineFilterWrapper = styled.div`
+  margin-bottom: 16px;
+`;
+
+export const AirlineSelectWrapper = styled.div`
+  width: 100%;
+`;
+
+export const AirlineSelect = styled.select`
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1a1a1a;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  background-color: #ffffff;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: #4d7cfe;
+  }
+`;
+
+// 코드 그룹 삭제 버튼
+export const CodeGroupDeleteButton = styled.button`
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  font-size: 16px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  margin-left: auto;
+
+  &:hover {
+    opacity: 1;
+  }
+`;
+
+// 폼 관련 스타일 (별칭)
+export const FormLabel = styled(Label)``;
+
+export const FormInput = styled(Input)``;
+
+export const FormTextarea = styled.textarea`
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 16px;
+  border: 1px solid #e0e6ed;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1a1a1a;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  resize: vertical;
+
+  &:focus {
+    outline: none;
+    border-color: #4d7cfe;
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+`;
+
+// 모달 컨텐츠
+export const ModalContent = styled(ModalBody)``;
+
+// 폼 액션 (별칭)
+export const FormActions = styled(ModalFooter)``;
