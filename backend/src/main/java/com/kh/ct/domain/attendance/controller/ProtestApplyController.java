@@ -25,28 +25,43 @@ public class ProtestApplyController {
     /**
      * 근태 정정 신청
      * 
-     * @param empId 직원 ID
-     * @param attendanceId 정정 대상 근태 ID
-     * @param protestRequestInTime 정정 요청 출근 시간
-     * @param protestRequestOutTime 정정 요청 퇴근 시간
-     * @param protestReason 정정 사유
-     * @param files 증빙 파일 목록
+     * <p><b>프론트엔드 연동 가이드:</b></p>
+     * <ul>
+     *   <li>기존 근태 기록이 있는 경우: {@code attendanceId}를 전송</li>
+     *   <li>근태 기록이 없는 경우 (결근/미출근): {@code attendanceDate}를 전송 (형식: yyyy-MM-dd)</li>
+     *   <li>{@code attendanceId}와 {@code attendanceDate} 중 하나는 필수</li>
+     *   <li>{@code attendanceDate}로 신청 시, 해당 날짜에 근태 기록이 없으면 자동으로 생성됨</li>
+     * </ul>
+     * 
+     * @param empId 직원 ID (필수)
+     * @param attendanceId 정정 대상 근태 ID (선택, attendanceDate와 둘 중 하나 필수)
+     * @param attendanceDate 정정 대상 날짜 (선택, attendanceId와 둘 중 하나 필수, 형식: yyyy-MM-dd)
+     * @param attendanceType 근무 유형 (NORMAL, LEAVE, HALF_LEAVE, LATE, ABSENT)
+     * @param protestRequestInTime 정정 요청 출근 시간 (선택, 형식: HH:mm)
+     * @param protestRequestOutTime 정정 요청 퇴근 시간 (선택, 형식: HH:mm)
+     * @param protestReason 정정 사유 (필수)
+     * @param files 증빙 파일 목록 (필수)
      * @return 정정 신청 응답
      */
     @PostMapping
     public ResponseEntity<ProtestDto.ListResponse> applyProtest(
             @RequestParam String empId,
-            @RequestParam Long attendanceId,
+            @RequestParam(required = false) Long attendanceId,
+            @RequestParam(required = false) String attendanceDate,
+            @RequestParam(required = false) String attendanceType,
             @RequestParam(required = false) String protestRequestInTime,
             @RequestParam(required = false) String protestRequestOutTime,
             @RequestParam String protestReason,
             @RequestParam(value = "files", required = false) List<MultipartFile> files) {
         
-        log.info("POST /api/attendance/protest - empId: {}, attendanceId: {}", empId, attendanceId);
+        log.info("POST /api/attendance/protest - empId: {}, attendanceId: {}, attendanceDate: {}", 
+                empId, attendanceId, attendanceDate);
 
         try {
             ProtestDto.ApplyRequest request = ProtestDto.ApplyRequest.builder()
                     .attendanceId(attendanceId)
+                    .attendanceDate(attendanceDate)
+                    .attendanceType(attendanceType)
                     .protestRequestInTime(protestRequestInTime)
                     .protestRequestOutTime(protestRequestOutTime)
                     .protestReason(protestReason)

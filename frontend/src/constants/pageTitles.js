@@ -43,6 +43,7 @@ export const PAGE_TITLES = {
     '/leave-apply': '휴가 신청',
     '/employee/leave-apply': '휴가 신청',
     '/protest-apply': '근태 정정 신청',
+    '/my-application-history': '내 신청 현황',
     '/approval': '휴가 승인',
     '/protest-approval': '근태 정정 승인',
 

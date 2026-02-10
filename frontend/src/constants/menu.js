@@ -19,7 +19,8 @@ export const USER_MENU = [
         category: "근태 관리",
         items: [
             { label: "내 근태 현황", icon: Calendar, id: "/my-attendance" },
-            { label: "휴가 신청", icon: Plane, id: "/vacation" }
+            { label: "휴가 신청", icon: Plane, id: "/vacation" },
+            { label: "내 신청 현황", icon: ClipboardCheck, id: "/my-application-history" }
         ]
     },
     {

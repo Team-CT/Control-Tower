@@ -51,7 +51,7 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
         }
 
         // 3. 휴가 일수 계산
-        Float leaveDays = calculateLeaveDays(request.getLeaveType(), request.getStartDate(), request.getEndDate());
+        Double leaveDays = calculateLeaveDays(request.getLeaveType(), request.getStartDate(), request.getEndDate());
 
         // 4. 잔여 휴가 확인
         if (applicant.getLeaveCount() == null || applicant.getLeaveCount() < leaveDays) {
@@ -111,9 +111,9 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
                 .orElseThrow(() -> new RuntimeException("직원을 찾을 수 없습니다"));
 
         int currentYear = LocalDateTime.now().getYear();
-        Float usedLeave = leaveApplyRepository.calculateUsedLeaveByYear(empId, currentYear);
-        Float remainingLeave = emp.getLeaveCount() != null ? emp.getLeaveCount() : 0.0f;
-        Float totalLeave = remainingLeave + usedLeave;
+        Double usedLeave = leaveApplyRepository.calculateUsedLeaveByYear(empId, currentYear);
+        Double remainingLeave = emp.getLeaveCount() != null ? emp.getLeaveCount() : 0.0;
+        Double totalLeave = remainingLeave + usedLeave;
 
         int usagePercentage = totalLeave > 0 ? (int) ((usedLeave / totalLeave) * 100) : 0;
 
@@ -192,14 +192,19 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
 
     /**
      * 휴가 일수 계산
+     * - HALF_DAY: 0.5일 고정
+     * - ANNUAL, SICK, UNPAID: 시작일~종료일 기간 계산
      */
-    private Float calculateLeaveDays(String leaveType, LocalDateTime startDate, LocalDateTime endDate) {
+    private Double calculateLeaveDays(String leaveType, LocalDateTime startDate, LocalDateTime endDate) {
+        // 반차는 무조건 0.5일
         if ("HALF_DAY".equals(leaveType)) {
-            return 0.5f;
+            return 0.5;
         }
-
+        
+        // 연차, 병가, 무급휴가는 기간 계산 (시작일과 종료일 포함)
+        // ANNUAL, SICK, UNPAID 모두 동일한 방식으로 일수 계산
         long days = ChronoUnit.DAYS.between(startDate.toLocalDate(), endDate.toLocalDate()) + 1;
-        return (float) days;
+        return (double) days;
     }
 
     /**
@@ -227,6 +232,7 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
                         entity.getLeaveApplyApplicant().getDepartmentId().getDepartmentName() : null)
                 .approverName(entity.getLeaveApplyApprover() != null ?
                         entity.getLeaveApplyApprover().getEmpName() : null)
+                .cancelReason(entity.getLeaveApplyCancelReason())
                 .createdDate(entity.getCreateDate())
                 .build();
     }
@@ -381,5 +387,19 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
         return leaveList.stream()
                 .map(this::convertToListResponse)
                 .collect(Collectors.toList());
+    }
+    
+    /**
+     * 휴가 신청 상세 조회
+     */
+    @Override
+    @Transactional(readOnly = true)
+    public LeaveDto.ListResponse getLeaveDetail(Long leaveApplyId) {
+        log.info("휴가 신청 상세 조회 - leaveApplyId: {}", leaveApplyId);
+        
+        LeaveApply leaveApply = leaveApplyRepository.findById(leaveApplyId)
+                .orElseThrow(() -> new RuntimeException("휴가 신청 내역을 찾을 수 없습니다"));
+        
+        return convertToListResponse(leaveApply);
     }
 }

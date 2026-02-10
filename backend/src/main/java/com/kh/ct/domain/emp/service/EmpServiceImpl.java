@@ -79,7 +79,7 @@ public class EmpServiceImpl implements EmpService {
                 // 기본값(정책)
                 .startDate(LocalDateTime.now())
                 .endDate(null)
-                .leaveCount(15f)
+                .leaveCount(15.0)
 
                 // nullable이라면 유지
                 .airlineId(null)

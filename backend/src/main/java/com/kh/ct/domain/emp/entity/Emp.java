@@ -64,7 +64,7 @@ public class Emp extends BaseTimeEntity {
 
     private LocalDateTime endDate;
 
-    private Float leaveCount;
+    private Double leaveCount;
 
     @Column(nullable = false, length = 50, unique = true)
     private String empNo;
