@@ -13,7 +13,11 @@ export const flightScheduleService = {
   
   // 승무원 추가
   addCrewMember: (flyScheduleId, empId) => {
-    return api.post(`/api/flight-schedules/${flyScheduleId}/crew`, { empId });
+    // 백엔드 DTO는 @JsonProperty("emp_id")를 사용하므로 emp_id로 보냄
+    console.log('승무원 추가 API 호출:', { flyScheduleId, empId });
+    return api.post(`/api/flight-schedules/${flyScheduleId}/crew`, { 
+      emp_id: empId
+    });
   },
   
   // 승무원 삭제

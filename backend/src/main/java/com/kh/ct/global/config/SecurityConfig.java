@@ -56,16 +56,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/common/codes/**").permitAll()
                         .requestMatchers("/api/airlines").permitAll()
                         .requestMatchers("/api/airports").permitAll()
-                        .requestMatchers("/api/super-admin/**").permitAll()
                         .requestMatchers("/api/file/download/**").permitAll()
-                        .requestMatchers("/api/flight-schedules/**").authenticated()
-
-                        .requestMatchers("/api/common/codes/**").permitAll()
-                        .requestMatchers("/api/airlines").permitAll()
-                        .requestMatchers("/api/airports").permitAll()
-                        .requestMatchers("/api/super-admin/**").permitAll()
-                        .requestMatchers("/api/file/download/**").permitAll()
-                        .requestMatchers("/api/flight-schedules/**").authenticated()
+                        
+                        // 항공편 API: 일반 직원은 조회만 가능, 관리자는 모든 작업 가능
+                        .requestMatchers(HttpMethod.GET, "/api/flight-schedules/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
                         .requestMatchers("/api/emp/**").authenticated()
 
                         //관리자 전용
