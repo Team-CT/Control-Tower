@@ -41,8 +41,8 @@ import {
 import { useAirlineTheme } from '../../context/AirlineThemeContext';
 import useAuthStore from '../../store/authStore';
 
-import {empService} from '../../api/emp/empService';
-import {fileService} from '../../api/emp/fileService';
+import { empService } from '../../api/emp/empService';
+import { fileService } from '../../api/emp/fileService';
 
 /**
  * ✅ 전제
@@ -63,6 +63,16 @@ const Settings = () => {
 
   const [profileImage, setProfileImage] = useState(null);
   const [profilePreview, setProfilePreview] = useState(null);
+
+  // ✅ 비밀번호 변경 상태
+  const [pwForm, setPwForm] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwError, setPwError] = useState(null);
+  const [pwSuccess, setPwSuccess] = useState(null);
 
   // ✅ 주소 조립/분해 유틸
   const ADDRESS_DELIMITER = ' | ';
@@ -176,11 +186,9 @@ const Settings = () => {
       setLoading(false);
     }
   };
+
   const formatPhoneKR = (value) => {
     const digits = String(value || '').replace(/\D/g, ''); // 숫자만
-
-    // 02(서울) 같은 국번까지 커버하고 싶으면 규칙이 더 필요하지만,
-    // 지금은 휴대폰(010/011/016/017/018/019 등) 중심으로 처리
     if (digits.length <= 3) return digits;
     if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
     return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
@@ -189,6 +197,7 @@ const Settings = () => {
   const handleChangeProfile = (key) => (e) => {
     setProfile((prev) => ({ ...prev, [key]: e.target.value }));
   };
+
   const handlePhoneChange = (e) => {
     const raw = e.target.value;
     const formatted = formatPhoneKR(raw);
@@ -313,6 +322,57 @@ const Settings = () => {
     loadMyProfile();
   };
 
+  // ✅ 비밀번호 변경 입력 핸들러
+  const handlePwChange = (key) => (e) => {
+    const v = e.target.value;
+    setPwForm((prev) => ({ ...prev, [key]: v }));
+  };
+
+
+
+  // ✅ 비밀번호 변경 API 호출
+  const handleChangePassword = async () => {
+    try {
+      setPwSaving(true);
+      setPwError(null);
+      setPwSuccess(null);
+
+      if (!pwForm.currentPassword) {
+        setPwError('현재 비밀번호를 입력해주세요.');
+        return;
+      }
+      if (!pwForm.newPassword) {
+        setPwError('새 비밀번호를 입력해주세요.');
+        return;
+      }
+      if (pwForm.newPassword !== pwForm.confirmPassword) {
+        setPwError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
+        return;
+      }
+      if (pwForm.currentPassword === pwForm.newPassword) {
+        setPwError('현재 비밀번호와 다른 비밀번호를 사용해주세요.');
+        return;
+      }
+
+      await empService.changeMyPassword({
+        current_password: pwForm.currentPassword,
+        new_password: pwForm.newPassword,
+      });
+
+      setPwSuccess('비밀번호가 변경되었습니다.');
+      setPwForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    } catch (e) {
+      console.error('비밀번호 변경 실패:', e);
+      const msg =
+        e?.response?.data?.message ||
+        e?.response?.data?.error ||
+        '비밀번호 변경에 실패했습니다. (현재 비밀번호를 확인하세요)';
+      setPwError(msg);
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
   return (
     <MainContainer>
       <ContentWrapper>
@@ -407,7 +467,14 @@ const Settings = () => {
                 <InfoRow>
                   <InfoLabel>전화번호</InfoLabel>
                   <InfoValue>
-                    <FormInput type="tel" value={profile.phone} onChange={handlePhoneChange} inputMode='numeric' placeholder='010-1234-5678' maxLength={13}/>
+                    <FormInput
+                      type="tel"
+                      value={profile.phone}
+                      onChange={handlePhoneChange}
+                      inputMode="numeric"
+                      placeholder="010-1234-5678"
+                      maxLength={13}
+                    />
                   </InfoValue>
                 </InfoRow>
 
@@ -487,7 +554,11 @@ const Settings = () => {
                 <SecurityCardHeader>
                   <h3>🔒 비밀번호 변경</h3>
                 </SecurityCardHeader>
+
                 <SecurityCardBody>
+                  {pwError && <div style={{ padding: '10px 0', color: '#dc2626' }}>{pwError}</div>}
+                  {pwSuccess && <div style={{ padding: '10px 0', color: '#16a34a' }}>{pwSuccess}</div>}
+
                   <SecurityItem>
                     <SecurityItemLeft>
                       <SecurityItemTitle>현재 비밀번호</SecurityItemTitle>
@@ -495,7 +566,13 @@ const Settings = () => {
                     </SecurityItemLeft>
                     <SecurityItemRight>
                       <PasswordInputGroup>
-                        <PasswordInput type="password" placeholder="현재 비밀번호를 입력하세요" />
+                        <PasswordInput
+                          type="password"
+                          placeholder="현재 비밀번호를 입력하세요"
+                          value={pwForm.currentPassword}
+                          onChange={handlePwChange('currentPassword')}
+                          disabled={pwSaving}
+                        />
                       </PasswordInputGroup>
                     </SecurityItemRight>
                   </SecurityItem>
@@ -507,7 +584,13 @@ const Settings = () => {
                     </SecurityItemLeft>
                     <SecurityItemRight>
                       <PasswordInputGroup>
-                        <PasswordInput type="password" placeholder="새 비밀번호를 입력하세요" />
+                        <PasswordInput
+                          type="password"
+                          placeholder="새 비밀번호를 입력하세요"
+                          value={pwForm.newPassword}
+                          onChange={handlePwChange('newPassword')}
+                          disabled={pwSaving}
+                        />
                       </PasswordInputGroup>
                     </SecurityItemRight>
                   </SecurityItem>
@@ -519,13 +602,21 @@ const Settings = () => {
                     </SecurityItemLeft>
                     <SecurityItemRight>
                       <PasswordInputGroup>
-                        <PasswordInput type="password" placeholder="비밀번호를 다시 입력하세요" />
+                        <PasswordInput
+                          type="password"
+                          placeholder="비밀번호를 다시 입력하세요"
+                          value={pwForm.confirmPassword}
+                          onChange={handlePwChange('confirmPassword')}
+                          disabled={pwSaving}
+                        />
                       </PasswordInputGroup>
                     </SecurityItemRight>
                   </SecurityItem>
 
                   <ActionButtons style={{ borderTop: 'none', paddingTop: 0 }}>
-                    <ChangePasswordButton>비밀번호 변경</ChangePasswordButton>
+                    <ChangePasswordButton onClick={handleChangePassword} disabled={pwSaving}>
+                      {pwSaving ? '변경 중...' : '비밀번호 변경'}
+                    </ChangePasswordButton>
                   </ActionButtons>
                 </SecurityCardBody>
               </SecurityCard>

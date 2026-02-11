@@ -100,6 +100,18 @@ public class EmpController {
         return ResponseEntity.ok(ApiResponse.success("내 프로필 수정 성공", updated));
     }
 
+    @PutMapping("/me/password")
+    public ResponseEntity<Void> changeMyPassword(
+            Authentication authentication,
+            @Valid @RequestBody EmpDto.ChangeMyPasswordRequest req
+    ) {
+        String empId = authentication.getName();
+        // ⚠️ authentication.getName()이 empId가 맞다는 전제 (대부분 subject로 empId 넣으면 맞음)
+
+        empService.changeMyPassword(empId, req.getCurrentPassword(), req.getNewPassword());
+        return ResponseEntity.ok().build();
+    }
+
     /**
      * 직원 상세 정보 조회
      */
