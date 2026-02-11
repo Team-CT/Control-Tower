@@ -27,7 +27,7 @@ public class FlySchedule extends BaseTimeEntity {
     @JoinColumn(name = "fly_schedule_id", referencedColumnName = "schedule_id")
     private AllSchedule schedule;
 
-    @Column(name = "airline_id", nullable = false)
+    @Column(name = "airline_id", nullable = true)
     private Long airlineId;
 
     @Column(name = "flight_number", length = 20)
@@ -55,7 +55,7 @@ public class FlySchedule extends BaseTimeEntity {
     private Long crewCount;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "flight_status", nullable = false)
+    @Column(name = "flight_status", nullable = true)
     private CommonEnums.flightStatus flightStatus;
 
     @Column(name = "seat_count")

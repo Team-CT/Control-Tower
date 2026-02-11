@@ -1,6 +1,7 @@
 package com.kh.ct.domain.schedule.controller;
 
 import com.kh.ct.domain.schedule.dto.FlyScheduleDto;
+import com.kh.ct.domain.schedule.service.FlightSyncService;
 import com.kh.ct.domain.schedule.service.FlyScheduleService;
 import com.kh.ct.global.dto.ApiResponse;
 import jakarta.validation.Valid;
@@ -21,7 +22,8 @@ import java.util.List;
 public class FlyScheduleController {
     
     private final FlyScheduleService flyScheduleService;
-    
+    private final FlightSyncService flightSyncService;
+
     /**
      * 비행편 목록 조회
      * - 관리자: 항공사별 전체 비행편 조회
@@ -37,15 +39,18 @@ public class FlyScheduleController {
             @RequestParam(required = false) String destination
     ) {
         List<FlyScheduleDto.ListResponse> schedules = flyScheduleService.getFlightSchedulesWithAuth(
-                authentication,
-                airlineId,
-                startDate,
-                endDate,
-                departure,
-                destination
+                authentication, airlineId, startDate, endDate, departure, destination
         );
-        
         return ResponseEntity.ok(ApiResponse.success("비행편 목록 조회 성공", schedules));
+    }
+
+    /**
+     * 외부 API 데이터 동기화
+     */
+    @GetMapping("/sync")
+    public ResponseEntity<ApiResponse<String>> syncExternalData() {
+        flightSyncService.syncApiData();
+        return ResponseEntity.ok(ApiResponse.success("비행 스케줄 동기화 요청 성공", "데이터 처리가 시작되었습니다."));
     }
     
     /**

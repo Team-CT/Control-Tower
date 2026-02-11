@@ -87,4 +87,12 @@ public interface FlyScheduleRepository extends JpaRepository<FlySchedule, Long> 
         @Param("departure") String departure,
         @Param("destination") String destination
     );
+    
+    // 날짜 범위 내 비행편 개수 조회
+    @Query("SELECT COUNT(fs) FROM FlySchedule fs " +
+           "WHERE fs.flyStartTime >= :startDate AND fs.flyStartTime <= :endDate")
+    long countByFlyStartTimeBetween(
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate
+    );
 }
