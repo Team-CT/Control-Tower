@@ -52,7 +52,7 @@ import TenantManagement from './pages/SuperAdmin/Tenant/TenantManagement.jsx';
 import TenantDetail from './pages/SuperAdmin/Tenant/TenantDetail.jsx';
 import CompanyRegistrationManagement from './pages/SuperAdmin/CompanyRegistrationManagement/CompanyRegistrationManagement.jsx';
 import QnADetail from './pages/QnADetail/QnADetail.jsx';
-
+import Chatbot from './ChatBot/Chatbot';
 // 레이아웃 컴포넌트 Import
 import MainLayout from './layout/MainLayout';
 
@@ -66,6 +66,7 @@ const ThemedApp = () => {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
+      <Chatbot />
       <Routes>
         {/* 1. 사이드바가 없는 페이지 (퍼블릭) */}
         <Route path="/" element={<LandingPage />} />
