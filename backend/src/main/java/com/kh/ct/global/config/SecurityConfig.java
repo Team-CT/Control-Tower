@@ -75,6 +75,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/dashboard/admin/**").permitAll()
                         .requestMatchers("/api/admin/attendance/**").permitAll()  // 관리자 근태 관리 API
                         .requestMatchers("/api/health/admin/**").permitAll() // 건강 관리자 API
+                        // 알림 API: 인증 필요
+                        .requestMatchers("/api/notifications/**").authenticated()
                         //나머지경로
                         .requestMatchers("/api/settings/**").permitAll()
                         .anyRequest().authenticated()

@@ -8,6 +8,7 @@ import com.kh.ct.domain.attendance.repository.LeaveApplyRepository;
 import com.kh.ct.domain.emp.entity.Emp;
 import com.kh.ct.domain.emp.repository.EmpRepository;
 import com.kh.ct.global.common.CommonEnums;
+import com.kh.ct.global.service.NotificationEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
     private final LeaveApplyRepository leaveApplyRepository;
     private final EmpRepository empRepository;
     private final AttendanceRepository attendanceRepository;
+    private final NotificationEventPublisher notificationEventPublisher;
 
     /**
      * 휴가 신청
@@ -186,6 +188,26 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
         } else {
             deleteAttendanceForRejection(leaveApply);
         }
+
+        // 알림 발행
+        String applicantEmpId = leaveApply.getLeaveApplyApplicant().getEmpId();
+        String alarmContent;
+        String alarmType;
+        String alarmLink;
+
+        if (request.getApproved()) {
+            alarmContent = String.format("휴가 신청이 승인되었습니다. (신청 코드: %s)", leaveApply.getLeaveApplyCode());
+            alarmType = "LEAVE_APPROVED";
+            alarmLink = "/employee-schedule";
+        } else {
+            alarmContent = String.format("휴가 신청이 반려되었습니다. (신청 코드: %s, 사유: %s)", 
+                    leaveApply.getLeaveApplyCode(), 
+                    request.getCancelReason() != null ? request.getCancelReason() : "사유 없음");
+            alarmType = "LEAVE_REJECTED";
+            alarmLink = "/employee-schedule";
+        }
+
+        notificationEventPublisher.publishNotificationEvent(applicantEmpId, alarmContent, alarmType, alarmLink);
 
         return convertToListResponse(leaveApply);
     }

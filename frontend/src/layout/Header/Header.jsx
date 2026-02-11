@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { useAirlineTheme } from '../../context/AirlineThemeContext';
@@ -7,13 +7,24 @@ import * as S from './Header.styled';
 import useAuthStore from '../../store/authStore';
 import { USER_MENU, ADMIN_MENU, SUPER_ADMIN_MENU } from '../../constants/menu';
 import { useNavigate } from 'react-router-dom';
+import NotificationBell from '../../components/NotificationBell/NotificationBell';
+import useNotificationSSE from '../../hooks/useNotificationSSE';
+import useNotificationStore from '../../store/notificationStore';
 
 
 const Header = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { theme } = useAirlineTheme();
-  const { emp, logout } = useAuthStore();
+  const { emp, logout, token } = useAuthStore();
+  const { addNotification, fetchUnreadCount } = useNotificationStore();
+
+  const handleNotification = (notification) => {
+    addNotification(notification);
+    fetchUnreadCount();
+  };
+
+  useNotificationSSE(token, handleNotification);
 
 
   const handleLogout = () => {
@@ -81,10 +92,7 @@ const Header = () => {
 
       {/* 오른쪽: 검색, 알림, 프로필 */}
       <S.HeaderRight>
-        <S.NotificationBadge>
-          <S.NotificationIcon>🔔</S.NotificationIcon>
-          <S.Badge>1</S.Badge>
-        </S.NotificationBadge>
+        <NotificationBell />
 
         <S.UserProfile>
           <S.UserAvatar>{emp?.empName ? emp.empName.charAt(0) : 'G'}</S.UserAvatar>
