@@ -59,7 +59,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/file/download/**").permitAll()
                         
                         // 항공편 API: 일반 직원은 조회만 가능, 관리자는 모든 작업 가능
-                        .requestMatchers(HttpMethod.GET, "/api/flight-schedules/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/flight-schedules/sync").permitAll() // 동기화 엔드포인트는 인증 없이 접근 가능
+                        .requestMatchers(HttpMethod.GET, "/api/flight-schedules").permitAll()
+                        // .requestMatchers(HttpMethod.GET, "/api/flight-schedules/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
                         .requestMatchers(HttpMethod.PATCH, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")

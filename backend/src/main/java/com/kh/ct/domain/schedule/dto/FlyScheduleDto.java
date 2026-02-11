@@ -126,4 +126,28 @@ public class FlyScheduleDto {
         @NotBlank(message = "직원 ID(empId)는 필수입니다.")
         private String empId;
     }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ExternalFlightData {
+        @JsonProperty("편명")
+        private String flightNumber;    // "KE713" -> FLY_SCHEDULE.FLIGHT_NUMBER
+
+        @JsonProperty("날짜")
+        private String date;            // "2015-02-27"
+
+        @JsonProperty("계획시간")       // API 더미 데이터 형식이 "계획시간"이었으므로 확인 필요
+        private String time;            // "16:20"
+
+        @JsonProperty("공항")           // API 데이터가 "공항"으로 온다면 departure로 매핑
+        private String departure;       // "PUS" -> FLY_SCHEDULE.DEPARTURE
+
+        @JsonProperty("상대공항")       // API 데이터가 "상대공항"으로 온다면 destination으로 매핑
+        private String destination;     // "NRT" -> FLY_SCHEDULE.DESTINATION
+
+        @JsonProperty("출도착(A도착D출발)")
+        private String type;            // "D" 인지 확인하여 출발/도착 로직 분리 가능
+    }
 }
