@@ -46,7 +46,7 @@ public class NotificationSseController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        log.info("SSE 연결 요청 - empId: {}, lastEventId: {}", empId, lastEventIdValue);
+        log.info("SSE 연결 요청 - empId: " + empId + ", lastEventId: " + lastEventIdValue);
 
         SseEmitter emitter = notificationSseService.createConnection(empId);
 
@@ -67,7 +67,7 @@ public class NotificationSseController {
                     }
                 }
             } catch (NumberFormatException e) {
-                log.warn("잘못된 Last-Event-ID 형식: {}", lastEventIdValue);
+                log.warn("잘못된 Last-Event-ID 형식: " + lastEventIdValue);
             }
         }
 
@@ -77,13 +77,28 @@ public class NotificationSseController {
     private String getCurrentEmpId(HttpServletRequest request, String tokenParam) {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication != null && authentication.isAuthenticated()) {
+            log.debug("SecurityContext 인증 상태 - authenticated: " + (authentication != null ? authentication.isAuthenticated() : false) + 
+                    ", name: " + (authentication != null ? authentication.getName() : null) + 
+                    ", path: " + request.getRequestURI());
+            
+            if (authentication != null && authentication.isAuthenticated() && !"anonymousUser".equals(authentication.getName())) {
                 return authentication.getName();
             }
 
+            // SecurityContext에 인증 정보가 없으면 토큰으로 직접 검증
             String token = tokenParam != null ? tokenParam : getJwtFromRequest(request);
+            log.debug("토큰 추출 - tokenParam: " + (tokenParam != null ? "있음" : "없음") + 
+                    ", token: " + (token != null ? "있음" : "없음") + 
+                    ", path: " + request.getRequestURI());
+            
             if (StringUtils.hasText(token)) {
-                return jwtTokenProvider.getempIdFromToken(token);
+                try {
+                    String empId = jwtTokenProvider.getempIdFromToken(token);
+                    log.debug("토큰에서 empId 추출 성공 - empId: " + empId);
+                    return empId;
+                } catch (Exception e) {
+                    log.error("토큰에서 empId 추출 실패", e);
+                }
             }
         } catch (Exception e) {
             log.error("사용자 ID 추출 실패", e);
