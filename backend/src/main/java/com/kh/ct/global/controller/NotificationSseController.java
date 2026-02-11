@@ -7,6 +7,7 @@ import com.kh.ct.global.service.NotificationSseService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,6 +16,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -41,7 +43,7 @@ public class NotificationSseController {
 
         String empId = getCurrentEmpId(request, tokenParam);
         if (empId == null) {
-            return ResponseEntity.unauthorized().build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         log.info("SSE 연결 요청 - empId: {}, lastEventId: {}", empId, lastEventIdValue);
