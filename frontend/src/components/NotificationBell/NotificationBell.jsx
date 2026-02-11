@@ -14,7 +14,8 @@ const NotificationBell = () => {
   useEffect(() => {
     fetchUnreadCount();
     fetchNotifications(0, 20);
-  }, [fetchUnreadCount, fetchNotifications]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event) => {

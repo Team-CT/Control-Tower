@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import { useAirlineTheme } from '../../context/AirlineThemeContext';
@@ -19,10 +19,10 @@ const Header = () => {
   const { emp, logout, token } = useAuthStore();
   const { addNotification, fetchUnreadCount } = useNotificationStore();
 
-  const handleNotification = (notification) => {
+  const handleNotification = useCallback((notification) => {
     addNotification(notification);
     fetchUnreadCount();
-  };
+  }, [addNotification, fetchUnreadCount]);
 
   useNotificationSSE(token, handleNotification);
 
