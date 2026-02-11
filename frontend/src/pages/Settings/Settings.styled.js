@@ -85,6 +85,46 @@ export const ProfileAvatar = styled.div`
   }
 `;
 
+export const InputRow = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+`;
+
+export const SmallButton = styled.button`
+  flex-shrink: 0;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-inverse);
+  background: var(--color-primary);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  /* 입력창 높이(12px 상하 패딩 + 폰트)와 비슷하게 맞춤 */
+  height: 44px;
+
+  &:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  @media (max-width: 768px) {
+    height: 42px;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+`;
+
 export const AvatarCircle = styled.div`
   position: relative;
   width: 120px;
@@ -157,10 +197,13 @@ export const FormInput = styled.input`
   padding: 12px 16px;
   font-size: 15px;
   color: var(--text-primary);
-  background: var(--bg-input);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   transition: all 0.2s ease;
+
+  /* ✅ 기본: 입력 가능 */
+  background: var(--bg-input);
+  cursor: text;
 
   &:focus {
     outline: none;
@@ -171,6 +214,29 @@ export const FormInput = styled.input`
 
   &::placeholder {
     color: #94a3b8;
+  }
+
+  /* ✅ 입력 불가(읽기 전용): 배경색/커서/선택만 막기 */
+  &[readonly] {
+    background: #f3f4f6;
+    color: #6b7280;
+    cursor: default;
+    user-select: none;
+  }
+
+  /* ✅ 완전 비활성(disabled): 더 진하게 + 커서 */
+  &:disabled {
+    background: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+
+  /* ✅ readOnly/disabled는 포커스 스타일이 불필요하니 제거(선택) */
+  &[readonly]:focus,
+  &:disabled:focus {
+    box-shadow: none;
+    border-color: var(--border-color);
+    background: inherit;
   }
 `;
 

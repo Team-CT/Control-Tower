@@ -27,6 +27,7 @@ public class EmpDto {
     private Integer age;
     private String departmentName;
     private String airlineName;
+    private Long profileImageId;
 
     @Getter
     @NoArgsConstructor
@@ -171,5 +172,76 @@ public class EmpDto {
         @NotBlank(message = "직책(job)은 필수입니다.")
         @Size(max = 50, message = "직책은 50자 이하여야 합니다.")
         private String job;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class UpdateMyProfileRequest {
+
+        @JsonProperty("emp_name")
+        @Size(max = 100, message = "이름은 100자 이하여야 합니다.")
+        private String empName;
+
+        @JsonProperty("age")
+        @Min(value = 0, message = "나이는 0 이상이어야 합니다.")
+        private Integer age;
+
+        @JsonProperty("email")
+        @Email(message = "이메일 형식이 올바르지 않습니다.")
+        @Size(max = 150, message = "이메일은 150자 이하여야 합니다.")
+        private String email;
+
+        @JsonProperty("phone")
+        @Size(max = 30, message = "전화번호는 30자 이하여야 합니다.")
+        private String phone;
+
+        @JsonProperty("address")
+        @Size(max = 255, message = "주소는 255자 이하여야 합니다.")
+        private String address;
+
+        @JsonProperty("profile_image_id")
+        private Long profileImageId;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class MyProfileResponse {
+
+        @JsonProperty("emp_id")
+        private String empId;
+
+        @JsonProperty("emp_name")
+        private String empName;
+
+        @JsonProperty("age")
+        private Integer age;
+
+        @JsonProperty("email")
+        private String email;
+
+        @JsonProperty("phone")
+        private String phone;
+
+        @JsonProperty("address")
+        private String address;
+
+        @JsonProperty("profile_image_id")
+        private Long profileImageId;
+
+        public static MyProfileResponse from(Emp emp) {
+            return MyProfileResponse.builder()
+                    .empId(emp.getEmpId())
+                    .empName(emp.getEmpName())
+                    .age(emp.getAge())
+                    .email(emp.getEmail())
+                    .phone(emp.getPhone())
+                    .address(emp.getAddress())
+                    .profileImageId(emp.getProfileImage() != null ? emp.getProfileImage().getFileId() : null)
+                    .build();
+        }
     }
 }

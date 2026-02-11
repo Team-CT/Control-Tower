@@ -16,7 +16,8 @@ export const API_ENDPOINTS = {
     CHECK_ID: `/api/emps/checkId`,        // GET ?empId=
     PREVIEW_EMP_NO: `/api/emps/empNo/preview`, // GET
     REGISTER: `/api/emps`,                 // POST
-    MANAGERS: `/api/emps/managers`,        // GET
+    MANAGERS: `/api/emps/managers`, 
+    ME: `/api/emps/me`,     
   },
 
   // ✅ FILE(업로드/삭제)

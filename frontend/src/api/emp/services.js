@@ -16,6 +16,7 @@ export const empService = {
   updateEmpRoleAndJob: (empId, role, job) => {
     return api.patch(`/api/emps/${empId}/role-job`, { role, job });
   },
+  
 };
 
 export default { empService };

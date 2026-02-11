@@ -7,7 +7,7 @@ import * as S from './Register.styled';
 import { empService } from '../../api/emp/empService';
 import { fileService } from '../../api/emp/fileService';
 
-// ✅ 추가: 이메일 인증 백엔드 연결 서비스
+// ✅ 이메일 인증 백엔드 연결 서비스
 import { passwordCodeService } from '../../api/emp/passwordCodeService';
 
 const Register = () => {
@@ -28,9 +28,15 @@ const Register = () => {
     name: '',
     age: '',
     phone: '',
-    address: '',
+
+    // ✅ 주소(카카오 주소검색 적용)
+    roadAddress: '', // 도로명/지번(검색으로 채움)
+    detailAddress: '', // 상세주소(직접 입력)
+    address: '', // ✅ 최종 저장용(road + detail 조합)
+
     department: '',
     position: '',
+
     profileImage: null, // 미리보기용(선택)
     profileImageId: null, // ✅ 업로드 결과 fileId
   });
@@ -78,6 +84,21 @@ const Register = () => {
 
     return () => clearInterval(id);
   }, [emailTimerRunning, emailSecondsLeft]);
+
+  /* ==========================
+   * ✅ 주소 합치기: 구분자 포함(핵심)
+   * - road + detail을 "도로명주소 | 상세주소"로 저장
+   * - 상세주소 없으면 "도로명주소"만 저장(구분자 X)
+   * ========================== */
+  const buildAddress = (road, detail) => {
+    const r = (road || '').trim();
+    const d = (detail || '').trim();
+
+    if (!r) return '';
+    if (!d) return r;
+
+    return `${r} | ${d}`; // ✅ 구분자
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -159,6 +180,60 @@ const Register = () => {
       alert(err.response?.data?.message || '이미지 업로드에 실패했습니다.');
       setFormData((prev) => ({ ...prev, profileImageId: null }));
     }
+  };
+
+  /* ==========================
+   * ✅ 카카오 주소검색 (우편번호 제외)
+   * - index.html에 스크립트 필요:
+   *   <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+   * ========================== */
+  const openKakaoAddressSearch = () => {
+    if (!window.daum?.Postcode) {
+      alert(
+        '카카오 주소 스크립트가 로드되지 않았습니다.\n' +
+          'index.html <head>에 아래 스크립트를 추가했는지 확인하세요:\n' +
+          '<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>'
+      );
+      return;
+    }
+
+    new window.daum.Postcode({
+      oncomplete: (data) => {
+        const road = data.roadAddress || '';
+        const jibun = data.jibunAddress || '';
+
+        // 참고항목(법정동/건물명 등) - 선택
+        let extra = '';
+        if (data.bname && /[동|로|가]$/g.test(data.bname)) extra += data.bname;
+        if (data.buildingName && data.apartment === 'Y') {
+          extra += (extra ? ', ' : '') + data.buildingName;
+        }
+        if (extra) extra = ` (${extra})`;
+
+        const baseAddress = road ? `${road}${extra}` : jibun;
+
+        // ✅ roadAddress 선택 시: 상세주소는 유지하고, address는 "road | detail" 규칙으로 업데이트
+        setFormData((prev) => {
+          const nextRoad = baseAddress;
+          return {
+            ...prev,
+            roadAddress: nextRoad,
+            address: buildAddress(nextRoad, prev.detailAddress),
+          };
+        });
+      },
+    }).open();
+  };
+
+  const handleDetailAddressChange = (e) => {
+    const detail = e.target.value;
+
+    // ✅ 상세주소 변경 시: address도 "road | detail" 규칙으로 업데이트
+    setFormData((prev) => ({
+      ...prev,
+      detailAddress: detail,
+      address: buildAddress(prev.roadAddress, detail),
+    }));
   };
 
   /* ==========================
@@ -248,6 +323,14 @@ const Register = () => {
       return alert('비밀번호가 일치하지 않습니다.');
     }
 
+    // ✅ 주소 검증(검색 기반)
+    if (!formData.roadAddress) {
+      return alert('주소 검색을 통해 주소를 선택해주세요.');
+    }
+
+    // ✅ 혹시 사용자가 상세주소를 입력했는데 address가 갱신되지 않은 케이스 방어(안전망)
+    const finalAddress = buildAddress(formData.roadAddress, formData.detailAddress);
+
     // 백엔드 EmpDto.RegisterRequest(JSONProperty)에 맞춰 payload 구성
     const payload = {
       emp_id: formData.userId,
@@ -257,7 +340,7 @@ const Register = () => {
       emp_pwd: formData.password,
       email: formData.email,
       phone: formData.phone,
-      address: formData.address,
+      address: finalAddress, // ✅ "road | detail" 최종 조립 문자열
       profile_image_id: formData.profileImageId, // ✅ 업로드 결과 fileId
     };
 
@@ -509,15 +592,37 @@ const Register = () => {
                   />
                 </S.InputGroup>
 
+                {/* ✅ 주소(카카오 주소검색 적용) */}
                 <S.InputGroup>
                   <S.InputLabel>주소</S.InputLabel>
+
+                  {/* 도로명/지번 주소(검색) + 버튼 */}
+                  <S.InputRow>
+                    <S.Input
+                      name="roadAddress"
+                      value={formData.roadAddress}
+                      placeholder="주소검색 버튼을 눌러 선택하세요"
+                      readOnly
+                      required
+                      style={{ background: '#f3f4f6', cursor: 'not-allowed' }}
+                    />
+                    <S.SmallButton type="button" onClick={openKakaoAddressSearch}>
+                      주소검색
+                    </S.SmallButton>
+                  </S.InputRow>
+
+                  {/* 상세주소 */}
                   <S.Input
-                    name="address"
-                    onChange={handleInputChange}
-                    value={formData.address}
-                    placeholder="주소 입력"
-                    required
+                    name="detailAddress"
+                    value={formData.detailAddress}
+                    onChange={handleDetailAddressChange}
+                    placeholder="상세주소 (예: 101동 1001호)"
                   />
+
+                  {/* 최종 저장되는 address 표시(선택) */}
+                  <S.HelperText>
+                    저장 주소: {buildAddress(formData.roadAddress, formData.detailAddress) || '(아직 선택되지 않음)'}
+                  </S.HelperText>
                 </S.InputGroup>
 
                 <S.InputGroup>
@@ -552,9 +657,7 @@ const Register = () => {
               </S.RegisterForm>
             )}
 
-            <S.LoginLink onClick={() => navigate('/login')}>
-              로그인 화면으로 돌아가기
-            </S.LoginLink>
+            <S.LoginLink onClick={() => navigate('/login')}>로그인 화면으로 돌아가기</S.LoginLink>
           </S.RegisterCard>
         </S.RegisterSection>
       </S.ContentWrapper>

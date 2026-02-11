@@ -47,7 +47,7 @@ public class Emp extends BaseTimeEntity {
     @Column(length = 30)
     private String phone;
 
-    @Column(nullable = false, length = 50)
+    @Column(length = 50)
     private String job;
 
     @Column(length = 150)
@@ -102,8 +102,9 @@ public class Emp extends BaseTimeEntity {
        if (phone != null) this.phone = phone;
        if (address != null) this.address = address;
    }
-
-
+    public void updateProfileImage(File profileImage) {
+        this.profileImage = profileImage;
+    }
 
     public void updateRoleAndJob(CommonEnums.Role role, String job) {
         this.role = role;

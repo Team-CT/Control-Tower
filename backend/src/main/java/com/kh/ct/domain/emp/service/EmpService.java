@@ -16,4 +16,6 @@ public interface EmpService {
     java.util.List<EmpDto> getManagerCandidates();
     List<EmpDto.EmployeeListItem> getEmployees(String role, Long airlineId);
     EmpDto updateEmpRoleAndJob(String empId, EmpDto.UpdateRoleAndJobRequest request);
+
+    EmpDto updateMyProfile(String empId, EmpDto.UpdateMyProfileRequest request);
 }
