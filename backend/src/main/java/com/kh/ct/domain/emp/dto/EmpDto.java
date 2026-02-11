@@ -179,6 +179,23 @@ public class EmpDto {
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder
+    public static class ChangeMyPasswordRequest {
+
+        @JsonProperty("current_password")
+        @NotBlank(message = "현재 비밀번호(current_password)는 필수입니다.")
+        private String currentPassword;
+
+        @JsonProperty("new_password")
+        @NotBlank(message = "새 비밀번호(new_password)는 필수입니다.")
+        @Size(max = 255, message = "새 비밀번호는 255자 이하여야 합니다.")
+        private String newPassword;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class UpdateMyProfileRequest {
 
         @JsonProperty("emp_name")

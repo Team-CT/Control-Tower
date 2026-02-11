@@ -18,4 +18,5 @@ public interface EmpService {
     EmpDto updateEmpRoleAndJob(String empId, EmpDto.UpdateRoleAndJobRequest request);
 
     EmpDto updateMyProfile(String empId, EmpDto.UpdateMyProfileRequest request);
+    void changeMyPassword(String empId, String currentPassword, String newPassword);
 }

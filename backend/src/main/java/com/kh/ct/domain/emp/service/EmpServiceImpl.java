@@ -288,4 +288,43 @@ public class EmpServiceImpl implements EmpService {
         return getEmpDetail(empId);
     }
 
+    @Override
+    @Transactional
+    public void changeMyPassword(String empId, String currentPassword, String newPassword) {
+
+        if (empId == null || empId.isBlank()) {
+            throw new IllegalArgumentException("empId는 필수입니다.");
+        }
+        if (currentPassword == null || currentPassword.isBlank()) {
+            throw new IllegalArgumentException("현재 비밀번호는 필수입니다.");
+        }
+        if (newPassword == null || newPassword.isBlank()) {
+            throw new IllegalArgumentException("새 비밀번호는 필수입니다.");
+        }
+
+        // ✅ 정책(필요하면 더 강화)
+        if (newPassword.length() < 8) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "새 비밀번호는 8자 이상이어야 합니다.");
+        }
+
+        Emp emp = empRepository.findById(empId)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND,
+                        "직원을 찾을 수 없습니다. (empId: " + empId + ")"));
+
+        // ✅ 현재 비번 검증
+        if (!passwordEncoder.matches(currentPassword, emp.getEmpPwd())) {
+            throw new BusinessException(HttpStatus.UNAUTHORIZED, "현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        // ✅ 동일 비번 방지(권장)
+        if (passwordEncoder.matches(newPassword, emp.getEmpPwd())) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "현재 비밀번호와 다른 비밀번호를 사용해주세요.");
+        }
+
+        // ✅ setter 대신 도메인 메서드 호출
+        emp.changePassword(passwordEncoder.encode(newPassword));
+
+        empRepository.save(emp);
+    }
+
 }

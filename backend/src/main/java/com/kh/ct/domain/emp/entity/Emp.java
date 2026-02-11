@@ -110,4 +110,11 @@ public class Emp extends BaseTimeEntity {
         this.role = role;
         this.job = job;
     }
+    public void changePassword(String encodedPassword) {
+        if (encodedPassword == null || encodedPassword.isBlank()) {
+            throw new IllegalArgumentException("encodedPassword는 비어 있을 수 없습니다.");
+        }
+        this.empPwd = encodedPassword;
+    }
+
 }

@@ -25,4 +25,9 @@ export const empService = {
   // payload는 DTO @JsonProperty 때문에 snake_case 권장:
   // { emp_name, age, email, phone, address, profile_image_id }
   updateMyProfile: (payload) => api.put(API_ENDPOINTS.EMP.ME, payload),
+
+    // ✅ 비밀번호 변경 (추가)
+  // payload:
+  // { current_password, new_password }
+  changeMyPassword: (payload) => api.put(API_ENDPOINTS.EMP.ME_PASSWORD, payload),
 };

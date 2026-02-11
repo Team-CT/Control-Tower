@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
     REGISTER: `/api/emps`,                 // POST
     MANAGERS: `/api/emps/managers`, 
     ME: `/api/emps/me`,     
+    ME_PASSWORD: '/api/emps/me/password',
   },
 
   // ✅ FILE(업로드/삭제)
