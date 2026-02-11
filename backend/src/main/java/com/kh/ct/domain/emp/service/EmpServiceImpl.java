@@ -73,7 +73,7 @@ public class EmpServiceImpl implements EmpService {
 
                 // 기본값 (정책)
                 .role(CommonEnums.Role.CABIN_CREW)
-                .job("STAFF")
+                .job(null)
                 .empStatus(CommonEnums.EmpStatus.Y)
 
                 // 기본값(정책)
@@ -113,6 +113,11 @@ public class EmpServiceImpl implements EmpService {
         if (emp.getAirlineId() != null) {
             airlineName = emp.getAirlineId().getAirlineName();
         }
+
+        Long profileImageId = null;
+        if(emp.getProfileImage() != null) {
+            profileImageId = emp.getProfileImage().getFileId();
+        }
         
         // DTO로 변환 (엔티티를 직접 반환하지 않아 순환 참조 방지)
         return EmpDto.builder()
@@ -130,6 +135,7 @@ public class EmpServiceImpl implements EmpService {
                 .age(emp.getAge())
                 .departmentName(departmentName)
                 .airlineName(airlineName)
+                .profileImageId(profileImageId)
                 .build();
     }
 
@@ -250,4 +256,36 @@ public class EmpServiceImpl implements EmpService {
                 .airlineName(airlineName)
                 .build();
     }
+    @Override
+    @Transactional
+    public EmpDto updateMyProfile(String empId, EmpDto.UpdateMyProfileRequest request) {
+
+        Emp emp = empRepository.findByIdWithDetails(empId)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND,
+                        "직원을 찾을 수 없습니다. (empId: " + empId + ")"));
+
+        // 1) 텍스트 프로필 업데이트 (setter X)
+        emp.updateProfile(
+                request.getEmpName(),
+                request.getAge(),
+                request.getEmail(),
+                request.getPhone(),
+                request.getAddress()
+        );
+
+        // 2) 이미지 업데이트 (있을 때만)
+        if (request.getProfileImageId() != null) {
+            File file = fileRepository.findById(request.getProfileImageId())
+                    .orElseThrow(() -> new BusinessException(HttpStatus.BAD_REQUEST,
+                            "프로필 이미지 파일이 존재하지 않습니다. fileId=" + request.getProfileImageId()));
+
+            emp.updateProfileImage(file); // ✅ 엔티티 메서드 필요
+        }
+
+        empRepository.save(emp);
+
+        // 3) 응답은 기존 getEmpDetail 재사용 (DTO 변환 중복 제거)
+        return getEmpDetail(empId);
+    }
+
 }

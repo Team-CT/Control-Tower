@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -48,14 +49,7 @@ public class EmpController {
         return ResponseEntity.ok(EmpDto.RegisterResponse.from(created));
     }
 
-    /**
-     * 직원 상세 정보 조회
-     */
-    @GetMapping("/{empId}")
-    public ResponseEntity<ApiResponse<EmpDto>> getEmpDetail(@PathVariable String empId) {
-        EmpDto empDetail = empService.getEmpDetail(empId);
-        return ResponseEntity.ok(ApiResponse.success("직원 상세 정보 조회 성공", empDetail));
-    }
+
     /**
      * 관리자(담당자) 후보 리스트 조회
      */
@@ -87,5 +81,31 @@ public class EmpController {
     ) {
         EmpDto updatedEmp = empService.updateEmpRoleAndJob(empId, request);
         return ResponseEntity.ok(ApiResponse.success("직급/직책 수정 성공", updatedEmp));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<EmpDto>> getMyProfile(Authentication authentication) {
+        String empId = authentication.getName();
+        EmpDto empDetail = empService.getEmpDetail(empId); // 기존 변환 로직 재사용
+        return ResponseEntity.ok(ApiResponse.success("내 프로필 조회 성공", empDetail));
+    }
+
+    @PutMapping("/me")
+    public ResponseEntity<ApiResponse<EmpDto>> updateMyProfile(
+            Authentication authentication,
+            @Valid @RequestBody EmpDto.UpdateMyProfileRequest request
+    ) {
+        String empId = authentication.getName();
+        EmpDto updated = empService.updateMyProfile(empId, request);
+        return ResponseEntity.ok(ApiResponse.success("내 프로필 수정 성공", updated));
+    }
+
+    /**
+     * 직원 상세 정보 조회
+     */
+    @GetMapping("/{empId}")
+    public ResponseEntity<ApiResponse<EmpDto>> getEmpDetail(@PathVariable String empId) {
+        EmpDto empDetail = empService.getEmpDetail(empId);
+        return ResponseEntity.ok(ApiResponse.success("직원 상세 정보 조회 성공", empDetail));
     }
 }

@@ -6,7 +6,7 @@ import { AirlineThemeProvider, useAirlineTheme } from './context/AirlineThemeCon
 
 // 페이지 컴포넌트 Import
 import LandingPage from './pages/Landing/LandingPage';
-import Login from './pages/Login/Login';
+import Login from './pages/login/login';
 import Register from './pages/Register/Register';
 import SelectId from './pages/SelectId/SelectId';
 import SelectPwd from './pages/SelectPwd/SelectPwd';
