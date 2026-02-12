@@ -30,6 +30,25 @@ const attendanceApi = {
             params: { empId, year, month }
         });
         return response.data;
+    },
+
+    /**
+     * 이미지에서 텍스트 추출 (OCR)
+     * @param {File} file - 이미지 파일
+     * @returns {Promise} 추출된 텍스트 데이터
+     */
+    extractTextFromImage: async (file) => {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // OCR 처리는 시간이 오래 걸릴 수 있으므로 타임아웃을 30초로 설정
+        const response = await api.post('/api/attendance/protest/ocr', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+            timeout: 30000, // 30초
+        });
+        return response.data;
     }
 };
 

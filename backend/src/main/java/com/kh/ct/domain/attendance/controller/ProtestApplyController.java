@@ -21,6 +21,7 @@ import java.util.List;
 public class ProtestApplyController {
 
     private final ProtestApplyService protestApplyService;
+    private final com.kh.ct.domain.attendance.service.VisionService visionService;
 
     /**
      * 근태 정정 신청
@@ -139,6 +140,38 @@ public class ProtestApplyController {
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             log.error("정정 승인/반려 실패", e);
+            throw e;
+        }
+    }
+
+    /**
+     * 이미지 OCR (텍스트 추출)
+     * 
+     * @param file 이미지 파일
+     * @return OCR 응답 (추출된 텍스트)
+     */
+    @PostMapping("/ocr")
+    public ResponseEntity<com.kh.ct.global.dto.ApiResponse<ProtestDto.OcrResponse>> extractTextFromImage(
+            @RequestParam("file") MultipartFile file) {
+        
+        log.info("POST /api/attendance/protest/ocr - 파일명: {}", file.getOriginalFilename());
+
+        try {
+            // Early Return: 이미지 파일 유효성 검증
+            String contentType = file.getContentType();
+            if (contentType == null || !contentType.startsWith("image/")) {
+                throw com.kh.ct.global.exception.BusinessException.badRequest("이미지 파일만 업로드 가능합니다.");
+            }
+
+            // VisionService를 통해 구조화된 데이터 추출
+            ProtestDto.OcrResponse response = visionService.extractText(file);
+
+            // ApiResponse 포맷으로 반환
+            return ResponseEntity.ok(
+                    com.kh.ct.global.dto.ApiResponse.success("텍스트 추출 완료", response)
+            );
+        } catch (Exception e) {
+            log.error("텍스트 추출 실패", e);
             throw e;
         }
     }
