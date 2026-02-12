@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import api from '../../api/axios';
+import attendanceApi from '../../api/attendanceApi';
 import SuccessModal from '../../components/SuccessModal';
 import * as S from './ProtestApply.styled';
 
@@ -16,6 +17,7 @@ const ProtestApply = () => {
     const selectedDate = location.state?.selectedDate;
 
     const [formData, setFormData] = useState({
+        targetDate: selectedDate || '',  // 정정 대상 날짜 추가
         attendanceType: 'NORMAL',  // 기본값: 정상출근
         protestRequestInTime: '',
         protestRequestOutTime: '',
@@ -25,6 +27,10 @@ const ProtestApply = () => {
     const [loading, setLoading] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [availableOptions, setAvailableOptions] = useState([]);
+    const [isOcrLoading, setIsOcrLoading] = useState(false);
+
+    // OCR 파일 input ref
+    const ocrFileInputRef = useRef(null);
 
     // 전체 근무 유형 옵션
     const allOptions = [
@@ -44,30 +50,26 @@ const ProtestApply = () => {
 
     // 날짜에 따라 근무 유형 옵션 필터링
     useEffect(() => {
-        if (!selectedDate) {
-            alert('정정할 날짜를 선택해주세요');
-            navigate('/my-attendance');
-            return;
-        }
+        // selectedDate가 있을 때만 옵션 필터링
+        if (selectedDate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
-        // 선택한 날짜와 오늘 날짜 비교
-        const today = new Date();
-        today.setHours(0, 0, 0, 0); // 시간 제거하고 날짜만 비교
+            const targetDate = new Date(selectedDate);
+            targetDate.setHours(0, 0, 0, 0);
 
-        const targetDate = new Date(selectedDate);
-        targetDate.setHours(0, 0, 0, 0);
-
-        // 미래 날짜면 휴가/반차만, 과거/오늘이면 전체 옵션
-        if (targetDate > today) {
-            setAvailableOptions(leaveOnlyOptions);
-            // 미래 날짜인 경우 기본값을 휴가로 변경
-            setFormData(prev => ({ ...prev, attendanceType: 'LEAVE' }));
+            // 미래 날짜면 휴가/반차만, 과거/오늘이면 전체 옵션
+            if (targetDate > today) {
+                setAvailableOptions(leaveOnlyOptions);
+                setFormData(prev => ({ ...prev, attendanceType: 'LEAVE' }));
+            } else {
+                setAvailableOptions(allOptions);
+            }
         } else {
+            // 날짜가 없으면 전체 옵션 표시
             setAvailableOptions(allOptions);
-            // 과거/오늘인 경우 기본값을 정상출근으로 유지
-            setFormData(prev => ({ ...prev, attendanceType: 'NORMAL' }));
         }
-    }, [selectedDate, navigate]);
+    }, [selectedDate]);
 
     // 시간 포맷팅 (HH:MM:SS -> HH:MM)
     const formatTime = (time) => {
@@ -108,6 +110,107 @@ const ProtestApply = () => {
         }));
     };
 
+    // AI 텍스트 추출 핸들러
+    const handleOcrExtract = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // 이미지 파일 검증
+        if (!file.type.startsWith('image/')) {
+            alert('이미지 파일만 업로드 가능합니다.');
+            e.target.value = ''; // input 초기화
+            return;
+        }
+
+        setIsOcrLoading(true);
+        try {
+            // attendanceApi.extractTextFromImage는 이미 response.data를 반환함
+            // 따라서 response는 ApiResponse 객체임
+            const response = await attendanceApi.extractTextFromImage(file);
+
+            // 응답 구조 디버깅
+            console.log('🔐 OCR API 전체 응답:', response);
+            console.log('🔐 response.data:', response.data);
+
+            // ApiResponse 구조 검증
+            if (!response) {
+                throw new Error('서버 응답이 비어있습니다.');
+            }
+
+            if (!response.success) {
+                throw new Error(response.message || '텍스트 추출에 실패했습니다.');
+            }
+
+            if (!response.data) {
+                throw new Error('추출된 데이터가 없습니다. 응답 구조를 확인해주세요.');
+            }
+
+            // response.data로 접근 (attendanceApi가 이미 response.data를 반환함)
+            let { targetDate, updateTime, reason, fileName } = response.data;
+
+            // 날짜 포맷 정제 (YYYY-MM-DD 형식 보장)
+            if (targetDate) {
+                targetDate = targetDate.trim().replace(/\./g, '-');
+            }
+
+            // 추출된 데이터를 폼에 자동 입력
+            setFormData(prev => ({
+                ...prev,
+                // 날짜: OCR 값 우선, 없으면 기존 값 유지
+                targetDate: targetDate || prev.targetDate || selectedDate || '',
+                // 시간: OCR 값 우선, 없으면 기존 값 유지
+                protestRequestInTime: updateTime || prev.protestRequestInTime,
+                protestRequestOutTime: updateTime || prev.protestRequestOutTime,
+                // 사유는 기존 텍스트에 줄바꿈으로 이어서 추가
+                protestReason: prev.protestReason
+                    ? `${prev.protestReason}\n${reason}`
+                    : reason
+            }));
+
+            // OCR에 사용한 파일을 증빙 파일 목록에 자동 추가
+            // 중복 방지: 파일명과 크기가 동일한 파일이 이미 있는지 확인
+            const isAlreadyAttached = files.some(
+                f => f.name === file.name && f.size === file.size
+            );
+
+            if (!isAlreadyAttached) {
+                setFiles(prevFiles => [...prevFiles, file]);
+                console.log('📎 OCR 파일을 증빙 파일 목록에 자동 추가:', file.name);
+            } else {
+                console.log('📎 파일이 이미 첨부되어 있습니다:', file.name);
+            }
+
+            // 추출 결과 요약 표시
+            const summary = [
+                targetDate && `📅 날짜: ${targetDate}`,
+                updateTime && `🕐 시간: ${updateTime}`,
+                reason && `📝 사유: ${reason}`
+            ].filter(Boolean).join('\n');
+
+            const fileAttachmentMsg = !isAlreadyAttached
+                ? '\n\n✅ 해당 서류가 증빙 파일로 자동 첨부되었습니다.'
+                : '\n\nℹ️ 해당 서류는 이미 첨부되어 있습니다.';
+
+            alert(`✅ 텍스트 추출 완료!\n\n${summary}\n\n파일명: ${fileName || file.name}${fileAttachmentMsg}`);
+        } catch (error) {
+            console.error('❌ OCR 실패:', error);
+            console.error('❌ 에러 응답:', error.response);
+
+            let errorMessage = '텍스트 추출에 실패했습니다.';
+
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            alert(`❌ ${errorMessage}`);
+        } finally {
+            setIsOcrLoading(false);
+            e.target.value = ''; // input 초기화
+        }
+    };
+
     // 제출 핸들러
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -120,6 +223,13 @@ const ProtestApply = () => {
 
         if (files.length === 0) {
             alert('증빙 파일을 최소 1개 이상 업로드해주세요');
+            return;
+        }
+
+        // 날짜 유효성 검사 추가
+        const finalDate = formData.targetDate || selectedDate;
+        if (!finalDate) {
+            alert('정정 대상 날짜를 선택하거나 서류를 업로드하여 AI가 날짜를 추출하도록 해주세요');
             return;
         }
 
@@ -136,11 +246,11 @@ const ProtestApply = () => {
             const formDataToSend = new FormData();
             formDataToSend.append('empId', empId);
 
-            // attendanceId가 있으면 전송, 없으면 attendanceDate 전송
+            // attendanceId가 있으면 전송, 없으면 targetDate 또는 selectedDate 전송
             if (selectedDailyData?.attendanceId) {
                 formDataToSend.append('attendanceId', selectedDailyData.attendanceId);
             } else {
-                formDataToSend.append('attendanceDate', selectedDate);
+                formDataToSend.append('attendanceDate', finalDate);
             }
 
             formDataToSend.append('attendanceType', formData.attendanceType);
@@ -196,10 +306,6 @@ const ProtestApply = () => {
         navigate('/my-attendance');
     };
 
-    if (!selectedDate) {
-        return null;
-    }
-
     return (
         <S.MainContentArea>
             <S.PageHeader>
@@ -216,8 +322,32 @@ const ProtestApply = () => {
                 <S.LeftColumn>
                     <S.SectionCard>
                         <S.SectionTitle>정정 대상 근태</S.SectionTitle>
+
+                        {/* 날짜 선택 섹션 */}
+                        <S.DateSection>
+                            <S.RecordTitle>정정 대상 날짜 *</S.RecordTitle>
+                            {selectedDate ? (
+                                <S.RecordValue style={{ fontSize: '16px', fontWeight: '600' }}>
+                                    📅 {selectedDate}
+                                </S.RecordValue>
+                            ) : (
+                                <>
+                                    <S.DateInput
+                                        type="date"
+                                        value={formData.targetDate}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            targetDate: e.target.value
+                                        }))}
+                                    />
+                                    <S.HelpText>
+                                        📌 서류를 업로드하면 AI가 자동으로 날짜를 채워줍니다
+                                    </S.HelpText>
+                                </>
+                            )}
+                        </S.DateSection>
+
                         <S.CurrentRecordSection>
-                            <S.RecordTitle>📅 {selectedDate}</S.RecordTitle>
                             {selectedDailyData ? (
                                 <>
                                     <S.RecordItem>
@@ -294,7 +424,23 @@ const ProtestApply = () => {
 
                     <S.SectionCard>
                         <S.ReasonSection>
-                            <S.ReasonLabel>정정 사유 *</S.ReasonLabel>
+                            <S.ReasonHeader>
+                                <S.ReasonLabel>정정 사유 *</S.ReasonLabel>
+                                <S.OcrButton
+                                    type="button"
+                                    onClick={() => ocrFileInputRef.current?.click()}
+                                    disabled={isOcrLoading}
+                                >
+                                    {isOcrLoading ? '🔄 추출 중...' : '🤖 AI로 텍스트 자동 완성'}
+                                </S.OcrButton>
+                                <input
+                                    ref={ocrFileInputRef}
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleOcrExtract}
+                                    style={{ display: 'none' }}
+                                />
+                            </S.ReasonHeader>
                             <S.ReasonTextarea
                                 name="protestReason"
                                 placeholder="정정이 필요한 사유를 상세히 입력하세요"

@@ -148,12 +148,81 @@ export const ReasonSection = styled.div`
   margin-bottom: 24px;
 `;
 
+export const ReasonHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+`;
+
 export const ReasonLabel = styled.label`
   display: block;
   font-size: 14px;
   font-weight: 600;
   color: #374151;
-  margin-bottom: 8px;
+`;
+
+export const OcrButton = styled.button`
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+`;
+
+// 날짜 섹션 컨테이너
+export const DateSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+`;
+
+// 날짜 입력 필드
+export const DateInput = styled.input`
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s;
+  background: white;
+  
+  &:focus {
+    outline: none;
+    border-color: #1976d2;
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+  }
+  
+  &:disabled {
+    background-color: #f9fafb;
+    cursor: not-allowed;
+  }
+`;
+
+// 도움말 텍스트
+export const HelpText = styled.p`
+  font-size: 13px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
 `;
 
 export const ReasonTextarea = styled.textarea`

@@ -133,4 +133,19 @@ public class ProtestDto {
         private Integer fileCount;                     // 첨부 파일 개수
         private LocalDateTime createdDate;             // 신청일
     }
+
+    /**
+     * OCR 응답 DTO
+     * 이미지에서 추출된 구조화된 데이터
+     */
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class OcrResponse {
+        private String targetDate;    // 정정일자 (YYYY-MM-DD)
+        private String updateTime;    // 출퇴근시간 (HH:mm)
+        private String reason;        // 사유
+        private String fileName;      // 원본 파일명
+    }
 }
