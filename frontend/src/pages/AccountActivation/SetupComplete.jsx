@@ -2,12 +2,20 @@ import React from 'react';
 import * as S from './SetupComplete.styled';
 
 const SetupComplete = ({ setupData }) => {
+  // setupData가 null이거나 undefined인 경우 처리
+  if (!setupData) {
+    console.warn('⚠️ [SetupComplete] setupData가 없습니다. 기본값을 사용합니다.');
+  }
+  
   // 백엔드에서 받은 데이터 사용
   const userInfo = {
     airline: setupData?.airlineName || '항공사',
     adminId: setupData?.adminId || '관리자 계정',
     status: '활성화됨',
   };
+  
+  console.log('🟢 [SetupComplete] 렌더링 - setupData:', setupData);
+  console.log('🟢 [SetupComplete] userInfo:', userInfo);
 
   const handleMainRedirect = () => {
     window.location.href = '/';
