@@ -1,9 +1,11 @@
 package com.kh.ct.domain.emp.service;
 
-import com.kh.ct.domain.emp.service.EmailSender;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -18,7 +20,37 @@ public class SmtpEmailSender implements EmailSender {
         msg.setTo(to);
         msg.setSubject(subject);
         msg.setText(text);
-
         mailSender.send(msg);
+    }
+
+    @Override
+    public void sendHtml(String to, String subject, String html) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(html, true); // true = HTML
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new RuntimeException("HTML 메일 전송 실패", e);
+        }
+    }
+
+    @Override
+    public void sendMultipart(String to, String subject, String text, String html) {
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setTo(to);
+            helper.setSubject(subject);
+
+            // 첫번째 파라미터: 텍스트, 두번째: HTML
+            helper.setText(text, html);
+
+            mailSender.send(mimeMessage);
+        } catch (MessagingException e) {
+            throw new RuntimeException("멀티파트 메일 전송 실패", e);
+        }
     }
 }

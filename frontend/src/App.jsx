@@ -55,6 +55,8 @@ import QnADetail from './pages/QnADetail/QnADetail.jsx';
 import Chatbot from './ChatBot/Chatbot';
 // 레이아웃 컴포넌트 Import
 import MainLayout from './layout/MainLayout';
+import FindPassword from "./pages/SelectPwd/SelectPwd.jsx";
+import ResetPassword from "./pages/SelectPwd/ResetPassword.jsx";
 
 // SuperAdminDashboard는 CompanyRegistrationManagement를 사용
 const SuperAdminDashboard = CompanyRegistrationManagement;
@@ -70,6 +72,9 @@ const ThemedApp = () => {
       <Routes>
         {/* 1. 사이드바가 없는 페이지 (퍼블릭) */}
         <Route path="/" element={<LandingPage />} />
+
+        <Route path="/find-password" element={<FindPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

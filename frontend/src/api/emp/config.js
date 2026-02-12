@@ -19,6 +19,7 @@ export const API_ENDPOINTS = {
     MANAGERS: `/api/emps/managers`, 
     ME: `/api/emps/me`,     
     ME_PASSWORD: '/api/emps/me/password',
+    FIND_ID: '/api/emps/findId',
   },
 
   // ✅ FILE(업로드/삭제)

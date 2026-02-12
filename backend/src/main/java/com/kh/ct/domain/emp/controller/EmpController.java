@@ -120,4 +120,14 @@ public class EmpController {
         EmpDto empDetail = empService.getEmpDetail(empId);
         return ResponseEntity.ok(ApiResponse.success("직원 상세 정보 조회 성공", empDetail));
     }
+
+    /** 아이디 찾기 */
+    @PostMapping("/findId")
+    public ResponseEntity<ApiResponse<EmpDto.FindIdResponse>> findEmpId(
+            @Valid @RequestBody EmpDto.FindIdRequest request
+    ) {
+        EmpDto.FindIdResponse result = empService.findEmpId(request);
+        return ResponseEntity.ok(ApiResponse.success("아이디 찾기 성공", result));
+    }
+
 }

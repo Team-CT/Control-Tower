@@ -35,8 +35,12 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         //인증없이 가능한 경우
+
+                        ///api/auth/password
                         .requestMatchers(HttpMethod.POST,"/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/emps").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/auth/password/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/emps/findId").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/emps/checkId").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/api/emps/empNo/preview").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/passwordCode/**").permitAll()
@@ -106,4 +110,17 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+
+    @Bean
+    public CommandLineRunner passwordEncodeRunner(PasswordEncoder passwordEncoder) {
+        return args -> {
+            String rawPassword = "qwer1234";   // 👉 여기 원하는 평문 비밀번호 입력
+            String encodedPassword = passwordEncoder.encode(rawPassword);
+
+            System.out.println("=================================");
+            System.out.println("🔐 RAW PASSWORD     : " + rawPassword);
+            System.out.println("🔐 ENCODED PASSWORD : " + encodedPassword);
+            System.out.println("=================================");
+        };
+    }
 }

@@ -15,6 +15,12 @@ export const API_CONFIG = {
 export const API_ENDPOINTS = {
   AUTH:{
     LOGIN: `/api/auth/login`,
-    ME:`/api/auth/me`
+    ME:`/api/auth/me`,
+
+    PASSWORD: {
+      RESET_LINK: '/api/auth/password/reset-link',
+      VALIDATE: '/api/auth/password/validate',
+      RESET: '/api/auth/password/reset',
+    },
   }
 };
