@@ -70,6 +70,7 @@ const ThemedApp = () => {
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <ErrorBoundary>
+
         <Routes>
           {/* 1. 사이드바가 없는 페이지 (퍼블릭) */}
           <Route path="/" element={<LandingPage />} />
@@ -131,7 +132,6 @@ const ThemedApp = () => {
             <Route path="/my-application-history" element={<MyApplicationHistory />} />
             <Route path="/approval" element={<LeaveApproval />} />
             <Route path="/protest-approval" element={<ProtestApproval />} />
-
             {/* [건강 관리] */}
             <Route path="/health-dashboard" element={<Dashboard />} />
             <Route path="/stress" element={<Stress />} />

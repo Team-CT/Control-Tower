@@ -140,6 +140,7 @@ public class EmpController {
         com.kh.ct.domain.emp.dto.AirlineDto.DetailResponse airlineInfo = empService.getAirlineByEmpId(empId);
         return ResponseEntity.ok(ApiResponse.success("내 항공사 정보 조회 성공", airlineInfo));
     }
+<<<<<<< Updated upstream
 
     /** 아이디 찾기 */
     @PostMapping("/findId")
@@ -150,4 +151,6 @@ public class EmpController {
         return ResponseEntity.ok(ApiResponse.success("아이디 찾기 성공", result));
     }
 
+=======
+>>>>>>> Stashed changes
 }

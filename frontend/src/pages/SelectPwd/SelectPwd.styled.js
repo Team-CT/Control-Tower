@@ -39,7 +39,6 @@ export const S = {
     height: 100vh;
     background: ${({ theme }) => theme.background.main || '#f3f4f6'};
     /* background: linear-gradient(117deg, ${({ theme }) => theme?.hover ?? TOKENS.accentSoft} 0%, #ffffff 100%); */
-
     padding: 0;
     margin: 0;
     overflow: hidden;
