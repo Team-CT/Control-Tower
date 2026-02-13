@@ -6,6 +6,7 @@ import com.kh.ct.domain.schedule.entity.AllSchedule;
 import com.kh.ct.domain.schedule.entity.FlySchedule;
 import com.kh.ct.domain.schedule.repository.AllScheduleRepository;
 import com.kh.ct.domain.schedule.repository.FlyScheduleRepository;
+import com.kh.ct.global.common.CommonEnums;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -25,6 +27,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -250,7 +253,7 @@ public class FlightSyncServiceImpl implements FlightSyncService {
             
             // 2. Raw String으로 URL 직접 조립 (UriComponentsBuilder 사용 안 함)
             // 브라우저 주소창과 완전히 동일한 형태로 생성
-            String urlString = cleanedBaseUrl + "?page=1&perPage=10&serviceKey=" + serviceKey;
+            String urlString = cleanedBaseUrl + "?page=1&perPage=100&serviceKey=" + serviceKey;
 
             
             // 4. URI.create() 사용 - 추가 인코딩 없이 문자열을 URI로 변환
@@ -309,7 +312,7 @@ public class FlightSyncServiceImpl implements FlightSyncService {
             log.error("API 호출 중 HTTP 클라이언트 에러 발생 - Status: {}, Response Body: {}", 
                     e.getStatusCode(), e.getResponseBodyAsString());
             log.error("호출한 URL (마스킹): [{}]", 
-                    (baseUrl + "?page=1&perPage=10&serviceKey=" + serviceKey).replace(serviceKey, "***[SERVICE_KEY]***"));
+                    (baseUrl + "?page=1&perPage=100&serviceKey=" + serviceKey).replace(serviceKey, "***[SERVICE_KEY]***"));
             throw new RuntimeException("외부 API 호출 실패: " + e.getMessage() + " - " + e.getResponseBodyAsString(), e);
         } catch (org.springframework.web.client.RestClientException e) {
             log.error("API 호출 중 RestClientException 발생", e);
@@ -374,75 +377,47 @@ public class FlightSyncServiceImpl implements FlightSyncService {
     }
 
     @Override
-    @Transactional
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void processExternalData(FlyScheduleDto.ExternalFlightData data) {
-        log.info("외부 데이터 처리 시작 - 편명: {}, 날짜: {}, 시간: {}",
-                data.getFlightNumber(), data.getDate(), data.getTime());
+        log.info("--- 데이터 처리 시작: {} ---", data.getFlightNumber());
 
-        // 1. API 데이터 파싱 (포맷: yyyy-MM-dd HH:mm)
+        // 1. 날짜 생성 (변수에 확실히 담기)
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        LocalDateTime originalTime = LocalDateTime.parse(data.getDate() + " " + data.getTime(), formatter);
+        LocalDateTime apiTime = LocalDateTime.parse(data.getDate() + " " + data.getTime(), formatter);
 
-        // 2. 2026년 2월 1일 ~ 2월 28일 사이 무작위 날짜 생성
-        // nextInt(1, 29)는 1부터 28까지의 랜덤 정수 생성 (29는 exclusive)
-        LocalDateTime now = LocalDateTime.now();
+        int randomDay = ThreadLocalRandom.current().nextInt(1, 29);
+        LocalDateTime targetStartTime = apiTime.withYear(2026).withMonth(2).withDayOfMonth(randomDay);
+        LocalDateTime targetEndTime = targetStartTime.plusHours(2);
 
-        // 원본 시간의 시/분은 유지하고, 날짜만 2026년 2월의 랜덤 날짜로 변경
-        LocalDateTime fixedTime = originalTime
-                .withYear(now.getYear())
-                .withMonth(now.getMonthValue())
-                .withDayOfMonth(now.getDayOfMonth());
+        log.info("[날짜 확인] 목표 설정 시간: {}", targetStartTime);
 
-        log.info("날짜 변환 완료 - 원본: {}, 변환 후: {}", originalTime, fixedTime);
-
-
-        // 3. 부모 테이블(AllSchedule) 저장
+        // 2. AllSchedule 저장 (부모)
         AllSchedule allSchedule = AllSchedule.builder()
                 .scheduleCode("FLIGHT")
-                .startDate(fixedTime)
-                .endDate(fixedTime.plusHours(2))
+                .startDate(targetStartTime) // 2026-02-xx 주입
+                .endDate(targetEndTime)
                 .build();
 
-        AllSchedule savedAllSchedule = allScheduleRepository.save(allSchedule);
-        log.info("AllSchedule 저장 완료: ID={}, scheduleCode={}, startDate={}, endDate={}",
-                savedAllSchedule.getScheduleId(),
-                savedAllSchedule.getScheduleCode(),
-                savedAllSchedule.getStartDate(),
-                savedAllSchedule.getEndDate());
+        // saveAndFlush를 사용하여 ID를 즉시 발급받고 영속 상태로 만듭니다.
+        AllSchedule savedAll = allScheduleRepository.saveAndFlush(allSchedule);
+        log.info("[부모 저장 완료] ID: {}, 시작시간: {}", savedAll.getScheduleId(), savedAll.getStartDate());
 
-        // 4. 자식 테이블(FlySchedule) 저장
-        // FlySchedule의 flyScheduleId는 AllSchedule의 scheduleId와 동일해야 함
-        Long airlineId = extractAirlineId(data.getFlightNumber());
-
+        // 3. FlySchedule 저장 (자식)
         FlySchedule flySchedule = FlySchedule.builder()
-                .flyScheduleId(savedAllSchedule.getScheduleId()) // AllSchedule의 ID와 동일하게 설정
-//                .schedule(savedAllSchedule) // AllSchedule 엔티티 참조
+                .flyScheduleId(savedAll.getScheduleId()) // ID 직접 할당
                 .flightNumber(data.getFlightNumber())
                 .departure(data.getDeparture())
                 .destination(data.getDestination())
-                .flyStartTime(fixedTime) // 변경된 오늘 날짜 적용!
-                .flyEndTime(fixedTime.plusHours(2)) // 도착 시간
-                .airlineId(airlineId)
-                .flightStatus(com.kh.ct.global.common.CommonEnums.flightStatus.ASSIGNING) // 기본 상태 (스케줄 등록됨)
+                .flyStartTime(targetStartTime)          // 2026-02-xx 주입
+                .flyEndTime(targetEndTime)
+                .airlineId(extractAirlineId(data.getFlightNumber()))
+                .flightStatus(CommonEnums.flightStatus.ASSIGNING)
                 .build();
 
-        FlySchedule savedFlySchedule = flyScheduleRepository.save(flySchedule);
-        log.info("FlySchedule 저장 완료: 편명={}, flyScheduleId={}, airlineId={}, departure={}, destination={}",
-                savedFlySchedule.getFlightNumber(),
-                savedFlySchedule.getFlyScheduleId(),
-                savedFlySchedule.getAirlineId(),
-                savedFlySchedule.getDeparture(),
-                savedFlySchedule.getDestination());
+        // 여기서 다시 한번 saveAndFlush
+        FlySchedule savedFly = flyScheduleRepository.saveAndFlush(flySchedule);
 
-        // 데이터 정합성 검증
-        if (!savedFlySchedule.getFlyScheduleId().equals(savedAllSchedule.getScheduleId())) {
-            log.error("데이터 정합성 오류: FlySchedule.flyScheduleId({}) != AllSchedule.scheduleId({})",
-                    savedFlySchedule.getFlyScheduleId(), savedAllSchedule.getScheduleId());
-            throw new IllegalStateException("FlySchedule과 AllSchedule의 ID가 일치하지 않습니다.");
-        }
-
-        log.info("데이터 정합성 검증 완료: flyScheduleId={} == scheduleId={}",
-                savedFlySchedule.getFlyScheduleId(), savedAllSchedule.getScheduleId());
+        log.info("✅ [최종 확인] DB 저장된 flyStartTime: {}", savedFly.getFlyStartTime());
     }
     /**
      * 편명(예: KE713)에서 앞 2글자를 추출하여 항공사 ID를 매핑하는 로직
