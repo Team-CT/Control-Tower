@@ -122,9 +122,9 @@ const TenantDetail = () => {
     return (
       <S.MainContainer>
         <S.ContentWrapper>
-          <div style={{ textAlign: 'center', padding: '50px' }}>
+          <S.LoadingWrapper>
             <p>데이터를 불러오는 중...</p>
-          </div>
+          </S.LoadingWrapper>
         </S.ContentWrapper>
       </S.MainContainer>
     );
@@ -137,12 +137,12 @@ const TenantDetail = () => {
           <S.BackButton onClick={handleGoBack}>
             ← 테넌트 목록으로 돌아가기
           </S.BackButton>
-          <div style={{ textAlign: 'center', padding: '50px', color: '#dc2626' }}>
+          <S.ErrorWrapper>
             <p>{error || '데이터를 찾을 수 없습니다.'}</p>
-            <button onClick={fetchTenantDetail} style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}>
+            <S.RetryButton onClick={fetchTenantDetail}>
               다시 시도
-            </button>
-          </div>
+            </S.RetryButton>
+          </S.ErrorWrapper>
         </S.ContentWrapper>
       </S.MainContainer>
     );
@@ -185,7 +185,7 @@ const TenantDetail = () => {
             <S.StatValue>{(tenantData.employeeCount || 0).toLocaleString()}</S.StatValue>
             <S.StatLabel>전체 직원 수</S.StatLabel>
             <S.StatSubtext>등록된 직원</S.StatSubtext>
-            <S.TrendIndicator positive>↗</S.TrendIndicator>
+            <S.TrendIndicator $positive>↗</S.TrendIndicator>
           </S.StatCard>
 
           <S.StatCard>
@@ -193,7 +193,7 @@ const TenantDetail = () => {
             <S.StatValue>{(tenantData.activeUsers || 0).toLocaleString()}</S.StatValue>
             <S.StatLabel>활성 사용자</S.StatLabel>
             <S.StatSubtext>현재 활성 상태</S.StatSubtext>
-            <S.TrendIndicator positive>↗</S.TrendIndicator>
+            <S.TrendIndicator $positive>↗</S.TrendIndicator>
           </S.StatCard>
 
           <S.StatCard>
@@ -201,7 +201,7 @@ const TenantDetail = () => {
             <S.StatValue>{tenantData.managedFeatures || 0}</S.StatValue>
             <S.StatLabel>관리 기능</S.StatLabel>
             <S.StatSubtext>활성화된 기능</S.StatSubtext>
-            <S.TrendIndicator positive>↗</S.TrendIndicator>
+            <S.TrendIndicator $positive>↗</S.TrendIndicator>
           </S.StatCard>
         </S.StatsGrid>
 
@@ -276,9 +276,9 @@ const TenantDetail = () => {
                 <S.SectionIcon>📄</S.SectionIcon>
                 최근 활동 로그
               </S.SectionTitle>
-              <div style={{ padding: '20px', textAlign: 'center', color: '#6f767e' }}>
+              <S.LogMessage>
                 활동 로그 기능은 준비 중입니다.
-              </div>
+              </S.LogMessage>
             </S.InfoSection>
           </S.RightColumn>
         </S.ContentGrid>

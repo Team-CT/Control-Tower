@@ -1,28 +1,10 @@
 import styled from 'styled-components';
 import { Plane } from 'lucide-react';
 
-/** 단색 회색 톤 토큰 (Login과 동일 컨셉) */
-const TOKENS = {
-  pageBg: '#f3f4f6',
-  cardBg: '#ffffff',
-  leftBg: '#f9fafb',
-
-  textPrimary: '#111827',
-  textSecondary: '#4b5563',
-  textTertiary: '#9ca3af',
-
-  border: '#e5e7eb',
-  shadow: '0 20px 40px rgba(0,0,0,0.08)',
-  shadowBtn: '0 4px 12px rgba(0,0,0,0.12)',
-
-  accent: '#111827',
-  ring: 'rgba(17,24,39,0.15)',
-};
-
 /* ---------- Layout ---------- */
 export const Container = styled.div`
   min-height: 100vh;
-  background: ${TOKENS.pageBg};
+  background: ${({ theme }) => theme.background.main};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -35,11 +17,11 @@ export const ContentWrapper = styled.div`
   max-width: 1000px;
   min-height: 600px;
   display: flex;
-  background: ${TOKENS.cardBg};
+  background: ${({ theme }) => theme.background.paper || 'white'};
   border-radius: 24px;
-  box-shadow: ${TOKENS.shadow};
+  box-shadow: ${({ theme }) => theme.shadow};
   overflow: hidden;
-  border: 1px solid ${TOKENS.border};
+  border: 1px solid ${({ theme }) => theme.border};
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -49,16 +31,16 @@ export const ContentWrapper = styled.div`
 /* ---------- Left : Brand ---------- */
 export const BrandSection = styled.div`
   flex: 1;
-  background: ${TOKENS.leftBg};
+  background: ${({ theme }) => theme.background.secondary || '#f9fafb'};
   padding: 60px 40px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border-right: 1px solid ${TOKENS.border};
+  border-right: 1px solid ${({ theme }) => theme.border};
 
   @media (max-width: 768px) {
     border-right: none;
-    border-bottom: 1px solid ${TOKENS.border};
+    border-bottom: 1px solid ${({ theme }) => theme.border};
     padding: 40px 30px;
   }
 `;
@@ -73,14 +55,14 @@ export const LogoIcon = styled(Plane)`
   width: 32px;
   height: 32px;
   transform: rotate(-45deg);
-  color: ${TOKENS.textPrimary};
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const BrandName = styled.h1`
   font-size: 24px;
   font-weight: 900;
   margin: 0;
-  color: ${TOKENS.textPrimary};
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const ServiceInfo = styled.div`
@@ -91,13 +73,13 @@ export const ServiceTitle = styled.h2`
   font-size: 32px;
   font-weight: 900;
   margin: 0 0 12px;
-  color: ${TOKENS.textPrimary};
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const ServiceDescription = styled.p`
   font-size: 15px;
   line-height: 1.7;
-  color: ${TOKENS.textSecondary};
+  color: ${({ theme }) => theme.text.secondary};
   max-width: 92%;
   margin: 0;
 `;
@@ -117,16 +99,16 @@ export const Step = styled.div`
   font-weight: 900;
   white-space: nowrap;
 
-  background: ${({ $active }) => ($active ? TOKENS.accent : 'transparent')};
-  color: ${({ $active, $done }) =>
-    $active ? '#ffffff' : $done ? TOKENS.textPrimary : TOKENS.textTertiary};
+  background: ${({ $active, theme }) => ($active ? theme.colors.primary : 'transparent')};
+  color: ${({ $active, $done, theme }) =>
+    $active ? theme.text.inverse : $done ? theme.text.primary : theme.text.tertiary};
 
-  border: ${({ $active, $done }) =>
+  border: ${({ $active, $done, theme }) =>
     $active
       ? '1px solid transparent'
       : $done
-      ? '1px solid rgba(17,24,39,0.25)'
-      : `1px solid ${TOKENS.border}`};
+        ? `1px solid ${theme.text.primary}40`
+        : `1px solid ${theme.border}`};
 
   transition: all 0.25s ease;
 `;
@@ -134,14 +116,14 @@ export const Step = styled.div`
 export const StepLine = styled.div`
   flex: 1;
   height: 2px;
-  background: ${({ $done }) => ($done ? TOKENS.accent : TOKENS.border)};
+  background: ${({ $done, theme }) => ($done ? theme.colors.primary : theme.border)};
   transition: background 0.25s ease;
 `;
 
 /* ---------- Right : Register ---------- */
 export const RegisterSection = styled.div`
   flex: 1.2;
-  background: ${TOKENS.cardBg};
+  background: ${({ theme }) => theme.background.paper || 'white'};
   padding: 60px 40px;
   display: flex;
   align-items: center;
@@ -166,7 +148,7 @@ export const RegisterTitle = styled.h2`
   font-size: 28px;
   font-weight: 900;
   margin: 0;
-  color: ${TOKENS.textPrimary};
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const RegisterForm = styled.form`
@@ -184,7 +166,7 @@ export const InputGroup = styled.div`
 export const InputLabel = styled.label`
   font-size: 14px;
   font-weight: 800;
-  color: ${TOKENS.textPrimary};
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const InputRow = styled.div`
@@ -196,22 +178,22 @@ export const InputRow = styled.div`
 export const Input = styled.input`
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid ${TOKENS.border};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 10px;
   font-size: 15px;
-  background: #f9fafb;
-  color: ${TOKENS.textPrimary};
+  background: ${({ theme }) => theme.background.input || '#f9fafb'};
+  color: ${({ theme }) => theme.text.primary};
   outline: none;
   box-sizing: border-box;
 
   &:focus {
-    background: #fff;
-    border-color: ${TOKENS.accent};
-    box-shadow: 0 0 0 4px ${TOKENS.ring};
+    background: ${({ theme }) => theme.background.paper || '#fff'};
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 4px ${({ theme }) => `${theme.colors.primary}20`};
   }
 
   &::placeholder {
-    color: ${TOKENS.textTertiary};
+    color: ${({ theme }) => theme.text.tertiary};
   }
 
   &:disabled {
@@ -224,8 +206,8 @@ export const Input = styled.input`
 export const SubmitButton = styled.button`
   width: 100%;
   padding: 14px;
-  background: ${TOKENS.accent};
-  color: #fff;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse};
   border: none;
   border-radius: 12px;
   font-size: 16px;
@@ -235,8 +217,9 @@ export const SubmitButton = styled.button`
   margin-top: 8px;
 
   &:hover {
-    box-shadow: ${TOKENS.shadowBtn};
+    box-shadow: ${({ theme }) => theme.shadowHover || '0 4px 12px rgba(0,0,0,0.12)'};
     transform: translateY(-1px);
+    background: ${({ theme }) => theme.colors.primaryHover || theme.colors.primary};
   }
 
   &:active {
@@ -256,17 +239,18 @@ export const SmallButton = styled.button`
   white-space: nowrap;
   padding: 0 16px;
   height: 44px;
-  background: ${TOKENS.cardBg};
-  color: ${TOKENS.textPrimary};
-  border: 1px solid ${TOKENS.border};
+  background: ${({ theme }) => theme.background.paper || 'white'};
+  color: ${({ theme }) => theme.text.primary};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 10px;
   font-weight: 900;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    box-shadow: ${TOKENS.shadowBtn};
+    box-shadow: ${({ theme }) => theme.shadowHover || '0 4px 12px rgba(0,0,0,0.12)'};
     transform: translateY(-1px);
+    background: ${({ theme }) => theme.background.hover};
   }
 
   &:active {
@@ -279,8 +263,8 @@ export const PrevButton = styled.button`
   width: 100%;
   padding: 14px;
   background: transparent;
-  color: ${TOKENS.textSecondary};
-  border: 1px solid ${TOKENS.border};
+  color: ${({ theme }) => theme.text.secondary};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 12px;
   font-size: 15px;
   font-weight: 900;
@@ -289,9 +273,10 @@ export const PrevButton = styled.button`
   margin-top: -6px;
 
   &:hover {
-    color: ${TOKENS.textPrimary};
-    box-shadow: ${TOKENS.shadowBtn};
+    color: ${({ theme }) => theme.text.primary};
+    box-shadow: ${({ theme }) => theme.shadowHover || '0 4px 12px rgba(0,0,0,0.12)'};
     transform: translateY(-1px);
+    background: ${({ theme }) => theme.background.hover};
   }
 
   &:active {
@@ -304,8 +289,8 @@ export const PrevButton = styled.button`
 export const ToggleContainer = styled.div`
   display: flex;
   gap: 8px;
-  background: #f9fafb;
-  border: 1px solid ${TOKENS.border};
+  background: ${({ theme }) => theme.background.secondary || '#f9fafb'};
+  border: 1px solid ${({ theme }) => theme.border};
   padding: 4px;
   border-radius: 12px;
 `;
@@ -320,11 +305,12 @@ export const ToggleButton = styled.button`
   cursor: pointer;
   transition: all 0.2s ease;
 
-  background: ${props => (props.$active ? TOKENS.accent : 'transparent')};
-  color: ${props => (props.$active ? '#fff' : TOKENS.textSecondary)};
+  background: ${({ $active, theme }) => ($active ? theme.colors.primary : 'transparent')};
+  color: ${({ $active, theme }) => ($active ? theme.text.inverse : theme.text.secondary)};
 
   &:hover {
-    color: ${props => (props.$active ? '#fff' : TOKENS.textPrimary)};
+    color: ${({ $active, theme }) => ($active ? theme.text.inverse : theme.text.primary)};
+    background: ${({ $active, theme }) => ($active ? theme.colors.primaryHover || theme.colors.primary : theme.background.hover)};
   }
 `;
 
@@ -341,13 +327,13 @@ export const RowGroup = styled.div`
 export const LoginLink = styled.span`
   display: block;
   text-align: center;
-  color: ${TOKENS.textTertiary};
+  color: ${({ theme }) => theme.text.tertiary};
   font-size: 14px;
   margin-top: 24px;
   cursor: pointer;
 
   &:hover {
-    color: ${TOKENS.textPrimary};
+    color: ${({ theme }) => theme.text.primary};
     text-decoration: underline;
   }
 `;
@@ -364,8 +350,8 @@ export const ProfileImagePreview = styled.div`
   height: 80px;
   border-radius: 50%;
   overflow: hidden;
-  border: 1px solid ${TOKENS.border};
-  background: #f9fafb;
+  border: 1px solid ${({ theme }) => theme.border};
+  background: ${({ theme }) => theme.background.secondary || '#f9fafb'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -379,14 +365,14 @@ export const ProfileImagePreview = styled.div`
 
 export const ProfilePlaceholder = styled.div`
   font-size: 32px;
-  color: ${TOKENS.textTertiary};
+  color: ${({ theme }) => theme.text.tertiary};
 `;
 
 export const ImageUploadButton = styled.button`
   padding: 10px 14px;
-  background: ${TOKENS.cardBg};
-  color: ${TOKENS.textPrimary};
-  border: 1px solid ${TOKENS.border};
+  background: ${({ theme }) => theme.background.paper || 'white'};
+  color: ${({ theme }) => theme.text.primary};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 12px;
   font-size: 14px;
   font-weight: 900;
@@ -394,8 +380,9 @@ export const ImageUploadButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    box-shadow: ${TOKENS.shadowBtn};
+    box-shadow: ${({ theme }) => theme.shadowHover};
     transform: translateY(-1px);
+    background: ${({ theme }) => theme.background.hover};
   }
 
   &:active {
@@ -406,7 +393,7 @@ export const ImageUploadButton = styled.button`
 
 export const HelperText = styled.p`
   font-size: 12px;
-  color: ${TOKENS.textTertiary};
+  color: ${({ theme }) => theme.text.tertiary};
   margin-top: 4px;
 `;
 
@@ -416,14 +403,14 @@ export const TimerBadge = styled.div`
   min-width: 64px;
   padding: 0 12px;
   border-radius: 10px;
-  border: 1px solid ${TOKENS.border};
-  background: #f9fafb;
+  border: 1px solid ${({ theme }) => theme.border};
+  background: ${({ theme }) => theme.background.secondary || '#f9fafb'};
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 900;
   font-size: 13px;
-  color: ${({ $expired }) => ($expired ? TOKENS.textTertiary : TOKENS.textPrimary)};
+  color: ${({ $expired, theme }) => ($expired ? theme.text.tertiary : theme.text.primary)};
 `;
 
 /* Unused but kept for compatibility */

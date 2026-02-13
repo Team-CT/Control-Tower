@@ -13,12 +13,12 @@ const FlightScheduleDetail = () => {
   const { getRole } = useAuthStore();
   const userRole = getRole();
   const isAdmin = userRole === 'AIRLINE_ADMIN' || userRole === 'ADMIN' || userRole === 'SUPER_ADMIN';
-  
+
   const [flightDetail, setFlightDetail] = useState(null);
   const [airports, setAirports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // 승무원 추가 모달 관련 상태
   const [showAddCrewModal, setShowAddCrewModal] = useState(false);
   const [selectedRole, setSelectedRole] = useState('');
@@ -141,47 +141,47 @@ const FlightScheduleDetail = () => {
     console.log('승무원 추가 모달 열기 - 역할:', role);
     console.log('전달받은 role 값:', role);
     console.log('crewMembers 원본 데이터:', flightDetail?.crewMembers);
-    
+
     setSelectedRole(role);
     setShowAddCrewModal(true);
     setSelectedEmployeeId('');
     setAvailableEmployees([]);
     setLoadingEmployees(true);
-    
+
     try {
       // role이 대문자로 전달되어야 함 (PILOT, CABIN_CREW 등)
       const roleUpper = role ? role.toUpperCase() : null;
       console.log('직원 목록 조회 요청 - role (대문자 변환):', roleUpper);
-      
+
       // 해당 역할의 직원 목록 조회 (role 필드로 조회)
       const response = await empService.getEmployees({ role: roleUpper });
       console.log('직원 목록 조회 응답:', response);
       console.log('직원 목록 조회 응답 전체:', JSON.stringify(response.data, null, 2));
-      
+
       const employees = response.data?.data || response.data || [];
       console.log('직원 목록:', employees);
       console.log('직원 수:', employees.length);
       if (employees.length > 0) {
         console.log('첫 번째 직원 데이터:', employees[0]);
-        console.log('각 직원의 필드:', employees.map(e => ({ 
-          empId: e.empId || e.emp_id, 
+        console.log('각 직원의 필드:', employees.map(e => ({
+          empId: e.empId || e.emp_id,
           empName: e.empName || e.emp_name,
-          role: e.role, 
-          job: e.job 
+          role: e.role,
+          job: e.job
         })));
       }
-      
+
       // 이미 배정된 직원 제외 (필드명 매핑 처리)
       const crewMembers = flightDetail?.crewMembers || flightDetail?.crew_members || [];
       console.log('배정된 크루 멤버:', crewMembers);
-      
+
       const assignedEmpIds = crewMembers.map(m => {
         const id = m.empId || m.emp_id;
         console.log('배정된 멤버 ID 추출:', { 원본: m, 추출된ID: id });
         return id;
       }).filter(Boolean);
       console.log('배정된 직원 ID 목록:', assignedEmpIds);
-      
+
       // 필드명 매핑 처리 (snake_case 또는 camelCase 모두 지원)
       const available = employees.filter(emp => {
         const empId = emp.empId || emp.emp_id;
@@ -191,7 +191,7 @@ const FlightScheduleDetail = () => {
       });
       console.log('추가 가능한 직원:', available);
       console.log('추가 가능한 직원 수:', available.length);
-      
+
       setAvailableEmployees(available);
     } catch (error) {
       console.error('직원 목록 조회 실패:', error);
@@ -203,20 +203,20 @@ const FlightScheduleDetail = () => {
       setLoadingEmployees(false);
     }
   };
-  
+
   // 승무원 추가
   const handleAddCrewMember = async () => {
     if (!selectedEmployeeId) {
       alert('직원을 선택해주세요.');
       return;
     }
-    
+
     try {
       const flyScheduleId = Number(flightId);
       console.log('승무원 추가 요청:', { flyScheduleId, selectedEmployeeId });
-      
+
       await flightScheduleService.addCrewMember(flyScheduleId, selectedEmployeeId);
-      
+
       alert('승무원이 추가되었습니다.');
       setShowAddCrewModal(false);
       setSelectedEmployeeId('');
@@ -228,15 +228,15 @@ const FlightScheduleDetail = () => {
       alert(errorMessage);
     }
   };
-  
+
   // 승무원 삭제
   const handleRemoveCrewMember = async (empId, empName, e) => {
     e.stopPropagation(); // 카드 클릭 이벤트 방지
-    
+
     if (!confirm(`정말로 "${empName}" 승무원을 삭제하시겠습니까?`)) {
       return;
     }
-    
+
     try {
       const flyScheduleId = Number(flightId);
       await flightScheduleService.removeCrewMember(flyScheduleId, empId);
@@ -247,7 +247,7 @@ const FlightScheduleDetail = () => {
       alert(error.response?.data?.message || '승무원 삭제에 실패했습니다.');
     }
   };
-  
+
   // 크루 멤버를 역할별로 그룹화
   const groupCrewByRole = (crewMembers) => {
     if (!crewMembers || crewMembers.length === 0) {
@@ -258,7 +258,7 @@ const FlightScheduleDetail = () => {
     const roleGroups = {};
 
     console.log('크루 멤버 그룹화 시작 - crewMembers:', crewMembers);
-    
+
     crewMembers.forEach((member) => {
       // 필드명 매핑 (snake_case 또는 camelCase 모두 지원)
       const empId = member.empId || member.emp_id;
@@ -274,7 +274,7 @@ const FlightScheduleDetail = () => {
         job,
         원본데이터: member
       });
-      
+
       // 역할별 그룹화 (role 필드 사용 - job이 아님!)
       if (!roleGroups[role]) {
         roleGroups[role] = [];
@@ -290,7 +290,7 @@ const FlightScheduleDetail = () => {
         bgColor: roleStyle.bgColor
       });
     });
-    
+
     console.log('그룹화 결과:', roleGroups);
 
     // 그룹을 배열로 변환 (우선순위: PILOT > CABIN_CREW > 기타)
@@ -325,9 +325,9 @@ const FlightScheduleDetail = () => {
   if (loading) {
     return (
       <S.PageContainer>
-        <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+        <S.MessageContainer>
           로딩 중...
-        </div>
+        </S.MessageContainer>
       </S.PageContainer>
     );
   }
@@ -335,9 +335,9 @@ const FlightScheduleDetail = () => {
   if (error || !flightDetail) {
     return (
       <S.PageContainer>
-        <div style={{ padding: '40px', textAlign: 'center', color: '#dc2626' }}>
+        <S.ErrorMessageContainer>
           {error || '비행편 정보를 찾을 수 없습니다.'}
-        </div>
+        </S.ErrorMessageContainer>
       </S.PageContainer>
     );
   }
@@ -346,7 +346,7 @@ const FlightScheduleDetail = () => {
   const crewMembers = flightDetail.crewMembers || flightDetail.crew_members || [];
   console.log('직원 목록 렌더링 - crewMembers:', crewMembers);
   console.log('직원 목록 길이:', crewMembers.length);
-  
+
   const crewPositions = groupCrewByRole(crewMembers);
   const departureAirportName = getAirportName(flightDetail.departure);
   const destinationAirportName = getAirportName(flightDetail.destination);
@@ -403,58 +403,57 @@ const FlightScheduleDetail = () => {
         crewPositions.map((position) => {
           // 역할 키 찾기 (첫 번째 멤버의 roleKey 사용)
           const roleKey = position.members[0]?.roleKey || 'PILOT';
-          
+
           return (
-          <S.CrewSection key={position.id}>
-            <S.CrewSectionHeader>
-              <S.CrewSectionTitle>{position.title}</S.CrewSectionTitle>
-              {isAdmin && (
-                <S.AddCrewButton onClick={() => handleOpenAddCrewModal(roleKey)}>
-                  + 승무원 추가
-                </S.AddCrewButton>
-              )}
-            </S.CrewSectionHeader>
+            <S.CrewSection key={position.id}>
+              <S.CrewSectionHeader>
+                <S.CrewSectionTitle>{position.title}</S.CrewSectionTitle>
+                {isAdmin && (
+                  <S.AddCrewButton onClick={() => handleOpenAddCrewModal(roleKey)}>
+                    + 승무원 추가
+                  </S.AddCrewButton>
+                )}
+              </S.CrewSectionHeader>
 
-            <S.CrewMemberList>
-              {position.members.map((member, index) => (
-                <S.CrewMemberCard
-                  key={member.empId || index}
-                  onClick={() => navigate(`/crew/${member.empId}`)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <S.CrewMemberLeft>
-                    <S.CrewAvatar $bgColor={member.bgColor}>
-                      {member.avatar}
-                    </S.CrewAvatar>
+              <S.CrewMemberList>
+                {position.members.map((member, index) => (
+                  <S.CrewMemberCard
+                    key={member.empId || index}
+                    onClick={() => navigate(`/crew/${member.empId}`)}
+                  >
+                    <S.CrewMemberLeft>
+                      <S.CrewAvatar $bgColor={member.bgColor}>
+                        {member.avatar}
+                      </S.CrewAvatar>
 
-                    <S.CrewInfo>
-                      <S.CrewName>{member.name}</S.CrewName>
+                      <S.CrewInfo>
+                        <S.CrewName>{member.name}</S.CrewName>
 
-                      <S.CrewMetadata>
-                        <S.CrewRole>{member.role}</S.CrewRole>
-                        <S.CrewDivider>•</S.CrewDivider>
-                        <S.CrewID>{member.empId}</S.CrewID>
-                      </S.CrewMetadata>
-                    </S.CrewInfo>
-                  </S.CrewMemberLeft>
+                        <S.CrewMetadata>
+                          <S.CrewRole>{member.role}</S.CrewRole>
+                          <S.CrewDivider>•</S.CrewDivider>
+                          <S.CrewID>{member.empId}</S.CrewID>
+                        </S.CrewMetadata>
+                      </S.CrewInfo>
+                    </S.CrewMemberLeft>
 
-                  <S.CrewMemberRight>
-                    <S.CrewStatusBadge $status={member.status}>
-                      {member.status}
-                    </S.CrewStatusBadge>
-                    {isAdmin && (
-                      <S.DeleteCrewButton
-                        onClick={(e) => handleRemoveCrewMember(member.empId, member.name, e)}
-                        title="승무원 삭제"
-                      >
-                        🗑️
-                      </S.DeleteCrewButton>
-                    )}
-                  </S.CrewMemberRight>
-                </S.CrewMemberCard>
-              ))}
-            </S.CrewMemberList>
-          </S.CrewSection>
+                    <S.CrewMemberRight>
+                      <S.CrewStatusBadge $status={member.status}>
+                        {member.status}
+                      </S.CrewStatusBadge>
+                      {isAdmin && (
+                        <S.DeleteCrewButton
+                          onClick={(e) => handleRemoveCrewMember(member.empId, member.name, e)}
+                          title="승무원 삭제"
+                        >
+                          🗑️
+                        </S.DeleteCrewButton>
+                      )}
+                    </S.CrewMemberRight>
+                  </S.CrewMemberCard>
+                ))}
+              </S.CrewMemberList>
+            </S.CrewSection>
           );
         })
       ) : (
@@ -469,7 +468,7 @@ const FlightScheduleDetail = () => {
           </S.CrewSectionHeader>
         </S.CrewSection>
       )}
-      
+
       {/* 승무원 추가 모달 */}
       {showAddCrewModal && (
         <S.ModalOverlay onClick={() => setShowAddCrewModal(false)}>
@@ -482,9 +481,9 @@ const FlightScheduleDetail = () => {
               <S.FormGroup>
                 <S.FormLabel>직원 선택 *</S.FormLabel>
                 {loadingEmployees ? (
-                  <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+                  <S.SmallMessage>
                     직원 목록을 불러오는 중...
-                  </div>
+                  </S.SmallMessage>
                 ) : (
                   <S.EmployeeSelect
                     value={selectedEmployeeId}

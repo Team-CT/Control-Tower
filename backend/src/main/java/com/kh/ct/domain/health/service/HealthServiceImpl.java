@@ -7,11 +7,14 @@ import com.kh.ct.domain.emp.repository.EmpRepository;
 import com.kh.ct.domain.health.dto.HealthDto;
 import com.kh.ct.domain.health.entity.EmpHealth;
 import com.kh.ct.domain.health.entity.EmpPhysicalTest;
+import com.kh.ct.domain.health.entity.Program;
 import com.kh.ct.domain.health.entity.HealthScoreRule;
 import com.kh.ct.domain.health.entity.ProgramApply;
 import com.kh.ct.domain.health.repository.*;
 import com.kh.ct.domain.health.service.parser.HealthLabelParser;
 import com.kh.ct.domain.health.service.parser.PdfTextExtractor;
+import com.kh.ct.domain.schedule.entity.AllSchedule;
+import com.kh.ct.domain.schedule.repository.AllScheduleRepository;
 import com.kh.ct.global.common.CommonEnums;
 import com.kh.ct.global.entity.File;
 import com.kh.ct.global.repository.FileRepository;
@@ -36,6 +39,8 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @RequiredArgsConstructor
 
@@ -48,11 +53,11 @@ public class HealthServiceImpl implements HealthService {
     private final FileRepository fileRepository;
     private final EmpHealthRepository empHealthRepository;
     private final ProgramApplyRepository programApplyRepository; // DDD - Repository 주입
-    private final com.kh.ct.domain.schedule.repository.AllScheduleRepository allScheduleRepository;
-    private final com.kh.ct.domain.health.repository.ProgramRepository programRepository;
+    private final AllScheduleRepository allScheduleRepository;
+    private final ProgramRepository programRepository;
     private final HealthScoreRuleRepository healthScoreRuleRepository;
     private final SurveyRepository surveyRepository;
-    private final AttendanceRepository attendanceRepository;;
+    private final AttendanceRepository attendanceRepository;
 
     private final Path baseDir = Paths.get("uploads", "pdf").toAbsolutePath().normalize();
 
@@ -65,9 +70,10 @@ public class HealthServiceImpl implements HealthService {
         }
 
         String text = pdfTextExtractor.extract(pdfFile);
-
+        System.out.println("TEST" + text);
         HealthDto.PhysicalTestRequest parsed = healthLabelParser.parse(text);
-
+        System.out.println("TEST" + parsed);
+        System.out.println("TEST" + parsed.getWeight());
 
         return HealthDto.PhysicalTestResponse.from(parsed);
     }
@@ -81,7 +87,6 @@ public class HealthServiceImpl implements HealthService {
 
         Emp emp = empRepository.findById(empId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 empId: " + empId));
-
         // 1) 파일 디스크 저장 + File row 저장
         String originalName = Optional.ofNullable(pdfFile.getOriginalFilename()).orElse("unknown.pdf");
         long size = pdfFile.getSize();
@@ -126,28 +131,30 @@ public class HealthServiceImpl implements HealthService {
         EmpPhysicalTest saved = healthRepository.save(req.toEntity());
 
         Integer bloodSugarScore = scoreOf("BLOOD_SUGAR", toBD(body.getBloodSugar()));
-        Integer sysScore        = scoreOf("SYSTOLIC_BLOOD_PRESSURE", toBD(body.getSystolicBloodPressure()));
-        Integer diaScore        = scoreOf("DIASTOLIC_BLOOD_PRESSURE", toBD(body.getDiastolicBloodPressure()));
-        Integer cholScore       = scoreOf("CHOLESTEROL", toBD(body.getCholesterol()));
-        Integer hrScore         = scoreOf("HEART_RATE", toBD(body.getHeartRate()));
-        Integer bmiScore        = scoreOf("BMI", toBD(body.getBmi()));
-        Integer fatScore        = scoreOf("BODY_FAT", toBD(body.getBodyFat()));
+        Integer sysScore = scoreOf("SYSTOLIC_BLOOD_PRESSURE", toBD(body.getSystolicBloodPressure()));
+        Integer diaScore = scoreOf("DIASTOLIC_BLOOD_PRESSURE", toBD(body.getDiastolicBloodPressure()));
+        Integer cholScore = scoreOf("CHOLESTEROL", toBD(body.getCholesterol()));
+        Integer hrScore = scoreOf("HEART_RATE", toBD(body.getHeartRate()));
+        Integer bmiScore = scoreOf("BMI", toBD(body.getBmi()));
+        Integer fatScore = scoreOf("BODY_FAT", toBD(body.getBodyFat()));
 
         // 혈압은 하나로 합치기(추천): 둘 다 있으면 min, 하나만 있으면 그 값
         Integer bpScore = null;
-        if (sysScore != null && diaScore != null) bpScore = Math.min(sysScore, diaScore);
-        else if (sysScore != null) bpScore = sysScore;
-        else if (diaScore != null) bpScore = diaScore;
+        if (sysScore != null && diaScore != null)
+            bpScore = Math.min(sysScore, diaScore);
+        else if (sysScore != null)
+            bpScore = sysScore;
+        else if (diaScore != null)
+            bpScore = diaScore;
 
         Integer physicalPoint = avgScore(List.of(
-                bloodSugarScore, bpScore, cholScore, hrScore, bmiScore, fatScore
-        ));
+                bloodSugarScore, bpScore, cholScore, hrScore, bmiScore, fatScore));
 
         EmpHealth prev = empHealthRepository
                 .findTopByEmpId_EmpIdOrderByEmpHealthIdDesc(empId)
                 .orElse(null);
 
-        Integer prevStress  = (prev != null) ? prev.getStressPoint()  : null;
+        Integer prevStress = (prev != null) ? prev.getStressPoint() : null;
         Integer prevFatigue = (prev != null) ? prev.getFatiguePoint() : null;
 
         // 3) health_point = 3개 평균 (null 제외)
@@ -155,15 +162,14 @@ public class HealthServiceImpl implements HealthService {
 
         // 4) 새 row INSERT (stress/fatigue는 직전 값 복사)
         EmpHealth newRow = EmpHealth.builder()
-                .empId(emp)                       // Emp 엔티티
-                .physicalPoint(physicalPoint)     // 새로 계산
-                .stressPoint(prevStress)          // 직전 값 복사
-                .fatiguePoint(prevFatigue)        // 직전 값 복사
-                .healthPoint(healthPoint)         // 평균(null 제외)
+                .empId(emp) // Emp 엔티티
+                .physicalPoint(physicalPoint) // 새로 계산
+                .stressPoint(prevStress) // 직전 값 복사
+                .fatiguePoint(prevFatigue) // 직전 값 복사
+                .healthPoint(healthPoint) // 평균(null 제외)
                 .build();
 
         empHealthRepository.save(newRow);
-
 
         return saved.getPhysicalTestId();
 
@@ -241,7 +247,7 @@ public class HealthServiceImpl implements HealthService {
         // 2. Domain Entity를 Application DTO로 변환 (Application Layer)
         return programApplies.stream()
                 .map(HealthDto.ProgramHistoryResponse::from)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     /**
@@ -255,11 +261,9 @@ public class HealthServiceImpl implements HealthService {
     @Transactional
     public void applyProgram(HealthDto.ApplyRequest request, String empId) {
         try {
-            System.out.println("[DEBUG] applyProgram started. EmpId: " + empId + ", Request: " + request);
-
             // [VALIDATION] 시작일 기준 최소 3일 전 예약 필수
-            java.time.LocalDate startDate = request.getStartDate().toLocalDate();
-            java.time.LocalDate minDate = java.time.LocalDate.now().plusDays(3);
+            LocalDate startDate = request.getStartDate().toLocalDate();
+            LocalDate minDate = LocalDate.now().plusDays(3);
 
             if (startDate.isBefore(minDate)) {
                 throw new IllegalArgumentException("프로그램은 시작일 기준 최소 3일 전에만 신청 가능합니다.");
@@ -268,7 +272,6 @@ public class HealthServiceImpl implements HealthService {
             // 1. 신청자 조회
             Emp applicant = empRepository.findById(empId)
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-            System.out.println("[DEBUG] Applicant found: " + applicant.getEmpName());
 
             // 2. 이미 신청한 내역이 있는지 확인 (PENDING 상태인 경우 중복 신청 방지 등)
             // 비즈니스 규칙: 동일 기간 중복 신청 불가? 혹은 그냥 허용? 일단 구현 생략 or Simple Validation
@@ -284,11 +287,9 @@ public class HealthServiceImpl implements HealthService {
                     .programApplyStatus(com.kh.ct.global.common.CommonEnums.ApplyStatus.PENDING)
                     .programApplyReason(request.getReason())
                     .build();
-            System.out.println("[DEBUG] ProgramApply entity built.");
 
             // [FIX] 먼저 저장하여 Managed 상태로 전환 (Program 생성 시 사용하기 위함)
             apply = programApplyRepository.save(apply);
-            System.out.println("[DEBUG] ProgramApply saved. ID: " + apply.getProgramApplyId());
 
             // 4. AllSchedule 생성 (일정)
             // request.getStartDate()가 null인지 확인
@@ -296,32 +297,28 @@ public class HealthServiceImpl implements HealthService {
                 throw new IllegalArgumentException("Start date or End date cannot be null");
             }
 
-            com.kh.ct.domain.schedule.entity.AllSchedule schedule = com.kh.ct.domain.schedule.entity.AllSchedule
+            AllSchedule schedule = AllSchedule
                     .builder()
                     .scheduleCode("HEALTH_" + request.getProgramCode().toUpperCase())
                     .startDate(request.getStartDate())
                     .endDate(request.getEndDate())
                     .build();
             schedule = allScheduleRepository.save(schedule); // [FIX] Managed Instance 반환값 사용
-            System.out.println("[DEBUG] AllSchedule saved. ID: " + schedule.getScheduleId());
 
             // 5. Program 생성 (세부 프로그램 정보)
             // Program은 ProgramApply와 OneToOne (MapsId)
-            com.kh.ct.domain.health.entity.Program program = com.kh.ct.domain.health.entity.Program.builder()
+            Program program = Program.builder()
                     .programApply(apply) // [FIX] Managed 'apply' 사용
                     .scheduleId(schedule)
                     .programContent(parseProgramContent(request.getProgramCode()))
                     .programStatus("APPLIED")
                     .build();
-            System.out.println("[DEBUG] Program entity built.");
 
             // apply = programApplyRepository.save(apply); // [REMOVED] 위에서 이미 저장함
 
             programRepository.save(program); // Child 저장
-            System.out.println("[DEBUG] Program saved. ApplyProgram Completed.");
 
         } catch (Exception e) {
-            System.err.println("[ERROR] applyProgram failed: " + e.getMessage());
             e.printStackTrace();
             throw e; // Rethrow to ensure transaction rollback
         }
@@ -346,7 +343,7 @@ public class HealthServiceImpl implements HealthService {
         List<ProgramApply> list = programApplyRepository.findByApplicantIdWithDetails(empId);
         return list.stream()
                 .map(HealthDto.ProgramHistoryResponse::from)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     private String getExt(String filename) {
@@ -371,7 +368,7 @@ public class HealthServiceImpl implements HealthService {
         // 1. Program 조회
         programRepository.findById(programApplyId).ifPresent(program -> {
             // 2. Schedule 삭제를 위해 조회 (Program이 Schedule을 참조함)
-            com.kh.ct.domain.schedule.entity.AllSchedule schedule = program.getScheduleId();
+            AllSchedule schedule = program.getScheduleId();
 
             // Program 삭제
             programRepository.delete(program);
@@ -388,12 +385,12 @@ public class HealthServiceImpl implements HealthService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<HealthDto.ApplyDetailResponse> getAdminApplyList(com.kh.ct.global.common.CommonEnums.ApplyStatus status,
+    public List<HealthDto.ApplyDetailResponse> getAdminApplyList(CommonEnums.ApplyStatus status,
             String programName) {
         return programApplyRepository.findAllByFilters(status, programName).stream()
                 .map(apply -> {
-                    com.kh.ct.domain.health.entity.Program program = apply.getProgram();
-                    com.kh.ct.domain.schedule.entity.AllSchedule schedule = (program != null) ? program.getScheduleId()
+                    Program program = apply.getProgram();
+                    AllSchedule schedule = (program != null) ? program.getScheduleId()
                             : null;
                     Emp applicant = apply.getProgramApplyApplicant();
                     String managerName = (apply.getProgramApplyManager() != null)
@@ -418,7 +415,7 @@ public class HealthServiceImpl implements HealthService {
                             .rejectReason(apply.getProgramApplyCancelReason())
                             .build();
                 })
-                .collect(java.util.stream.Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -427,8 +424,8 @@ public class HealthServiceImpl implements HealthService {
         ProgramApply apply = programApplyRepository.findById(programApplyId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신청 내역입니다."));
 
-        com.kh.ct.domain.health.entity.Program program = apply.getProgram();
-        com.kh.ct.domain.schedule.entity.AllSchedule schedule = (program != null) ? program.getScheduleId() : null;
+        Program program = apply.getProgram();
+        AllSchedule schedule = (program != null) ? program.getScheduleId() : null;
         Emp applicant = apply.getProgramApplyApplicant();
 
         String managerName = (apply.getProgramApplyManager() != null) ? apply.getProgramApplyManager().getEmpName()
@@ -462,14 +459,6 @@ public class HealthServiceImpl implements HealthService {
         Emp manager = empRepository.findById(request.getManagerId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 담당자입니다."));
 
-        // Entity에 비즈니스 메서드가 없으므로 Setter가 없다면 추가 필요.
-        // 현재는 Setter가 없으므로 update 메서드를 Entity에 추가하는 것이 좋음.
-        // 하지만 여기서는 간편하게 리플렉션이나 빌더 패턴을 다시 쓸 수 없음 (JPA Managed 상태 유지).
-        // 따라서 ProgramApply Entity에 `approve` 메서드를 추가했다고 가정하고 호출하거나,
-        // @Setter가 없으므로 여기서는 Compile Error가 날 것임.
-        // [IMPORTANT] ProgramApply.java에 updateStatus 메서드를 추가해야 함.
-        // 일단 이 코드 블록 전/후로 ProgramApply.java를 수정하겠음.
-
         apply.approve(manager);
     }
 
@@ -501,8 +490,6 @@ public class HealthServiceImpl implements HealthService {
                 .fatiguePoint(eh != null ? eh.getFatiguePoint() : null)
                 .build();
     }
-
-
 
     @Override
     public HealthDto.EmpHealthTrendResponse healthPointTrend(String empId, int days) {
@@ -551,10 +538,14 @@ public class HealthServiceImpl implements HealthService {
 
             if (cur != null) {
                 // 값이 있는 날: 갱신 + last 업데이트
-                if (cur.getHealthPoint() != null) lastHealth = cur.getHealthPoint();
-                if (cur.getPhysicalPoint() != null) lastPhysical = cur.getPhysicalPoint();
-                if (cur.getStressPoint() != null) lastStress = cur.getStressPoint();
-                if (cur.getFatiguePoint() != null) lastFatigue = cur.getFatiguePoint();
+                if (cur.getHealthPoint() != null)
+                    lastHealth = cur.getHealthPoint();
+                if (cur.getPhysicalPoint() != null)
+                    lastPhysical = cur.getPhysicalPoint();
+                if (cur.getStressPoint() != null)
+                    lastStress = cur.getStressPoint();
+                if (cur.getFatiguePoint() != null)
+                    lastFatigue = cur.getFatiguePoint();
 
                 series.add(cur);
             } else {
@@ -599,16 +590,14 @@ public class HealthServiceImpl implements HealthService {
                 .findTop2ByEmpId_EmpIdOrderByEmpHealthIdDesc(empId);
 
         if (lastTwo.size() >= 2) {
-            Integer latest = lastTwo.get(0).getHealthPoint();   // 최신
-            Integer prev   = lastTwo.get(1).getHealthPoint();   // 직전
+            Integer latest = lastTwo.get(0).getHealthPoint(); // 최신
+            Integer prev = lastTwo.get(1).getHealthPoint(); // 직전
 
             // null 방어: 둘 중 하나라도 null이면 0
             if (latest != null && prev != null) {
                 scoreDelta = latest - prev;
             }
         }
-
-
 
         return HealthDto.EmpHealthRecordResponse.builder()
                 .programCnt(programCnt)
@@ -618,16 +607,17 @@ public class HealthServiceImpl implements HealthService {
                 .build();
     }
 
-
     private Integer toInt(Object o) {
-        if (o == null) return null;
-        if (o instanceof Number n) return n.intValue();
+        if (o == null)
+            return null;
+        if (o instanceof Number n)
+            return n.intValue();
         return Integer.valueOf(String.valueOf(o));
     }
 
-
     private Integer scoreOf(String kind, BigDecimal v) {
-        if (v == null) return null;
+        if (v == null)
+            return null;
         return healthScoreRuleRepository.findMatchedRule(kind, v)
                 .map(HealthScoreRule::getScore)
                 .orElse(null);
@@ -635,13 +625,15 @@ public class HealthServiceImpl implements HealthService {
 
     private Integer avgScore(List<Integer> scores) {
         List<Integer> valid = scores.stream().filter(Objects::nonNull).toList();
-        if (valid.isEmpty()) return null;
+        if (valid.isEmpty())
+            return null;
         double avg = valid.stream().mapToInt(i -> i).average().orElse(0);
         return (int) Math.round(avg);
     }
 
     private BigDecimal toBD(Number n) {
-        if (n == null) return null;
+        if (n == null)
+            return null;
         return new BigDecimal(String.valueOf(n));
     }
 
@@ -654,20 +646,24 @@ public class HealthServiceImpl implements HealthService {
                 cnt++;
             }
         }
-        if (cnt == 0) return null;          // 평균 대상이 없으면 null
+        if (cnt == 0)
+            return null; // 평균 대상이 없으면 null
         return (int) Math.round((double) sum / cnt);
     }
 
     private long calcMinutes(LocalTime inTime, LocalTime outTime) {
-        if (inTime == null || outTime == null) return 0;
+        if (inTime == null || outTime == null)
+            return 0;
 
         long minutes = Duration.between(inTime, outTime).toMinutes();
 
         // 야간근무(자정 넘어감) 보정
-        if (minutes < 0) minutes += 24 * 60;
+        if (minutes < 0)
+            minutes += 24 * 60;
 
         // 음수 방어
-        if (minutes < 0) return 0;
+        if (minutes < 0)
+            return 0;
 
         return minutes;
     }

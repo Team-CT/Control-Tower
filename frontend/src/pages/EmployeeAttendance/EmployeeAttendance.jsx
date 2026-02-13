@@ -379,13 +379,7 @@ const EmployeeAttendance = () => {
                     <S.ScheduleDate>
                       근무시간: {selectedDailyData.workHours !== null ? `${selectedDailyData.workHours}시간` : '계산 불가'}
                     </S.ScheduleDate>
-                    <S.ScheduleStatus style={{
-                      backgroundColor: getStatusColor(selectedDailyData.attendanceStatus) + '20',
-                      color: getStatusColor(selectedDailyData.attendanceStatus),
-                      padding: '4px 12px',
-                      borderRadius: '12px',
-                      fontWeight: '600'
-                    }}>
+                    <S.ScheduleStatus $status={selectedDailyData.attendanceStatus}>
                       {getStatusText(selectedDailyData.attendanceStatus)}
                     </S.ScheduleStatus>
                   </S.ScheduleItem>
@@ -396,7 +390,7 @@ const EmployeeAttendance = () => {
                   <S.ScheduleDate>
                     {selectedDate.getFullYear()}-{String(selectedDate.getMonth() + 1).padStart(2, '0')}-{String(selectedDate.getDate()).padStart(2, '0')}
                   </S.ScheduleDate>
-                  <S.ScheduleDate style={{ color: '#f59e0b', marginTop: '8px' }}>
+                  <S.ScheduleDate style={{ color: ({ theme }) => theme?.status?.warning || '#f59e0b', marginTop: '8px' }}>
                     출근 기록이 없는 날입니다. 정정 신청을 통해 근태를 등록할 수 있습니다.
                   </S.ScheduleDate>
                 </S.ScheduleItem>

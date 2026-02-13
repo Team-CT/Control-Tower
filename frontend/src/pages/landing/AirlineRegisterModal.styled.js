@@ -26,12 +26,12 @@ export const Overlay = styled.div`
 `;
 
 export const ModalContainer = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   width: 100%;
   max-width: 500px;
   border-radius: 20px;
   padding: 40px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: ${({ theme }) => theme.shadowLg || theme.shadow};
   position: relative;
   animation: ${slideUp} 0.3s ease-out;
   max-height: 90vh;
@@ -50,7 +50,7 @@ export const CloseButton = styled.button`
   background: none;
   border: none;
   font-size: 24px;
-  color: #999;
+  color: ${({ theme }) => theme.text.secondary};
   cursor: pointer;
   padding: 8px;
   border-radius: 50%;
@@ -62,8 +62,8 @@ export const CloseButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background-color: #f5f5f5;
-    color: #333;
+    background-color: ${({ theme }) => theme.background.hover};
+    color: ${({ theme }) => theme.text.primary};
   }
 `;
 
@@ -75,13 +75,13 @@ export const Header = styled.div`
 export const Title = styled.h2`
   font-size: 24px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 8px 0;
 `;
 
 export const SubTitle = styled.p`
   font-size: 15px;
-  color: #666;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
 `;
 
@@ -100,29 +100,31 @@ export const InputGroup = styled.div`
 export const Label = styled.label`
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const Input = styled.input`
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
   transition: all 0.2s;
   outline: none;
   box-sizing: border-box;
+  background-color: ${({ theme }) => theme.background.input};
+  color: ${({ theme }) => theme.text.primary};
 
   &:focus {
-    border-color: ${props => props.theme.primary};
-    box-shadow: 0 0 0 3px ${props => props.theme.primary}20;
+    border-color: ${props => props.theme.colors.primary};
+    box-shadow: 0 0 0 3px ${props => props.theme.colors.primary}20;
   }
 `;
 
 export const TextArea = styled.textarea`
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
   transition: all 0.2s;
@@ -131,36 +133,39 @@ export const TextArea = styled.textarea`
   min-height: 100px;
   font-family: inherit;
   box-sizing: border-box;
+  background-color: ${({ theme }) => theme.background.input};
+  color: ${({ theme }) => theme.text.primary};
 
   &:focus {
-    border-color: ${props => props.theme.primary};
-    box-shadow: 0 0 0 3px ${props => props.theme.primary}20;
+    border-color: ${props => props.theme.colors.primary};
+    box-shadow: 0 0 0 3px ${props => props.theme.colors.primary}20;
   }
 `;
 
 export const Select = styled.select`
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
   transition: all 0.2s;
   outline: none;
-  background-color: white;
+  background-color: ${({ theme }) => theme.background.input};
+  color: ${({ theme }) => theme.text.primary};
   cursor: pointer;
   box-sizing: border-box;
 
   &:focus {
-    border-color: ${props => props.theme.primary};
-    box-shadow: 0 0 0 3px ${props => props.theme.primary}20;
+    border-color: ${props => props.theme.colors.primary};
+    box-shadow: 0 0 0 3px ${props => props.theme.colors.primary}20;
   }
 `;
 
 export const SubmitButton = styled.button`
   width: 100%;
   padding: 14px;
-  background-color: ${props => props.theme.primary};
-  color: white;
+  background-color: ${props => props.theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse};
   border: none;
   border-radius: 12px;
   font-size: 16px;
@@ -170,7 +175,7 @@ export const SubmitButton = styled.button`
   margin-top: 12px;
 
   &:hover {
-    background-color: ${props => props.theme.secondary};
+    background-color: ${props => props.theme.colors.secondary};
     transform: translateY(-1px);
   }
 

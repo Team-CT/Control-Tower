@@ -287,8 +287,8 @@ const ProtestApproval = () => {
         <S.MainContentArea>
             {/* 통계 카드 */}
             <S.StatsGrid>
-                <S.StatCard $bgColor="#fef3c7">
-                    <S.StatIcon $color="#f59e0b">📋</S.StatIcon>
+                <S.StatCard $type="pending">
+                    <S.StatIcon $type="pending">📋</S.StatIcon>
                     <S.StatInfo>
                         <S.StatLabel>대기 중</S.StatLabel>
                         <S.StatValue>{stats.pending}</S.StatValue>
@@ -296,8 +296,8 @@ const ProtestApproval = () => {
                     </S.StatInfo>
                 </S.StatCard>
 
-                <S.StatCard $bgColor="#d1fae5">
-                    <S.StatIcon $color="#10b981">✓</S.StatIcon>
+                <S.StatCard $type="approved">
+                    <S.StatIcon $type="approved">✓</S.StatIcon>
                     <S.StatInfo>
                         <S.StatLabel>승인</S.StatLabel>
                         <S.StatValue>{stats.approved}</S.StatValue>
@@ -305,8 +305,8 @@ const ProtestApproval = () => {
                     </S.StatInfo>
                 </S.StatCard>
 
-                <S.StatCard $bgColor="#fee2e2">
-                    <S.StatIcon $color="#ef4444">⚠</S.StatIcon>
+                <S.StatCard $type="rejected">
+                    <S.StatIcon $type="rejected">⚠</S.StatIcon>
                     <S.StatInfo>
                         <S.StatLabel>반려</S.StatLabel>
                         <S.StatValue>{stats.rejected}</S.StatValue>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from 'styled-components';
 import api from '../../api/axios';
 import {
   MainContentArea,
@@ -38,10 +39,12 @@ import {
   ModalContent,
   DetailRow,
   ButtonGroup,
-  CloseButton
+  CloseButton,
+  EmptyState
 } from './LeaveApproval.styled';
 
 const LeaveApproval = () => {
+  const theme = useTheme();
   const [activeFilter, setActiveFilter] = useState('all');
   const [leaves, setLeaves] = useState([]);
   const [selectedLeave, setSelectedLeave] = useState(null);
@@ -55,24 +58,24 @@ const LeaveApproval = () => {
       label: '대기 중',
       value: leaves.filter(l => l.status === 'PENDING').length,
       subtext: '처리 필요',
-      color: '#fef3c7',
-      iconColor: '#f59e0b'
+      color: theme.status.warning,
+      iconColor: theme.status.warning
     },
     {
       icon: '✓',
       label: '승인',
       value: leaves.filter(l => l.status === 'APPROVED').length,
       subtext: '완료됨',
-      color: '#d1fae5',
-      iconColor: '#10b981'
+      color: theme.status.success,
+      iconColor: theme.status.success
     },
     {
       icon: '⚠',
       label: '반려',
       value: leaves.filter(l => l.status === 'REJECTED').length,
       subtext: '처리됨',
-      color: '#fee2e2',
-      iconColor: '#ef4444'
+      color: theme.status.error,
+      iconColor: theme.status.error
     },
   ];
 
@@ -217,13 +220,13 @@ const LeaveApproval = () => {
 
         <ApprovalList>
           {loading ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
+            <EmptyState>
               데이터를 불러오는 중입니다...
-            </div>
+            </EmptyState>
           ) : filteredApprovals.length === 0 ? (
-            <div style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>
+            <EmptyState>
               신청 내역이 없습니다.
-            </div>
+            </EmptyState>
           ) : (
             filteredApprovals.map((leave, index) => (
               <ApprovalItem key={leave.leaveId || leave.id || index}>

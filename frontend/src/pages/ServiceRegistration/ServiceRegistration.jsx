@@ -32,6 +32,7 @@ import {
 import { airlineApplyService } from '../../api/airline-apply/services';
 
 const ServiceRegistration = () => {
+  const theme = useTheme(); // Get theme
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     airlineName: '',
@@ -68,9 +69,9 @@ const ServiceRegistration = () => {
 
   const handleSubmit = async () => {
     // 필수 필드 검증
-    if (!formData.airlineName || !formData.airlineAddress || !formData.managerName || 
-        !formData.managerPhone || !formData.managerEmail || !formData.businessLicense || 
-        !formData.employmentCert) {
+    if (!formData.airlineName || !formData.airlineAddress || !formData.managerName ||
+      !formData.managerPhone || !formData.managerEmail || !formData.businessLicense ||
+      !formData.employmentCert) {
       alert('필수 항목을 모두 입력해주세요.');
       return;
     }
@@ -81,7 +82,7 @@ const ServiceRegistration = () => {
 
       // FormData 생성
       const submitFormData = new FormData();
-      
+
       // JSON 데이터 추가 (@RequestPart가 JSON을 파싱하려면 application/json Content-Type 필요)
       const data = {
         airlineName: formData.airlineName,
@@ -101,7 +102,7 @@ const ServiceRegistration = () => {
       }
 
       const response = await airlineApplyService.createApplication(submitFormData);
-      
+
       alert('가입 신청이 완료되었습니다. 검토 후 결과를 이메일로 안내드리겠습니다.');
       // 성공 시 홈으로 이동하거나 다른 페이지로 이동
       navigate('/');
@@ -121,8 +122,8 @@ const ServiceRegistration = () => {
         <PageHeader>
           <HeaderIcon>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <polyline points="9 22 9 12 15 12 15 22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              <polyline points="9 22 9 12 15 12 15 22" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </HeaderIcon>
           <PageTitle>서비스 가입 신청</PageTitle>
@@ -235,8 +236,8 @@ const ServiceRegistration = () => {
               >
                 <UploadIcon>
                   <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <path d="M16 22V10M16 10L11 15M16 10L21 15" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M28 20V26C28 27.1046 27.1046 28 26 28H6C4.89543 28 4 27.1046 4 26V20" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 22V10M16 10L11 15M16 10L21 15" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M28 20V26C28 27.1046 27.1046 28 26 28H6C4.89543 28 4 27.1046 4 26V20" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </UploadIcon>
                 <UploadText>
@@ -263,8 +264,8 @@ const ServiceRegistration = () => {
               >
                 <UploadIcon>
                   <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-                    <path d="M16 22V10M16 10L11 15M16 10L21 15" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M28 20V26C28 27.1046 27.1046 28 26 28H6C4.89543 28 4 27.1046 4 26V20" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M16 22V10M16 10L11 15M16 10L21 15" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M28 20V26C28 27.1046 27.1046 28 26 28H6C4.89543 28 4 27.1046 4 26V20" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </UploadIcon>
                 <UploadText>
@@ -287,7 +288,7 @@ const ServiceRegistration = () => {
         </InfoBox>
 
         {error && (
-          <div style={{ color: '#dc2626', textAlign: 'center', marginBottom: '20px' }}>
+          <div style={{ color: theme.status.error || '#dc2626', textAlign: 'center', marginBottom: '20px' }}>
             {error}
           </div>
         )}

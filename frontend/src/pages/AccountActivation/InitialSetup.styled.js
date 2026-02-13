@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
+  background: ${({ theme }) => theme.background.main};
   padding: 60px 40px;
   display: flex;
   justify-content: center;
@@ -49,7 +49,7 @@ export const StepNumber = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: ${props => props.theme?.primary || '#4a4a4a'};
+  background: ${({ theme }) => theme.colors.primary};
   color: white;
   display: flex;
   align-items: center;
@@ -61,14 +61,14 @@ export const StepNumber = styled.div`
 export const StepLabel = styled.span`
   font-size: 15px;
   font-weight: 500;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const FormCard = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   padding: 60px 80px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ theme }) => theme.shadow};
 
   @media (max-width: 1024px) {
     padding: 40px;
@@ -83,7 +83,7 @@ export const IconWrapper = styled.div`
   width: 80px;
   height: 80px;
   margin: 0 auto 24px;
-  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
+  background: ${({ theme }) => theme.colors.primary};
   border-radius: 20px;
   display: flex;
   align-items: center;
@@ -92,19 +92,20 @@ export const IconWrapper = styled.div`
 
 export const Icon = styled.div`
   font-size: 40px;
+  color: white;
 `;
 
 export const Title = styled.h1`
   font-size: 32px;
   font-weight: 700;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   text-align: center;
   margin-bottom: 12px;
 `;
 
 export const Subtitle = styled.p`
   font-size: 16px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   text-align: center;
   margin-bottom: 48px;
   line-height: 1.6;
@@ -113,7 +114,7 @@ export const Subtitle = styled.p`
 export const Section = styled.section`
   margin-bottom: 40px;
   padding-bottom: 40px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 
   &:last-of-type {
     border-bottom: none;
@@ -132,7 +133,7 @@ export const SectionNumber = styled.div`
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #4a4a4a;
+  background: ${({ theme }) => theme.colors.primary};
   color: white;
   display: flex;
   align-items: center;
@@ -144,7 +145,7 @@ export const SectionNumber = styled.div`
 export const SectionTitle = styled.h2`
   font-size: 20px;
   font-weight: 600;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const Label = styled.label`
@@ -153,7 +154,7 @@ export const Label = styled.label`
   gap: 8px;
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 12px;
 `;
 
@@ -178,7 +179,7 @@ export const LogoUploadArea = styled.div`
 export const UploadBox = styled.div`
   width: 200px;
   height: 200px;
-  border: 2px dashed #d1d5db;
+  border: 2px dashed ${({ theme }) => theme.border};
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -186,11 +187,11 @@ export const UploadBox = styled.div`
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.input};
 
   &:hover {
-    border-color: #4a4a4a;
-    background: #f5f5f5;
+    border-color: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => theme.background.hover};
   }
 
   @media (max-width: 768px) {
@@ -201,18 +202,19 @@ export const UploadBox = styled.div`
 export const UploadIcon = styled.div`
   font-size: 40px;
   margin-bottom: 12px;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const UploadText = styled.div`
   font-size: 14px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   text-align: center;
 `;
 
 export const UploadGuide = styled.div`
   flex: 1;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: ${({ theme }) => theme.background.subtle || theme.background.main};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 12px;
   padding: 20px;
 `;
@@ -220,13 +222,13 @@ export const UploadGuide = styled.div`
 export const GuideTitle = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 12px;
 `;
 
 export const GuideItem = styled.div`
   font-size: 13px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 6px;
   line-height: 1.5;
 
@@ -249,20 +251,21 @@ export const Input = styled.input`
   flex: 1;
   height: 48px;
   padding: 0 16px;
-  border: 1.5px solid #d1d5db;
+  border: 1.5px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.input};
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}20`};
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
@@ -270,18 +273,18 @@ export const Select = styled.select`
   width: 100%;
   height: 48px;
   padding: 0 16px;
-  border: 1.5px solid #d1d5db;
+  border: 1.5px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
-  color: #111827;
-  background: white;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.input};
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #4a4a4a;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}20`};
   }
 `;
 
@@ -295,7 +298,7 @@ export const DepartmentInputWrapper = styled.div`
 export const DepartmentIconWrapper = styled.div`
   width: 48px;
   height: 48px;
-  background: #f5f5f5;
+  background: ${({ theme }) => theme.background.subtle || theme.background.main};
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -304,12 +307,13 @@ export const DepartmentIconWrapper = styled.div`
 
 export const DepartmentIcon = styled.div`
   font-size: 24px;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const AddButton = styled.button`
   height: 48px;
   padding: 0 24px;
-  background: #4a4a4a;
+  background: ${({ theme }) => theme.colors.primary};
   color: white;
   border: none;
   border-radius: 8px;
@@ -320,7 +324,7 @@ export const AddButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #2a2a2a;
+    filter: brightness(0.9);
   }
 `;
 
@@ -328,30 +332,30 @@ export const PositionDropdown = styled.select`
   width: 120px;
   height: 48px;
   padding: 0 12px;
-  border: 1.5px solid #d1d5db;
+  border: 1.5px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
-  color: #111827;
-  background: white;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.input};
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #4a4a4a;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 export const Description = styled.p`
   font-size: 14px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 20px;
   line-height: 1.6;
 `;
 
 export const BulkUploadInfo = styled.div`
-  background: #f5f5f5;
-  border: 1px solid #d1d1d1;
+  background: ${({ theme }) => theme.background.subtle || theme.background.main};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 24px;
@@ -360,12 +364,13 @@ export const BulkUploadInfo = styled.div`
 export const InfoIcon = styled.div`
   font-size: 24px;
   margin-bottom: 8px;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 export const InfoTitle = styled.div`
   font-size: 15px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 12px;
 `;
 
@@ -375,7 +380,7 @@ export const InfoList = styled.div`
 
 export const InfoItem = styled.div`
   font-size: 13px;
-  color: #4a4a4a;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 6px;
 
   &:last-child {
@@ -385,9 +390,9 @@ export const InfoItem = styled.div`
 
 export const TemplateButton = styled.button`
   padding: 8px 16px;
-  background: white;
-  border: 1px solid #4a4a4a;
-  color: #4a4a4a;
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primary};
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
@@ -395,7 +400,7 @@ export const TemplateButton = styled.button`
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f5f5f5;
+    background: ${({ theme }) => theme.background.hover};
   }
 `;
 
@@ -406,7 +411,7 @@ export const FileUploadArea = styled.div`
 export const UploadDropZone = styled.div`
   width: 100%;
   min-height: 200px;
-  border: 2px dashed #d1d5db;
+  border: 2px dashed ${({ theme }) => theme.border};
   border-radius: 12px;
   display: flex;
   flex-direction: column;
@@ -414,18 +419,18 @@ export const UploadDropZone = styled.div`
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.subtle || theme.background.main};
   padding: 40px 20px;
 
   &:hover {
-    border-color: #4a4a4a;
-    background: #f5f5f5;
+    border-color: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => theme.background.hover};
   }
 `;
 
 export const UploadMainText = styled.div`
   font-size: 15px;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   font-weight: 500;
   margin-bottom: 8px;
   text-align: center;
@@ -433,12 +438,12 @@ export const UploadMainText = styled.div`
 
 export const UploadSubText = styled.div`
   font-size: 13px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const WarningBox = styled.div`
-  background: #fffbeb;
-  border: 1px solid #fcd34d;
+  background: ${({ theme }) => `${theme.status.warning}10`};
+  border: 1px solid ${({ theme }) => theme.status.warning};
   border-radius: 12px;
   padding: 20px;
 `;
@@ -446,12 +451,14 @@ export const WarningBox = styled.div`
 export const WarningIcon = styled.div`
   font-size: 20px;
   margin-bottom: 8px;
+  color: ${({ theme }) => theme.status.warning};
 `;
 
 export const WarningTitle = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #92400e;
+  color: ${({ theme }) => theme.status.warning};
+  filter: brightness(0.8);
   margin-bottom: 12px;
 `;
 
@@ -463,7 +470,8 @@ export const WarningList = styled.ul`
 
 export const WarningItem = styled.li`
   font-size: 13px;
-  color: #78350f;
+  color: ${({ theme }) => theme.status.warning};
+  filter: brightness(0.6);
   margin-bottom: 6px;
   padding-left: 16px;
   position: relative;
@@ -483,7 +491,7 @@ export const WarningItem = styled.li`
 export const SubmitButton = styled.button`
   width: 100%;
   height: 56px;
-  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
+  background: ${({ theme }) => theme.colors.primary};
   color: white;
   font-size: 16px;
   font-weight: 600;
@@ -495,7 +503,7 @@ export const SubmitButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    box-shadow: ${({ theme }) => `0 8px 24px ${theme.colors.primary}4D`};
   }
 
   &:active {

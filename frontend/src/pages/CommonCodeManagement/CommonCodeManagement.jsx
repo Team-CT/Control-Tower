@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from 'styled-components';
 import { commonCodeService } from '../../api/commonCode/services';
 import { tenantService } from '../../api/tenant/services';
 import useAuthStore from '../../store/authStore';
@@ -51,6 +52,7 @@ import {
 } from './CommonCodeManagement.styled.js';
 
 const CommonCodeManagement = () => {
+  const theme = useTheme();
   const { getRole, emp } = useAuthStore();
   const userRole = getRole();
   const isSuperAdmin = userRole === 'SUPER_ADMIN';
@@ -407,7 +409,9 @@ const CommonCodeManagement = () => {
               onClick={() => handleCodeGroupClick(group.codeId, group.codeName)}
               style={{
                 cursor: 'pointer',
-                backgroundColor: selectedCodeId === group.codeId ? '#e3f2fd' : 'white'
+                backgroundColor: selectedCodeId === group.codeId ?
+                  (theme.mode === 'dark' ? `${theme.colors.primary}30` : '#e3f2fd') :
+                  theme.background.paper
               }}
             >
               <CodeGroupCardHeader>

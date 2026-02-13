@@ -1,6 +1,8 @@
 package com.kh.ct.domain.emp.service;
 
+import com.kh.ct.domain.emp.dto.AirlineDto;
 import com.kh.ct.domain.emp.dto.EmpDto;
+import com.kh.ct.domain.emp.entity.Airline;
 import com.kh.ct.domain.emp.entity.Emp;
 import com.kh.ct.domain.emp.repository.EmpRepository;
 import com.kh.ct.global.common.CommonEnums;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -152,7 +155,7 @@ public class EmpServiceImpl implements EmpService {
                             .role(emp.getRole() != null ? emp.getRole().name() : "")
                             .build();
                 })
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -350,6 +353,32 @@ public class EmpServiceImpl implements EmpService {
                 .findByEmpNameAndEmailAndEmpStatus(empName, email, CommonEnums.EmpStatus.Y)
                 .map(emp -> EmpDto.FindIdResponse.success(emp.getEmpId()))
                 .orElseGet(EmpDto.FindIdResponse::fail);
+    }
+
+    @Override
+    public AirlineDto.DetailResponse getAirlineByEmpId(String empId) {
+        Emp emp = empRepository.findByIdWithDetails(empId)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND,
+                        "직원을 찾을 수 없습니다. (empId: " + empId + ")"));
+
+        if (emp.getAirlineId() == null) {
+            throw new BusinessException(HttpStatus.NOT_FOUND,
+                    "해당 직원은 항공사에 소속되어 있지 않습니다.");
+        }
+
+        Airline airline = emp.getAirlineId();
+        // AirlineDto.DetailResponse 생성
+        return AirlineDto.DetailResponse.builder()
+                .id(airline.getAirlineId())
+                .name(airline.getAirlineName())
+                .primaryColor(airline.getPrimaryColor())
+                .secondaryColor(airline.getSecondaryColor())
+                .icon(airline.getIcon() != null ? airline.getIcon() : "✈️")
+                .businessNumber(airline.getBusinessNumber() != null ? airline.getBusinessNumber() : "")
+                .mainNumber(airline.getMainNumber() != null ? airline.getMainNumber() : "")
+                .address(airline.getAirlineAddress() != null ? airline.getAirlineAddress() : "")
+                .email(airline.getEmail() != null ? airline.getEmail() : "")
+                .build();
     }
 
 }

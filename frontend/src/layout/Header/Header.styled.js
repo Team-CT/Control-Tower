@@ -7,19 +7,19 @@ export const LogoutButton = styled.button`
 
   font-size: 13px;
   font-weight: 500;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.text.secondary};
 
   background: transparent;
-  border: 1px solid ${({ theme }) => theme.colors.border};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 6px;
 
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.danger || '#e53935'};
-    border-color: ${({ theme }) => theme.colors.danger || '#e53935'};
-    background-color: rgba(229, 57, 53, 0.06);
+    color: ${({ theme }) => theme.colors.danger};
+    border-color: ${({ theme }) => theme.colors.danger};
+    background-color: ${({ theme }) => theme.background.hover};
   }
 
   &:active {
@@ -55,7 +55,7 @@ export const BreadcrumbItem = styled.span`
 `;
 
 export const BreadcrumbSeparator = styled.span`
-  color: #d1d5db;
+  color: ${({ theme }) => theme.border};
 `;
 
 export const HeaderRight = styled.div`
@@ -77,7 +77,7 @@ export const SearchIconButton = styled.button`
 
   &:hover {
     color: var(--primary-color);
-    background-color: #f3f4f6;
+    background-color: var(--bg-hover);
   }
 `;
 
@@ -94,8 +94,8 @@ export const Badge = styled.span`
   position: absolute;
   top: -4px;
   right: -4px;
-  background: ${props => props.theme.primary};
-  color: white;
+  background: ${props => props.theme.colors.primary};
+  color: ${props => props.theme.text.inverse};
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -134,10 +134,10 @@ export const UserInfo = styled.div`
 export const UserName = styled.div`
   font-size: 15px;
   font-weight: 600;
-  color: #333;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const UserRole = styled.div`
   font-size: 13px;
-  color: #999;
+  color: ${({ theme }) => theme.text.secondary};
 `;

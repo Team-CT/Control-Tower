@@ -43,7 +43,7 @@ const NotificationBell = () => {
   return (
     <S.NotificationContainer ref={dropdownRef}>
       <S.NotificationButton onClick={handleBellClick}>
-        <Bell size={20} />
+        <Bell size={28} />
         {unreadCount > 0 && (
           <S.Badge>{unreadCount > 99 ? '99+' : unreadCount}</S.Badge>
         )}

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: ${({ theme }) => theme.background.secondary};
   padding: 32px;
   box-sizing: border-box;
   overflow-x: hidden;
@@ -31,7 +31,7 @@ export const BackButton = styled.button`
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #6f767e;
+  color: ${({ theme }) => theme.text.secondary};
   background-color: transparent;
   border: none;
   border-radius: 6px;
@@ -40,8 +40,8 @@ export const BackButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background-color: #f1f3f5;
-    color: #1a1d1f;
+    background-color: ${({ theme }) => theme.background.hover};
+    color: ${({ theme }) => theme.text.primary};
   }
 `;
 
@@ -49,10 +49,10 @@ export const TenantHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.background.paper};
   padding: 32px;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: ${({ theme }) => theme.shadow || '0 1px 3px rgba(0, 0, 0, 0.05)'};
   margin-bottom: 24px;
   box-sizing: border-box;
 
@@ -80,7 +80,7 @@ export const TenantIconLarge = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #e8edff;
+  background-color: ${({ theme }) => `${theme.colors.primary}10`};
   border-radius: 16px;
   font-size: 36px;
 `;
@@ -94,13 +94,13 @@ export const TenantHeaderInfo = styled.div`
 export const TenantNameLarge = styled.h1`
   font-size: 28px;
   font-weight: 700;
-  color: #1a1d1f;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
 export const TenantId = styled.div`
   font-size: 14px;
-  color: #6f767e;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const TenantHeaderRight = styled.div`
@@ -122,8 +122,8 @@ export const StatusBadgeLarge = styled.div`
   border-radius: 8px;
   font-size: 15px;
   font-weight: 600;
-  background-color: ${props => props.$status === 'active' ? '#d4f4dd' : '#ffe4e6'};
-  color: ${props => props.$status === 'active' ? '#0f7a35' : '#dc2626'};
+  background-color: ${props => props.$status === 'active' ? `${props.theme.status.success}20` : `${props.theme.status.error}20`};
+  color: ${props => props.$status === 'active' ? props.theme.status.success : props.theme.status.error};
 `;
 
 export const PlanBadgeLarge = styled.div`
@@ -132,8 +132,16 @@ export const PlanBadgeLarge = styled.div`
   border-radius: 8px;
   font-size: 15px;
   font-weight: 600;
-  background-color: ${props => props.plan === 'Enterprise' ? '#f3e8ff' : '#dbeafe'};
-  color: ${props => props.plan === 'Enterprise' ? '#7c3aed' : '#2563eb'};
+  background-color: ${props => {
+    if (props.plan === 'Enterprise') return '#f3e8ff';
+    if (props.plan === 'Professional') return '#dbeafe';
+    return props.theme.background.secondary;
+  }};
+  color: ${props => {
+    if (props.plan === 'Enterprise') return '#7c3aed';
+    if (props.plan === 'Professional') return '#2563eb';
+    return props.theme.text.secondary;
+  }};
 `;
 
 export const QuickActionsBar = styled.div`
@@ -159,17 +167,17 @@ export const QuickActionButton = styled.button`
   padding: 16px;
   font-size: 15px;
   font-weight: 600;
-  color: #4c6fff;
-  background-color: #ffffff;
-  border: 2px solid #4c6fff;
+  color: ${({ theme }) => theme.colors.primary};
+  background-color: ${({ theme }) => theme.background.paper};
+  border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
   box-sizing: border-box;
 
   &:hover {
-    background-color: #4c6fff;
-    color: #ffffff;
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.text.inverse};
   }
 
   @media (max-width: 768px) {
@@ -199,15 +207,15 @@ export const StatsGrid = styled.div`
 
 export const StatCard = styled.div`
   position: relative;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.background.paper};
   padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: ${({ theme }) => theme.shadow || '0 1px 3px rgba(0, 0, 0, 0.05)'};
   transition: all 0.2s;
   box-sizing: border-box;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: ${({ theme }) => theme.shadowHover || '0 4px 12px rgba(0, 0, 0, 0.1)'};
   }
 
   @media (max-width: 768px) {
@@ -223,20 +231,20 @@ export const StatIcon = styled.div`
 export const StatValue = styled.div`
   font-size: 32px;
   font-weight: 700;
-  color: #1a1d1f;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 8px;
 `;
 
 export const StatLabel = styled.div`
   font-size: 14px;
   font-weight: 500;
-  color: #6f767e;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 4px;
 `;
 
 export const StatSubtext = styled.div`
   font-size: 13px;
-  color: #9a9fa5;
+  color: ${({ theme }) => theme.text.tertiary};
 `;
 
 export const TrendIndicator = styled.div`
@@ -244,7 +252,7 @@ export const TrendIndicator = styled.div`
   top: 20px;
   right: 20px;
   font-size: 24px;
-  color: ${props => props.positive ? '#0f7a35' : '#dc2626'};
+  color: ${({ theme, $positive }) => $positive ? theme.status.success : theme.status.error};
 `;
 
 export const ContentGrid = styled.div`
@@ -270,10 +278,10 @@ export const RightColumn = styled.div`
 `;
 
 export const InfoSection = styled.div`
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.background.paper};
   padding: 24px;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: ${({ theme }) => theme.shadow || '0 1px 3px rgba(0, 0, 0, 0.05)'};
   box-sizing: border-box;
 
   @media (max-width: 768px) {
@@ -294,7 +302,7 @@ export const SectionTitle = styled.h2`
   gap: 10px;
   font-size: 18px;
   font-weight: 700;
-  color: #1a1d1f;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 20px 0;
 `;
 
@@ -305,12 +313,12 @@ export const SectionIcon = styled.span`
 export const ViewAllLink = styled.a`
   font-size: 14px;
   font-weight: 500;
-  color: #4c6fff;
+  color: ${({ theme }) => theme.colors.primary};
   text-decoration: none;
   transition: color 0.2s;
 
   &:hover {
-    color: #3651e0;
+    color: ${({ theme }) => theme.colors.secondary};
     text-decoration: underline;
   }
 `;
@@ -327,7 +335,7 @@ export const InfoRow = styled.div`
   align-items: flex-start;
   gap: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #f1f3f5;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 
   &:last-child {
     border-bottom: none;
@@ -338,7 +346,7 @@ export const InfoRow = styled.div`
 export const InfoLabel = styled.div`
   font-size: 14px;
   font-weight: 500;
-  color: #6f767e;
+  color: ${({ theme }) => theme.text.secondary};
   min-width: 140px;
   flex-shrink: 0;
 
@@ -351,7 +359,7 @@ export const InfoLabel = styled.div`
 export const InfoValue = styled.div`
   font-size: 14px;
   font-weight: 500;
-  color: #1a1d1f;
+  color: ${({ theme }) => theme.text.primary};
   text-align: right;
   flex: 1;
   word-break: break-word;
@@ -364,14 +372,14 @@ export const UsageItem = styled.div`
 export const UsageLabel = styled.div`
   font-size: 14px;
   font-weight: 500;
-  color: #1a1d1f;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 12px;
 `;
 
 export const ProgressBarContainer = styled.div`
   width: 100%;
   height: 8px;
-  background-color: #e4e7eb;
+  background-color: ${({ theme }) => theme.border};
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 8px;
@@ -380,14 +388,14 @@ export const ProgressBarContainer = styled.div`
 export const ProgressBar = styled.div`
   width: ${props => props.$progress}%;
   height: 100%;
-  background: linear-gradient(90deg, #4c6fff 0%, #6b8aff 100%);
+  background: linear-gradient(90deg, ${({ theme }) => theme.colors.primary} 0%, ${({ theme }) => theme.colors.secondary} 100%);
   border-radius: 4px;
   transition: width 0.3s ease;
 `;
 
 export const UsageValue = styled.div`
   font-size: 13px;
-  color: #6f767e;
+  color: ${({ theme }) => theme.text.secondary};
   text-align: right;
 `;
 
@@ -401,7 +409,7 @@ export const ActivityItem = styled.div`
   display: flex;
   gap: 12px;
   padding-bottom: 16px;
-  border-bottom: 1px solid #f1f3f5;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 
   &:last-child {
     border-bottom: none;
@@ -412,7 +420,7 @@ export const ActivityItem = styled.div`
 export const ActivityDot = styled.div`
   width: 8px;
   height: 8px;
-  background-color: #4c6fff;
+  background-color: ${({ theme }) => theme.colors.primary};
   border-radius: 50%;
   margin-top: 6px;
   flex-shrink: 0;
@@ -425,11 +433,44 @@ export const ActivityContent = styled.div`
 export const ActivityAction = styled.div`
   font-size: 14px;
   font-weight: 500;
-  color: #1a1d1f;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 4px;
 `;
 
 export const ActivityMeta = styled.div`
   font-size: 13px;
-  color: #6f767e;
+  color: ${({ theme }) => theme.text.secondary};
+`;
+
+// Additional Components for Inline Style Replacement
+export const LoadingWrapper = styled.div`
+  text-align: center;
+  padding: 50px;
+  color: ${({ theme }) => theme.text.secondary};
+`;
+
+export const ErrorWrapper = styled.div`
+  text-align: center;
+  padding: 50px;
+  color: ${({ theme }) => theme.status.error};
+`;
+
+export const RetryButton = styled.button`
+  margin-top: 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 6px;
+  color: ${({ theme }) => theme.text.primary};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.background.hover};
+  }
+`;
+
+export const LogMessage = styled.div`
+  padding: 20px;
+  text-align: center;
+  color: ${({ theme }) => theme.text.secondary};
 `;

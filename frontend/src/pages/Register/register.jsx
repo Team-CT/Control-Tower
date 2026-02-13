@@ -191,8 +191,8 @@ const Register = () => {
     if (!window.daum?.Postcode) {
       alert(
         '카카오 주소 스크립트가 로드되지 않았습니다.\n' +
-          'index.html <head>에 아래 스크립트를 추가했는지 확인하세요:\n' +
-          '<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>'
+        'index.html <head>에 아래 스크립트를 추가했는지 확인하세요:\n' +
+        '<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>'
       );
       return;
     }
@@ -493,7 +493,7 @@ const Register = () => {
                     value={formData.email}
                     readOnly
                     placeholder="이메일"
-                    style={{ background: '#f3f4f6', cursor: 'not-allowed' }}
+                    style={{ background: theme?.background?.input || '#f3f4f6', cursor: 'not-allowed' }}
                   />
                 </S.InputGroup>
 
@@ -505,7 +505,7 @@ const Register = () => {
                       value={formData.userId}
                       readOnly
                       placeholder="아이디"
-                      style={{ background: '#f3f4f6', cursor: 'not-allowed' }}
+                      style={{ background: theme?.background?.input || '#f3f4f6', cursor: 'not-allowed' }}
                     />
                   </S.InputGroup>
 
@@ -516,7 +516,7 @@ const Register = () => {
                       value={formData.empNo || '사번 생성 대기'}
                       readOnly
                       placeholder="사번"
-                      style={{ background: '#f3f4f6', cursor: 'not-allowed' }}
+                      style={{ background: theme?.background?.input || '#f3f4f6', cursor: 'not-allowed' }}
                     />
                   </S.InputGroup>
                 </S.RowGroup>
@@ -604,7 +604,7 @@ const Register = () => {
                       placeholder="주소검색 버튼을 눌러 선택하세요"
                       readOnly
                       required
-                      style={{ background: '#f3f4f6', cursor: 'not-allowed' }}
+                      style={{ background: theme?.background?.input || '#f3f4f6', cursor: 'not-allowed' }}
                     />
                     <S.SmallButton type="button" onClick={openKakaoAddressSearch}>
                       주소검색

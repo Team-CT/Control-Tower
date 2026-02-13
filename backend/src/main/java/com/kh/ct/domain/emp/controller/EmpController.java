@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
+import com.kh.ct.domain.emp.dto.AirlineDto;
 
 @RestController
 @RequestMapping("/api/emps")
@@ -54,7 +55,7 @@ public class EmpController {
      * 관리자(담당자) 후보 리스트 조회
      */
     @GetMapping("/managers")
-    public ResponseEntity<ApiResponse<java.util.List<EmpDto>>> getManagerCandidates() {
+    public ResponseEntity<ApiResponse<List<EmpDto>>> getManagerCandidates() {
         java.util.List<EmpDto> managers = empService.getManagerCandidates();
         return ResponseEntity.ok(ApiResponse.success("관리자 후보 조회 성공", managers));
     }
@@ -121,6 +122,24 @@ public class EmpController {
         return ResponseEntity.ok(ApiResponse.success("직원 상세 정보 조회 성공", empDetail));
     }
 
+    /**
+     * 직원의 항공사 정보 조회 (테마 적용용)
+     */
+    @GetMapping("/{empId}/airline")
+    public ResponseEntity<ApiResponse<AirlineDto.DetailResponse>> getEmpAirline(@PathVariable String empId) {
+       AirlineDto.DetailResponse airlineInfo = empService.getAirlineByEmpId(empId);
+        return ResponseEntity.ok(ApiResponse.success("항공사 정보 조회 성공", airlineInfo));
+    }
+
+    /**
+     * 내 항공사 정보 조회 (보안 강화)
+     */
+    @GetMapping("/me/airline")
+    public ResponseEntity<ApiResponse<AirlineDto.DetailResponse>> getMyAirline(Authentication authentication) {
+        String empId = authentication.getName();
+        AirlineDto.DetailResponse airlineInfo = empService.getAirlineByEmpId(empId);
+        return ResponseEntity.ok(ApiResponse.success("내 항공사 정보 조회 성공", airlineInfo));
+    }
     /** 아이디 찾기 */
     @PostMapping("/findId")
     public ResponseEntity<ApiResponse<EmpDto.FindIdResponse>> findEmpId(
@@ -129,5 +148,4 @@ public class EmpController {
         EmpDto.FindIdResponse result = empService.findEmpId(request);
         return ResponseEntity.ok(ApiResponse.success("아이디 찾기 성공", result));
     }
-
 }

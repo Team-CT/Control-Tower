@@ -15,8 +15,10 @@ import {
   Edit3,
   Trash2
 } from 'lucide-react';
+import { useTheme } from 'styled-components';
 
 const QnADetail = () => {
+  const theme = useTheme();
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -129,8 +131,8 @@ const QnADetail = () => {
             {/* 상태 뱃지 및 수정/삭제 버튼 레이아웃 */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <D.CategoryBadge
-                $bgColor={question.answered ? '#3a774c' : '#FACC15'}
-                $textColor={question.answered ? '#e0e0e0' : '#422006'}
+                $bgColor={question.answered ? theme.status.success : theme.status.warning}
+                $textColor={question.answered ? theme.text.inverse : theme.text.primary}
               >
                 {question.answered ? <CheckCircle2 size={14} /> : <Clock size={14} />}
                 {question.answered ? '답변완료' : '답변대기'}
@@ -139,13 +141,13 @@ const QnADetail = () => {
               <div style={{ display: 'flex', gap: '10px' }}>
                 {/* 수정 버튼: 작성자이면서 답변 대기 중일 때만 */}
                 {isAuthor && !question.answered && (
-                  <button onClick={() => setIsEditMode(!isEditMode)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#666' }}>
+                  <button onClick={() => setIsEditMode(!isEditMode)} style={{ border: 'none', background: 'none', cursor: 'pointer', color: theme.text.secondary }}>
                     <Edit3 size={18} />
                   </button>
                 )}
                 {/* 삭제 버튼: 작성자라면 항상 노출 */}
                 {isAuthor && (
-                  <button onClick={handleQuestionDelete} style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ff4d4f' }}>
+                  <button onClick={handleQuestionDelete} style={{ border: 'none', background: 'none', cursor: 'pointer', color: theme.status.error }}>
                     <Trash2 size={18} />
                   </button>
                 )}
@@ -181,7 +183,7 @@ const QnADetail = () => {
                 <button onClick={() => setIsEditMode(false)}>취소</button>
                 <button
                   onClick={handleQuestionUpdate}
-                  style={{ backgroundColor: '#3a774c', color: '#fff', border: 'none', padding: '5px 15px', borderRadius: '4px', cursor: 'pointer' }}
+                  style={{ backgroundColor: theme.status.success, color: theme.text.inverse, border: 'none', padding: '5px 15px', borderRadius: '4px', cursor: 'pointer' }}
                 >
                   수정완료
                 </button>
@@ -197,13 +199,13 @@ const QnADetail = () => {
           {question.answered ? (
             <D.AnswerSection>
               <D.AnswerHeader>
-                <MessageCircle size={20} color="#3a774c" />
+                <MessageCircle size={20} color={theme.status.success} />
                 <h3>관리자 답변</h3>
                 <span className="date">{question.answerDate?.split('T')[0]}</span>
                 {isAdmin && (
                   <button
                     onClick={() => setIsReplyMode(true)}
-                    style={{ marginLeft: 'auto', background: 'none', border: 'none', color: '#666', cursor: 'pointer' }}
+                    style={{ marginLeft: 'auto', background: 'none', border: 'none', color: theme.text.secondary, cursor: 'pointer' }}
                   >
                     수정
                   </button>
@@ -238,7 +240,7 @@ const QnADetail = () => {
                 </D.AdminReplyBox>
               ) : (
                 <D.NoAnswerBox>
-                  <Clock size={40} color="#ccc" />
+                  <Clock size={40} color={theme.text.disabled} />
                   <p>답변을 준비 중입니다. 잠시만 기다려주세요.</p>
                 </D.NoAnswerBox>
               )}

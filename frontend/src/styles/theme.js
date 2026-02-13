@@ -13,32 +13,6 @@ export const airlines = {
       danger: '#E53E3E'        // 위험/오류 (Red-600)
     }
   },
-  // 대한항공
-  KE: {
-    id: 'KE',
-    name: 'Korean Air',
-    code: 'KE',
-    colors: {
-      primary: '#0066CC',      // 대한항공 청자색 계열 블루
-      secondary: '#004C99',    // 진한 블루
-      accent: '#3399FF',       // 밝은 블루
-      hover: '#E6F0FF',        // 호버 배경색
-      danger: '#E53E3E'
-    }
-  },
-  // 진에어
-  LJ: {
-    id: 'LJ',
-    name: 'Jin Air',
-    code: 'LJ',
-    colors: {
-      primary: '#9ACD32',      // 진에어 연두색
-      secondary: '#6B8E23',    // 올리브 그린
-      accent: '#C5E1A5',       // 밝은 연두
-      hover: '#F1F8E9',        // 호버 배경색
-      danger: '#E53E3E'
-    }
-  }
 };
 
 // 라이트 모드 공통 색상
@@ -59,6 +33,12 @@ export const lightTheme = {
     disabled: '#A0AEC0',       // Gray-400
     inverse: '#FFFFFF'         // 반전 텍스트 (아이콘 등)
   },
+  status: {
+    success: '#10B981',        // Emerald-500
+    warning: '#F59E0B',        // Amber-500
+    error: '#EF4444',          // Red-500
+    info: '#3B82F6'            // Blue-500
+  },
   border: '#E2E8F0',           // Slate-200
   shadow: 'rgba(0, 0, 0, 0.1)',
   overlay: 'rgba(0, 0, 0, 0.5)'
@@ -76,27 +56,92 @@ export const darkTheme = {
     input: '#1A202C'
   },
   text: {
-    primary: '#F7FAFC',        // Gray-50
+    primary: '#F7FAFC',        // Gray-50 (완전한 흰색보다 부드러움)
     secondary: '#E2E8F0',      // Gray-200
     tertiary: '#CBD5E0',       // Gray-300
     disabled: '#718096',       // Gray-500
     inverse: '#1A202C'         // 반전 텍스트
+  },
+  status: {
+    success: '#10B981',        // Emerald-500 (다크모드에서도 동일하게 유지하거나 필요시 조정)
+    warning: '#F59E0B',        // Amber-500
+    error: '#EF4444',          // Red-500
+    info: '#3B82F6'            // Blue-500
   },
   border: '#4A5568',           // Gray-700
   shadow: 'rgba(0, 0, 0, 0.4)',
   overlay: 'rgba(0, 0, 0, 0.7)'
 };
 
+// 색상 유틸리티 함수 import
+import { lightenColor, adjustBrightness } from '../utils/colorUtils';
+
 // 테마 생성 함수
-export const createTheme = (airlineCode, isDark = false) => {
-  // 항공사가 없으면 Control Tower 기본값
-  const airline = airlines[airlineCode] || airlines.CONTROL_TOWER;
-  
+export const createTheme = (airlineCode, isDark = false, dynamicData = null) => {
+  console.log('🎨 [createTheme] 호출됨:', {
+    airlineCode,
+    isDark,
+    dynamicData,
+    hasDynamicData: !!(dynamicData && dynamicData.primaryColor)
+  });
+
   // 다크모드 여부에 따른 베이스 테마 선택
   const baseTheme = isDark ? darkTheme : lightTheme;
 
+  // 1. 동적 데이터가 있으면 우선 사용 (DB에서 가져온 색상)
+  if (dynamicData && dynamicData.primaryColor) {
+    console.log('✅ [createTheme] 동적 데이터 사용:', dynamicData);
+
+    // 다크 모드 시 색상 보정: 채도는 유지하되 밝기를 높여 시인성 향상
+    const primaryColor = isDark
+      ? adjustBrightness(dynamicData.primaryColor, 25)
+      : dynamicData.primaryColor;
+
+    const secondaryColor = isDark
+      ? adjustBrightness(dynamicData.secondaryColor || dynamicData.primaryColor, 20)
+      : (dynamicData.secondaryColor || dynamicData.primaryColor);
+
+    console.log('🎨 [createTheme] 색상 보정 결과:', {
+      원본Primary: dynamicData.primaryColor,
+      보정Primary: primaryColor,
+      원본Secondary: dynamicData.secondaryColor,
+      보정Secondary: secondaryColor,
+      isDark
+    });
+
+    const airline = {
+      id: airlineCode || 'DYNAMIC',
+      name: dynamicData.name || 'Unknown Airline',
+      code: airlineCode || 'XX',
+      colors: {
+        primary: primaryColor,
+        secondary: secondaryColor,
+        accent: lightenColor(primaryColor, 15),
+        hover: isDark ? baseTheme.background.hover : lightenColor(dynamicData.primaryColor, 40),
+        danger: '#E53E3E'
+      }
+    };
+
+    const finalTheme = {
+      ...baseTheme,
+      airline: {
+        id: airline.id,
+        name: airline.name,
+        code: airline.code
+      },
+      colors: airline.colors
+    };
+
+    console.log('✅ [createTheme] 동적 테마 생성 완료:', finalTheme);
+    return finalTheme;
+  }
+
+  // 2. 프리셋 폴백 (정적 데이터)
+  console.log('⚠️ [createTheme] 프리셋 폴백 사용 (airlineCode:', airlineCode, ')');
+  const airline = airlines[airlineCode] || airlines.CONTROL_TOWER;
+
   // 최종 테마 객체 반환
-  return {
+  const finalTheme = {
     ...baseTheme,
     airline: {
       id: airline.id,
@@ -112,6 +157,9 @@ export const createTheme = (airlineCode, isDark = false) => {
       danger: airline.colors.danger
     }
   };
+
+  console.log('⚠️ [createTheme] 프리셋 테마 생성 완료:', finalTheme);
+  return finalTheme;
 };
 
 export default { airlines, lightTheme, darkTheme, createTheme };

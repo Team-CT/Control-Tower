@@ -87,6 +87,8 @@ public class AirlineServiceImpl implements AirlineService {
                 .activeUsers(activeUsers != null ? activeUsers : 0L)
                 .status(entity.getStatus() != null ? entity.getStatus().name().toLowerCase() : "active")
                 .icon(entity.getIcon() != null ? entity.getIcon() : "✈️")
+                .primaryColor(entity.getPrimaryColor())
+                .secondaryColor(entity.getSecondaryColor())
                 .build();
     }
 
@@ -115,6 +117,8 @@ public class AirlineServiceImpl implements AirlineService {
                 .totalRevenue(calculateTotalRevenue(planPrice, entity.getJoinDate()))
                 .status(entity.getStatus() != null ? entity.getStatus().name().toLowerCase() : "active")
                 .icon(entity.getIcon() != null ? entity.getIcon() : "✈️")
+                .primaryColor(entity.getPrimaryColor())
+                .secondaryColor(entity.getSecondaryColor())
                 .country(entity.getCountry() != null ? entity.getCountry() : "대한민국")
                 .address(entity.getAirlineAddress())
                 .email(entity.getEmail())

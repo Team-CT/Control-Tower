@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background-color: #F8F9FA;
+  background-color: ${({ theme }) => theme.background.secondary || theme.background.main};
   padding: 32px 48px;
 
   @media (max-width: 1024px) {
@@ -32,13 +32,13 @@ export const PageHeader = styled.div`
 export const PageTitle = styled.h1`
   font-size: 28px;
   font-weight: 700;
-  color: #1A1A1A;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 8px 0;
 `;
 
 export const PageSubtitle = styled.p`
   font-size: 15px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
 `;
 
@@ -47,7 +47,7 @@ export const ActionButton = styled.button`
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background-color: ${props => props.theme.primary};
+  background-color: ${({ theme }) => theme.colors.primary};
   color: white;
   border: none;
   border-radius: 8px;
@@ -66,11 +66,11 @@ export const ActionButton = styled.button`
 `;
 
 export const SearchSection = styled.form`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   padding: 24px;
   border-radius: 12px;
   margin-bottom: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
 export const SearchInputWrapper = styled.div`
@@ -85,23 +85,26 @@ export const SearchIcon = styled.span`
   top: 50%;
   transform: translateY(-50%);
   font-size: 18px;
+  color: ${({ theme }) => theme.text.tertiary};
 `;
 
 export const SearchInput = styled.input`
   width: 100%;
   padding: 14px 16px 14px 48px;
-  border: 1.5px solid #E5E7EB;
+  border: 1.5px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
   transition: border-color 0.2s;
+  background: ${({ theme }) => theme.background.input || 'transparent'};
+  color: ${({ theme }) => theme.text.primary};
 
   &:focus {
     outline: none;
-    border-color: ${props => props.theme.primary};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 
   &::placeholder {
-    color: #9CA3AF;
+    color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
@@ -114,20 +117,24 @@ export const FilterGroup = styled.div`
 
 export const FilterButton = styled.button`
   padding: 10px 20px;
-  background-color: ${props => props.active ? props.theme.primary : '#F3F4F6'};
-  color: ${props => props.active ? 'white' : '#4B5563'};
+  background-color: ${props => props.active ? props.theme.colors.primary : props.theme.background.secondary};
+  color: ${props => props.active ? 'white' : props.theme.text.secondary};
   border: none;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+
+  &:hover {
+    background-color: ${props => props.active ? props.theme.colors.primary : props.theme.background.hover};
+  }
 `;
 
 export const FilterDivider = styled.div`
   width: 1px;
   height: 20px;
-  background-color: #D1D5DB;
+  background-color: ${({ theme }) => theme.border};
 `;
 
 export const EmployeeCount = styled.div`
@@ -136,10 +143,10 @@ export const EmployeeCount = styled.div`
   align-items: center;
   margin-bottom: 16px;
   font-size: 15px;
-  color: #4B5563;
+  color: ${({ theme }) => theme.text.secondary};
 
   strong {
-    color: ${props => props.theme.primary};
+    color: ${({ theme }) => theme.colors.primary};
     font-weight: 700;
   }
 `;
@@ -147,7 +154,7 @@ export const EmployeeCount = styled.div`
 export const FilterToggle = styled.button`
   background: none;
   border: none;
-  color: ${props => props.theme.primary};
+  color: ${({ theme }) => theme.colors.primary};
   font-size: 14px;
   cursor: pointer;
   display: flex;
@@ -161,16 +168,16 @@ export const FilterToggle = styled.button`
 
 export const TableContainer = styled.table`
   width: 100%;
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ theme }) => theme.shadow};
   border-collapse: collapse;
 `;
 
 export const TableHeader = styled.thead`
-  background-color: #F9FAFB;
-  border-bottom: 2px solid #E5E7EB;
+  background-color: ${({ theme }) => theme.background.secondary};
+  border-bottom: 2px solid ${({ theme }) => theme.border};
 `;
 
 export const TableHeaderCell = styled.th`
@@ -178,13 +185,13 @@ export const TableHeaderCell = styled.th`
   text-align: left;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.secondary};
   width: ${props => props.width || 'auto'};
 `;
 
 export const TableBody = styled.tbody`
   tr:not(:last-child) {
-    border-bottom: 1px solid #F3F4F6;
+    border-bottom: 1px solid ${({ theme }) => theme.border};
   }
 `;
 
@@ -192,12 +199,13 @@ export const TableRow = styled.tr`
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #F9FAFB;
+    background-color: ${({ theme }) => theme.background.hover};
   }
 
   td {
     padding: 20px;
     font-size: 14px;
+    color: ${({ theme }) => theme.text.primary};
   }
 `;
 
@@ -230,12 +238,12 @@ export const EmployeeDetails = styled.div`
 export const EmployeeName = styled.div`
   font-size: 15px;
   font-weight: 600;
-  color: #1A1A1A;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const EmployeeId = styled.div`
   font-size: 13px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const DepartmentInfo = styled.div`
@@ -247,17 +255,17 @@ export const DepartmentInfo = styled.div`
 export const DepartmentName = styled.div`
   font-size: 14px;
   font-weight: 500;
-  color: #1A1A1A;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const DepartmentRole = styled.div`
   font-size: 13px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const DateText = styled.div`
   font-size: 14px;
-  color: #4B5563;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const StatusBadge = styled.span`
@@ -269,25 +277,25 @@ export const StatusBadge = styled.span`
   background-color: ${props => {
     switch (props.type) {
       case 'normal':
-        return '#D1FAE5';
+        return `${props.theme.status.success}15`;
       case 'warning':
-        return '#FEF3C7';
+        return `${props.theme.status.warning}15`;
       case 'alert':
-        return '#FEE2E2';
+        return `${props.theme.status.error}15`;
       default:
-        return '#F3F4F6';
+        return props.theme.background.secondary;
     }
   }};
   color: ${props => {
     switch (props.type) {
       case 'normal':
-        return '#065F46';
+        return props.theme.status.success;
       case 'warning':
-        return '#92400E';
+        return props.theme.status.warning;
       case 'alert':
-        return '#991B1B';
+        return props.theme.status.error;
       default:
-        return '#4B5563';
+        return props.theme.text.secondary;
     }
   }};
 `;
@@ -296,18 +304,20 @@ export const IconButton = styled.button`
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  border: 1px solid #E5E7EB;
-  background: white;
+  border: 1px solid ${({ theme }) => theme.border};
+  background: ${({ theme }) => theme.background.paper};
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
+  color: ${({ theme }) => theme.text.secondary};
   transition: all 0.2s;
 
   &:hover {
-    background-color: #F3F4F6;
-    border-color: #D1D5DB;
+    background-color: ${({ theme }) => theme.background.secondary};
+    border-color: ${({ theme }) => theme.text.disabled};
+    color: ${({ theme }) => theme.text.primary};
   }
 `;
 
@@ -321,20 +331,24 @@ export const Pagination = styled.div`
 
 export const PageInfo = styled.div`
   font-size: 14px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const PageButton = styled.button`
   width: 36px;
   height: 36px;
   border-radius: 8px;
-  border: 1px solid ${props => props.active ? props.theme.primary : '#E5E7EB'};
-  background-color: ${props => props.active ? props.theme.primary : 'white'};
-  color: ${props => props.active ? 'white' : '#4B5563'};
+  border: 1px solid ${props => props.active ? props.theme.colors.primary : props.theme.border};
+  background-color: ${props => props.active ? props.theme.colors.primary : props.theme.background.paper};
+  color: ${props => props.active ? 'white' : props.theme.text.secondary};
   cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
   opacity: ${props => props.disabled ? 0.5 : 1};
   font-size: 14px;
   font-weight: 500;
   transition: all 0.2s;
 
+  &:hover:not(:disabled) {
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${props => props.active ? 'white' : props.theme.colors.primary};
+  }
 `;

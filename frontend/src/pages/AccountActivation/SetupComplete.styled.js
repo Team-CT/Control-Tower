@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
+  background: ${({ theme }) => theme.background.main};
   padding: 60px 40px;
   display: flex;
   justify-content: center;
@@ -20,10 +20,10 @@ export const ContentWrapper = styled.div`
 `;
 
 export const SuccessCard = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 20px;
   padding: 80px 60px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.shadow};
   text-align: center;
 
   @media (max-width: 768px) {
@@ -39,12 +39,12 @@ export const IconWrapper = styled.div`
   width: 100px;
   height: 100px;
   margin: 0 auto 32px;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: ${({ theme }) => theme.status.success};
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 8px 24px ${({ theme }) => `${theme.status.success}4D`};
   animation: scaleIn 0.5s ease-out;
 
   @keyframes scaleIn {
@@ -71,7 +71,7 @@ export const CheckIcon = styled.div`
 export const Title = styled.h1`
   font-size: 36px;
   font-weight: 700;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 16px;
 
   @media (max-width: 768px) {
@@ -81,7 +81,7 @@ export const Title = styled.h1`
 
 export const Subtitle = styled.p`
   font-size: 16px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   line-height: 1.7;
   margin-bottom: 48px;
 
@@ -91,8 +91,8 @@ export const Subtitle = styled.p`
 `;
 
 export const InfoCard = styled.div`
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: ${({ theme }) => theme.background.subtle || theme.background.main};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 16px;
   padding: 32px;
   margin-bottom: 40px;
@@ -112,19 +112,19 @@ export const InfoRow = styled.div`
 
 export const InfoLabel = styled.span`
   font-size: 14px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   font-weight: 500;
 `;
 
 export const InfoValue = styled.span`
   font-size: 15px;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   font-weight: 600;
 `;
 
 export const Divider = styled.div`
   height: 1px;
-  background: #e5e7eb;
+  background: ${({ theme }) => theme.border};
   margin: 8px 0;
 `;
 
@@ -133,8 +133,8 @@ export const StatusBadge = styled.div`
   align-items: center;
   gap: 6px;
   padding: 6px 16px;
-  background: #d1fae5;
-  color: #065f46;
+  background: ${({ theme }) => `${theme.status.success}20`};
+  color: ${({ theme }) => theme.status.success};
   border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
@@ -147,7 +147,7 @@ export const StatusIcon = styled.span`
 export const ActionButton = styled.button`
   width: 100%;
   height: 56px;
-  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
+  background: ${({ theme }) => theme.colors.primary};
   color: white;
   font-size: 16px;
   font-weight: 600;
@@ -158,7 +158,7 @@ export const ActionButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    box-shadow: ${({ theme }) => `0 8px 24px ${theme.colors.primary}4D`};
   }
 
   &:active {

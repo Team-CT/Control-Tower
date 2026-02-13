@@ -4,7 +4,7 @@ import styled from 'styled-components';
 export const PageLayout = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.background.main};
 `;
 
 export const MainContentArea = styled.div`
@@ -20,46 +20,47 @@ export const PageHeader = styled.div`
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 2px solid ${({ theme }) => theme.colors.border};
+  border-bottom: 2px solid ${({ theme }) => theme.border};
 `;
 
 export const PageTitle = styled.h1`
   font-size: 1.75rem;
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
 export const PageDescription = styled.p`
   font-size: 0.95rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0.5rem 0 0 0;
 `;
 
 // ========== Table Container ==========
 export const TableCard = styled.div`
-  background: ${({ theme }) => theme.colors.cardBackground};
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ theme }) => theme.shadow};
   overflow: hidden;
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const TableHeader = styled.div`
   padding: 1.5rem;
-  background: ${({ theme }) => theme.colors.surface};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  background: ${({ theme }) => theme.background.paper};
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const TableTitle = styled.h2`
   font-size: 1.2rem;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
 export const TableCount = styled.span`
   font-size: 0.9rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.text.secondary};
   margin-left: 0.5rem;
 `;
 
@@ -70,14 +71,15 @@ export const Table = styled.table`
 `;
 
 export const TableHead = styled.thead`
-  background: ${({ theme }) => theme.colors.surface};
+  background: ${({ theme }) => theme.background.main};
 `;
 
 export const TableRow = styled.tr`
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  border-bottom: 1px solid ${({ theme }) => theme.border};
+  cursor: pointer;
   
   &:hover {
-    background: ${({ theme }) => theme.colors.hoverBackground};
+    background: ${({ theme }) => theme.background.hover};
   }
   
   &:last-child {
@@ -90,7 +92,7 @@ export const TableHeaderCell = styled.th`
   text-align: left;
   font-size: 0.9rem;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.text.secondary};
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
@@ -99,7 +101,7 @@ export const TableHeaderCell = styled.th`
 export const TableCell = styled.td`
   padding: 1.2rem 1rem;
   font-size: 0.95rem;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 // ========== Status Badge ==========
@@ -116,27 +118,27 @@ export const StatusBadge = styled.span`
     switch ($status) {
       case 'PENDING':
         return `
-          background: rgba(255, 152, 0, 0.1);
-          color: #f57c00;
-          border: 1px solid rgba(255, 152, 0, 0.3);
+          background: ${theme.status.warning}15;
+          color: ${theme.status.warning};
+          border: 1px solid ${theme.status.warning}30;
         `;
       case 'APPROVED':
         return `
-          background: rgba(76, 175, 80, 0.1);
-          color: #388e3c;
-          border: 1px solid rgba(76, 175, 80, 0.3);
+          background: ${theme.status.success}15;
+          color: ${theme.status.success};
+          border: 1px solid ${theme.status.success}30;
         `;
       case 'REJECTED':
         return `
-          background: rgba(244, 67, 54, 0.1);
-          color: #d32f2f;
-          border: 1px solid rgba(244, 67, 54, 0.3);
+          background: ${theme.status.error}15;
+          color: ${theme.status.error};
+          border: 1px solid ${theme.status.error}30;
         `;
       default:
         return `
-          background: rgba(158, 158, 158, 0.1);
-          color: #616161;
-          border: 1px solid rgba(158, 158, 158, 0.3);
+          background: ${theme.background.main};
+          color: ${theme.text.secondary};
+          border: 1px solid ${theme.border};
         `;
     }
   }}
@@ -159,23 +161,23 @@ export const CategoryBadge = styled.span`
     switch ($category) {
       case '상담':
         return `
-          background: rgba(103, 58, 183, 0.1);
-          color: #5e35b1;
+          background: ${theme.colors.primary}15;
+          color: ${theme.colors.primary};
         `;
       case '운동':
         return `
-          background: rgba(33, 150, 243, 0.1);
-          color: #1976d2;
+          background: ${theme.colors.secondary}15;
+          color: ${theme.colors.secondary};
         `;
       case '휴식':
         return `
-          background: rgba(0, 150, 136, 0.1);
-          color: #00897b;
+          background: ${theme.status.info}15;
+          color: ${theme.status.info || '#00897b'};
         `;
       default:
         return `
-          background: rgba(158, 158, 158, 0.1);
-          color: #616161;
+          background: ${theme.background.main};
+          color: ${theme.text.secondary};
         `;
     }
   }}
@@ -198,13 +200,13 @@ export const ActionButton = styled.button`
 `;
 
 export const CancelButton = styled(ActionButton)`
-  background: ${({ theme }) => theme.colors.danger};
-  color: white;
+  background: ${({ theme }) => theme.status.error};
+  color: ${({ theme }) => theme.text.inverse || 'white'};
   
   &:hover:not(:disabled) {
-    background: ${({ theme }) => theme.colors.dangerHover};
+    background: ${({ theme }) => theme.colors.dangerHover || '#b91c1c'};
     transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(244, 67, 54, 0.3);
+    box-shadow: ${({ theme }) => theme.shadowHover};
   }
 `;
 
@@ -218,17 +220,18 @@ export const EmptyIcon = styled.div`
   font-size: 4rem;
   margin-bottom: 1rem;
   opacity: 0.3;
+  color: ${({ theme }) => theme.text.disabled};
 `;
 
 export const EmptyText = styled.p`
   font-size: 1.1rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
 `;
 
 export const EmptySubText = styled.p`
   font-size: 0.9rem;
-  color: ${({ theme }) => theme.colors.textTertiary};
+  color: ${({ theme }) => theme.text.disabled};
   margin: 0.5rem 0 0 0;
 `;
 
@@ -242,7 +245,7 @@ export const LoadingSpinner = styled.div`
   display: inline-block;
   width: 40px;
   height: 40px;
-  border: 4px solid ${({ theme }) => theme.colors.border};
+  border: 4px solid ${({ theme }) => theme.border};
   border-top-color: ${({ theme }) => theme.colors.primary};
   border-radius: 50%;
   animation: spin 1s linear infinite;
@@ -255,12 +258,12 @@ export const LoadingSpinner = styled.div`
 export const LoadingText = styled.p`
   margin-top: 1rem;
   font-size: 0.95rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 // ========== Date Format ==========
 export const DateText = styled.span`
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.text.primary};
   font-weight: 500;
 `;
 
@@ -272,7 +275,7 @@ export const DateRange = styled.div`
 
 export const DateLabel = styled.span`
   font-size: 0.8rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 // ========== Modal ==========
@@ -291,11 +294,11 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalContainer = styled.div`
-  background: ${({ theme }) => theme.colors.surface || '#fff'};
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   width: 90%;
   max-width: 600px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: ${({ theme }) => theme.shadow};
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -315,8 +318,8 @@ export const ModalContainer = styled.div`
 
 export const ModalHeader = styled.div`
   padding: 1.5rem 2rem;
-  background: ${({ theme }) => theme.colors.surface};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.border};
+  background: ${({ theme }) => theme.background.paper};
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -325,7 +328,7 @@ export const ModalHeader = styled.div`
 export const ModalTitle = styled.h2`
   font-size: 1.35rem;
   font-weight: 700;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
@@ -333,7 +336,7 @@ export const ModalCloseButton = styled.button`
   background: none;
   border: none;
   font-size: 1.5rem;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.text.secondary};
   cursor: pointer;
   padding: 0.5rem;
   line-height: 1;
@@ -344,8 +347,8 @@ export const ModalCloseButton = styled.button`
   justify-content: center;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.text};
-    background: ${({ theme }) => theme.colors.hoverBackground || 'rgba(0,0,0,0.05)'};
+    color: ${({ theme }) => theme.text.primary};
+    background: ${({ theme }) => theme.background.hover};
   }
 `;
 
@@ -367,7 +370,7 @@ export const ModalLabel = styled.label`
   display: block;
   font-size: 0.9rem;
   font-weight: 600;
-  color: ${({ theme }) => theme.colors.textSecondary};
+  color: ${({ theme }) => theme.text.secondary};
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 0.75rem;
@@ -375,14 +378,14 @@ export const ModalLabel = styled.label`
 
 export const ModalValue = styled.div`
   font-size: 1.05rem;
-  color: ${({ theme }) => theme.colors.text};
+  color: ${({ theme }) => theme.text.primary};
   line-height: 1.6;
   
   ${({ $isBox, theme }) => $isBox && `
-    background: ${theme.colors.background || '#f8f9fa'};
+    background: ${theme.background.main};
     padding: 1.2rem;
     border-radius: 8px;
-    border: 1px solid ${theme.colors.border};
+    border: 1px solid ${theme.border};
     min-height: 3rem;
   `}
 `;
@@ -396,11 +399,11 @@ export const ModalStatusValue = styled(ModalValue)`
   ${({ $status, theme }) => {
     switch ($status) {
       case 'APPROVED':
-        return `color: ${theme.colors.success || '#388e3c'};`;
+        return `color: ${theme.status.success};`;
       case 'REJECTED':
-        return `color: ${theme.colors.danger || '#d32f2f'};`;
+        return `color: ${theme.status.error};`;
       case 'PENDING':
-        return `color: ${theme.colors.warning || '#f57c00'}; font-size: 0.95rem; font-weight: normal;`;
+        return `color: ${theme.status.warning}; font-size: 0.95rem; font-weight: normal;`;
       default:
         return '';
     }
@@ -409,8 +412,8 @@ export const ModalStatusValue = styled(ModalValue)`
 
 export const ModalFooter = styled.div`
   padding: 1.5rem 2rem;
-  background: ${({ theme }) => theme.colors.background || '#f8f9fa'};
-  border-top: 1px solid ${({ theme }) => theme.colors.border};
+  background: ${({ theme }) => theme.background.main};
+  border-top: 1px solid ${({ theme }) => theme.border};
   display: flex;
   justify-content: flex-end;
   gap: 0.75rem;
@@ -432,24 +435,31 @@ export const ModalActionButton = styled.button`
         return `
           background: ${theme.colors.primary};
           color: white;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          box-shadow: ${theme.shadow};
           &:hover { filter: brightness(110%); transform: translateY(-1px); }
           &:active { transform: translateY(0); }
         `;
       case 'danger':
         return `
-          background: ${theme.colors.danger};
+          background: ${theme.status.error};
           color: white;
           &:hover { filter: brightness(110%); }
         `;
       case 'secondary':
       default:
         return `
-          background: white;
-          color: ${theme.colors.text};
-          border: 1px solid ${theme.colors.border};
-          &:hover { background: ${theme.colors.hoverBackground}; border-color: ${theme.colors.textSecondary}; }
+          background: ${theme.background.paper};
+          color: ${theme.text.primary};
+          border: 1px solid ${theme.border};
+          &:hover { background: ${theme.background.hover}; border-color: ${theme.text.secondary}; }
         `;
     }
   }}
+`;
+
+export const TruncatedText = styled.div`
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 `;

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTheme } from 'styled-components';
 import {
   MainContentArea,
   PageHeader,
@@ -41,18 +42,19 @@ import {
 } from './EmployeeSchedule.styled';
 
 const EmployeeSchedule = () => {
+  const theme = useTheme();
   // TODO: Zustand state mapping
   // const { schedules, stats, fetchSchedules } = useScheduleStore();
-  
+
   const [currentMonth, setCurrentMonth] = useState('2026년 1월');
   const [activeTab, setActiveTab] = useState('assigned');
-  
+
   // Mock data - Replace with Zustand
   const stats = [
-    { label: '전체 항공편', value: 100, unit: '편', color: '#e0e7ff' },
-    { label: '배정 완료', value: 100, unit: '편', color: '#d1fae5' },
-    { label: '수정 필요', value: 0, unit: '편', color: '#fef3c7' },
-    { label: '총 직원', value: 310, unit: '명', color: '#e5e7eb' },
+    { label: '전체 항공편', value: 100, unit: '편', color: theme.colors.primary },
+    { label: '배정 완료', value: 100, unit: '편', color: theme.status.success },
+    { label: '수정 필요', value: 0, unit: '편', color: theme.status.warning },
+    { label: '총 직원', value: 310, unit: '명', color: theme.text.secondary },
   ];
 
   const filterTabs = [
@@ -176,116 +178,116 @@ const EmployeeSchedule = () => {
         </div>
       </PageHeader>
 
-        {/* Statistics Cards */}
-        <StatsCardGrid>
-          {stats.map((stat, index) => (
-            <StatCard key={index} $color={stat.color}>
-              <StatLabel>{stat.label}</StatLabel>
-              <div>
-                <StatValue>{stat.value}</StatValue>
-                <StatUnit>{stat.unit}</StatUnit>
-              </div>
-            </StatCard>
-          ))}
-        </StatsCardGrid>
+      {/* Statistics Cards */}
+      <StatsCardGrid>
+        {stats.map((stat, index) => (
+          <StatCard key={index} $color={stat.color}>
+            <StatLabel>{stat.label}</StatLabel>
+            <div>
+              <StatValue>{stat.value}</StatValue>
+              <StatUnit>{stat.unit}</StatUnit>
+            </div>
+          </StatCard>
+        ))}
+      </StatsCardGrid>
 
-        {/* Control Panel */}
-        <ControlPanel>
-          <MonthNavigator>
-            <NavButton onClick={() => handleMonthChange('prev')}>
-              ‹
-            </NavButton>
-            <CurrentMonth>{currentMonth}</CurrentMonth>
-            <NavButton onClick={() => handleMonthChange('next')}>
-              ›
-            </NavButton>
-          </MonthNavigator>
+      {/* Control Panel */}
+      <ControlPanel>
+        <MonthNavigator>
+          <NavButton onClick={() => handleMonthChange('prev')}>
+            ‹
+          </NavButton>
+          <CurrentMonth>{currentMonth}</CurrentMonth>
+          <NavButton onClick={() => handleMonthChange('next')}>
+            ›
+          </NavButton>
+        </MonthNavigator>
 
-          <RefreshButton onClick={handleRefresh}>
-            ↻ 자동 배정 실행
-          </RefreshButton>
-          <RefreshButton onClick={handleRefresh}>
-            ↻ 초기화
-          </RefreshButton>
-        </ControlPanel>
+        <RefreshButton onClick={handleRefresh}>
+          ↻ 자동 배정 실행
+        </RefreshButton>
+        <RefreshButton onClick={handleRefresh}>
+          ↻ 초기화
+        </RefreshButton>
+      </ControlPanel>
 
-        {/* Filter Tabs */}
-        <FilterTabs>
-          {filterTabs.map((tab) => (
-            <FilterTab
-              key={tab.id}
-              $active={activeTab === tab.id}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              <TabIcon>{tab.icon}</TabIcon>
-              <TabLabel>{tab.label}</TabLabel>
-              <TabBadge $active={activeTab === tab.id}>
-                ({tab.count}건)
-              </TabBadge>
-            </FilterTab>
-          ))}
-        </FilterTabs>
+      {/* Filter Tabs */}
+      <FilterTabs>
+        {filterTabs.map((tab) => (
+          <FilterTab
+            key={tab.id}
+            $active={activeTab === tab.id}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            <TabIcon>{tab.icon}</TabIcon>
+            <TabLabel>{tab.label}</TabLabel>
+            <TabBadge $active={activeTab === tab.id}>
+              ({tab.count}건)
+            </TabBadge>
+          </FilterTab>
+        ))}
+      </FilterTabs>
 
-        {/* Schedule Table */}
-        <ScheduleTableWrapper>
-          <ScheduleTable>
-            <TableHeader>
-              <tr>
-                <TableHeaderCell>편명</TableHeaderCell>
-                <TableHeaderCell>노선</TableHeaderCell>
-                <TableHeaderCell>출발시간</TableHeaderCell>
-                <TableHeaderCell>비행시간</TableHeaderCell>
-                <TableHeaderCell>승객수</TableHeaderCell>
-                <TableHeaderCell>배정 승무원</TableHeaderCell>
-                <TableHeaderCell>관리</TableHeaderCell>
-              </tr>
-            </TableHeader>
-            <TableBody>
-              {scheduleData.map((schedule) => (
-                <TableRow key={schedule.id}>
-                  <TableCell>
-                    <FlightNumber>{schedule.id}</FlightNumber>
-                  </TableCell>
-                  <TableCell>
-                    <RouteCode>{schedule.route.from}</RouteCode>
-                    <RouteArrow>→</RouteArrow>
-                    <RouteCode>{schedule.route.to}</RouteCode>
-                  </TableCell>
-                  <TableCell>
-                    <FlightTime>{schedule.departure}</FlightTime>
-                  </TableCell>
-                  <TableCell>
-                    <Duration>{schedule.duration}</Duration>
-                    <StatusBadge $type={schedule.status}>
-                      {schedule.status}
-                    </StatusBadge>
-                  </TableCell>
-                  <TableCell>
-                    <PassengerCount>{schedule.passengers}명</PassengerCount>
-                  </TableCell>
-                  <TableCell>
-                    <CrewSection>
-                      {schedule.crew.map((member, idx) => (
-                        <CrewMember key={idx}>
-                          <CrewRole>{member.role}</CrewRole>
-                          <CrewName>{member.name}</CrewName>
-                          {member.badges.map((badge, bidx) => (
-                            <CrewBadge key={bidx}>{badge}</CrewBadge>
-                          ))}
-                        </CrewMember>
-                      ))}
-                    </CrewSection>
-                  </TableCell>
-                  <TableCell>
-                    <ActionButton onClick={() => handleEdit(schedule.id)}>
-                      ✏️ 수정
-                    </ActionButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </ScheduleTable>
-        </ScheduleTableWrapper>
+      {/* Schedule Table */}
+      <ScheduleTableWrapper>
+        <ScheduleTable>
+          <TableHeader>
+            <tr>
+              <TableHeaderCell>편명</TableHeaderCell>
+              <TableHeaderCell>노선</TableHeaderCell>
+              <TableHeaderCell>출발시간</TableHeaderCell>
+              <TableHeaderCell>비행시간</TableHeaderCell>
+              <TableHeaderCell>승객수</TableHeaderCell>
+              <TableHeaderCell>배정 승무원</TableHeaderCell>
+              <TableHeaderCell>관리</TableHeaderCell>
+            </tr>
+          </TableHeader>
+          <TableBody>
+            {scheduleData.map((schedule) => (
+              <TableRow key={schedule.id}>
+                <TableCell>
+                  <FlightNumber>{schedule.id}</FlightNumber>
+                </TableCell>
+                <TableCell>
+                  <RouteCode>{schedule.route.from}</RouteCode>
+                  <RouteArrow>→</RouteArrow>
+                  <RouteCode>{schedule.route.to}</RouteCode>
+                </TableCell>
+                <TableCell>
+                  <FlightTime>{schedule.departure}</FlightTime>
+                </TableCell>
+                <TableCell>
+                  <Duration>{schedule.duration}</Duration>
+                  <StatusBadge $type={schedule.status}>
+                    {schedule.status}
+                  </StatusBadge>
+                </TableCell>
+                <TableCell>
+                  <PassengerCount>{schedule.passengers}명</PassengerCount>
+                </TableCell>
+                <TableCell>
+                  <CrewSection>
+                    {schedule.crew.map((member, idx) => (
+                      <CrewMember key={idx}>
+                        <CrewRole>{member.role}</CrewRole>
+                        <CrewName>{member.name}</CrewName>
+                        {member.badges.map((badge, bidx) => (
+                          <CrewBadge key={bidx}>{badge}</CrewBadge>
+                        ))}
+                      </CrewMember>
+                    ))}
+                  </CrewSection>
+                </TableCell>
+                <TableCell>
+                  <ActionButton onClick={() => handleEdit(schedule.id)}>
+                    ✏️ 수정
+                  </ActionButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </ScheduleTable>
+      </ScheduleTableWrapper>
     </MainContentArea>
   );
 };

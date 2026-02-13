@@ -355,8 +355,8 @@ const LeaveApproval = () => {
     <MainContentArea>
       {/* Statistics Cards */}
       <StatsGrid>
-        <StatCard $bgColor="#fef3c7">
-          <StatIcon $color="#f59e0b">📋</StatIcon>
+        <StatCard $type="pending">
+          <StatIcon $type="pending">📋</StatIcon>
           <StatInfo>
             <StatLabel>대기 중</StatLabel>
             <StatValue>{stats.pending}</StatValue>
@@ -364,8 +364,8 @@ const LeaveApproval = () => {
           </StatInfo>
         </StatCard>
 
-        <StatCard $bgColor="#d1fae5">
-          <StatIcon $color="#10b981">✓</StatIcon>
+        <StatCard $type="approved">
+          <StatIcon $type="approved">✓</StatIcon>
           <StatInfo>
             <StatLabel>승인</StatLabel>
             <StatValue>{stats.approved}</StatValue>
@@ -373,8 +373,8 @@ const LeaveApproval = () => {
           </StatInfo>
         </StatCard>
 
-        <StatCard $bgColor="#fee2e2">
-          <StatIcon $color="#ef4444">⚠</StatIcon>
+        <StatCard $type="rejected">
+          <StatIcon $type="rejected">⚠</StatIcon>
           <StatInfo>
             <StatLabel>반려</StatLabel>
             <StatValue>{stats.rejected}</StatValue>

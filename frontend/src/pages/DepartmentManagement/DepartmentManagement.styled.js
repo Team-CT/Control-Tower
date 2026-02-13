@@ -6,7 +6,7 @@ export const MainContainer = styled.main`
   max-width: 1600px; /* 대형 모니터 대응, 중앙 정렬 */
   margin: 0 auto;
   padding: 40px;
-  background-color: var(--bg-main);
+  background-color: ${({ theme }) => theme.background.secondary || theme.background.main};
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -26,12 +26,12 @@ export const PageHeader = styled.header`
 
 export const Breadcrumb = styled.nav`
   font-size: 14px;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.tertiary};
   display: flex;
   gap: 8px;
 
   .current {
-    color: #111827;
+    color: ${({ theme }) => theme.text.primary};
     font-weight: 600;
   }
 `;
@@ -40,13 +40,13 @@ export const TitleSection = styled.div`
   h2 {
     font-size: 28px;
     font-weight: 700;
-    color: var(--text-main);
+    color: ${({ theme }) => theme.text.primary};
     margin-bottom: 8px;
   }
   
   p {
     font-size: 16px;
-    color: var(--text-sub);
+    color: ${({ theme }) => theme.text.secondary};
   }
 `;
 
@@ -68,23 +68,28 @@ export const SearchInputWrapper = styled.div`
     left: 16px;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.secondary};
     font-size: 18px;
   }
 
   input {
     width: 100%;
     padding: 14px 16px 14px 48px;
-    border: 1px solid #e5e7eb;
+    border: 1px solid ${({ theme }) => theme.border};
     border-radius: 50px; /* 둥근 검색창 스타일 */
     font-size: 15px;
     outline: none;
     transition: all 0.2s;
-    background-color: #ffffff;
+    background-color: ${({ theme }) => theme.background.paper};
+    color: ${({ theme }) => theme.text.primary};
 
     &:focus {
-      border-color: #0064DE;
-      box-shadow: 0 0 0 3px rgba(0, 100, 222, 0.1);
+      border-color: ${({ theme }) => theme.colors.primary};
+      box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}1A`};
+    }
+
+    &::placeholder {
+      color: ${({ theme }) => theme.text.disabled};
     }
   }
 
@@ -94,7 +99,7 @@ export const SearchInputWrapper = styled.div`
 `;
 
 export const CreateButton = styled.button`
-  background-color: var(--primary-color);
+  background-color: ${({ theme }) => theme.colors.primary};
   color: white;
   border: none;
   padding: 12px 28px;
@@ -103,11 +108,12 @@ export const CreateButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  transition: all 0.2s;
 
   &:hover {
-    background-color: var(--primary-hover);
+    filter: brightness(0.9);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 85, 170, 0.2);
+    box-shadow: ${({ theme }) => theme.shadowHover};
   }
 `;
 
@@ -129,8 +135,8 @@ export const GridContainer = styled.div`
 `;
 
 export const DepartmentCard = styled.article`
-  background: white;
-  border: 1px solid #e5e7eb;
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 16px;
   padding: 28px;
   display: flex;
@@ -149,13 +155,13 @@ export const DepartmentCard = styled.article`
     left: 0;
     width: 100%;
     height: 4px;
-    background-color: ${props => props.$type === 'CABIN' ? 'var(--primary-color)' : props.$type === 'MAINTENANCE' ? '#4B5563' : 'var(--secondary-color)'};
+    background-color: ${props => props.$type === 'CABIN' ? props.theme.colors.primary : props.$type === 'MAINTENANCE' ? props.theme.text.secondary : props.theme.colors.secondary};
   }
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-    border-color: #d1d5db;
+    box-shadow: ${({ theme }) => theme.shadowHover};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -168,25 +174,26 @@ export const CardHeader = styled.div`
   .icon-box {
     width: 48px;
     height: 48px;
-    background-color: #f3f4f6;
+    background-color: ${({ theme }) => theme.background.secondary};
     border-radius: 12px;
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 24px;
+    color: ${({ theme }) => theme.text.primary};
   }
 
   h3 {
     font-size: 20px;
     font-weight: 700;
-    color: #111827;
+    color: ${({ theme }) => theme.text.primary};
     margin: 0;
   }
 `;
 
 export const CardDescription = styled.p`
   font-size: 15px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   line-height: 1.6;
   min-height: 48px; /* 2줄 정도의 높이 확보 */
   margin: 0;
@@ -197,19 +204,19 @@ export const ManagerSection = styled.div`
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background-color: #f9fafb;
+  background-color: ${({ theme }) => theme.background.secondary};
   border-radius: 8px;
 
   .avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: #d1d5db;
+    background-color: ${({ theme }) => theme.border};
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: 600;
-    color: #4b5563;
+    color: ${({ theme }) => theme.text.secondary};
     overflow: hidden;
 
     img {
@@ -225,14 +232,14 @@ export const ManagerSection = styled.div`
     
     .role {
       font-size: 12px;
-      color: #6b7280;
+      color: ${({ theme }) => theme.text.secondary};
       margin-bottom: 2px;
     }
     
     .name {
       font-size: 14px;
       font-weight: 600;
-      color: #374151;
+      color: ${({ theme }) => theme.text.primary};
     }
   }
 `;
@@ -242,7 +249,7 @@ export const StatsFooter = styled.footer`
   justify-content: space-between;
   align-items: center;
   padding-top: 20px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid ${({ theme }) => theme.border};
   margin-top: auto; /* 카드가 길어지면 하단 고정 */
 
   .stat-item {
@@ -250,12 +257,12 @@ export const StatsFooter = styled.footer`
     align-items: center;
     gap: 6px;
     font-size: 14px;
-    color: #4b5563;
+    color: ${({ theme }) => theme.text.secondary};
     font-weight: 500;
 
     .icon {
       font-size: 16px;
-      color: #9ca3af;
+      color: ${({ theme }) => theme.text.tertiary};
     }
   }
 `;

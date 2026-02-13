@@ -37,10 +37,12 @@ import {
   GuideNumber,
   GuideContent,
   GuideItemTitle,
-  GuideItemDescription
+  GuideItemDescription,
+  HiddenInput,
+  ErrorMessage
 } from './HealthInfoSubmission.styled';
 import axios from 'axios';
-import { empPhysicalTestService} from '../../api/Health/healthService';
+import { empPhysicalTestService } from '../../api/Health/healthService';
 import useAuthStore from '../../store/authStore';
 import { useNavigate } from 'react-router-dom';
 
@@ -53,34 +55,34 @@ const HealthInfoSubmission = () => {
     memo: ''
   });
 
-  const [previewData, setPreviewData] = useState(null); 
+  const [previewData, setPreviewData] = useState(null);
   const empId = useAuthStore((s) => s.getEmpId());
   const hydrate = useAuthStore((s) => s.hydrate);
 
   useEffect(() => {
     if (!empId) hydrate();
   }, [empId, hydrate]);
-  
+
   const fileInputRef = useRef(null);
   const maxCharacters = 2000;
 
   const formatPreviewToMemo = (d) => {
-  const line = (label, value) => `${label}: ${value ?? "-"}`;
-  return [
-    line("검사일", d?.test_date),
-    line("키", d?.height),
-    line("체중", d?.weight),
-    line("혈당", d?.blood_sugar),
-    line("수축기혈압", d?.systolic_blood_pressure),
-    line("이완기혈압", d?.diastolic_blood_pressure),
-    line("콜레스테롤", d?.cholesterol),
-    line("심박수", d?.heart_rate),
-    line("BMI", d?.bmi),
-    line("체지방", d?.body_fat),
-  ].join("\n");
-};
+    const line = (label, value) => `${label}: ${value ?? "-"}`;
+    return [
+      line("검사일", d?.test_date),
+      line("키", d?.height),
+      line("체중", d?.weight),
+      line("혈당", d?.blood_sugar),
+      line("수축기혈압", d?.systolic_blood_pressure),
+      line("이완기혈압", d?.diastolic_blood_pressure),
+      line("콜레스테롤", d?.cholesterol),
+      line("심박수", d?.heart_rate),
+      line("BMI", d?.bmi),
+      line("체지방", d?.body_fat),
+    ].join("\n");
+  };
 
-  {/* TODO: Zustand state mapping */}
+  {/* TODO: Zustand state mapping */ }
   const noticeItems = [
     '건강검진 결과서, 진료 기록 등을 PDF 형식or 업로드하거나 직접 입력해 주 있습니다',
     '제출된 정보는 관리자가 검토후 AI시스템에 반영됩니다',
@@ -104,50 +106,50 @@ const HealthInfoSubmission = () => {
   ];
 
   const callPreview = async (file) => {
-  const fd = new FormData();
-  fd.append("file", file);
+    const fd = new FormData();
+    fd.append("file", file);
 
-  const res = await axios.post("/preview", fd, {
-    headers: { "Content-Type": "multipart/form-data" }, 
-  });
-  setPreviewData(res.data);
-};
+    const res = await axios.post("/preview", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    setPreviewData(res.data);
+  };
 
-const callSave = async () => {
-  if (!empId) {
-    alert("empId가 필요합니다.");
-    return;
-  }
-  if (!uploadedFile) {
-    alert("파일을 업로드해주세요.");
-    return;
-  }
-  if (!previewData) {
-    alert("미리보기 데이터가 없습니다. 먼저 파일을 업로드해주세요.");
-    return;
-  }
+  const callSave = async () => {
+    if (!empId) {
+      alert("empId가 필요합니다.");
+      return;
+    }
+    if (!uploadedFile) {
+      alert("파일을 업로드해주세요.");
+      return;
+    }
+    if (!previewData) {
+      alert("미리보기 데이터가 없습니다. 먼저 파일을 업로드해주세요.");
+      return;
+    }
 
-  // 백엔드 save는 @RequestPart("data") HealthDto.PhysicalTestRequest 를 받으므로
-  // JSON을 application/json 파트로 넣어야 함
-  const fd = new FormData();
-  fd.append("empId", empId);
-  fd.append("file", uploadedFile);
-  fd.append(
-    "data",
-    new Blob([JSON.stringify(previewData)], { type: "application/json" })
-  );
+    // 백엔드 save는 @RequestPart("data") HealthDto.PhysicalTestRequest 를 받으므로
+    // JSON을 application/json 파트로 넣어야 함
+    const fd = new FormData();
+    fd.append("empId", empId);
+    fd.append("file", uploadedFile);
+    fd.append(
+      "data",
+      new Blob([JSON.stringify(previewData)], { type: "application/json" })
+    );
 
-  const res = await axios.post("/save", fd, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+    const res = await axios.post("/save", fd, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
 
-  const savedId = res.data; // Long
-  // 저장 후 리스트/상세로 이동
-  // navigate(`/health/physical-tests/${savedId}`) 등
-  alert(`저장 완료 (id: ${savedId})`);
-};
+    const savedId = res.data; // Long
+    // 저장 후 리스트/상세로 이동
+    // navigate(`/health/physical-tests/${savedId}`) 등
+    alert(`저장 완료 (id: ${savedId})`);
+  };
 
-  const handleFileUpload = async(event) => {
+  const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (file) {
       // Validate file size (10MB max)
@@ -155,7 +157,7 @@ const callSave = async () => {
         alert('파일 크기는 10MB를 초과할 수 없습니다.');
         return;
       }
-      
+
       // Validate file type
       const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
       if (!allowedTypes.includes(file.type)) {
@@ -165,7 +167,7 @@ const callSave = async () => {
 
       setUploadedFile(file);
       setSelectedMethod("file");
-      {/* TODO: Upload file with Zustand */}
+      {/* TODO: Upload file with Zustand */ }
       try {
         const fd = new FormData();
         fd.append("file", file);
@@ -175,8 +177,8 @@ const callSave = async () => {
         setPreviewData(preview);
         setFormData((prev) => ({
           ...prev,
-          classification: "건강검진",            
-          memo: formatPreviewToMemo(preview),  
+          classification: "건강검진",
+          memo: formatPreviewToMemo(preview),
         }));
         setSelectedMethod("text");
 
@@ -193,7 +195,7 @@ const callSave = async () => {
       ...prev,
       [name]: value
     }));
-    {/* TODO: Update Zustand store */}
+    {/* TODO: Update Zustand store */ }
   };
 
   const handleMemoChange = (e) => {
@@ -203,7 +205,7 @@ const callSave = async () => {
         ...prev,
         memo: value
       }));
-      {/* TODO: Update Zustand store */}
+      {/* TODO: Update Zustand store */ }
     }
   };
 
@@ -212,7 +214,7 @@ const callSave = async () => {
       setFormData({ classification: '', memo: '' });
       setUploadedFile(null);
       setSelectedMethod('text');
-      {/* TODO: Reset Zustand store */}
+      {/* TODO: Reset Zustand store */ }
     }
   };
 
@@ -235,13 +237,13 @@ const callSave = async () => {
 
     try {
       console.log(previewData);
-      await empPhysicalTestService.save(empId,uploadedFile,previewData);
+      await empPhysicalTestService.save(empId, uploadedFile, previewData);
     } catch (e) {
       console.error(e);
       alert("저장 실패");
     }
 
-    {/* TODO: Submit with Zustand */}
+    {/* TODO: Submit with Zustand */ }
     console.log('Submitting:', { formData, uploadedFile, selectedMethod });
     alert('건강 정보가 제출되었습니다.');
     navigate("/healthsubmissionhistory")
@@ -275,7 +277,7 @@ const callSave = async () => {
 
             <UploadMethodSection>
               <UploadOptions>
-                <UploadOption 
+                <UploadOption
                   selected={selectedMethod === 'text'}
                   onClick={() => setSelectedMethod('text')}
                 >
@@ -286,7 +288,7 @@ const callSave = async () => {
                   </UploadOptionContent>
                 </UploadOption>
 
-                <UploadOption 
+                <UploadOption
                   selected={selectedMethod === 'file'}
                   onClick={() => {
                     setSelectedMethod('file');
@@ -302,12 +304,11 @@ const callSave = async () => {
                   </UploadOptionContent>
                 </UploadOption>
 
-                <input
+                <HiddenInput
                   ref={fileInputRef}
                   type="file"
                   accept=".pdf,image/*"
                   onChange={handleFileUpload}
-                  style={{ display: 'none' }}
                 />
               </UploadOptions>
             </UploadMethodSection>
@@ -350,9 +351,9 @@ const callSave = async () => {
               <CharacterCounter>
                 <span>{formData.memo.length} / {maxCharacters}자</span>
                 {formData.memo.length > 0 && formData.memo.length < 50 && (
-                  <span style={{ color: '#DC2626', marginLeft: '12px' }}>
+                  <ErrorMessage>
                     최소 50자 이상 입력해주세요
-                  </span>
+                  </ErrorMessage>
                 )}
               </CharacterCounter>
             </FormGroup>
@@ -383,7 +384,7 @@ const callSave = async () => {
           </GuideList>
         </GuideSection>
       </ContentWrapper>
-    </MainContainer>
+    </MainContainer >
   );
 };
 

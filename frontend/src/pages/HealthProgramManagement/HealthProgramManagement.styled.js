@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background-color: #F8F9FA;
+  background-color: ${({ theme }) => theme.background.secondary};
   padding: 32px 48px;
 
   @media (max-width: 1024px) {
@@ -26,8 +26,8 @@ export const HeaderBadge = styled.div`
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: ${({ theme }) => `linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.secondary} 100%)`};
+  color: ${({ theme }) => theme.text.inverse || 'white'};
   border-radius: 20px;
   font-size: 13px;
   font-weight: 600;
@@ -37,32 +37,33 @@ export const HeaderBadge = styled.div`
 export const PageTitle = styled.h1`
   font-size: 28px;
   font-weight: 700;
-  color: #1A1A1A;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 8px 0;
 `;
 
 export const PageSubtitle = styled.p`
   font-size: 15px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
 `;
 
 export const ActionBar = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   padding: 16px 20px;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ theme }) => theme.shadow};
   margin-bottom: 24px;
   display: flex;
   gap: 12px;
   align-items: center;
   flex-wrap: wrap;
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const ActionButton = styled.button`
   padding: 10px 20px;
-  background: ${props => props.$active ? '#4F46E5' : '#F3F4F6'};
-  color: ${props => props.$active ? 'white' : '#4B5563'};
+  background: ${props => props.$active ? props.theme.colors.primary : props.theme.background.main};
+  color: ${props => props.$active ? props.theme.text.inverse || 'white' : props.theme.text.secondary};
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -74,14 +75,14 @@ export const ActionButton = styled.button`
   white-space: nowrap;
 
   &:hover {
-    background: ${props => props.$active ? '#4338CA' : '#E5E7EB'};
+    background: ${props => props.$active ? props.theme.colors.primaryHover : props.theme.background.hover};
   }
 `;
 
 export const FilterButton = styled.button`
   padding: 10px 20px;
-  background: #F3F4F6;
-  color: #4B5563;
+  background: ${({ theme }) => theme.background.main};
+  color: ${({ theme }) => theme.text.secondary};
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -91,14 +92,14 @@ export const FilterButton = styled.button`
   white-space: nowrap;
 
   &:hover {
-    background: #E5E7EB;
+    background: ${({ theme }) => theme.background.hover};
   }
 `;
 
 export const SortButton = styled.button`
   padding: 10px 20px;
-  background: #F3F4F6;
-  color: #4B5563;
+  background: ${({ theme }) => theme.background.main};
+  color: ${({ theme }) => theme.text.secondary};
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -108,7 +109,7 @@ export const SortButton = styled.button`
   white-space: nowrap;
 
   &:hover {
-    background: #E5E7EB;
+    background: ${({ theme }) => theme.background.hover};
   }
 `;
 
@@ -129,23 +130,26 @@ export const SearchIcon = styled.span`
   top: 50%;
   transform: translateY(-50%);
   font-size: 16px;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const SearchInput = styled.input`
   width: 100%;
   padding: 10px 14px 10px 42px;
-  border: 1.5px solid #E5E7EB;
+  border: 1.5px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
+  background: ${({ theme }) => theme.background.main};
+  color: ${({ theme }) => theme.text.primary};
   transition: border-color 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #4F46E5;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 
   &::placeholder {
-    color: #9CA3AF;
+    color: ${({ theme }) => theme.text.disabled || '#9CA3AF'};
   }
 `;
 
@@ -156,15 +160,21 @@ export const ProgramList = styled.div`
 `;
 
 export const ProgramCard = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
   padding: 28px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ theme }) => theme.shadow};
   transition: all 0.2s;
+  border: 1px solid ${({ theme }) => theme.border};
+  cursor: pointer;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: ${({ theme }) => theme.shadowHover};
   }
+`;
+
+export const RejectReasonText = styled.div`
+  color: ${({ theme }) => theme.status.error};
 `;
 
 export const ProgramHeader = styled.div`
@@ -173,7 +183,7 @@ export const ProgramHeader = styled.div`
   align-items: flex-start;
   margin-bottom: 24px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #F3F4F6;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   gap: 20px;
 
   @media (max-width: 768px) {
@@ -185,8 +195,8 @@ export const ParticipantAvatar = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: ${props => props.color || '#4A90E2'};
-  color: white;
+  background: ${props => props.color || props.theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse || 'white'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -202,18 +212,18 @@ export const ParticipantInfo = styled.div`
 export const ParticipantName = styled.span`
   font-size: 18px;
   font-weight: 700;
-  color: #1A1A1A;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const ParticipantId = styled.span`
   font-size: 14px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
   font-weight: 500;
 `;
 
 export const ParticipantDepartment = styled.div`
   font-size: 14px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const StatusBadge = styled.div`
@@ -225,25 +235,25 @@ export const StatusBadge = styled.div`
   background: ${props => {
     switch (props.$statusType) {
       case 'warning':
-        return '#FEF3C7';
+        return `${props.theme.status.warning}15`;
       case 'success':
-        return '#D1FAE5';
+        return `${props.theme.status.success}15`;
       case 'info':
-        return '#DBEAFE';
+        return `${props.theme.status.info || props.theme.colors.primary}15`;
       default:
-        return '#F3F4F6';
+        return props.theme.background.main;
     }
   }};
   color: ${props => {
     switch (props.$statusType) {
       case 'warning':
-        return '#92400E';
+        return props.theme.status.warning;
       case 'success':
-        return '#065F46';
+        return props.theme.status.success;
       case 'info':
-        return '#1E40AF';
+        return props.theme.status.info || props.theme.colors.primary;
       default:
-        return '#4B5563';
+        return props.theme.text.secondary;
     }
   }};
 `;
@@ -255,13 +265,13 @@ export const ProgramContent = styled.div`
 export const SectionLabel = styled.div`
   font-size: 13px;
   font-weight: 600;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 8px;
 `;
 
 export const ProgramDescription = styled.p`
   font-size: 15px;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
   line-height: 1.6;
   margin: 0;
 `;
@@ -271,7 +281,7 @@ export const StatsGrid = styled.div`
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
   padding: 20px;
-  background: #F9FAFB;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 10px;
   margin-bottom: 24px;
 
@@ -291,13 +301,13 @@ export const StatItem = styled.div`
 export const StatValue = styled.div`
   font-size: 24px;
   font-weight: 700;
-  color: #4F46E5;
+  color: ${({ theme }) => theme.colors.primary};
   margin-bottom: 6px;
 `;
 
 export const StatLabel = styled.div`
   font-size: 13px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
   font-weight: 500;
 `;
 
@@ -315,7 +325,7 @@ export const CardFooter = styled.div`
 
 export const FooterDate = styled.div`
   font-size: 13px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
   display: flex;
   align-items: center;
   gap: 6px;
@@ -336,9 +346,9 @@ export const CardActions = styled.div`
 
 export const RejectButton = styled.button`
   padding: 12px 28px;
-  background: white;
-  color: #DC2626;
-  border: 1.5px solid #DC2626;
+  background: ${({ theme }) => theme.background.paper || 'white'};
+  color: ${({ theme }) => theme.status.error};
+  border: 1.5px solid ${({ theme }) => theme.status.error};
   border-radius: 8px;
   font-size: 15px;
   font-weight: 600;
@@ -350,14 +360,14 @@ export const RejectButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background: #FEE2E2;
+    background: ${({ theme }) => `${theme.status.error}15`};
   }
 `;
 
 export const ApproveButton = styled.button`
   padding: 12px 28px;
-  background: #10B981;
-  color: white;
+  background: ${({ theme }) => theme.status.success};
+  color: ${({ theme }) => theme.text.inverse || 'white'};
   border: none;
   border-radius: 8px;
   font-size: 15px;
@@ -370,27 +380,29 @@ export const ApproveButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background: #059669;
+    background: ${({ theme }) => theme.status.successHover || theme.status.success};
   }
 `;
 
 export const EmptyState = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
   padding: 80px 20px;
   text-align: center;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const EmptyIcon = styled.div`
   font-size: 64px;
   margin-bottom: 16px;
   opacity: 0.5;
+  color: ${({ theme }) => theme.text.disabled};
 `;
 
 export const EmptyText = styled.p`
   font-size: 16px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
 `;
 
@@ -408,16 +420,17 @@ export const ModalOverlay = styled.div`
   justify-content: center;
   z-index: 1000;
   padding: 24px;
+  backdrop-filter: blur(4px);
 `;
 
 export const ModalContainer = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
   width: 100%;
   max-width: 600px; // 상세 모달 크기 적절히 조절
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.shadow};
   animation: modalFadeIn 0.2s ease-out;
 
   @keyframes modalFadeIn {
@@ -428,7 +441,7 @@ export const ModalContainer = styled.div`
 
 export const ModalHeader = styled.div`
   padding: 24px 24px 16px;
-  border-bottom: 1px solid #E5E7EB;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -437,7 +450,7 @@ export const ModalHeader = styled.div`
 export const ModalTitle = styled.h2`
   font-size: 20px;
   font-weight: 700;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
@@ -445,12 +458,12 @@ export const ModalCloseButton = styled.button`
   background: none;
   border: none;
   font-size: 24px;
-  color: #9CA3AF;
+  color: ${({ theme }) => theme.text.secondary};
   cursor: pointer;
   padding: 4px;
   
   &:hover {
-    color: #4B5563;
+    color: ${({ theme }) => theme.text.primary};
   }
 `;
 
@@ -470,16 +483,16 @@ export const ModalLabel = styled.label`
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 8px;
 `;
 
 export const ModalValue = styled.div`
   font-size: 15px;
-  color: #111827;
+  color: ${props => props.$isError ? props.theme.status.error : props.theme.text.primary};
   padding: 10px 12px;
-  background: ${props => props.$isBox ? '#F9FAFB' : 'transparent'};
-  border: ${props => props.$isBox ? '1px solid #E5E7EB' : 'none'};
+  background: ${props => props.$isBox ? props.theme.background.main : 'transparent'};
+  border: ${props => props.$isBox ? `1px solid ${props.theme.border}` : 'none'};
   border-radius: 6px;
   
   ${props => props.$grid && `
@@ -492,30 +505,33 @@ export const ModalValue = styled.div`
 export const InputTextarea = styled.textarea`
   width: 100%;
   padding: 12px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
   min-height: 100px;
   resize: vertical;
+  background: ${({ theme }) => theme.background.paper};
+  color: ${({ theme }) => theme.text.primary};
   
   &:focus {
     outline: none;
-    border-color: #4F46E5;
-    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => `${theme.colors.primary}20`};
   }
 `;
 
 export const SelectBox = styled.select`
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #E5E7EB;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
-  background-color: white;
+  background-color: ${({ theme }) => theme.background.paper};
+  color: ${({ theme }) => theme.text.primary};
   
   &:focus {
     outline: none;
-    border-color: #4F46E5;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -524,7 +540,7 @@ export const ModalFooter = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  border-top: 1px solid #E5E7EB;
+  border-top: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const ModalActionButton = styled.button`
@@ -536,25 +552,94 @@ export const ModalActionButton = styled.button`
   transition: all 0.2s;
   
   ${props => props.$variant === 'primary' && `
-    background: #4F46E5;
+    background: ${props.theme.colors.primary};
     color: white;
     border: none;
-    &:hover { background: #4338CA; }
-    &:disabled { background: #9CA3AF; cursor: not-allowed; }
+    &:hover { background: ${props.theme.colors.primaryHover}; }
+    &:disabled { background: ${props.theme.text.disabled}; cursor: not-allowed; }
   `}
 
   ${props => props.$variant === 'danger' && `
-    background: #DC2626;
+    background: ${props.theme.status.error};
     color: white;
     border: none;
-    &:hover { background: #B91C1C; }
-    &:disabled { background: #F87171; cursor: not-allowed; }
+    &:hover { filter: brightness(110%); }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
   `}
 
   ${props => props.$variant === 'secondary' && `
-    background: white;
-    color: #374151;
-    border: 1px solid #D1D5DB;
-    &:hover { background: #F3F4F6; }
+    background: ${props.theme.background.paper};
+    color: ${props.theme.text.primary};
+    border: 1px solid ${props.theme.border};
+    &:hover { background: ${props.theme.background.hover}; }
   `}
+`;
+
+export const FilterGroup = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+
+  @media (max-width: 640px) {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+`;
+
+export const FilterSelect = styled.select`
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.background.paper};
+  color: ${({ theme }) => theme.text.primary};
+  font-size: 14px;
+  cursor: pointer;
+  
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+export const ActionGroup = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+export const HeaderContent = styled.div`
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex: 1;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+`;
+
+export const ParticipantDetail = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+`;
+
+export const ProgramTitleText = styled.span`
+  display: block;
+  font-weight: 700;
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: 4px;
+  font-size: 16px;
+`;
+
+export const ProgramDateText = styled.div`
+  font-size: 13px;
+  color: ${({ theme }) => theme.text.tertiary};
+  margin-top: 4px;
+  display: block;
 `;

@@ -51,7 +51,14 @@ import {
   InputTextarea,
   SelectBox,
   ModalFooter,
-  ModalActionButton
+  ModalActionButton,
+  ActionGroup,
+  FilterGroup,
+  FilterSelect,
+  HeaderContent,
+  ParticipantDetail,
+  ProgramTitleText,
+  ProgramDateText
 } from './HealthProgramManagement.styled';
 
 const HealthProgramManagement = () => {
@@ -242,32 +249,34 @@ const HealthProgramManagement = () => {
         </PageHeader>
 
         <ActionBar>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <ActionGroup>
             <ActionButton $active>📋 전체 내역</ActionButton>
 
             {/* 필터 영역 */}
-            <SelectBox
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              style={{ width: '120px', height: '40px' }}
-            >
-              <option value="">전체 상태</option>
-              <option value="PENDING">승인 대기</option>
-              <option value="APPROVED">승인 완료</option>
-              <option value="REJECTED">반려됨</option>
-            </SelectBox>
+            <FilterGroup>
+              <FilterSelect
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                style={{ width: '120px' }}
+              >
+                <option value="">전체 상태</option>
+                <option value="PENDING">승인 대기</option>
+                <option value="APPROVED">승인 완료</option>
+                <option value="REJECTED">반려됨</option>
+              </FilterSelect>
 
-            <SelectBox
-              value={programFilter}
-              onChange={(e) => setProgramFilter(e.target.value)}
-              style={{ width: '150px', height: '40px' }}
-            >
-              <option value="">전체 프로그램</option>
-              <option value="심리">심리 상담</option>
-              <option value="운동">체력 증진 운동</option>
-              <option value="휴식">집중 휴식</option>
-            </SelectBox>
-          </div>
+              <FilterSelect
+                value={programFilter}
+                onChange={(e) => setProgramFilter(e.target.value)}
+                style={{ width: '150px' }}
+              >
+                <option value="">전체 프로그램</option>
+                <option value="심리">심리 상담</option>
+                <option value="운동">체력 증진 운동</option>
+                <option value="휴식">집중 휴식</option>
+              </FilterSelect>
+            </FilterGroup>
+          </ActionGroup>
           <SearchBar>
             <SearchIcon>🔍</SearchIcon>
             <SearchInput
@@ -285,18 +294,18 @@ const HealthProgramManagement = () => {
         ) : filteredPrograms.length > 0 ? (
           <ProgramList>
             {filteredPrograms.map((program) => (
-              <ProgramCard key={program.programApplyId} onClick={() => handleCardClick(program)} style={{ cursor: 'pointer' }}>
+              <ProgramCard key={program.programApplyId} onClick={() => handleCardClick(program)}>
                 <ProgramHeader>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
+                  <HeaderContent>
                     <ParticipantAvatar>{program.empName ? program.empName[0] : '?'}</ParticipantAvatar>
                     <ParticipantInfo>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
+                      <ParticipantDetail>
                         <ParticipantName>{program.empName}</ParticipantName>
                         <ParticipantId>({program.empNo})</ParticipantId>
-                      </div>
+                      </ParticipantDetail>
                       <ParticipantDepartment>{program.departmentName}</ParticipantDepartment>
                     </ParticipantInfo>
-                  </div>
+                  </HeaderContent>
                   <StatusBadge $statusType={getStatusColor(program.status)}>
                     {getStatusText(program.status)}
                   </StatusBadge>
@@ -351,12 +360,12 @@ const HealthProgramManagement = () => {
                 <ModalSection>
                   <ModalLabel>신청 내용</ModalLabel>
                   <ModalValue $isBox>
-                    <div style={{ marginBottom: '8px', fontWeight: 'bold' }}>[{selectedApply.programName}]</div>
+                    <ProgramTitleText>[{selectedApply.programName}]</ProgramTitleText>
                     {selectedApply.applyReason}
                     {selectedApply.startDate && (
-                      <div style={{ marginTop: '8px', fontSize: '13px', color: '#666' }}>
+                      <ProgramDateText>
                         희망 기간: {new Date(selectedApply.startDate).toLocaleDateString()} ~ {new Date(selectedApply.endDate).toLocaleDateString()}
-                      </div>
+                      </ProgramDateText>
                     )}
                   </ModalValue>
                 </ModalSection>
@@ -397,7 +406,7 @@ const HealthProgramManagement = () => {
                 {selectedApply.status === 'REJECTED' && modalMode === 'detail' && (
                   <ModalSection>
                     <ModalLabel>반려 사유</ModalLabel>
-                    <ModalValue $isBox style={{ color: '#DC2626' }}>
+                    <ModalValue $isBox $isError>
                       {selectedApply.rejectReason}
                     </ModalValue>
                   </ModalSection>

@@ -321,7 +321,23 @@ const ProtestApply = () => {
                 {/* 왼쪽: 신청 폼 */}
                 <S.LeftColumn>
                     <S.SectionCard>
-                        <S.SectionTitle>정정 대상 근태</S.SectionTitle>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                            <S.SectionTitle style={{ marginBottom: 0 }}>정정 대상 근태</S.SectionTitle>
+                            <S.OcrButton
+                                type="button"
+                                onClick={() => ocrFileInputRef.current?.click()}
+                                disabled={isOcrLoading}
+                            >
+                                {isOcrLoading ? '🔄 추출 중...' : '🤖 AI로 텍스트 자동 완성'}
+                            </S.OcrButton>
+                            <input
+                                ref={ocrFileInputRef}
+                                type="file"
+                                accept="image/*"
+                                onChange={handleOcrExtract}
+                                style={{ display: 'none' }}
+                            />
+                        </div>
 
                         {/* 날짜 선택 섹션 */}
                         <S.DateSection>
@@ -424,22 +440,9 @@ const ProtestApply = () => {
 
                     <S.SectionCard>
                         <S.ReasonSection>
+
                             <S.ReasonHeader>
                                 <S.ReasonLabel>정정 사유 *</S.ReasonLabel>
-                                <S.OcrButton
-                                    type="button"
-                                    onClick={() => ocrFileInputRef.current?.click()}
-                                    disabled={isOcrLoading}
-                                >
-                                    {isOcrLoading ? '🔄 추출 중...' : '🤖 AI로 텍스트 자동 완성'}
-                                </S.OcrButton>
-                                <input
-                                    ref={ocrFileInputRef}
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleOcrExtract}
-                                    style={{ display: 'none' }}
-                                />
                             </S.ReasonHeader>
                             <S.ReasonTextarea
                                 name="protestReason"

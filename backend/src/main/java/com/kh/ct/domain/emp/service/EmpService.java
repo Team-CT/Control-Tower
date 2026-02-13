@@ -1,5 +1,6 @@
 package com.kh.ct.domain.emp.service;
 
+import com.kh.ct.domain.emp.dto.AirlineDto;
 import com.kh.ct.domain.emp.dto.EmpDto;
 import com.kh.ct.domain.emp.entity.Emp;
 
@@ -19,6 +20,11 @@ public interface EmpService {
 
     EmpDto updateMyProfile(String empId, EmpDto.UpdateMyProfileRequest request);
     void changeMyPassword(String empId, String currentPassword, String newPassword);
+
+    /**
+     * 직원의 항공사 정보 조회 (테마 적용용)
+     */
+    AirlineDto.DetailResponse getAirlineByEmpId(String empId);
 
     EmpDto.FindIdResponse findEmpId(EmpDto.FindIdRequest request);
 }

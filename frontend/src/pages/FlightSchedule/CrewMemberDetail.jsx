@@ -119,9 +119,9 @@ const CrewMemberDetail = () => {
   if (loading) {
     return (
       <S.PageContainer>
-        <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+        <S.EmptyState>
           로딩 중...
-        </div>
+        </S.EmptyState>
       </S.PageContainer>
     );
   }
@@ -129,9 +129,9 @@ const CrewMemberDetail = () => {
   if (error || !empDetail) {
     return (
       <S.PageContainer>
-        <div style={{ padding: '40px', textAlign: 'center', color: '#dc2626' }}>
+        <S.ErrorState>
           {error || '직원 정보를 찾을 수 없습니다.'}
-        </div>
+        </S.ErrorState>
       </S.PageContainer>
     );
   }

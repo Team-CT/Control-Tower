@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
+  background: ${({ theme }) => theme.background.main};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,9 +17,9 @@ export const MainContainer = styled.div`
 export const ContentWrapper = styled.div`
   width: 100%;
   max-width: 1200px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 24px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: ${({ theme }) => theme.shadow || '0 20px 60px rgba(0, 0, 0, 0.15)'};
   padding: 60px 80px;
 
   @media (max-width: 1024px) {
@@ -41,19 +41,19 @@ export const PageHeader = styled.div`
 export const HeaderIcon = styled.div`
   width: 72px;
   height: 72px;
-  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
+  background: ${({ theme }) => theme.colors.primary};
   border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 24px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  box-shadow: ${({ theme }) => theme.shadowHover || '0 8px 24px rgba(0, 0, 0, 0.2)'};
 `;
 
 export const PageTitle = styled.h1`
   font-size: 36px;
   font-weight: 700;
-  color: #1e293b;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 12px 0;
   letter-spacing: -0.02em;
 
@@ -64,7 +64,7 @@ export const PageTitle = styled.h1`
 
 export const PageDescription = styled.p`
   font-size: 16px;
-  color: #64748b;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
   line-height: 1.6;
 `;
@@ -72,7 +72,7 @@ export const PageDescription = styled.p`
 export const FormSection = styled.section`
   margin-bottom: 48px;
   padding-bottom: 48px;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 
   &:last-of-type {
     border-bottom: none;
@@ -90,8 +90,8 @@ export const SectionHeader = styled.div`
 export const SectionNumber = styled.div`
   width: 40px;
   height: 40px;
-  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
-  color: white;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse};
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -104,7 +104,7 @@ export const SectionNumber = styled.div`
 export const SectionTitle = styled.h2`
   font-size: 24px;
   font-weight: 600;
-  color: #1e293b;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 
   @media (max-width: 768px) {
@@ -137,94 +137,94 @@ export const FormGroup = styled.div`
 export const Label = styled.label`
   font-size: 15px;
   font-weight: 600;
-  color: #334155;
+  color: ${({ theme }) => theme.text.primary};
   display: flex;
   align-items: center;
   gap: 4px;
 `;
 
 export const RequiredMark = styled.span`
-  color: #000000;
+  color: ${({ theme }) => theme.status.error || '#dc2626'};
   font-size: 15px;
 `;
 
 export const Input = styled.input`
   width: 100%;
   padding: 14px 16px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid ${({ theme }) => theme.border};
   border-radius: 12px;
   font-size: 15px;
-  color: #1e293b;
+  color: ${({ theme }) => theme.text.primary};
   transition: all 0.2s ease;
-  background: #ffffff;
+  background: ${({ theme }) => theme.background.input || '#ffffff'};
 
   &::placeholder {
-    color: #94a3b8;
+    color: ${({ theme }) => theme.text.tertiary};
   }
 
   &:focus {
     outline: none;
-    border-color: #4a4a4a;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}20`};
   }
 
   &:hover {
-    border-color: #cbd5e1;
+    border-color: ${({ theme }) => theme.text.secondary};
   }
 `;
 
 export const Select = styled.select`
   width: 100%;
   padding: 14px 16px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid ${({ theme }) => theme.border};
   border-radius: 12px;
   font-size: 15px;
-  color: #1e293b;
-  background: #ffffff;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.input || '#ffffff'};
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:focus {
     outline: none;
-    border-color: #4a4a4a;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}20`};
   }
 
   &:hover {
-    border-color: #cbd5e1;
+    border-color: ${({ theme }) => theme.text.secondary};
   }
 `;
 
 export const TextArea = styled.textarea`
   width: 100%;
   padding: 14px 16px;
-  border: 2px solid #e2e8f0;
+  border: 2px solid ${({ theme }) => theme.border};
   border-radius: 12px;
   font-size: 15px;
-  color: #1e293b;
+  color: ${({ theme }) => theme.text.primary};
   font-family: inherit;
   resize: vertical;
   transition: all 0.2s ease;
-  background: #ffffff;
+  background: ${({ theme }) => theme.background.input || '#ffffff'};
 
   &::placeholder {
-    color: #94a3b8;
+    color: ${({ theme }) => theme.text.tertiary};
   }
 
   &:focus {
     outline: none;
-    border-color: #4a4a4a;
-    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}20`};
   }
 
   &:hover {
-    border-color: #cbd5e1;
+    border-color: ${({ theme }) => theme.text.secondary};
   }
 `;
 
 export const HelpText = styled.p`
   font-size: 13px;
-  color: #64748b;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
   line-height: 1.5;
 `;
@@ -232,9 +232,9 @@ export const HelpText = styled.p`
 export const FileUploadArea = styled.div`
   width: 100%;
   padding: 48px 24px;
-  border: 2px dashed #cbd5e1;
+  border: 2px dashed ${({ theme }) => theme.text.tertiary || '#cbd5e1'};
   border-radius: 12px;
-  background: #f8fafc;
+  background: ${({ theme }) => theme.background.secondary};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -244,8 +244,8 @@ export const FileUploadArea = styled.div`
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #4a4a4a;
-    background: #f5f5f5;
+    border-color: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => theme.background.hover};
   }
 `;
 
@@ -258,19 +258,19 @@ export const UploadIcon = styled.div`
 export const UploadText = styled.p`
   font-size: 16px;
   font-weight: 600;
-  color: #475569;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
 export const UploadHint = styled.p`
   font-size: 13px;
-  color: #94a3b8;
+  color: ${({ theme }) => theme.text.tertiary};
   margin: 0;
 `;
 
 export const InfoBox = styled.div`
-  background: linear-gradient(135deg, #f5f5f5 0%, #e5e5e5 100%);
-  border: 1px solid #d1d1d1;
+  background: ${({ theme }) => theme.background.secondary};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 16px;
   padding: 32px;
   margin: 48px 0;
@@ -283,7 +283,7 @@ export const InfoBox = styled.div`
 export const InfoTitle = styled.h3`
   font-size: 18px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 16px 0;
 `;
 
@@ -298,7 +298,7 @@ export const InfoList = styled.ul`
 
 export const InfoItem = styled.li`
   font-size: 14px;
-  color: #4a4a4a;
+  color: ${({ theme }) => theme.text.secondary};
   line-height: 1.6;
 `;
 
@@ -308,19 +308,20 @@ export const SubmitButton = styled.button`
   display: block;
   margin: 0 auto;
   padding: 18px 32px;
-  background: linear-gradient(135deg, #4a4a4a 0%, #2a2a2a 100%);
-  color: white;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse};
   font-size: 17px;
   font-weight: 600;
   border: none;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: ${({ theme }) => theme.shadowHover};
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    box-shadow: ${({ theme }) => theme.shadow || '0 8px 24px rgba(0, 0, 0, 0.3)'};
+    background: ${({ theme }) => theme.colors.primaryHover || theme.colors.primary};
   }
 
   &:active {
@@ -336,11 +337,11 @@ export const Footer = styled.footer`
   text-align: center;
   margin-top: 56px;
   padding-top: 32px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const Copyright = styled.p`
   font-size: 14px;
-  color: #94a3b8;
+  color: ${({ theme }) => theme.text.tertiary};
   margin: 4px 0;
 `;

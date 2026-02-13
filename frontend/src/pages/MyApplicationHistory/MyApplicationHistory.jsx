@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTheme } from 'styled-components';
 import useAuthStore from '../../store/authStore';
 import api from '../../api/axios';
 import * as S from './MyApplicationHistory.styled';
@@ -71,14 +72,37 @@ const MyApplicationHistory = () => {
     }, [activeTab]);
 
     // 상태 배지 렌더링
+    // Note: Colors are now handled by the Styled Component based on status, 
+    // but if we need specific overrides, we should use theme constants from a hook or props.
+    // For now, we will pass the status type to the styled component and let it handle colors, 
+    // or pass theme variables if we have access to theme here. 
+    // Since we don't have direct access to theme object here without a hook, 
+    // let's rely on the styled component to map status to color, OR use a hook.
+    // However, the styled component currently accepts a `color` prop.
+    // Let's use the styled component's internal mapping if possible, or mapping strings.
+
+    // Better approach: Let's pass the *status type* to the styled component and let it select the color from the theme.
+    // But StatusBadge definition in styled.js was: background: ${props => props.color || ...}
+    // Let's update it to accept $statusType and map it. 
+
+    // ACTUALLY, I will update this function to return the status string, and the styled component to accept $status.
+    // But wait, the previous styled definition I wrote was:
+    // background: ${props => props.color || props.theme.text.secondary};
+
+    // I should probably update the styled component to handle the mapping, 
+    // OR I can keep passing colors but I need access to the theme.
+    // I'll import useTheme from styled-components.
+
+    const theme = useTheme();
+
     const renderStatusBadge = (status) => {
         const statusConfig = {
-            PENDING: { label: '대기', color: '#f59e0b' },
-            APPROVED: { label: '승인', color: '#10b981' },
-            REJECTED: { label: '반려', color: '#ef4444' }
+            PENDING: { label: '대기', color: theme.status.warning },
+            APPROVED: { label: '승인', color: theme.status.success },
+            REJECTED: { label: '반려', color: theme.status.error }
         };
 
-        const config = statusConfig[status] || { label: status, color: '#6b7280' };
+        const config = statusConfig[status] || { label: status, color: theme.text.secondary };
 
         return (
             <S.StatusBadge color={config.color}>

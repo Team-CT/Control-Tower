@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background-color: #F8F9FA;
+  background-color: ${({ theme }) => theme.background.secondary};
   padding: 32px 48px;
 
   @media (max-width: 1024px) {
@@ -24,19 +24,19 @@ export const PageHeader = styled.div`
 export const PageTitle = styled.h1`
   font-size: 28px;
   font-weight: 700;
-  color: #1A1A1A;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 8px 0;
 `;
 
 export const PageSubtitle = styled.p`
   font-size: 15px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
 `;
 
 export const InfoNotice = styled.div`
-  background: linear-gradient(135deg, #EBF5FF 0%, #F0F9FF 100%);
-  border: 1.5px solid #BFDBFE;
+  background: ${({ theme }) => `linear-gradient(135deg, ${theme.colors.primary}10 0%, ${theme.colors.primary}20 100%)`};
+  border: 1.5px solid ${({ theme }) => `${theme.colors.primary}40`};
   border-radius: 12px;
   padding: 24px;
   display: flex;
@@ -48,6 +48,7 @@ export const NoticeIcon = styled.div`
   font-size: 24px;
   line-height: 1;
   flex-shrink: 0;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 export const NoticeContent = styled.div`
@@ -57,7 +58,7 @@ export const NoticeContent = styled.div`
 export const NoticeTitle = styled.div`
   font-size: 16px;
   font-weight: 700;
-  color: #1E40AF;
+  color: ${({ theme }) => theme.colors.primary};
   margin-bottom: 12px;
 `;
 
@@ -72,7 +73,7 @@ export const NoticeList = styled.ul`
 
 export const NoticeItem = styled.li`
   font-size: 14px;
-  color: #1E40AF;
+  color: ${({ theme }) => theme.colors.primary};
   line-height: 1.6;
   padding-left: 20px;
   position: relative;
@@ -86,16 +87,17 @@ export const NoticeItem = styled.li`
 `;
 
 export const FormContainer = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ theme }) => theme.shadow};
   overflow: hidden;
   margin-bottom: 24px;
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const FormSection = styled.div`
   padding: 28px 32px;
-  border-bottom: 1px solid #F3F4F6;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 
   &:last-child {
     border-bottom: none;
@@ -109,7 +111,7 @@ export const SectionHeader = styled.div`
 export const SectionTitle = styled.h2`
   font-size: 18px;
   font-weight: 700;
-  color: #1A1A1A;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
@@ -132,16 +134,16 @@ export const UploadOption = styled.button`
   align-items: center;
   gap: 16px;
   padding: 24px;
-  background: ${props => props.selected ? '#EBF5FF' : '#F9FAFB'};
-  border: 2px solid ${props => props.selected ? '#1E88E5' : '#E5E7EB'};
+  background: ${props => props.selected ? `${props.theme.colors.primary}10` : props.theme.background.main};
+  border: 2px solid ${props => props.selected ? props.theme.colors.primary : props.theme.border};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
   text-align: left;
 
   &:hover {
-    background: ${props => props.selected ? '#DBEAFE' : '#F3F4F6'};
-    border-color: ${props => props.selected ? '#1565C0' : '#1E88E5'};
+    background: ${props => props.selected ? `${props.theme.colors.primary}20` : props.theme.background.hover};
+    border-color: ${props => props.selected ? props.theme.colors.primary : props.theme.colors.primary};
   }
 `;
 
@@ -149,6 +151,7 @@ export const UploadIcon = styled.div`
   font-size: 32px;
   line-height: 1;
   flex-shrink: 0;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 export const UploadOptionContent = styled.div`
@@ -158,13 +161,13 @@ export const UploadOptionContent = styled.div`
 export const UploadOptionTitle = styled.div`
   font-size: 16px;
   font-weight: 600;
-  color: #1A1A1A;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 4px;
 `;
 
 export const UploadOptionDescription = styled.div`
   font-size: 13px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const FormGroup = styled.div`
@@ -175,36 +178,38 @@ export const FormLabel = styled.label`
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 8px;
 `;
 
 export const FormInput = styled.input`
   width: 100%;
   padding: 14px 16px;
-  border: 1.5px solid #E5E7EB;
+  border: 1.5px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
-  color: #1A1A1A;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.main};
   transition: border-color 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #1E88E5;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 
   &::placeholder {
-    color: #9CA3AF;
+    color: ${({ theme }) => theme.text.disabled || '#9CA3AF'};
   }
 `;
 
 export const FormTextArea = styled.textarea`
   width: 100%;
   padding: 16px;
-  border: 1.5px solid #E5E7EB;
+  border: 1.5px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
-  color: #1A1A1A;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.main};
   line-height: 1.6;
   resize: vertical;
   font-family: inherit;
@@ -213,15 +218,15 @@ export const FormTextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: #1E88E5;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 
   &::placeholder {
-    color: #9CA3AF;
+    color: ${({ theme }) => theme.text.disabled || '#9CA3AF'};
   }
 
   &:disabled {
-    background-color: #F9FAFB;
+    background-color: ${({ theme }) => theme.background.secondary};
     cursor: not-allowed;
   }
 `;
@@ -232,12 +237,12 @@ export const CharacterCounter = styled.div`
   align-items: center;
   margin-top: 8px;
   font-size: 13px;
-  color: #6B7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const FormActions = styled.div`
   padding: 24px 32px;
-  background: #F9FAFB;
+  background: ${({ theme }) => theme.background.secondary};
   display: flex;
   justify-content: flex-end;
   gap: 12px;
@@ -253,9 +258,9 @@ export const FormActions = styled.div`
 
 export const ResetButton = styled.button`
   padding: 14px 32px;
-  background: white;
-  color: #374151;
-  border: 1.5px solid #E5E7EB;
+  background: ${({ theme }) => theme.background.paper || 'white'};
+  color: ${({ theme }) => theme.text.primary};
+  border: 1.5px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
   font-weight: 600;
@@ -263,15 +268,15 @@ export const ResetButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: #F9FAFB;
-    border-color: #D1D5DB;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.text.secondary};
   }
 `;
 
 export const SubmitButton = styled.button`
   padding: 14px 32px;
-  background: #1E88E5;
-  color: white;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse || 'white'};
   border: none;
   border-radius: 8px;
   font-size: 15px;
@@ -284,18 +289,19 @@ export const SubmitButton = styled.button`
   justify-content: center;
 
   &:hover {
-    background: #1565C0;
+    background: ${({ theme }) => theme.colors.primaryHover || theme.colors.primary};
+    opacity: 0.9;
   }
 
   &:disabled {
-    background: #D1D5DB;
+    background: ${({ theme }) => theme.text.disabled || '#D1D5DB'};
     cursor: not-allowed;
   }
 `;
 
 export const GuideSection = styled.div`
-  background: #FFFBEB;
-  border: 1.5px solid #FDE68A;
+  background: ${({ theme }) => `${theme.status.warning}10` || '#FFFBEB'};
+  border: 1.5px solid ${({ theme }) => `${theme.status.warning}40` || '#FDE68A'};
   border-radius: 12px;
   padding: 28px;
 `;
@@ -303,7 +309,7 @@ export const GuideSection = styled.div`
 export const GuideTitle = styled.h3`
   font-size: 18px;
   font-weight: 700;
-  color: #92400E;
+  color: ${({ theme }) => theme.status.warning || '#92400E'};
   margin: 0 0 20px 0;
 `;
 
@@ -323,8 +329,8 @@ export const GuideNumber = styled.div`
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #FCD34D;
-  color: #92400E;
+  background: ${({ theme }) => `${theme.status.warning}40` || '#FCD34D'};
+  color: ${({ theme }) => theme.status.warning || '#92400E'};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -340,12 +346,23 @@ export const GuideContent = styled.div`
 export const GuideItemTitle = styled.div`
   font-size: 15px;
   font-weight: 600;
-  color: #92400E;
+  color: ${({ theme }) => theme.status.warning || '#92400E'};
   margin-bottom: 6px;
 `;
 
 export const GuideItemDescription = styled.div`
   font-size: 14px;
-  color: #B45309;
+  color: ${({ theme }) => theme.status.warning || '#B45309'};
+  opacity: 0.9;
   line-height: 1.5;
+`;
+
+export const HiddenInput = styled.input`
+  display: none;
+`;
+
+export const ErrorMessage = styled.span`
+  color: ${({ theme }) => theme.status.error};
+  margin-left: 12px;
+  font-size: 14px;
 `;

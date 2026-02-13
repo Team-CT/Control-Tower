@@ -6,7 +6,7 @@ export const PageLayout = styled.div`
   display: flex;
   min-height: 100%;
   width: 100%;
-  background: var(--bg-main);
+  background: ${({ theme }) => theme.background.secondary};
 `;
 
 export const MainContentArea = styled.div`
@@ -42,18 +42,18 @@ export const BreadcrumbItem = styled.span`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: ${(props) => (props.$active ? '600' : '400')};
-  color: ${(props) => (props.$active ? '#1d2838' : '#6b7280')};
+  color: ${(props) => (props.$active ? props.theme.text.primary : props.theme.text.secondary)};
   cursor: ${(props) => (props.$active ? 'default' : 'pointer')};
   transition: color 0.2s ease;
 
   &:hover {
-    color: ${(props) => (props.$active ? '#1d2838' : '#0284c7')};
+    color: ${(props) => (props.$active ? props.theme.text.primary : props.theme.colors.primary)};
   }
 `;
 
 export const BreadcrumbSeparator = styled.span`
   font-size: 14px;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.tertiary};
   user-select: none;
 `;
 
@@ -61,7 +61,7 @@ export const PageTitle = styled.h1`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 28px;
   font-weight: 700;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 8px 0;
 
   @media (max-width: 768px) {
@@ -73,7 +73,7 @@ export const PageDescription = styled.p`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 15px;
   font-weight: 400;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
 `;
 
@@ -108,17 +108,17 @@ export const RightColumn = styled.div`
 // ==================== 공통 카드 ====================
 
 export const SectionCard = styled.div`
-  background: #ffffff;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
   padding: 28px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
 export const SectionTitle = styled.h2`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 18px;
   font-weight: 700;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 20px 0;
   display: flex;
   align-items: center;
@@ -141,18 +141,18 @@ export const LeaveTypeButton = styled.button`
   align-items: center;
   gap: 16px;
   padding: 20px;
-  background: ${(props) => (props.$active ? 'var(--primary-light)' : '#ffffff')};
-  border: 2px solid ${(props) => (props.$active ? 'var(--primary-color)' : 'var(--border-color)')};
+  background: ${(props) => (props.$active ? `${props.theme.colors.primary}10` : props.theme.background.paper)};
+  border: 2px solid ${(props) => (props.$active ? props.theme.colors.primary : props.theme.border)};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
 
   &:hover {
-    background: var(--primary-light);
-    border-color: var(--primary-color);
+    background: ${({ theme }) => `${theme.colors.primary}05`};
+    border-color: ${({ theme }) => theme.colors.primary};
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 85, 170, 0.1);
+    box-shadow: ${({ theme }) => theme.shadowHover};
   }
 
   &:active {
@@ -167,16 +167,16 @@ export const LeaveTypeIcon = styled.div`
   align-items: center;
   justify-content: center;
   font-size: 24px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
 export const LeaveTypeName = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 16px;
   font-weight: 700;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 4px;
 `;
 
@@ -184,7 +184,7 @@ export const LeaveTypeCount = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 // ==================== 날짜 선택 ====================
@@ -209,7 +209,7 @@ export const DateLabel = styled.label`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const DateInput = styled.input`
@@ -218,21 +218,21 @@ export const DateInput = styled.input`
   padding: 12px 16px;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 15px;
-  color: #1f2937;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.input};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   outline: none;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f3f4f6;
+    background: ${({ theme }) => theme.background.hover};
   }
 
   &:focus {
-    background: #ffffff;
-    border-color: #0284c7;
-    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+    background: ${({ theme }) => theme.background.paper};
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}1a`};
   }
 `;
 
@@ -249,7 +249,7 @@ export const ReasonLabel = styled.label`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const ReasonTextarea = styled.textarea`
@@ -258,9 +258,9 @@ export const ReasonTextarea = styled.textarea`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 15px;
   line-height: 1.6;
-  color: #1f2937;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.input};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   outline: none;
   resize: vertical;
@@ -268,17 +268,17 @@ export const ReasonTextarea = styled.textarea`
   transition: all 0.2s ease;
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.tertiary};
   }
 
   &:hover {
-    background: #f3f4f6;
+    background: ${({ theme }) => theme.background.hover};
   }
 
   &:focus {
-    background: #ffffff;
-    border-color: #0284c7;
-    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+    background: ${({ theme }) => theme.background.paper};
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}1a`};
   }
 `;
 
@@ -286,8 +286,8 @@ export const ReasonTextarea = styled.textarea`
 
 export const InfoBox = styled.div`
   padding: 16px;
-  background: #eff6ff;
-  border-left: 4px solid #0284c7;
+  background: ${({ theme }) => `${theme.colors.primary}08`};
+  border-left: 4px solid ${({ theme }) => theme.colors.primary};
   border-radius: 8px;
   margin-bottom: 24px;
 `;
@@ -296,7 +296,7 @@ export const InfoTitle = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 700;
-  color: #0369a1;
+  color: ${({ theme }) => theme.colors.primary};
   margin-bottom: 12px;
 `;
 
@@ -310,7 +310,7 @@ export const InfoItem = styled.li`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 400;
-  color: #1e40af;
+  color: ${({ theme }) => theme.text.secondary};
   line-height: 1.8;
 `;
 
@@ -331,16 +331,16 @@ export const CancelButton = styled.button`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 15px;
   font-weight: 600;
-  color: #6b7280;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
+  color: ${({ theme }) => theme.text.secondary};
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.text.tertiary};
   }
 
   &:active {
@@ -353,17 +353,17 @@ export const SubmitButton = styled.button`
   font-family: inherit;
   font-size: 15px;
   font-weight: 600;
-  color: #ffffff;
-  background: var(--primary-color);
+  color: ${({ theme }) => theme.text.inverse};
+  background: ${({ theme }) => theme.colors.primary};
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: var(--primary-hover);
+    background: ${({ theme }) => theme.colors.secondary};
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0, 85, 170, 0.2);
+    box-shadow: 0 8px 16px ${({ theme }) => `${theme.colors.primary}33`};
   }
 
   &:active {
@@ -374,11 +374,11 @@ export const SubmitButton = styled.button`
 // ==================== 잔여 휴가 카드 ====================
 
 export const RemainingLeaveCard = styled.div`
-  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  background: linear-gradient(135deg, ${({ theme }) => theme.colors.primary} 0%, ${({ theme }) => theme.colors.secondary} 100%);
   border-radius: 16px;
   padding: 32px;
-  color: #ffffff;
-  box-shadow: 0 8px 24px rgba(2, 132, 199, 0.25);
+  color: ${({ theme }) => theme.text.inverse};
+  box-shadow: 0 8px 24px ${({ theme }) => `${theme.colors.primary}40`};
 `;
 
 export const RemainingStat = styled.div`
@@ -468,13 +468,13 @@ export const QuotaCard = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 16px;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.input};
   border-radius: 10px;
   margin-bottom: 12px;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f3f4f6;
+    background: ${({ theme }) => theme.background.hover};
   }
 
   &:last-child {
@@ -488,12 +488,12 @@ export const QuotaBadge = styled.span`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text.inverse};
   background: ${(props) => {
-    if ((props.$type || '').includes('연차')) return '#10b981';
-    if ((props.$type || '').includes('반차')) return '#f59e0b';
-    if ((props.$type || '').includes('병가')) return '#8b5cf6';
-    return '#6b7280';
+    if ((props.$type || '').includes('연차')) return props.theme.status.success;
+    if ((props.$type || '').includes('반차')) return props.theme.status.warning;
+    if ((props.$type || '').includes('병가')) return props.theme.colors.secondary;
+    return props.theme.text.tertiary;
   }};
   border-radius: 6px;
   margin-right: 8px;
@@ -503,14 +503,14 @@ export const QuotaType = styled.span`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const QuotaValue = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
   margin-top: 4px;
 `;
 
@@ -518,7 +518,7 @@ export const QuotaDetail = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 12px;
   font-weight: 400;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-top: 2px;
 `;
 
@@ -531,7 +531,7 @@ export const HistoryItem = styled.div`
   justify-content: space-between;
   align-items: flex-start;
   padding: 14px 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 
   &:last-child {
     border-bottom: none;
@@ -549,12 +549,12 @@ export const HistoryType = styled.span`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #ffffff;
+  color: ${({ theme }) => theme.text.inverse};
   background: ${(props) => {
-    if ((props.$type || '').includes('연차')) return '#10b981';
-    if ((props.$type || '').includes('반차')) return '#f59e0b';
-    if ((props.$type || '').includes('병가')) return '#8b5cf6';
-    return '#6b7280';
+    if ((props.$type || '').includes('ANNUAL')) return props.theme.status.success;
+    if ((props.$type || '').includes('HALF_DAY')) return props.theme.status.warning;
+    if ((props.$type || '').includes('SICK')) return props.theme.colors.secondary;
+    return props.theme.text.tertiary;
   }};
   border-radius: 4px;
   margin-bottom: 6px;
@@ -564,7 +564,7 @@ export const HistoryDate = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 4px;
 `;
 
@@ -572,7 +572,7 @@ export const HistoryDuration = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 12px;
   font-weight: 400;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const HistoryStatus = styled.span`
@@ -583,8 +583,8 @@ export const HistoryStatus = styled.span`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 12px;
   font-weight: 600;
-  color: ${(props) => (props.$status === 'approved' ? '#047857' : '#dc2626')};
-  background: ${(props) => (props.$status === 'approved' ? '#d1fae5' : '#fee2e2')};
+  color: ${(props) => (props.$status === 'approved' ? props.theme.status.success : props.theme.status.error)};
+  background: ${(props) => (props.$status === 'approved' ? `${props.theme.status.success}20` : `${props.theme.status.error}20`)};
   border-radius: 6px;
   white-space: nowrap;
 `;

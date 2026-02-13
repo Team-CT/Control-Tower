@@ -3,6 +3,7 @@ package com.kh.ct.domain.health.controller;
 import com.kh.ct.domain.health.dto.HealthDto;
 import com.kh.ct.domain.health.entity.EmpHealth;
 import com.kh.ct.domain.health.service.HealthService;
+import com.kh.ct.global.common.CommonEnums;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,7 +53,6 @@ public class HealthController {
     public ResponseEntity<Long> save(@RequestParam("empId") String empId,
             @RequestPart("file") MultipartFile file,
             @RequestPart("data") HealthDto.PhysicalTestRequest data) {
-
         Long empPhysicalTestId = healthService.save(file, empId, data);
 
         return ResponseEntity.ok(empPhysicalTestId);
@@ -159,7 +159,7 @@ public class HealthController {
 
     @GetMapping("/admin/apply/list")
     public ResponseEntity<List<HealthDto.ApplyDetailResponse>> getAdminApplyList(
-            @RequestParam(required = false) com.kh.ct.global.common.CommonEnums.ApplyStatus status,
+            @RequestParam(required = false) CommonEnums.ApplyStatus status,
             @RequestParam(required = false) String programName) {
         return ResponseEntity.ok(healthService.getAdminApplyList(status, programName));
     }

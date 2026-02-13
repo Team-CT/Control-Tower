@@ -1,206 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
-import {
-  Building2, CheckCircle, XCircle, Mail, Phone,
-  Calendar, FileText, Search, Filter
-} from 'lucide-react';
-
-const MainContainer = styled.div`
-  padding: 32px;
-  max-width: 1400px;
-  margin: 0 auto;
-`;
-
-const Header = styled.div`
-  margin-bottom: 32px;
-`;
-
-const Title = styled.h1`
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-`;
-
-const Subtitle = styled.p`
-  font-size: 14px;
-  color: var(--text-secondary);
-`;
-
-const FilterBar = styled.div`
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-`;
-
-const SearchInput = styled.input`
-  flex: 1;
-  padding: 10px 16px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  font-size: 14px;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  
-  &:focus {
-    outline: none;
-    border-color: var(--primary-color);
-  }
-`;
-
-const FilterButton = styled.button`
-  padding: 10px 20px;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  font-size: 14px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  
-  &:hover {
-    background: var(--bg-hover);
-  }
-  
-  ${props => props.$active && `
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-  `}
-`;
-
-const ApprovalList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const ApprovalCard = styled.div`
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 24px;
-`;
-
-const CardHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: 20px;
-`;
-
-const AirlineInfo = styled.div`
-  flex: 1;
-`;
-
-const AirlineName = styled.h3`
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
-
-const StatusBadge = styled.span`
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
-  
-  ${props => props.$status === 'pending' && `
-    background: #FFF3CD;
-    color: #856404;
-  `}
-  
-  ${props => props.$status === 'approved' && `
-    background: #D4EDDA;
-    color: #155724;
-  `}
-  
-  ${props => props.$status === 'rejected' && `
-    background: #F8D7DA;
-    color: #721C24;
-  `}
-`;
-
-const DetailGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-`;
-
-const DetailItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--text-secondary);
-`;
-
-const DetailLabel = styled.span`
-  font-weight: 500;
-  color: var(--text-primary);
-`;
-
-const ThemeColorBox = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`;
-
-const ColorSwatch = styled.div`
-  width: 16px;
-  height: 16px;
-  border-radius: 4px;
-  background-color: ${props => props.$color};
-  border: 1px solid var(--border-color);
-`;
-
-const ActionButtons = styled.div`
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-`;
-
-const Button = styled.button`
-  padding: 10px 24px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  
-  ${props => props.$approve && `
-    background: #50C878;
-    color: white;
-    &:hover {
-      background: #45B369;
-    }
-  `}
-  
-  ${props => props.$reject && `
-    background: #FF6B6B;
-    color: white;
-    &:hover {
-      background: #E85C5C;
-    }
-  `}
-  
-  ${props => props.$view && `
-    background: var(--bg-main);
-    color: var(--text-primary);
-    border: 1px solid var(--border-color);
-    &:hover {
-      background: var(--bg-hover);
-    }
-  `}
-`;
+import * as S from './AirlineApprovalManagement.styled';
 
 const AirlineApprovalManagement = () => {
   const [filter, setFilter] = useState('pending'); // 'all', 'pending', 'approved', 'rejected'
@@ -302,123 +101,170 @@ const AirlineApprovalManagement = () => {
   });
 
   return (
-    <MainContainer>
-      <Header>
-        <Title>항공사 승인 관리</Title>
-        <Subtitle>항공사 가입 신청 검토 및 승인 처리</Subtitle>
-      </Header>
+    <S.MainContainer>
+      <S.Header>
+        <S.Title>항공사 승인 관리</S.Title>
+        <S.Subtitle>항공사 가입 신청 검토 및 승인 처리</S.Subtitle>
+      </S.Header>
 
-      <FilterBar>
-        <SearchInput
+      <S.StatsGrid>
+        <S.StatCard $type="pending">
+          <S.StatIcon $type="pending">📋</S.StatIcon>
+          <S.StatInfo>
+            <S.StatLabel>대기 중</S.StatLabel>
+            <S.StatValue>{approvalRequests.filter(r => r.status === 'pending').length}</S.StatValue>
+            <S.StatSubtext>처리 필요</S.StatSubtext>
+          </S.StatInfo>
+        </S.StatCard>
+
+        <S.StatCard $type="approved">
+          <S.StatIcon $type="approved">✓</S.StatIcon>
+          <S.StatInfo>
+            <S.StatLabel>승인</S.StatLabel>
+            <S.StatValue>{approvalRequests.filter(r => r.status === 'approved').length}</S.StatValue>
+            <S.StatSubtext>승인 완료</S.StatSubtext>
+          </S.StatInfo>
+        </S.StatCard>
+
+        <S.StatCard $type="rejected">
+          <S.StatIcon $type="rejected">⚠</S.StatIcon>
+          <S.StatInfo>
+            <S.StatLabel>반려</S.StatLabel>
+            <S.StatValue>{approvalRequests.filter(r => r.status === 'rejected').length}</S.StatValue>
+            <S.StatSubtext>반려 처리</S.StatSubtext>
+          </S.StatInfo>
+        </S.StatCard>
+      </S.StatsGrid>
+
+      <S.FilterBar>
+        <S.SearchInput
           type="text"
           placeholder="항공사명 또는 이메일로 검색..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <FilterButton
+        <S.FilterButton
           $active={filter === 'all'}
           onClick={() => setFilter('all')}
         >
           전체
-        </FilterButton>
-        <FilterButton
+        </S.FilterButton>
+        <S.FilterButton
           $active={filter === 'pending'}
           onClick={() => setFilter('pending')}
         >
           대기 중
-        </FilterButton>
-        <FilterButton
+        </S.FilterButton>
+        <S.FilterButton
           $active={filter === 'approved'}
           onClick={() => setFilter('approved')}
         >
           승인됨
-        </FilterButton>
-        <FilterButton
+        </S.FilterButton>
+        <S.FilterButton
           $active={filter === 'rejected'}
           onClick={() => setFilter('rejected')}
         >
           반려됨
-        </FilterButton>
-      </FilterBar>
+        </S.FilterButton>
+      </S.FilterBar>
 
-      <ApprovalList>
+      <S.ApprovalList>
         {filteredRequests.map(request => (
-          <ApprovalCard key={request.id}>
-            <CardHeader>
-              <AirlineInfo>
-                <AirlineName>
+          <S.ApprovalCard key={request.id}>
+            <S.CardHeader>
+              <S.AirlineInfo>
+                <S.AirlineName>
                   <Building2 size={20} />
                   {request.airlineName}
-                </AirlineName>
-              </AirlineInfo>
-              <StatusBadge $status={request.status}>
+                </S.AirlineName>
+              </S.AirlineInfo>
+              <S.StatusBadge $status={request.status}>
                 {request.status === 'pending' && '승인 대기'}
                 {request.status === 'approved' && '승인 완료'}
                 {request.status === 'rejected' && '반려됨'}
-              </StatusBadge>
-            </CardHeader>
+              </S.StatusBadge>
+            </S.CardHeader>
 
-            <DetailGrid>
-              <DetailItem>
+            <S.DetailGrid>
+              <S.DetailItem>
                 <Mail size={16} />
-                <DetailLabel>이메일:</DetailLabel> {request.managerEmail}
-              </DetailItem>
-              <DetailItem>
+                <S.DetailLabel>이메일:</S.DetailLabel> {request.managerEmail}
+              </S.DetailItem>
+              <S.DetailItem>
                 <Phone size={16} />
-                <DetailLabel>전화번호:</DetailLabel> {request.managerPhone}
-              </DetailItem>
-              <DetailItem>
+                <S.DetailLabel>전화번호:</S.DetailLabel> {request.managerPhone}
+              </S.DetailItem>
+              <S.DetailItem>
                 <Building2 size={16} />
-                <DetailLabel>도메인:</DetailLabel> @{request.domain}
-              </DetailItem>
-              <DetailItem>
+                <S.DetailLabel>도메인:</S.DetailLabel> @{request.domain}
+              </S.DetailItem>
+              <S.DetailItem>
                 <Calendar size={16} />
-                <DetailLabel>신청일:</DetailLabel> {request.submittedDate}
-              </DetailItem>
-              <DetailItem>
+                <S.DetailLabel>신청일:</S.DetailLabel> {request.submittedDate}
+              </S.DetailItem>
+              <S.DetailItem>
                 <Building2 size={16} />
-                <DetailLabel>주소:</DetailLabel> {request.airlineAddress}
-              </DetailItem>
-              <DetailItem>
+                <S.DetailLabel>주소:</S.DetailLabel> {request.airlineAddress}
+              </S.DetailItem>
+              <S.DetailItem>
                 <Phone size={16} />
-                <DetailLabel>대표번호:</DetailLabel> {request.mainNumber}
-              </DetailItem>
-              <DetailItem style={{ gridColumn: 'span 2' }}>
-                <DetailLabel>테마 컬러:</DetailLabel>
-                <ThemeColorBox>
-                  <ColorSwatch $color={request.theme.mainColor} />
+                <S.DetailLabel>대표번호:</S.DetailLabel> {request.mainNumber}
+              </S.DetailItem>
+              <S.DetailItem style={{ gridColumn: 'span 2' }}>
+                <S.DetailLabel>테마 컬러:</S.DetailLabel>
+                <S.ThemeColorBox>
+                  <S.ColorSwatch $color={request.theme.mainColor} />
                   <span>{request.theme.mainColor}</span>
-                  <ColorSwatch $color={request.theme.subColor} />
+                  <S.ColorSwatch $color={request.theme.subColor} />
                   <span>{request.theme.subColor}</span>
-                </ThemeColorBox>
-              </DetailItem>
+                </S.ThemeColorBox>
+              </S.DetailItem>
               {request.description && (
-                <DetailItem style={{ gridColumn: 'span 2' }}>
-                  <DetailLabel>설명:</DetailLabel> {request.description}
-                </DetailItem>
+                <S.DetailItem style={{ gridColumn: 'span 2' }}>
+                  <S.DetailLabel>설명:</S.DetailLabel> {request.description}
+                </S.DetailItem>
               )}
-            </DetailGrid>
+            </S.DetailGrid>
 
             {request.status === 'pending' && (
-              <ActionButtons>
-                <Button $view onClick={() => handleViewDetails(request.id)}>
+              <S.ActionButtons>
+                <S.Button $view onClick={() => handleViewDetails(request.id)}>
                   <FileText size={16} />
                   상세 보기
-                </Button>
-                <Button $reject onClick={() => handleReject(request)}>
+                </S.Button>
+                <S.Button $reject onClick={() => handleReject(request)}>
                   <XCircle size={16} />
                   반려
-                </Button>
-                <Button $approve onClick={() => handleApprove(request.id)}>
+                </S.Button>
+                <S.Button $approve onClick={() => handleApprove(request.id)}>
                   <CheckCircle size={16} />
                   승인
-                </Button>
-              </ActionButtons>
+                </S.Button>
+              </S.ActionButtons>
             )}
-          </ApprovalCard>
+          </S.ApprovalCard>
         ))}
-      </ApprovalList>
-    </MainContainer>
+      </S.ApprovalList>
+
+      {/* 반려 모달 */}
+      {rejectModalOpen && (
+        <S.ModalOverlay onClick={() => setRejectModalOpen(false)}>
+          <S.ModalContainer onClick={e => e.stopPropagation()}>
+            <S.ModalHeader>반려 사유 입력</S.ModalHeader>
+            <S.TextArea
+              placeholder="반려 사유를 입력해주세요."
+              value={rejectReason}
+              onChange={e => setRejectReason(e.target.value)}
+            />
+            <S.ModalActions>
+              <S.Button $view onClick={() => setRejectModalOpen(false)}>취소</S.Button>
+              <S.Button $reject onClick={handleRejectConfirm}>반려 확인</S.Button>
+            </S.ModalActions>
+          </S.ModalContainer>
+        </S.ModalOverlay>
+      )}
+    </S.MainContainer>
   );
 };
 
