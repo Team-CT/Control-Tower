@@ -13,14 +13,34 @@ const Chatbot = () => {
     
     const userMsg = { text: input, isBot: false };
     setMessages(prev => [...prev, userMsg]);
+    const currentInput = input;
     setInput("");
 
     try {
+      // 1. localStorage에서 auth-storage 꺼내기
+      const authStorage = localStorage.getItem('auth-storage');
+      let token = null;
+
+      if (authStorage) {
+        const parsedAuth = JSON.parse(authStorage);
+        // Zustand의 persist 구조인 state 안의 token 값을 가져옵니다.
+        token = parsedAuth.state?.token; 
+      }
+
+      // 2. fetch 요청 시 headers에 토큰 추가
       const response = await fetch('http://localhost:8001/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: input }),
+        headers: { 
+          'Content-Type': 'application/json',
+          // Bearer 토큰 형식으로 인증 헤더 추가
+          'Authorization': token ? `Bearer ${token}` : "" 
+        },
+        body: JSON.stringify({ message: currentInput }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
       const data = await response.json();
       setMessages(prev => [...prev, { text: data.reply, isBot: true }]);
@@ -29,7 +49,6 @@ const Chatbot = () => {
       setMessages(prev => [...prev, { text: "죄송합니다. 서버와 연결할 수 없습니다.", isBot: true }]);
     }
   };
-
   return (
     <>
       {/* 챗봇 버튼 */}

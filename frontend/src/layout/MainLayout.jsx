@@ -5,7 +5,7 @@ import Sidebar from './Sidebar/Sidebar';
 import Header from './Header/Header';
 import Footer from './Footer/Footer';
 import useAuthStore from '../store/authStore';
-
+import Chatbot from '../ChatBot/Chatbot';
 // 전체 레이아웃 (화면 꽉 채움, 스크롤 없음)
 const LayoutContainer = styled.div`
   display: flex;
@@ -48,7 +48,9 @@ const MainLayout = () => {
   const userRole = getRole();
 
   return (
+    
     <LayoutContainer>
+      <Chatbot />
       {/* 1. 좌측 사이드바 (userRole 값 전달) */}
       <Sidebar userRole={userRole} />
 
