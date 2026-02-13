@@ -1,6 +1,8 @@
 package com.kh.ct.domain.emp.service;
 
+import com.kh.ct.domain.emp.dto.AirlineDto;
 import com.kh.ct.domain.emp.dto.EmpDto;
+import com.kh.ct.domain.emp.entity.Airline;
 import com.kh.ct.domain.emp.entity.Emp;
 import com.kh.ct.domain.emp.repository.EmpRepository;
 import com.kh.ct.global.common.CommonEnums;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -152,7 +155,7 @@ public class EmpServiceImpl implements EmpService {
                             .role(emp.getRole() != null ? emp.getRole().name() : "")
                             .build();
                 })
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -328,7 +331,6 @@ public class EmpServiceImpl implements EmpService {
     }
 
     @Override
-<<<<<<< Updated upstream
     public EmpDto.FindIdResponse findEmpId(EmpDto.FindIdRequest request) {
 
         if (request == null) {
@@ -354,7 +356,7 @@ public class EmpServiceImpl implements EmpService {
     }
 
     @Override
-    public com.kh.ct.domain.emp.dto.AirlineDto.DetailResponse getAirlineByEmpId(String empId) {
+    public AirlineDto.DetailResponse getAirlineByEmpId(String empId) {
         Emp emp = empRepository.findByIdWithDetails(empId)
                 .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND,
                         "직원을 찾을 수 없습니다. (empId: " + empId + ")"));
@@ -364,24 +366,9 @@ public class EmpServiceImpl implements EmpService {
                     "해당 직원은 항공사에 소속되어 있지 않습니다.");
         }
 
-        com.kh.ct.domain.emp.entity.Airline airline = emp.getAirlineId();
-
-=======
-    public com.kh.ct.domain.emp.dto.AirlineDto.DetailResponse getAirlineByEmpId(String empId) {
-        Emp emp = empRepository.findByIdWithDetails(empId)
-                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, 
-                        "직원을 찾을 수 없습니다. (empId: " + empId + ")"));
-        
-        if (emp.getAirlineId() == null) {
-            throw new BusinessException(HttpStatus.NOT_FOUND, 
-                    "해당 직원은 항공사에 소속되어 있지 않습니다.");
-        }
-        
-        com.kh.ct.domain.emp.entity.Airline airline = emp.getAirlineId();
-        
->>>>>>> Stashed changes
+        Airline airline = emp.getAirlineId();
         // AirlineDto.DetailResponse 생성
-        return com.kh.ct.domain.emp.dto.AirlineDto.DetailResponse.builder()
+        return AirlineDto.DetailResponse.builder()
                 .id(airline.getAirlineId())
                 .name(airline.getAirlineName())
                 .primaryColor(airline.getPrimaryColor())

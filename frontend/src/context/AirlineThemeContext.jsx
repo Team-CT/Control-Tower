@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { createTheme } from '../styles/theme';
-import axios from 'axios';
+import { api } from '../api/axios';
 
 const AirlineThemeContext = createContext();
 
@@ -153,7 +153,7 @@ export const AirlineThemeProvider = ({ children }) => {
         console.log('📡 [AirlineThemeContext] API 호출 시작: /api/emps/me/airline');
 
         // API 호출 (토큰 기반 인증, empId 불필요)
-        const response = await axios.get('/api/emps/me/airline');
+        const response = await api.get('/api/emps/me/airline');
         console.log('📡 [AirlineThemeContext] API 응답:', response.data);
 
         const data = response.data.data; // ApiResponse 구조: { success, message, data }

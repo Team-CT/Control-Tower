@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/emps/findId").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/emps/checkId").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/api/emps/empNo/preview").permitAll()
+                        .requestMatchers("/api/emps/me/**").authenticated() // 내 정보 조회 등은 인증 필수 (와일드카드보다 우선순위 높음)
                         .requestMatchers(HttpMethod.GET, "/api/emps/*/airline").permitAll() // 임시: 테스트용 (나중에 authenticated()로 변경)
                         .requestMatchers(HttpMethod.POST,"/api/passwordCode/**").permitAll()
 

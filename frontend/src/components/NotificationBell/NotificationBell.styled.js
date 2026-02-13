@@ -10,21 +10,27 @@ export const NotificationButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 42px; /* UserAvatar와 동일한 크기 */
+  height: 42px;
+  padding: 0; /* 패딩 제거하여 아이콘 크기 확보 */
+  flex-shrink: 0;
   border: none;
   background: transparent;
   cursor: pointer;
-  border-radius: 8px;
-  color: ${({ theme }) => theme.colors.text || '#333'};
-  transition: background-color 0.2s;
+  border-radius: 50%; /* 원형 버튼 */
+  
+  /* 테마 변수 대신 CSS 변수 사용 (AirlineThemeContext에서 확실히 설정됨) */
+  color: var(--text-secondary, #4A5568);
+  transition: all 0.2s ease;
+  z-index: 10;
 
   &:hover {
-    background-color: ${({ theme }) => theme.colors.hover || 'rgba(0, 0, 0, 0.05)'};
+    color: var(--text-primary, #1A202C);
+    background-color: var(--bg-hover, #E2E8F0);
   }
 
   &:active {
-    background-color: ${({ theme }) => theme.colors.active || 'rgba(0, 0, 0, 0.1)'};
+    transform: scale(0.95);
   }
 `;
 

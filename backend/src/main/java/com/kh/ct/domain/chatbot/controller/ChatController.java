@@ -11,10 +11,9 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:5173")
-@RequiredArgsConstructor // Lombok을 사용하면 생성자를 직접 안 써도 됩니다.
+@RequiredArgsConstructor
 public class ChatController {
 
-    // 서비스 레이어를 주입받습니다.
     private final ChatService chatService;
 
     @PostMapping("/chat")

@@ -14,6 +14,7 @@ import com.kh.ct.domain.health.repository.*;
 import com.kh.ct.domain.health.service.parser.HealthLabelParser;
 import com.kh.ct.domain.health.service.parser.PdfTextExtractor;
 import com.kh.ct.domain.schedule.entity.AllSchedule;
+import com.kh.ct.domain.schedule.repository.AllScheduleRepository;
 import com.kh.ct.global.common.CommonEnums;
 import com.kh.ct.global.entity.File;
 import com.kh.ct.global.repository.FileRepository;
@@ -52,8 +53,8 @@ public class HealthServiceImpl implements HealthService {
     private final FileRepository fileRepository;
     private final EmpHealthRepository empHealthRepository;
     private final ProgramApplyRepository programApplyRepository; // DDD - Repository 주입
-    private final com.kh.ct.domain.schedule.repository.AllScheduleRepository allScheduleRepository;
-    private final com.kh.ct.domain.health.repository.ProgramRepository programRepository;
+    private final AllScheduleRepository allScheduleRepository;
+    private final ProgramRepository programRepository;
     private final HealthScoreRuleRepository healthScoreRuleRepository;
     private final SurveyRepository surveyRepository;
     private final AttendanceRepository attendanceRepository;
@@ -261,8 +262,8 @@ public class HealthServiceImpl implements HealthService {
     public void applyProgram(HealthDto.ApplyRequest request, String empId) {
         try {
             // [VALIDATION] 시작일 기준 최소 3일 전 예약 필수
-            java.time.LocalDate startDate = request.getStartDate().toLocalDate();
-            java.time.LocalDate minDate = java.time.LocalDate.now().plusDays(3);
+            LocalDate startDate = request.getStartDate().toLocalDate();
+            LocalDate minDate = LocalDate.now().plusDays(3);
 
             if (startDate.isBefore(minDate)) {
                 throw new IllegalArgumentException("프로그램은 시작일 기준 최소 3일 전에만 신청 가능합니다.");
@@ -296,7 +297,7 @@ public class HealthServiceImpl implements HealthService {
                 throw new IllegalArgumentException("Start date or End date cannot be null");
             }
 
-            com.kh.ct.domain.schedule.entity.AllSchedule schedule = com.kh.ct.domain.schedule.entity.AllSchedule
+            AllSchedule schedule = AllSchedule
                     .builder()
                     .scheduleCode("HEALTH_" + request.getProgramCode().toUpperCase())
                     .startDate(request.getStartDate())
@@ -306,7 +307,7 @@ public class HealthServiceImpl implements HealthService {
 
             // 5. Program 생성 (세부 프로그램 정보)
             // Program은 ProgramApply와 OneToOne (MapsId)
-            com.kh.ct.domain.health.entity.Program program = com.kh.ct.domain.health.entity.Program.builder()
+            Program program = Program.builder()
                     .programApply(apply) // [FIX] Managed 'apply' 사용
                     .scheduleId(schedule)
                     .programContent(parseProgramContent(request.getProgramCode()))
@@ -367,7 +368,7 @@ public class HealthServiceImpl implements HealthService {
         // 1. Program 조회
         programRepository.findById(programApplyId).ifPresent(program -> {
             // 2. Schedule 삭제를 위해 조회 (Program이 Schedule을 참조함)
-            com.kh.ct.domain.schedule.entity.AllSchedule schedule = program.getScheduleId();
+            AllSchedule schedule = program.getScheduleId();
 
             // Program 삭제
             programRepository.delete(program);
@@ -384,7 +385,7 @@ public class HealthServiceImpl implements HealthService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<HealthDto.ApplyDetailResponse> getAdminApplyList(com.kh.ct.global.common.CommonEnums.ApplyStatus status,
+    public List<HealthDto.ApplyDetailResponse> getAdminApplyList(CommonEnums.ApplyStatus status,
             String programName) {
         return programApplyRepository.findAllByFilters(status, programName).stream()
                 .map(apply -> {
