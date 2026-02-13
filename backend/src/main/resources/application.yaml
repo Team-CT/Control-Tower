@@ -51,12 +51,18 @@ spring:
   ai:
     google:
       genai:
-        api-key: AIzaSyC7PpFY9MjMAF_ie_ESlHcAyK_pmk4j5WI
+        api-key: ${APIKEY}
         project-id: any-name-is-ok
         chat:
           options:
             model: gemini-2.5-flash
             temperature: 0.7
+            # 2. 올라마 설정 (새로 추가)
+#    ollama:
+#      base-url: http://localhost:11434
+#      chat:
+#        options:
+#          model: llama3.1
 
 server:
   port: 8001
