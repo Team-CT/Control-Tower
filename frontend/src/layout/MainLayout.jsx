@@ -11,7 +11,7 @@ const LayoutContainer = styled.div`
   display: flex;
   width: 100%;
   height: 100vh;
-  background-color: var(--bg-main);
+  background-color: ${({ theme }) => theme.background.main};
   overflow: hidden;
 `;
 
@@ -22,7 +22,7 @@ const ContentArea = styled.div`
   flex-direction: column;
   height: 100%;
   position: relative;
-  background-color: var(--bg-secondary);
+  background-color: ${({ theme }) => theme.background.secondary};
 `;
 
 // 실제 스크롤이 발생하는 영역

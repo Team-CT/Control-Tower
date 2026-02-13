@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: ${({ theme }) => theme.background.secondary};
   padding: 32px;
   box-sizing: border-box;
   overflow-x: hidden;
@@ -31,13 +31,13 @@ export const PageHeader = styled.div`
 export const PageTitle = styled.h1`
   font-size: 28px;
   font-weight: 700;
-  color: #1a1d1f;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 8px 0;
 `;
 
 export const PageDescription = styled.p`
   font-size: 15px;
-  color: #6f767e;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
 `;
 
@@ -70,34 +70,35 @@ export const SearchIcon = styled.span`
   top: 50%;
   transform: translateY(-50%);
   font-size: 18px;
-  color: #9a9fa5;
+  color: ${({ theme }) => theme.text.tertiary};
 `;
 
 export const SearchInput = styled.input`
   width: 100%;
   padding: 14px 16px 14px 48px;
   font-size: 15px;
-  border: 1px solid #e4e7eb;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.background.input};
+  color: ${({ theme }) => theme.text.primary};
   transition: all 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #4c6fff;
-    box-shadow: 0 0 0 3px rgba(76, 111, 255, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}1a`};
   }
 
   &::placeholder {
-    color: #9a9fa5;
+    color: ${({ theme }) => theme.text.tertiary};
   }
 `;
 
 export const ViewToggle = styled.div`
   display: flex;
   gap: 4px;
-  background-color: #ffffff;
-  border: 1px solid #e4e7eb;
+  background-color: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   padding: 4px;
 `;
@@ -109,15 +110,15 @@ export const ViewButton = styled.button`
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  background-color: ${props => props.$active ? '#4c6fff' : 'transparent'};
-  color: ${props => props.$active ? '#ffffff' : '#6f767e'};
+  background-color: ${props => props.$active ? props.theme.colors.primary : 'transparent'};
+  color: ${props => props.$active ? props.theme.text.inverse : props.theme.text.secondary};
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: ${props => props.$active ? '#3651e0' : '#f1f3f5'};
+    background-color: ${props => props.$active ? props.theme.colors.secondary : props.theme.background.hover};
   }
 `;
 
@@ -134,15 +135,15 @@ export const GridContainer = styled.div`
 
 export const TenantCard = styled.div`
   position: relative;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: ${({ theme }) => theme.shadow || '0 1px 3px rgba(0, 0, 0, 0.05)'};
   transition: all 0.2s;
   box-sizing: border-box;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: ${({ theme }) => theme.shadowHover || '0 4px 12px rgba(0, 0, 0, 0.1)'};
     transform: translateY(-2px);
   }
 
@@ -164,7 +165,7 @@ export const TenantIcon = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #e8edff;
+  background-color: ${({ theme }) => `${theme.colors.primary}10`};
   border-radius: 12px;
   font-size: 24px;
 `;
@@ -172,7 +173,7 @@ export const TenantIcon = styled.div`
 export const TenantName = styled.h3`
   font-size: 18px;
   font-weight: 700;
-  color: #1a1d1f;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
@@ -182,7 +183,7 @@ export const CardBody = styled.div`
 
 export const TenantId = styled.div`
   font-size: 13px;
-  color: #6f767e;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 8px;
 `;
 
@@ -194,22 +195,24 @@ export const PlanBadge = styled.span`
   font-weight: 600;
   margin-bottom: 12px;
   background-color: ${props => {
+    if (props.plan === 'Enterprise') return `${props.theme.colors.primary}20`; // Assuming purple is primary related or specific color needed? Keeping consistent with original intent but using theme logic if possible, or keeping specific colors if they are distinct from theme.
+    // Actually, Enterprise was purple, Professional was blue. Let's use theme colors if possible or static colors if they imply specific tiers.
+    // Original: Enterprise #f3e8ff (purple-100), Professional #dbeafe (blue-100), Basic #f1f3f5 (gray-100)
+    // Let's keep specific colors but maybe use theme variables for base if available, or just hardcoded for these specific business logic badges.
     if (props.plan === 'Enterprise') return '#f3e8ff';
     if (props.plan === 'Professional') return '#dbeafe';
-    if (props.plan === 'Basic') return '#f1f3f5';
-    return '#f1f3f5';
+    return props.theme.background.secondary;
   }};
   color: ${props => {
     if (props.plan === 'Enterprise') return '#7c3aed';
     if (props.plan === 'Professional') return '#2563eb';
-    if (props.plan === 'Basic') return '#6f767e';
-    return '#6f767e';
+    return props.theme.text.secondary;
   }};
 `;
 
 export const EmployeeCount = styled.div`
   font-size: 14px;
-  color: #33373d;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const CardFooter = styled.div`
@@ -218,7 +221,7 @@ export const CardFooter = styled.div`
   justify-content: space-between;
   gap: 12px;
   padding-top: 16px;
-  border-top: 1px solid #f1f3f5;
+  border-top: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const StatusBadge = styled.div`
@@ -230,16 +233,16 @@ export const StatusBadge = styled.div`
   font-size: 13px;
   font-weight: 500;
   background-color: ${props => {
-    if (props.$status === 'active') return '#d4f4dd';
-    if (props.$status === 'payment-pending') return '#fff3cd';
-    if (props.$status === 'inactive') return '#ffe4e6';
-    return '#f1f3f5';
+    if (props.$status === 'active') return `${props.theme.status.success}20`;
+    if (props.$status === 'payment-pending') return `${props.theme.status.warning}20`;
+    if (props.$status === 'inactive') return `${props.theme.status.error}20`;
+    return props.theme.background.secondary;
   }};
   color: ${props => {
-    if (props.$status === 'active') return '#0f7a35';
-    if (props.$status === 'payment-pending') return '#856404';
-    if (props.$status === 'inactive') return '#dc2626';
-    return '#6f767e';
+    if (props.$status === 'active') return props.theme.status.success;
+    if (props.$status === 'payment-pending') return props.theme.status.warning;
+    if (props.$status === 'inactive') return props.theme.status.error;
+    return props.theme.text.secondary;
   }};
 `;
 
@@ -254,15 +257,15 @@ export const ViewDetailButton = styled.button`
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 600;
-  color: #ffffff;
-  background-color: #4c6fff;
+  color: ${({ theme }) => theme.text.inverse};
+  background-color: ${({ theme }) => theme.colors.primary};
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: #3651e0;
+    background-color: ${({ theme }) => theme.colors.secondary};
   }
 `;
 
@@ -282,20 +285,20 @@ export const ActionButton = styled.button`
   border: none;
   border-radius: 6px;
   font-size: 20px;
-  color: #6f767e;
+  color: ${({ theme }) => theme.text.secondary};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: #f1f3f5;
+    background-color: ${({ theme }) => theme.background.hover};
   }
 `;
 
 // Table View
 export const TableContainer = styled.div`
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: ${({ theme }) => theme.shadow || '0 1px 3px rgba(0, 0, 0, 0.05)'};
   overflow-x: auto;
   box-sizing: border-box;
 `;
@@ -306,19 +309,19 @@ export const Table = styled.table`
 `;
 
 export const TableHead = styled.thead`
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e4e7eb;
+  background-color: ${({ theme }) => theme.background.secondary};
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const TableBody = styled.tbody``;
 
 export const TableRow = styled.tr`
   &:not(:last-child) {
-    border-bottom: 1px solid #f1f3f5;
+    border-bottom: 1px solid ${({ theme }) => theme.border};
   }
 
   &:hover {
-    background-color: #f8f9fa;
+    background-color: ${({ theme }) => theme.background.hover};
   }
 `;
 
@@ -327,14 +330,14 @@ export const TableHeader = styled.th`
   text-align: left;
   font-size: 14px;
   font-weight: 600;
-  color: #1a1d1f;
+  color: ${({ theme }) => theme.text.primary};
   white-space: nowrap;
 `;
 
 export const TableCell = styled.td`
   padding: 18px 20px;
   font-size: 14px;
-  color: #33373d;
+  color: ${({ theme }) => theme.text.secondary};
   vertical-align: middle;
 `;
 
@@ -350,14 +353,14 @@ export const TenantIconSmall = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #e8edff;
+  background-color: ${({ theme }) => `${theme.colors.primary}10`};
   border-radius: 8px;
   font-size: 18px;
 `;
 
 export const TenantNameText = styled.span`
   font-weight: 600;
-  color: #1a1d1f;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const ViewDetailButtonSmall = styled.button`
@@ -367,15 +370,42 @@ export const ViewDetailButtonSmall = styled.button`
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 500;
-  color: #4c6fff;
+  color: ${({ theme }) => theme.colors.primary};
   background-color: transparent;
-  border: 1px solid #4c6fff;
+  border: 1px solid ${({ theme }) => theme.colors.primary};
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: #4c6fff;
-    color: #ffffff;
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.text.inverse};
+  }
+`;
+
+// Additional Components for Inline Style Replacement
+export const LoadingWrapper = styled.div`
+  text-align: center;
+  padding: 50px;
+  color: ${({ theme }) => theme.text.secondary};
+`;
+
+export const ErrorWrapper = styled.div`
+  text-align: center;
+  padding: 50px;
+  color: ${({ theme }) => theme.status.error};
+`;
+
+export const RetryButton = styled.button`
+  margin-top: 20px;
+  padding: 10px 20px;
+  cursor: pointer;
+  background-color: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 6px;
+  color: ${({ theme }) => theme.text.primary};
+
+  &:hover {
+    background-color: ${({ theme }) => theme.background.hover};
   }
 `;

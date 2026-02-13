@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/emps/findId").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/emps/checkId").permitAll()
                         .requestMatchers(HttpMethod.GET,  "/api/emps/empNo/preview").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/emps/*/airline").permitAll() // 임시: 테스트용 (나중에 authenticated()로 변경)
                         .requestMatchers(HttpMethod.POST,"/api/passwordCode/**").permitAll()
 
                         .requestMatchers("/api/chat").permitAll()
@@ -111,16 +112,5 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    public CommandLineRunner passwordEncodeRunner(PasswordEncoder passwordEncoder) {
-        return args -> {
-            String rawPassword = "qwer1234";   // 👉 여기 원하는 평문 비밀번호 입력
-            String encodedPassword = passwordEncoder.encode(rawPassword);
 
-            System.out.println("=================================");
-            System.out.println("🔐 RAW PASSWORD     : " + rawPassword);
-            System.out.println("🔐 ENCODED PASSWORD : " + encodedPassword);
-            System.out.println("=================================");
-        };
-    }
 }

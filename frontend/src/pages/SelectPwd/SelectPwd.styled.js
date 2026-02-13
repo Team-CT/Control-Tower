@@ -37,12 +37,8 @@ export const S = {
     justify-content: center;
     width: 100vw;
     height: 100vh;
-
-    /* ✅ 옵션 1) 기존 테마 배경 유지(테마 감성 유지) */
-    background: linear-gradient(117deg, ${({ theme }) => theme?.hover ?? TOKENS.accentSoft} 0%, #ffffff 100%);
-
-    /* ✅ 옵션 2) 테마 의존 제거(항상 동일) - 원하면 위 줄을 지우고 아래만 쓰기 */
-    /* background: ${TOKENS.pageBg}; */
+    background: ${({ theme }) => theme.background.main || '#f3f4f6'};
+    /* background: linear-gradient(117deg, ${({ theme }) => theme?.hover ?? TOKENS.accentSoft} 0%, #ffffff 100%); */
 
     padding: 0;
     margin: 0;
@@ -50,15 +46,16 @@ export const S = {
   `,
 
   FindCard: styled.article`
-    background: ${TOKENS.cardBg};
+    background: ${({ theme }) => theme.background.paper || '#FFFFFF'};
     border-radius: 16px;
-    box-shadow: ${TOKENS.shadow};
+    box-shadow: ${({ theme }) => theme.shadow || '0 20px 40px rgba(0,0,0,0.08)'};
     padding: 48px 56px 56px;
     width: 100%;
     max-width: 520px;
     display: flex;
     flex-direction: column;
     gap: 32px;
+    border: 1px solid ${({ theme }) => theme.border};
 
     @media (max-width: 1024px) {
       max-width: 448px;
@@ -76,7 +73,7 @@ export const S = {
   Title: styled.h1`
     font-size: 32px;
     font-weight: 700;
-    color: ${TOKENS.textPrimary};
+    color: ${({ theme }) => theme.text.primary};
     margin: 0;
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -89,7 +86,7 @@ export const S = {
   Subtitle: styled.p`
     font-size: 17px;
     font-weight: 400;
-    color: ${TOKENS.textSecondary};
+    color: ${({ theme }) => theme.text.secondary};
     margin: 0;
     line-height: 1.5;
 
@@ -113,7 +110,7 @@ export const S = {
   Label: styled.label`
     font-size: 15px;
     font-weight: 400;
-    color: #0a0a0a;
+    color: ${({ theme }) => theme.text.primary};
     line-height: 1;
 
     @media (max-width: 1024px) {
@@ -124,34 +121,32 @@ export const S = {
   Input: styled.input`
     width: 100%;
     padding: 12px 16px;
-    background: ${TOKENS.inputBg};
-    border: 1px solid transparent;
+    background: ${({ theme }) => theme.background.input || '#F3F3F5'};
+    border: 1px solid ${({ theme }) => theme.border || 'transparent'};
     border-radius: 8px;
     font-size: 15px;
-    color: #0a0a0a;
+    color: ${({ theme }) => theme.text.primary};
     transition: all 0.2s ease;
     box-sizing: border-box;
 
     &::placeholder {
-      color: ${TOKENS.textMuted};
+      color: ${({ theme }) => theme.text.tertiary || '#717182'};
     }
 
     &:focus {
       outline: none;
-
-      /* ✅ 포커스 링/보더는 테마 primary를 쓰되, 없으면 TOKENS로 대체 */
-      border-color: ${({ theme }) => theme?.primary ?? TOKENS.accent};
-      background: #ffffff;
-      box-shadow: 0 0 0 3px ${({ theme }) => (theme?.primary ?? TOKENS.accent)}20;
+      border-color: ${({ theme }) => theme.colors.primary};
+      background: ${({ theme }) => theme.background.paper || '#FFFFFF'};
+      box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}20`};
     }
 
     &:hover:not(:focus):not(:disabled) {
-      background: ${TOKENS.inputHoverBg};
+      background: ${({ theme }) => theme.background.hover || '#EBEBED'};
     }
 
     &:disabled {
-      background: ${TOKENS.inputDisabledBg};
-      color: ${TOKENS.inputDisabledText};
+      background: ${({ theme }) => theme.background.disabled || '#E5E7EB'};
+      color: ${({ theme }) => theme.text.disabled || '#9CA3AF'};
       cursor: not-allowed;
     }
 
@@ -160,16 +155,11 @@ export const S = {
     }
   `,
 
-  /**
-   * ✅ 핵심 수정: 버튼 배경을 “항상 충분히 어둡게”
-   * - theme.primary가 밝아서 글씨가 안 보이는 문제를 원천 차단
-   * - hover도 대비 유지
-   */
   SubmitButton: styled.button`
     width: 100%;
     padding: 12px 20px;
-    background: ${TOKENS.accent};
-    color: #ffffff;
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.text.inverse || '#FFFFFF'};
     border: none;
     border-radius: 8px;
     font-size: 15px;
@@ -179,9 +169,9 @@ export const S = {
     margin-top: 8px;
 
     &:hover {
-      background: ${TOKENS.accentHover};
+      background: ${({ theme }) => theme.colors.primaryHover || theme.colors.primary};
       transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(17, 24, 39, 0.22);
+      box-shadow: 0 4px 16px ${({ theme }) => `${theme.colors.primary}50`};
     }
 
     &:active {
@@ -189,7 +179,7 @@ export const S = {
     }
 
     &:disabled {
-      background: #9ca3af;
+      background: ${({ theme }) => theme.text.disabled || '#CCCCCC'};
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
@@ -200,23 +190,12 @@ export const S = {
     }
   `,
 
-  /**
-   * ✅ 안내 메시지(성공/실패/정보 공용)
-   * - 테마 primary가 연해도 메시지가 흐려지지 않게 “진회색” 기준 유지
-   * - 배경은 부드럽게
-   */
   InfoMessage: styled.div`
     padding: 16px 20px;
-
-    /* ✅ 옵션 1) 테마 hover 사용(테마 감성 유지) */
-    background: ${({ theme }) => theme?.hover ?? TOKENS.accentSoft};
-
-    /* ✅ 옵션 2) 완전 통일 */
-    /* background: ${TOKENS.accentSoft}; */
-
-    border: 1px solid ${TOKENS.accentBorder};
+    background: ${({ theme }) => theme.background.secondary || '#f9fafb'};
+    border: 1px solid ${({ theme }) => theme.colors.primary};
     border-radius: 8px;
-    color: ${TOKENS.accent};
+    color: ${({ theme }) => theme.colors.primary};
     font-size: 14px;
     font-weight: 600;
     text-align: center;
@@ -234,7 +213,7 @@ export const S = {
   FooterLink: styled.button`
     background: none;
     border: none;
-    color: ${TOKENS.accent};
+    color: ${({ theme }) => theme.text.secondary};
     font-size: 16px;
     font-weight: 400;
     cursor: pointer;
@@ -243,7 +222,7 @@ export const S = {
     white-space: nowrap;
 
     &:hover {
-      color: ${TOKENS.accentHover};
+      color: ${({ theme }) => theme.text.primary};
       text-decoration: underline;
     }
 
@@ -253,7 +232,7 @@ export const S = {
   `,
 
   Divider: styled.span`
-    color: ${TOKENS.divider};
+    color: ${({ theme }) => theme.text.tertiary || '#99A1AE'};
     font-size: 14px;
     font-weight: 400;
     user-select: none;

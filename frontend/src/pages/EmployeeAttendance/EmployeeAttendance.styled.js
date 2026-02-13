@@ -4,7 +4,7 @@ import styled from 'styled-components';
 export const PageContainer = styled.div`
   display: flex;
   min-height: 100vh;
-  background: #f5f7fa;
+  background: ${({ theme }) => theme.background.secondary};
 `;
 
 export const ContentArea = styled.div`
@@ -17,7 +17,7 @@ export const ContentArea = styled.div`
 
 export const Breadcrumb = styled.div`
   font-size: 13px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.tertiary};
   margin-bottom: 24px;
   
   span {
@@ -32,13 +32,13 @@ export const PageHeader = styled.div`
 export const PageTitle = styled.h1`
   font-size: 28px;
   font-weight: 700;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 8px;
 `;
 
 export const PageSubtitle = styled.p`
   font-size: 14px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 // 통계 카드
@@ -54,38 +54,39 @@ export const StatsGrid = styled.div`
 `;
 
 export const StatCard = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px ${({ theme }) => theme.shadow};
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 12px;
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const StatIconWrapper = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: ${props => props.$bgColor || '#e0f2fe'};
+  background: ${props => props.$bgColor || props.theme.background.tertiary};
   display: flex;
   align-items: center;
   justify-content: center;
-  color: ${props => props.$iconColor || '#0284c7'};
+  color: ${props => props.$iconColor || props.theme.colors.primary};
   margin-bottom: 8px;
 `;
 
 export const StatValue = styled.div`
   font-size: 32px;
   font-weight: 700;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const StatLabel = styled.div`
   font-size: 13px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   font-weight: 500;
 `;
 
@@ -101,10 +102,11 @@ export const MainContent = styled.div`
 `;
 
 export const CalendarSection = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 12px;
   padding: 32px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const CalendarHeader = styled.div`
@@ -117,7 +119,7 @@ export const CalendarHeader = styled.div`
 export const MonthTitle = styled.h2`
   font-size: 18px;
   font-weight: 700;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const NavButtons = styled.div`
@@ -129,9 +131,9 @@ export const NavButton = styled.button`
   width: 32px;
   height: 32px;
   border-radius: 6px;
-  border: 1px solid #e5e7eb;
-  background: white;
-  color: #6b7280;
+  border: 1px solid ${({ theme }) => theme.border};
+  background: ${({ theme }) => theme.background.main};
+  color: ${({ theme }) => theme.text.secondary};
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -139,8 +141,8 @@ export const NavButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #d1d5db;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.border};
   }
 
   &:disabled {
@@ -160,24 +162,24 @@ export const DayHeader = styled.div`
   padding: 12px 0;
   font-size: 13px;
   font-weight: 600;
-  color: ${props => props.$isWeekend ? '#ef4444' : '#6b7280'};
+  color: ${props => props.$isWeekend ? props.theme.status.error : props.theme.text.secondary};
 `;
 
 export const DayCell = styled.div`
   aspect-ratio: 1;
-  border: 1px solid ${props => props.$isToday ? '#2563eb' : '#e5e7eb'};
+  border: 1px solid ${props => props.$isToday ? props.theme.colors.primary : props.theme.border};
   border-radius: 8px;
   padding: 8px;
   cursor: pointer;
   background: ${props => {
-    if (props.$isSelected) return '#1e40af';
-    if (props.$isToday) return '#dbeafe';
-    return 'white';
+    if (props.$isSelected) return props.theme.colors.primary;
+    if (props.$isToday) return `${props.theme.colors.primary}1A`; // 10% opacity
+    return props.theme.background.main;
   }};
   color: ${props => {
-    if (props.$isSelected) return 'white';
-    if (props.$isOtherMonth) return '#d1d5db';
-    return '#1f2937';
+    if (props.$isSelected) return props.theme.text.inverse;
+    if (props.$isOtherMonth) return props.theme.text.disabled;
+    return props.theme.text.primary;
   }};
   position: relative;
   transition: all 0.2s;
@@ -187,8 +189,8 @@ export const DayCell = styled.div`
   justify-content: flex-start;
 
   &:hover {
-    background: ${props => props.$isSelected ? '#1e40af' : '#f9fafb'};
-    border-color: ${props => props.$isSelected ? '#1e40af' : '#d1d5db'};
+    background: ${props => props.$isSelected ? props.theme.colors.primary : props.theme.background.hover};
+    border-color: ${props => props.$isSelected ? props.theme.colors.primary : props.theme.border};
   }
 `;
 
@@ -203,14 +205,14 @@ export const StatusDot = styled.div`
   height: 6px;
   border-radius: 50%;
   background: ${props => {
-    if (props.$status === 'PRESENT' || props.$status === 'present') return '#10b981';      // 출근 - 녹색
-    if (props.$status === 'LATE' || props.$status === 'late') return '#f59e0b';            // 지각 - 주황
-    if (props.$status === 'EARLY_LEAVE' || props.$status === 'early_leave') return '#f59e0b';  // 조퇴 - 주황
-    if (props.$status === 'ABSENT' || props.$status === 'absent') return '#ef4444';        // 결근 - 빨강
-    if (props.$status === 'VACATION' || props.$status === 'vacation') return '#3b82f6';    // 휴가 - 파랑
-    if (props.$status === 'HALF_DAY' || props.$status === 'half_day') return '#8b5cf6';    // 반차 - 보라
-    if (props.$status === 'LEAVE_PENDING') return '#fbbf24';  // 휴가 대기 - 노랑
-    if (props.$status === 'LEAVE') return '#3b82f6';          // 휴가 승인 - 파랑
+    if (props.$status === 'PRESENT' || props.$status === 'present') return props.theme.status.success;
+    if (props.$status === 'LATE' || props.$status === 'late') return props.theme.status.warning;
+    if (props.$status === 'EARLY_LEAVE' || props.$status === 'early_leave') return props.theme.status.warning;
+    if (props.$status === 'ABSENT' || props.$status === 'absent') return props.theme.status.error;
+    if (props.$status === 'VACATION' || props.$status === 'vacation') return props.theme.status.info;
+    if (props.$status === 'HALF_DAY' || props.$status === 'half_day') return '#8b5cf6';
+    if (props.$status === 'LEAVE_PENDING') return props.theme.status.warning;
+    if (props.$status === 'LEAVE') return props.theme.status.info;
     return 'transparent';
   }};
   margin-top: 2px;
@@ -221,7 +223,7 @@ export const Legend = styled.div`
   gap: 24px;
   margin-top: 24px;
   padding-top: 24px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid ${({ theme }) => theme.border};
   flex-wrap: wrap;
 `;
 
@@ -230,7 +232,7 @@ export const LegendItem = styled.div`
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const LegendDot = styled.div`
@@ -248,22 +250,23 @@ export const Sidebar = styled.div`
 `;
 
 export const SidebarCard = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const SidebarTitle = styled.h3`
   font-size: 16px;
   font-weight: 700;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 16px;
 `;
 
 export const ScheduleItem = styled.div`
   padding: 12px;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.secondary}; // or tertiary
   border-radius: 8px;
   margin-bottom: 12px;
 `;
@@ -271,24 +274,35 @@ export const ScheduleItem = styled.div`
 export const ScheduleName = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 4px;
 `;
 
 export const ScheduleDate = styled.div`
   font-size: 12px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const ScheduleStatus = styled.div`
   display: inline-block;
   padding: 4px 12px;
-  background: #fef3c7;
-  color: #92400e;
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
   margin-top: 8px;
+  
+  ${({ theme, $status }) => {
+    let color = theme.colors.primary; // default
+    if ($status === 'PRESENT') color = theme.status.success;
+    else if (['LATE', 'EARLY_LEAVE', 'LEAVE_PENDING'].includes($status)) color = theme.status.warning;
+    else if ($status === 'ABSENT') color = theme.status.error;
+    else if (['VACATION', 'LEAVE', 'HALF_DAY'].includes($status)) color = theme.status.info;
+
+    return `
+      background-color: ${color}20; // 12% opacity (approx for hex 20)
+      color: ${color};
+    `;
+  }}
 `;
 
 export const ActionButton = styled.button`
@@ -296,25 +310,25 @@ export const ActionButton = styled.button`
   padding: 12px;
   border-radius: 8px;
   border: none;
-  background: ${props => props.$primary ? '#2563eb' : 'white'};
-  color: ${props => props.$primary ? 'white' : '#2563eb'};
+  background: ${props => props.$primary ? props.theme.colors.primary : props.theme.background.main};
+  color: ${props => props.$primary ? props.theme.text.inverse : props.theme.colors.primary};
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  border: 1px solid ${props => props.$primary ? '#2563eb' : '#2563eb'};
+  border: 1px solid ${props => props.theme.colors.primary};
   margin-bottom: 8px;
 
   &:hover {
-    background: ${props => props.$primary ? '#1d4ed8' : '#eff6ff'};
+    background: ${props => props.$primary ? props.theme.colors.secondary : props.theme.background.hover};
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: ${props => props.$primary ? '#93c5fd' : '#f3f4f6'};
-    border-color: ${props => props.$primary ? '#93c5fd' : '#d1d5db'};
-    color: ${props => props.$primary ? '#e0e7ff' : '#9ca3af'};
+    background: ${props => props.$primary ? props.theme.text.disabled : props.theme.background.tertiary};
+    border-color: ${({ theme }) => theme.text.disabled};
+    color: ${({ theme }) => theme.text.tertiary};
   }
 
   &:last-child {
@@ -329,7 +343,7 @@ export const LoadingContainer = styled.div`
   align-items: center;
   min-height: 400px;
   font-size: 16px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const ErrorContainer = styled.div`
@@ -343,7 +357,7 @@ export const ErrorContainer = styled.div`
 
 export const ErrorMessage = styled.div`
   font-size: 16px;
-  color: #ef4444;
+  color: ${({ theme }) => theme.status.error};
   text-align: center;
 `;
 
@@ -351,13 +365,13 @@ export const RetryButton = styled.button`
   padding: 12px 24px;
   border-radius: 8px;
   border: none;
-  background: #2563eb;
-  color: white;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse};
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
 
   &:hover {
-    background: #1d4ed8;
+    background: ${({ theme }) => theme.colors.secondary};
   }
 `;

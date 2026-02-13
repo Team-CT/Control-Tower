@@ -213,7 +213,6 @@ const HealthProgramHistory = () => {
                                     <S.TableRow
                                         key={item.program_apply_id}
                                         onClick={() => handleRowClick(item)}
-                                        style={{ cursor: 'pointer' }}
                                     >
                                         {/* 프로그램명 */}
                                         <S.TableCell>
@@ -261,9 +260,9 @@ const HealthProgramHistory = () => {
                                         {/* 신청 사유 */}
                                         <S.TableCell>
                                             {item.apply_reason ? (
-                                                <div style={{ maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                <S.TruncatedText>
                                                     {item.apply_reason}
-                                                </div>
+                                                </S.TruncatedText>
                                             ) : (
                                                 '-'
                                             )}

@@ -79,9 +79,9 @@ const TenantManagement = () => {
     return (
       <S.MainContainer>
         <S.ContentWrapper>
-          <div style={{ textAlign: 'center', padding: '50px' }}>
+          <S.LoadingWrapper>
             <p>데이터를 불러오는 중...</p>
-          </div>
+          </S.LoadingWrapper>
         </S.ContentWrapper>
       </S.MainContainer>
     );
@@ -91,12 +91,12 @@ const TenantManagement = () => {
     return (
       <S.MainContainer>
         <S.ContentWrapper>
-          <div style={{ textAlign: 'center', padding: '50px', color: '#dc2626' }}>
+          <S.ErrorWrapper>
             <p>{error}</p>
-            <button onClick={fetchTenants} style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}>
+            <S.RetryButton onClick={fetchTenants}>
               다시 시도
-            </button>
-          </div>
+            </S.RetryButton>
+          </S.ErrorWrapper>
         </S.ContentWrapper>
       </S.MainContainer>
     );

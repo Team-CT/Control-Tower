@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContentArea = styled.div`
   flex: 1;
   padding: 40px;
-  background-color: #f9fafb;
+  background-color: ${({ theme }) => theme.background.secondary};
   overflow-y: auto;
 `;
 
@@ -15,10 +15,10 @@ export const StatsGrid = styled.div`
 `;
 
 export const StatCard = styled.div`
-  background-color: white;
+  background-color: ${({ theme }) => theme.background.paper};
   padding: 24px;
   border-radius: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: ${({ theme }) => theme.shadow};
   display: flex;
   align-items: flex-start;
   gap: 16px;
@@ -29,8 +29,8 @@ export const StatIcon = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background-color: ${(props) => props.$bgColor || '#f3f4f6'};
-  color: ${(props) => props.$color || '#6b7280'};
+  background-color: ${(props) => props.$bgColor ? `${props.$bgColor}20` : props.theme.background.secondary};
+  color: ${(props) => props.$color || props.theme.text.secondary};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -44,20 +44,20 @@ export const StatInfo = styled.div`
 
 export const StatLabel = styled.span`
   font-size: 14px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 4px;
 `;
 
 export const StatValue = styled.span`
   font-size: 24px;
   font-weight: 700;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 4px;
 `;
 
 export const StatSubtext = styled.span`
   font-size: 12px;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.tertiary};
 `;
 
 export const FilterSection = styled.div`
@@ -69,10 +69,10 @@ export const FilterSection = styled.div`
 
 export const FilterTabs = styled.div`
   display: flex;
-  background-color: white;
+  background-color: ${({ theme }) => theme.background.paper};
   padding: 4px;
   border-radius: 12px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
 export const FilterTab = styled.button`
@@ -82,14 +82,14 @@ export const FilterTab = styled.button`
   padding: 8px 16px;
   border-radius: 8px;
   border: none;
-  background-color: ${(props) => (props.$active ? '#eff6ff' : 'transparent')};
-  color: ${(props) => (props.$active ? '#2563eb' : '#6b7280')};
+  background-color: ${(props) => (props.$active ? `${props.theme.colors.primary}10` : 'transparent')};
+  color: ${(props) => (props.$active ? props.theme.colors.primary : props.theme.text.secondary)};
   font-weight: ${(props) => (props.$active ? '600' : '500')};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: ${(props) => (props.$active ? '#eff6ff' : '#f9fafb')};
+    background-color: ${(props) => (props.$active ? `${props.theme.colors.primary}10` : props.theme.background.hover)};
   }
 `;
 
@@ -104,28 +104,28 @@ export const TabLabel = styled.span`
 export const SortDropdown = styled.select`
   padding: 8px 16px;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  color: #374151;
-  background-color: white;
+  border: 1px solid ${({ theme }) => theme.border};
+  color: ${({ theme }) => theme.text.primary};
+  background-color: ${({ theme }) => theme.background.paper};
   font-size: 14px;
   cursor: pointer;
   outline: none;
 
   &:focus {
-    border-color: #2563eb;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 export const ApprovalListSection = styled.div`
-  background-color: white;
+  background-color: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.shadow};
   overflow: hidden;
 `;
 
 export const ListHeader = styled.div`
   padding: 20px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -134,12 +134,12 @@ export const ListHeader = styled.div`
 export const ListTitle = styled.h2`
   font-size: 18px;
   font-weight: 700;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
 export const SortButton = styled.button`
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   background: none;
   border: none;
   font-size: 14px;
@@ -150,7 +150,7 @@ export const SortButton = styled.button`
   gap: 4px;
 
   &:hover {
-    color: #111827;
+    color: ${({ theme }) => theme.text.primary};
   }
 `;
 
@@ -163,7 +163,7 @@ export const ApprovalItem = styled.div`
   display: flex;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   transition: background-color 0.2s;
 
   &:last-child {
@@ -171,7 +171,7 @@ export const ApprovalItem = styled.div`
   }
 
   &:hover {
-    background-color: #f9fafb;
+    background-color: ${({ theme }) => theme.background.hover};
   }
 `;
 
@@ -179,8 +179,8 @@ export const ApprovalAvatar = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background-color: ${(props) => props.$color || '#e5e7eb'};
-  color: white;
+  background-color: ${(props) => props.$color || props.theme.background.secondary};
+  color: ${({ theme }) => theme.text.inverse};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -196,13 +196,13 @@ export const ApprovalInfo = styled.div`
 export const ApprovalName = styled.div`
   font-size: 16px;
   font-weight: 600;
-  color: #111827;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 4px;
 `;
 
 export const ApprovalDepartment = styled.div`
   font-size: 13px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const ApprovalDetails = styled.div`
@@ -221,27 +221,27 @@ export const ApprovalType = styled.span`
   ${(props) => {
     switch (props.$type) {
       case 'annual':
-        return `background-color: #dbeafe; color: #2563eb;`;
+        return `background-color: ${props.theme.colors.primary}20; color: ${props.theme.colors.primary};`;
       case 'sick':
-        return `background-color: #f3e8ff; color: #7c3aed;`;
+        return `background-color: ${props.theme.colors.secondary}20; color: ${props.theme.colors.secondary};`;
       case 'half':
-        return `background-color: #ffedd5; color: #c2410c;`;
+        return `background-color: ${props.theme.status.warning}20; color: ${props.theme.status.warning};`;
       default:
-        return `background-color: #f3f4f6; color: #4b5563;`;
+        return `background-color: ${props.theme.text.tertiary}20; color: ${props.theme.text.tertiary};`;
     }
   }}
 `;
 
 export const ApprovalDate = styled.div`
   font-size: 14px;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
   font-weight: 500;
 `;
 
 export const ApprovalPeriod = styled.div`
   font-size: 13px;
-  color: #6b7280;
-  background-color: #f9fafb;
+  color: ${({ theme }) => theme.text.secondary};
+  background-color: ${({ theme }) => theme.background.secondary};
   padding: 4px 8px;
   border-radius: 6px;
 `;
@@ -254,17 +254,17 @@ export const ApprovalActions = styled.div`
 export const ViewButton = styled.button`
   padding: 8px 16px;
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  background-color: white;
-  color: #374151;
+  border: 1px solid ${({ theme }) => theme.border};
+  background-color: ${({ theme }) => theme.background.paper};
+  color: ${({ theme }) => theme.text.primary};
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: #f9fafb;
-    border-color: #d1d5db;
+    background-color: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.text.secondary};
   }
 `;
 
@@ -272,15 +272,15 @@ export const ApproveButton = styled.button`
   padding: 8px 16px;
   border-radius: 8px;
   border: none;
-  background-color: #10b981;
-  color: white;
+  background-color: ${({ theme }) => theme.status.success};
+  color: ${({ theme }) => theme.text.inverse};
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: #059669;
+    opacity: 0.9;
   }
 `;
 
@@ -288,15 +288,15 @@ export const RejectButton = styled.button`
   padding: 8px 16px;
   border-radius: 8px;
   border: none;
-  background-color: #ef4444;
-  color: white;
+  background-color: ${({ theme }) => theme.status.error};
+  color: ${({ theme }) => theme.text.inverse};
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background-color: #dc2626;
+    opacity: 0.9;
   }
 `;
 
@@ -315,17 +315,17 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalContent = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   padding: 30px;
   border-radius: 12px;
   width: 500px;
   max-width: 90%;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  box-shadow: ${({ theme }) => theme.shadow};
   
   h2 {
     margin-bottom: 20px;
     font-size: 1.5rem;
-    color: #333;
+    color: ${({ theme }) => theme.text.primary};
   }
 `;
 
@@ -336,17 +336,17 @@ export const DetailRow = styled.div`
   
   label {
     font-weight: bold;
-    color: #555;
+    color: ${({ theme }) => theme.text.secondary};
     margin-bottom: 5px;
   }
   
   span, p {
     font-size: 1rem;
-    color: #333;
+    color: ${({ theme }) => theme.text.primary};
   }
   
   p {
-    background: #f9f9f9;
+    background: ${({ theme }) => theme.background.secondary};
     padding: 10px;
     border-radius: 5px;
     min-height: 60px;
@@ -363,13 +363,20 @@ export const ButtonGroup = styled.div`
 
 export const CloseButton = styled.button`
   padding: 10px 20px;
-  background: #e5e7eb;
+  background: ${({ theme }) => theme.background.secondary};
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-weight: bold;
+  color: ${({ theme }) => theme.text.primary};
   
   &:hover {
-    background: #d1d5db;
+    background: ${({ theme }) => theme.background.hover};
   }
+`;
+
+export const EmptyState = styled.div`
+  padding: 40px;
+  text-align: center;
+  color: ${({ theme }) => theme.text.secondary};
 `;

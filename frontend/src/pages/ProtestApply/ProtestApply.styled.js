@@ -19,13 +19,13 @@ export const PageHeader = styled.div`
 export const PageTitle = styled.h1`
   font-size: 28px;
   font-weight: 700;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 8px;
 `;
 
 export const PageDescription = styled.p`
   font-size: 14px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 // 컨텐츠 그리드
@@ -53,31 +53,33 @@ export const RightColumn = styled.div`
 
 // 섹션 카드
 export const SectionCard = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 12px;
   padding: 32px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const SectionTitle = styled.h2`
   font-size: 18px;
   font-weight: 700;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 20px;
 `;
 
 // 현재 기록 섹션
 export const CurrentRecordSection = styled.div`
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.secondary};
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 24px;
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const RecordTitle = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 12px;
 `;
 
@@ -86,7 +88,7 @@ export const RecordItem = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 8px 0;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 
   &:last-child {
     border-bottom: none;
@@ -95,13 +97,13 @@ export const RecordItem = styled.div`
 
 export const RecordLabel = styled.span`
   font-size: 14px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const RecordValue = styled.span`
   font-size: 14px;
   font-weight: 600;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 // 시간 입력 그룹
@@ -121,25 +123,26 @@ export const InputWrapper = styled.div`
 export const InputLabel = styled.label`
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const TimeInput = styled.input`
   padding: 12px 16px;
-  border: 1px solid #d1d5db;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.input};
   transition: all 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}1A`};
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
@@ -159,13 +162,13 @@ export const ReasonLabel = styled.label`
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const OcrButton = styled.button`
   padding: 8px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: linear-gradient(135deg, ${({ theme }) => theme.colors.primary} 0%, ${({ theme }) => theme.colors.secondary} 100%);
+  color: ${({ theme }) => theme.text.inverse};
   border: none;
   border-radius: 8px;
   font-size: 13px;
@@ -178,7 +181,7 @@ export const OcrButton = styled.button`
   
   &:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px ${({ theme }) => theme.shadow};
   }
   
   &:disabled {
@@ -198,29 +201,31 @@ export const DateSection = styled.div`
 // 날짜 입력 필드
 export const DateInput = styled.input`
   padding: 12px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
   transition: all 0.2s;
-  background: white;
+  background: ${({ theme }) => theme.background.input};
+  color: ${({ theme }) => theme.text.primary};
   
   &:focus {
     outline: none;
-    border-color: #1976d2;
-    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}1A`};
   }
   
   &:disabled {
-    background-color: #f9fafb;
+    background-color: ${({ theme }) => theme.background.secondary};
     cursor: not-allowed;
+    color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
 // 도움말 텍스트
 export const HelpText = styled.p`
   font-size: 13px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
   line-height: 1.5;
 `;
@@ -228,22 +233,23 @@ export const HelpText = styled.p`
 export const ReasonTextarea = styled.textarea`
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #d1d5db;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.input};
   resize: vertical;
   min-height: 120px;
   transition: all 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}1A`};
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
@@ -256,22 +262,22 @@ export const FileUploadLabel = styled.label`
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 8px;
 `;
 
 export const FileUploadArea = styled.div`
-  border: 2px dashed #d1d5db;
+  border: 2px dashed ${({ theme }) => theme.border};
   border-radius: 8px;
   padding: 32px;
   text-align: center;
   cursor: pointer;
   transition: all 0.2s;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.secondary};
 
   &:hover {
-    border-color: #2563eb;
-    background: #eff6ff;
+    border-color: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => theme.background.hover};
   }
 
   input[type="file"] {
@@ -281,19 +287,19 @@ export const FileUploadArea = styled.div`
 
 export const FileUploadIcon = styled.div`
   font-size: 48px;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.tertiary};
   margin-bottom: 12px;
 `;
 
 export const FileUploadText = styled.div`
   font-size: 14px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 4px;
 `;
 
 export const FileUploadHint = styled.div`
   font-size: 12px;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.disabled};
 `;
 
 // 파일 목록
@@ -309,9 +315,9 @@ export const FileItem = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.secondary};
   border-radius: 8px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const FileInfo = styled.div`
@@ -323,25 +329,25 @@ export const FileInfo = styled.div`
 
 export const FileIcon = styled.div`
   font-size: 24px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const FileName = styled.div`
   font-size: 14px;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   font-weight: 500;
 `;
 
 export const FileSize = styled.div`
   font-size: 12px;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.tertiary};
 `;
 
 export const RemoveButton = styled.button`
   padding: 4px 8px;
   background: transparent;
   border: none;
-  color: #ef4444;
+  color: ${({ theme }) => theme.status.error};
   cursor: pointer;
   font-size: 20px;
   transition: all 0.2s;
@@ -353,8 +359,8 @@ export const RemoveButton = styled.button`
 
 // 정보 박스
 export const InfoBox = styled.div`
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
+  background: ${({ theme }) => `${theme.status.info}1A`};
+  border: 1px solid ${({ theme }) => `${theme.status.info}33`}; // 20% opacity
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 24px;
@@ -363,7 +369,7 @@ export const InfoBox = styled.div`
 export const InfoTitle = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #1e40af;
+  color: ${({ theme }) => theme.status.info};
   margin-bottom: 8px;
 `;
 
@@ -375,7 +381,7 @@ export const InfoList = styled.ul`
 
 export const InfoItem = styled.li`
   font-size: 13px;
-  color: #1e40af;
+  color: ${({ theme }) => theme.status.info};
   padding: 4px 0;
 `;
 
@@ -389,17 +395,17 @@ export const ActionButtons = styled.div`
 export const CancelButton = styled.button`
   padding: 12px 24px;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
-  background: white;
-  color: #374151;
+  border: 1px solid ${({ theme }) => theme.border};
+  background: ${({ theme }) => theme.background.main};
+  color: ${({ theme }) => theme.text.primary};
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
@@ -407,41 +413,42 @@ export const SubmitButton = styled.button`
   padding: 12px 24px;
   border-radius: 8px;
   border: none;
-  background: #2563eb;
-  color: white;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse};
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: #1d4ed8;
+    background: ${({ theme }) => theme.colors.secondary};
   }
 
   &:disabled {
-    background: #93c5fd;
+    background: ${({ theme }) => theme.text.disabled};
     cursor: not-allowed;
   }
 `;
 
 // 사이드바 카드
 export const SidebarCard = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const SidebarTitle = styled.h3`
   font-size: 16px;
   font-weight: 700;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 16px;
 `;
 
 export const GuideItem = styled.div`
   padding: 12px;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.secondary};
   border-radius: 8px;
   margin-bottom: 12px;
 
@@ -453,13 +460,13 @@ export const GuideItem = styled.div`
 export const GuideTitle = styled.div`
   font-size: 14px;
   font-weight: 600;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 4px;
 `;
 
 export const GuideText = styled.div`
   font-size: 13px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   line-height: 1.5;
 `;
 
@@ -472,49 +479,50 @@ export const Label = styled.label`
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 8px;
 `;
 
 export const Input = styled.input`
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #d1d5db;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.input};
   transition: all 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}1A`};
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
 export const Select = styled.select`
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #d1d5db;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
-  color: #1f2937;
-  background: white;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.input};
   cursor: pointer;
   transition: all 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}1A`};
   }
 
   &:disabled {
-    background: #f3f4f6;
+    background: ${({ theme }) => theme.background.secondary};
     cursor: not-allowed;
   }
 `;

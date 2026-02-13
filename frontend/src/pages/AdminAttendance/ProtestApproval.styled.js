@@ -42,14 +42,36 @@ export const StatCard = styled.div`
   align-items: center;
   gap: 16px;
   padding: 24px;
-  background: ${props => props.$bgColor || '#ffffff'};
+  background: ${({ theme, $type }) => {
+    switch ($type) {
+      case 'pending':
+        return theme.mode === 'dark' ? `${theme.status.warning}20` : '#FFF8E1'; // Light Amber
+      case 'approved':
+        return theme.mode === 'dark' ? `${theme.status.success}20` : '#E6FFFA'; // Light Emerald
+      case 'rejected':
+        return theme.mode === 'dark' ? `${theme.status.error}20` : '#FFF5F5'; // Light Red
+      default:
+        return theme.background.paper;
+    }
+  }};
+  border: 1px solid ${({ theme, $type }) => {
+    if (theme.mode === 'dark') {
+      switch ($type) {
+        case 'pending': return `${theme.status.warning}40`;
+        case 'approved': return `${theme.status.success}40`;
+        case 'rejected': return `${theme.status.error}40`;
+        default: return theme.border;
+      }
+    }
+    return 'transparent';
+  }};
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.shadow};
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: ${({ theme }) => theme.shadowHover};
   }
 `;
 
@@ -60,7 +82,14 @@ export const StatIcon = styled.div`
   align-items: center;
   justify-content: center;
   font-size: 28px;
-  background: ${props => props.$color || '#6b7280'};
+  background: ${({ theme, $type }) => {
+    switch ($type) {
+      case 'pending': return theme.status.warning;
+      case 'approved': return theme.status.success;
+      case 'rejected': return theme.status.error;
+      default: return theme.text.tertiary;
+    }
+  }};
   color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -77,14 +106,14 @@ export const StatLabel = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const StatValue = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 32px;
   font-weight: 700;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   line-height: 1;
 
   @media (max-width: 768px) {
@@ -96,7 +125,7 @@ export const StatSubtext = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.tertiary};
 `;
 
 // ==================== 필터 섹션 ====================
@@ -117,10 +146,10 @@ export const FilterSection = styled.div`
 export const FilterTabs = styled.div`
   display: flex;
   gap: 12px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.background.paper};
   padding: 6px;
   border-radius: 10px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.shadow};
 
   @media (max-width: 768px) {
     overflow-x: auto;
@@ -136,8 +165,8 @@ export const FilterTab = styled.button`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: ${props => props.$active ? '600' : '500'};
-  color: ${props => props.$active ? '#ffffff' : '#6b7280'};
-  background: ${props => props.$active ? '#0284c7' : 'transparent'};
+  color: ${props => props.$active ? '#ffffff' : props.theme.text.secondary};
+  background: ${props => props.$active ? props.theme.colors.primary : 'transparent'};
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -145,8 +174,8 @@ export const FilterTab = styled.button`
   white-space: nowrap;
 
   &:hover {
-    background: ${props => props.$active ? '#0369a1' : '#f3f4f6'};
-    color: ${props => props.$active ? '#ffffff' : '#1f2937'};
+    background: ${props => props.$active ? props.theme.colors.primary : props.theme.background.secondary};
+    color: ${props => props.$active ? '#ffffff' : props.theme.text.primary};
   }
 
   &:active {
@@ -161,31 +190,31 @@ export const SortDropdown = styled.select`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: #374151;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   cursor: pointer;
   outline: none;
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #0284c7;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 
   &:focus {
-    border-color: #0284c7;
-    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}20`};
   }
 `;
 
 // ==================== 신청 목록 ====================
 
 export const ApprovalListSection = styled.div`
-  background: #ffffff;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
   padding: 28px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
 export const ListHeader = styled.div`
@@ -194,14 +223,14 @@ export const ListHeader = styled.div`
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid ${({ theme }) => theme.background.secondary || theme.background.main};
 `;
 
 export const ListTitle = styled.h2`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 18px;
   font-weight: 700;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
@@ -213,16 +242,16 @@ export const SortButton = styled.button`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: #6b7280;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  color: ${({ theme }) => theme.text.secondary};
+  background: ${({ theme }) => theme.background.secondary || theme.background.main};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f3f4f6;
-    border-color: #d1d5db;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
@@ -238,14 +267,14 @@ export const ApprovalItem = styled.div`
   align-items: center;
   gap: 20px;
   padding: 20px;
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  background: ${({ theme }) => theme.background.secondary || theme.background.main};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 10px;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f3f4f6;
-    border-color: #0284c7;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.colors.primary};
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 
@@ -265,7 +294,7 @@ export const ApprovalAvatar = styled.div`
   font-size: 16px;
   font-weight: 700;
   color: #ffffff;
-  background: ${props => props.$color || '#6b7280'};
+  background: ${props => props.$color || props.theme.text.tertiary};
   border-radius: 50%;
 `;
 
@@ -279,14 +308,14 @@ export const ApprovalName = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 16px;
   font-weight: 700;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const ApprovalDepartment = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const ApprovalDetails = styled.div`
@@ -303,14 +332,14 @@ export const ApprovalDate = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const ApprovalPeriod = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 400;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const ApprovalActions = styled.div`
@@ -335,17 +364,17 @@ export const ViewButton = styled.button`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 600;
-  color: #6b7280;
-  background: #ffffff;
-  border: 1px solid #d1d5db;
+  color: ${({ theme }) => theme.text.secondary};
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #9ca3af;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.text.disabled};
   }
 
   &:active {
@@ -362,7 +391,7 @@ export const ApproveButton = styled.button`
   font-size: 13px;
   font-weight: 600;
   color: #ffffff;
-  background: #10b981;
+  background: ${({ theme }) => theme.status.success};
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -370,8 +399,8 @@ export const ApproveButton = styled.button`
   white-space: nowrap;
 
   &:hover {
-    background: #059669;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    filter: brightness(0.9);
+    box-shadow: ${({ theme }) => `0 4px 12px ${theme.status.success}4D`};
   }
 
   &:active {
@@ -388,7 +417,7 @@ export const RejectButton = styled.button`
   font-size: 13px;
   font-weight: 600;
   color: #ffffff;
-  background: #ef4444;
+  background: ${({ theme }) => theme.status.error};
   border: none;
   border-radius: 6px;
   cursor: pointer;
@@ -396,8 +425,8 @@ export const RejectButton = styled.button`
   white-space: nowrap;
 
   &:hover {
-    background: #dc2626;
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    filter: brightness(0.9);
+    box-shadow: ${({ theme }) => `0 4px 12px ${theme.status.error}4D`};
   }
 
   &:active {
@@ -423,13 +452,13 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalContent = styled.div`
-  background: #ffffff;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   max-width: 700px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: ${({ theme }) => theme.shadow};
   animation: modalSlideIn 0.3s ease;
 
   @keyframes modalSlideIn {
@@ -446,7 +475,7 @@ export const ModalContent = styled.div`
 
 export const ModalHeader = styled.div`
   padding: 24px 28px;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid ${({ theme }) => theme.background.secondary || theme.background.main};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -456,7 +485,7 @@ export const ModalTitle = styled.h2`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 20px;
   font-weight: 700;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
@@ -466,17 +495,17 @@ export const CloseButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
+  background: ${({ theme }) => theme.background.secondary || theme.background.main};
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-size: 20px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   transition: all 0.2s ease;
 
   &:hover {
-    background: #e5e7eb;
-    color: #1f2937;
+    background: ${({ theme }) => theme.background.hover};
+    color: ${({ theme }) => theme.text.primary};
   }
 `;
 
@@ -496,7 +525,7 @@ export const DetailLabel = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 600;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 8px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -506,7 +535,7 @@ export const DetailValue = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 15px;
   font-weight: 500;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   line-height: 1.6;
 `;
 
@@ -515,20 +544,20 @@ export const ApplicantInfo = styled.div`
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.secondary || theme.background.main};
   border-radius: 10px;
   margin-bottom: 24px;
 `;
 
 export const ReasonBox = styled.div`
   padding: 16px;
-  background: #f9fafb;
-  border-left: 4px solid #0284c7;
+  background: ${({ theme }) => theme.background.secondary || theme.background.main};
+  border-left: 4px solid ${({ theme }) => theme.colors.primary};
   border-radius: 8px;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 400;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
   line-height: 1.6;
   white-space: pre-wrap;
 `;
@@ -541,17 +570,17 @@ export const StatusBadge = styled.span`
   font-weight: 700;
   color: #ffffff;
   background: ${props => {
-    if (props.$status === 'PENDING') return '#f59e0b';
-    if (props.$status === 'APPROVED') return '#10b981';
-    if (props.$status === 'REJECTED') return '#ef4444';
-    return '#6b7280';
+    if (props.$status === 'PENDING') return props.theme.status.warning;
+    if (props.$status === 'APPROVED') return props.theme.status.success;
+    if (props.$status === 'REJECTED') return props.theme.status.error;
+    return props.theme.text.tertiary;
   }};
   border-radius: 8px;
 `;
 
 export const ModalFooter = styled.div`
   padding: 20px 28px;
-  border-top: 2px solid #f3f4f6;
+  border-top: 2px solid ${({ theme }) => theme.background.secondary || theme.background.main};
   display: flex;
   gap: 12px;
   justify-content: flex-end;
@@ -566,9 +595,9 @@ export const RejectReasonInput = styled.textarea`
   padding: 12px;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
-  color: #1d2838;
-  background: #ffffff;
-  border: 2px solid #e5e7eb;
+  color: ${({ theme }) => theme.text.primary};
+  background: ${({ theme }) => theme.background.paper};
+  border: 2px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   resize: vertical;
   min-height: 80px;
@@ -576,12 +605,12 @@ export const RejectReasonInput = styled.textarea`
   transition: all 0.2s ease;
 
   &:focus {
-    border-color: #0284c7;
-    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+    border-color: ${({ theme }) => theme.status.error};
+    box-shadow: 0 0 0 3px ${({ theme }) => `${theme.status.error}20`};
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
@@ -590,15 +619,15 @@ export const CancelButton = styled.button`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: #6b7280;
-  background: #f3f4f6;
+  color: ${({ theme }) => theme.text.secondary};
+  background: ${({ theme }) => theme.background.secondary || theme.background.main};
   border: none;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #e5e7eb;
+    background: ${({ theme }) => theme.background.hover};
   }
 
   &:active {
@@ -613,7 +642,7 @@ export const ComparisonBox = styled.div`
   grid-template-columns: 1fr auto 1fr;
   gap: 16px;
   padding: 20px;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.secondary || theme.background.main};
   border-radius: 10px;
   align-items: center;
 
@@ -628,16 +657,16 @@ export const ComparisonItem = styled.div`
   flex-direction: column;
   gap: 8px;
   padding: 16px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 8px;
-  border: 2px solid ${props => props.$highlight ? '#ef4444' : '#e5e7eb'};
+  border: 2px solid ${props => props.$highlight ? props.theme.status.error : props.theme.border};
 `;
 
 export const ComparisonLabel = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 12px;
   font-weight: 600;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   text-transform: uppercase;
   letter-spacing: 0.5px;
 `;
@@ -646,12 +675,12 @@ export const ComparisonValue = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 18px;
   font-weight: 700;
-  color: ${props => props.$highlight ? '#ef4444' : '#1d2838'};
+  color: ${props => props.$highlight ? props.theme.status.error : props.theme.text.primary};
 `;
 
 export const ComparisonArrow = styled.div`
   font-size: 24px;
-  color: #0284c7;
+  color: ${({ theme }) => theme.colors.primary};
   display: flex;
   align-items: center;
   justify-content: center;
@@ -672,28 +701,28 @@ export const FileItem = styled.div`
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #0284c7;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 export const FileIcon = styled.div`
   font-size: 20px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const FileName = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   flex: 1;
   word-break: break-all;
 `;
@@ -702,7 +731,7 @@ export const FileSize = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 12px;
   font-weight: 400;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.tertiary};
 `;
 
 export const FileActions = styled.div`
@@ -715,16 +744,16 @@ export const FileActionButton = styled.button`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 12px;
   font-weight: 600;
-  color: ${props => props.$variant === 'preview' ? '#0284c7' : '#6b7280'};
-  background: ${props => props.$variant === 'preview' ? '#e0f2fe' : '#f3f4f6'};
-  border: 1px solid ${props => props.$variant === 'preview' ? '#0284c7' : '#d1d5db'};
+  color: ${props => props.$variant === 'preview' ? props.theme.colors.primary : props.theme.text.secondary};
+  background: ${props => props.$variant === 'preview' ? `${props.theme.colors.primary}15` : props.theme.background.secondary};
+  border: 1px solid ${props => props.$variant === 'preview' ? props.theme.colors.primary : props.theme.text.disabled};
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
 
   &:hover {
-    background: ${props => props.$variant === 'preview' ? '#bae6fd' : '#e5e7eb'};
+    background: ${props => props.$variant === 'preview' ? `${props.theme.colors.primary}40` : props.theme.background.hover};
   }
 
   &:active {
@@ -750,7 +779,7 @@ export const PreviewModalOverlay = styled.div`
 `;
 
 export const PreviewModalContent = styled.div`
-  background: #ffffff;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   max-width: 90vw;
   max-height: 90vh;
@@ -764,18 +793,18 @@ export const PreviewModalContent = styled.div`
 
 export const PreviewHeader = styled.div`
   padding: 16px 24px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.secondary || theme.background.main};
 `;
 
 export const PreviewTitle = styled.h3`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 16px;
   font-weight: 600;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
   word-break: break-all;
 `;
@@ -787,7 +816,7 @@ export const PreviewBody = styled.div`
   align-items: center;
   justify-content: center;
   padding: 20px;
-  background: #f3f4f6;
+  background: ${({ theme }) => theme.background.subtle || '#f3f4f6'};
 `;
 
 export const PreviewImage = styled.img`
@@ -795,7 +824,7 @@ export const PreviewImage = styled.img`
   max-height: 100%;
   object-fit: contain;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
 export const PreviewIframe = styled.iframe`
@@ -810,5 +839,5 @@ export const PreviewMessage = styled.div`
   text-align: center;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;

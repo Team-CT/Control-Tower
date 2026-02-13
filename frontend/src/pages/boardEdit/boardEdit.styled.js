@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const PageContainer = styled.div`
   display: flex;
   min-height: 100vh;
-  background: transparent;
+  background: ${({ theme }) => theme.background.secondary || theme.background.main};
   width: 100%;
 `;
 
@@ -34,14 +34,14 @@ export const PageHeader = styled.div`
 export const PageTitle = styled.h1`
   font-size: 28px;
   font-weight: 700;
-  color: #222;
+  color: ${({ theme }) => theme.text.primary};
   display: flex;
   align-items: center;
   gap: 12px;
 `;
 
 export const CreateButton = styled.button`
-  background: ${props => props.theme.primary};
+  background: ${({ theme }) => theme.colors.primary};
   color: white;
   border: none;
   padding: 12px 28px;
@@ -50,12 +50,12 @@ export const CreateButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: ${({ theme }) => theme.shadow};
 
   &:hover {
-    background: ${props => props.theme.secondary};
+    filter: brightness(0.9);
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    box-shadow: ${({ theme }) => theme.shadowHover};
   }
 `;
 
@@ -63,7 +63,7 @@ export const TabSection = styled.div`
   display: flex;
   gap: 8px;
   margin-bottom: 32px;
-  border-bottom: 2px solid #E5E8EB;
+  border-bottom: 2px solid ${({ theme }) => theme.border};
   padding-bottom: 0;
 `;
 
@@ -73,15 +73,15 @@ export const Tab = styled.button`
   padding: 14px 28px;
   font-size: 15px;
   font-weight: 600;
-  color: ${props => props.$active ? props.theme.primary : '#666'};
+  color: ${props => props.$active ? props.theme.colors.primary : props.theme.text.secondary};
   cursor: pointer;
   position: relative;
   transition: all 0.2s;
-  border-bottom: 3px solid ${props => props.$active ? props.theme.primary : 'transparent'};
+  border-bottom: 3px solid ${props => props.$active ? props.theme.colors.primary : 'transparent'};
   margin-bottom: -2px;
 
   &:hover {
-    color: ${props => props.$active ? props.theme.primary : props.theme.secondary};
+    color: ${props => props.$active ? props.theme.colors.primary : props.theme.text.primary};
   }
 `;
 
@@ -101,24 +101,26 @@ export const SearchForm = styled.form`
 export const SearchInput = styled.input`
   flex: 1;
   padding: 14px 20px;
-  border: 2px solid #E5E8EB;
+  border: 2px solid ${({ theme }) => theme.border};
   border-right: none;
   border-radius: 8px 0 0 8px;
   font-size: 15px;
   outline: none;
   transition: border-color 0.2s;
+  background: ${({ theme }) => theme.background.paper};
+  color: ${({ theme }) => theme.text.primary};
 
   &:focus {
-    border-color: ${props => props.theme.primary};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 
   &::placeholder {
-    color: #999;
+    color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
 export const SearchButton = styled.button`
-  background: ${props => props.theme.primary};
+  background: ${({ theme }) => theme.colors.primary};
   color: white;
   border: none;
   padding: 14px 24px;
@@ -130,15 +132,15 @@ export const SearchButton = styled.button`
   transition: background 0.2s;
 
   &:hover {
-    background: ${props => props.theme.secondary};
+    filter: brightness(0.9);
   }
 `;
 
 export const FilterButton = styled.button`
   padding: 12px 24px;
-  border: 2px solid ${props => props.active ? props.theme.primary : '#E5E8EB'};
-  background: ${props => props.active ? props.theme.primary : 'white'};
-  color: ${props => props.active ? 'white' : '#666'};
+  border: 2px solid ${props => props.active ? props.theme.colors.primary : props.theme.border};
+  background: ${props => props.active ? props.theme.colors.primary : props.theme.background.paper};
+  color: ${props => props.active ? 'white' : props.theme.text.secondary};
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
@@ -146,8 +148,8 @@ export const FilterButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    border-color: ${props => props.active ? props.theme.primary : props.theme.secondary};
-    color: ${props => props.active ? 'white' : props.theme.secondary};
+    border-color: ${props => props.active ? props.theme.colors.primary : props.theme.colors.primary};
+    color: ${props => props.active ? 'white' : props.theme.colors.primary};
   }
 `;
 
@@ -159,28 +161,28 @@ export const BoardList = styled.div`
 `;
 
 export const BoardItem = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
   padding: 24px 28px;
   display: flex;
   gap: 20px;
   align-items: flex-start;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadow};
   transition: all 0.2s;
   cursor: pointer;
 
   &:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: ${({ theme }) => theme.shadowHover};
     transform: translateY(-2px);
   }
 `;
 
 export const CategoryBadge = styled.div`
-  background: ${props => props.bgColor || props.theme.hover};
+  background: ${props => props.bgColor || `${props.theme.colors.primary}15`};
   color: ${props => {
-    if (props.bgColor === '#FFE5E5') return '#D32F2F'; // 긴급/에러 등은 고정색 유지
-    if (props.bgColor === '#FFF9E5') return '#F57C00';
-    return props.theme.primary; // 기본값은 테마 메인 컬러
+    if (props.bgColor === '#FFE5E5') return props.theme.status.error;
+    if (props.bgColor === '#FFF9E5') return props.theme.status.warning;
+    return props.theme.colors.primary;
   }};
   padding: 8px 16px;
   border-radius: 6px;
@@ -201,7 +203,7 @@ export const BoardContent = styled.div`
 export const BoardTitle = styled.h3`
   font-size: 16px;
   font-weight: 600;
-  color: #222;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
   line-height: 1.5;
 `;
@@ -223,7 +225,7 @@ export const MetaItem = styled.div`
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #666;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const MetaIcon = styled.span`
@@ -241,7 +243,7 @@ export const StatItem = styled.div`
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: #666;
+  color: ${({ theme }) => theme.text.secondary};
   font-weight: 500;
 `;
 
@@ -256,17 +258,17 @@ export const Pagination = styled.div`
 export const PaginationButton = styled.button`
   width: 40px;
   height: 40px;
-  border: 1px solid #E5E8EB;
-  background: white;
+  border: 1px solid ${({ theme }) => theme.border};
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 6px;
   cursor: pointer;
   font-size: 16px;
-  color: #666;
+  color: ${({ theme }) => theme.text.secondary};
   transition: all 0.2s;
 
   &:hover:not(:disabled) {
-    border-color: ${props => props.theme.primary};
-    color: ${props => props.theme.primary};
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary};
   }
 
   &:disabled {
@@ -278,9 +280,9 @@ export const PaginationButton = styled.button`
 export const PageNumber = styled.button`
   width: 40px;
   height: 40px;
-  border: 1px solid ${props => props.active ? props.theme.primary : '#E5E8EB'};
-  background: ${props => props.active ? props.theme.primary : 'white'};
-  color: ${props => props.active ? 'white' : '#666'};
+  border: 1px solid ${props => props.active ? props.theme.colors.primary : props.theme.border};
+  background: ${props => props.active ? props.theme.colors.primary : props.theme.background.paper};
+  color: ${props => props.active ? 'white' : props.theme.text.secondary};
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
@@ -288,8 +290,8 @@ export const PageNumber = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    border-color: ${props => props.theme.primary};
-    color: ${props => props.active ? 'white' : props.theme.primary};
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${props => props.active ? 'white' : props.theme.colors.primary};
   }
 `;
 
@@ -304,13 +306,14 @@ export const ModalOverlay = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 `;
 
 export const ModalContainer = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   width: 600px;
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: ${({ theme }) => theme.shadow};
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -319,17 +322,17 @@ export const ModalContainer = styled.div`
 
 export const ModalHeader = styled.div`
   padding: 20px 24px;
-  border-bottom: 1px solid #E5E8EB;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #F8F9FA;
+  background: ${({ theme }) => theme.background.secondary};
 `;
 
 export const ModalTitle = styled.h2`
   font-size: 18px;
   font-weight: 700;
-  color: #222;
+  color: ${({ theme }) => theme.text.primary};
   display: flex;
   align-items: center;
   gap: 10px;
@@ -339,11 +342,11 @@ export const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  color: #666;
+  color: ${({ theme }) => theme.text.secondary};
   transition: color 0.2s;
 
   &:hover {
-    color: #222;
+    color: ${({ theme }) => theme.text.primary};
   }
 `;
 
@@ -367,47 +370,53 @@ export const FormGroup = styled.div`
 export const FormLabel = styled.label`
   font-size: 14px;
   font-weight: 600;
-  color: #444;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const FormInput = styled.input`
   padding: 12px;
-  border: 1px solid #E5E8EB;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
   outline: none;
   transition: border-color 0.2s;
+  background: ${({ theme }) => theme.background.input};
+  color: ${({ theme }) => theme.text.primary};
 
   &:focus {
-    border-color: ${props => props.theme.primary};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 export const FormSelect = styled.select`
   padding: 12px;
-  border: 1px solid #E5E8EB;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
   outline: none;
   transition: border-color 0.2s;
+  background: ${({ theme }) => theme.background.input};
+  color: ${({ theme }) => theme.text.primary};
 
   &:focus {
-    border-color: ${props => props.theme.primary};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 export const FormTextarea = styled.textarea`
   padding: 12px;
-  border: 1px solid #E5E8EB;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 15px;
   resize: vertical;
   outline: none;
   transition: border-color 0.2s;
   font-family: inherit;
+  background: ${({ theme }) => theme.background.input};
+  color: ${({ theme }) => theme.text.primary};
 
   &:focus {
-    border-color: ${props => props.theme.primary};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -420,24 +429,24 @@ export const ModalFooter = styled.div`
 
 export const CancelButton = styled.button`
   padding: 12px 24px;
-  background: white;
-  border: 1px solid #E5E8EB;
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: #666;
+  color: ${({ theme }) => theme.text.secondary};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: #F8F9FA;
-    border-color: #D1D5DB;
+    background: ${({ theme }) => theme.background.secondary};
+    border-color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
 export const SubmitButton = styled.button`
   padding: 12px 24px;
-  background: ${props => props.theme.primary};
+  background: ${({ theme }) => theme.colors.primary};
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -447,6 +456,6 @@ export const SubmitButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: ${props => props.theme.secondary};
+    filter: brightness(0.9);
   }
 `;

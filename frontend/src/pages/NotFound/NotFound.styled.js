@@ -6,7 +6,7 @@ export const MainContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #f5f7fa 0%, #e8eef5 100%);
+  background: ${({ theme }) => theme.background.main};
   padding: 40px 20px;
 `;
 
@@ -39,8 +39,8 @@ export const TeamImage = styled.img`
   height: 280px;
   border-radius: 50%;
   object-fit: cover;
-  border: 6px solid #ffffff;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  border: 6px solid ${({ theme }) => theme.background.paper};
+  box-shadow: ${({ theme }) => theme.shadowLg};
   transition: transform 0.3s ease;
 
   &:hover {
@@ -56,11 +56,11 @@ export const TeamImage = styled.img`
 export const ErrorCode = styled.h1`
   font-size: 120px;
   font-weight: 900;
-  color: #1e293b;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
   line-height: 1;
   letter-spacing: -4px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: ${({ theme }) => `linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.secondary} 100%)`};
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -103,7 +103,7 @@ export const IconContainer = styled.div`
 export const ErrorTitle = styled.h2`
   font-size: 32px;
   font-weight: 700;
-  color: #1e293b;
+  color: ${({ theme }) => theme.text.primary};
   margin: 16px 0 0 0;
   line-height: 1.4;
 
@@ -114,7 +114,7 @@ export const ErrorTitle = styled.h2`
 
 export const ErrorDescription = styled.p`
   font-size: 18px;
-  color: #64748b;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 12px 0;
   line-height: 1.8;
   font-weight: 400;
@@ -126,7 +126,7 @@ export const ErrorDescription = styled.p`
 
 export const ErrorSubtext = styled.p`
   font-size: 16px;
-  color: #94a3b8;
+  color: ${({ theme }) => theme.text.disabled || theme.text.tertiary};
   margin: 8px 0 32px 0;
   font-weight: 500;
 
@@ -155,13 +155,13 @@ export const BackButton = styled.button`
   padding: 14px 32px;
   font-size: 16px;
   font-weight: 600;
-  color: #475569;
-  background: #ffffff;
-  border: 2px solid #e2e8f0;
+  color: ${({ theme }) => theme.text.secondary};
+  background: ${({ theme }) => theme.background.paper};
+  border: 2px solid ${({ theme }) => theme.border};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: ${({ theme }) => theme.shadowSm};
 
   span {
     font-size: 20px;
@@ -169,10 +169,10 @@ export const BackButton = styled.button`
   }
 
   &:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.colors.primary};
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: ${({ theme }) => theme.shadow};
 
     span {
       transform: translateX(-4px);
@@ -198,17 +198,17 @@ export const HomeButton = styled.button`
   padding: 14px 32px;
   font-size: 16px;
   font-weight: 600;
-  color: #ffffff;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: ${({ theme }) => theme.text.inverse || 'white'};
+  background: ${({ theme }) => `linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.secondary} 100%)`};
   border: none;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: ${({ theme }) => theme.shadow};
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+    box-shadow: ${({ theme }) => theme.shadowLg};
   }
 
   &:active {
@@ -238,33 +238,33 @@ export const FooterSection = styled.div`
   gap: 16px;
   margin-top: 48px;
   padding-top: 32px;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid ${({ theme }) => theme.border};
   width: 100%;
 `;
 
 export const ContactText = styled.p`
   font-size: 15px;
-  color: #64748b;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
   font-weight: 400;
 `;
 
 export const ContactLink = styled.a`
-  color: #3b82f6;
+  color: ${({ theme }) => theme.colors.primary};
   font-weight: 600;
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: all 0.2s ease;
 
   &:hover {
-    color: #2563eb;
-    border-bottom-color: #2563eb;
+    color: ${({ theme }) => theme.colors.primaryHover || theme.colors.primary};
+    border-bottom-color: ${({ theme }) => theme.colors.primaryHover || theme.colors.primary};
   }
 `;
 
 export const Copyright = styled.p`
   font-size: 14px;
-  color: #94a3b8;
+  color: ${({ theme }) => theme.text.disabled || theme.text.tertiary};
   margin: 0;
   font-weight: 400;
 `;

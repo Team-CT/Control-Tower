@@ -23,7 +23,7 @@ import {
   CardIcon,
   CardTitle,
   CardDate,
- 
+
   FileAttachment,
   FileIcon,
   FileName,
@@ -47,12 +47,12 @@ const HealthSubmissionHistory = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
 
-  {/* TODO: Zustand state mapping */}
+  {/* TODO: Zustand state mapping */ }
 
-    const empId = useAuthStore((s) => s.getEmpId()); // 또는 s.emp?.empId
-    const hydrate = useAuthStore((s) => s.hydrate);
+  const empId = useAuthStore((s) => s.getEmpId()); // 또는 s.emp?.empId
+  const hydrate = useAuthStore((s) => s.hydrate);
 
-    const fetchPosts = async (page = 0) => {
+  const fetchPosts = async (page = 0) => {
     if (!empId) return;
     try {
       const res = await empPhysicalTestService.getPhysicalTest(empId, page, 4);
@@ -75,7 +75,7 @@ const HealthSubmissionHistory = () => {
     if (empId) fetchPosts(0);
   }, [empId]);
 
-    const submissionHistory = useMemo(() => {
+  const submissionHistory = useMemo(() => {
     return items.map((x, idx) => {
       const date = x.testDate ? String(x.testDate).slice(0, 10) : "-";
       const bp = `${x.systolicBloodPressure ?? "-"} / ${x.diastolicBloodPressure ?? "-"}`;
@@ -168,7 +168,7 @@ const HealthSubmissionHistory = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    {/* TODO: Implement search with Zustand */}
+    {/* TODO: Implement search with Zustand */ }
   };
 
   return (
@@ -179,7 +179,7 @@ const HealthSubmissionHistory = () => {
             <PageTitle>내 건강 정보 제출 이력</PageTitle>
             <PageSubtitle>제출한 건강 정보 기록을 확인하고 관리합니다</PageSubtitle>
           </div>
-          
+
           <StatsCard>
             <StatsIcon>📋</StatsIcon>
             <div>
@@ -191,18 +191,18 @@ const HealthSubmissionHistory = () => {
 
 
         <HistorySection>
-          
+
           {filteredHistory.length > 0 ? (
             <HistoryGrid>
               {filteredHistory.map((item) => (
                 <HistoryCard key={item.id} $hasAdminNote={!!item.adminNote}>
                   <CardHeader>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <S.CardTitleGroup>
                       <CardIcon type={item.type}>
                         {getCardIcon(item.type)}
                       </CardIcon>
                       <CardTitle>{item.title}</CardTitle>
-                    </div>
+                    </S.CardTitleGroup>
                     <CardDate>
                       <SubmitButton type="button"
                         onClick={() => handleDownload(item.file_id)} // fileId 필요
@@ -241,26 +241,26 @@ const HealthSubmissionHistory = () => {
             </EmptyState>
           )}
         </HistorySection>
-                  {/* 페이지네이션 섹션 */}
-          <Pagination>
-            <PaginationButton 
-              onClick={() => fetchPosts(currentPage - 1)}
-              disabled={currentPage === 0}
-            >‹</PaginationButton>
+        {/* 페이지네이션 섹션 */}
+        <Pagination>
+          <PaginationButton
+            onClick={() => fetchPosts(currentPage - 1)}
+            disabled={currentPage === 0}
+          >‹</PaginationButton>
 
-            {[...Array(totalPages)].map((_, idx) => (
-              <PageNumber
-                key={idx}
-                $active={currentPage === idx}
-                onClick={() => fetchPosts(idx)}
-              >{idx + 1}</PageNumber>
-            ))}
+          {[...Array(totalPages)].map((_, idx) => (
+            <PageNumber
+              key={idx}
+              $active={currentPage === idx}
+              onClick={() => fetchPosts(idx)}
+            >{idx + 1}</PageNumber>
+          ))}
 
-            <PaginationButton 
-              onClick={() => fetchPosts(currentPage + 1)}
-              disabled={currentPage + 1 >= totalPages}
-            >›</PaginationButton>
-          </Pagination>
+          <PaginationButton
+            onClick={() => fetchPosts(currentPage + 1)}
+            disabled={currentPage + 1 >= totalPages}
+          >›</PaginationButton>
+        </Pagination>
 
 
       </ContentWrapper>

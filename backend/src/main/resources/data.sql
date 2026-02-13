@@ -3,8 +3,8 @@ INSERT INTO airline_apply (airline_apply_id, airline_name, airline_apply_email, 
 VALUES (1, 'Jin Air', 'admin@jinair.com', '박관리', '010-1234-5678', 'APPROVED', true, NOW(), NOW());
 
 -- Airline (ID: 1)
-INSERT INTO airline (airline_id, airline_name, theme, main_number, airline_address, airline_desc, plan, status, country, email, phone, join_date, airline_apply_id, create_date, update_date)
-VALUES (1, 'Jin Air', 'Theme-Green', '1600-6200', '서울 강서구 공항대로 212', '아시아 최고의 LCC 진에어입니다.', 'Enterprise', 'ACTIVE', 'Korea', 'contact@jinair.com', '1600-6200', '2020-01-01', 1, NOW(), NOW());
+INSERT INTO airline (airline_id, airline_name, theme, primary_color, secondary_color, main_number, airline_address, airline_desc, plan, status, country, email, phone, join_date, airline_apply_id, create_date, update_date)
+VALUES (1, 'Jin Air', 'Theme-Green', '#9ACD32', '#6B8E23', '1600-6200', '서울 강서구 공항대로 212', '아시아 최고의 LCC 진에어입니다.', 'Enterprise', 'ACTIVE', 'Korea', 'contact@jinair.com', '1600-6200', '2020-01-01', 1, NOW(), NOW());
 
 -- Codes (Job & Rank)
 INSERT INTO code (code_id, code_name, airline_id, create_date, update_date) VALUES (1, '직급', 1, NOW(), NOW());

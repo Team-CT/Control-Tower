@@ -3,8 +3,8 @@ import styled from 'styled-components';
 export const FooterContainer = styled.footer`
   width: 100%;
   padding: 40px;
-  background-color: var(--bg-main);
-  border-top: 1px solid var(--border-color);
+  background-color: ${({ theme }) => theme.background.main};
+  border-top: 1px solid ${({ theme }) => theme.border};
   display: flex;
   justify-content: center;
   box-sizing: border-box;
@@ -33,7 +33,7 @@ export const LeftSection = styled.div`
 export const CompanyName = styled.h2`
   font-size: 16px;
   font-weight: 700;
-  color: var(--text-main);
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
@@ -43,7 +43,7 @@ export const InfoRow = styled.div`
   gap: 8px;
   align-items: center;
   font-size: 13px;
-  color: var(--text-tertiary);
+  color: ${({ theme }) => theme.text.tertiary};
   line-height: 1.5;
 `;
 
@@ -55,7 +55,7 @@ export const InfoItem = styled.span`
     content: '|';
     display: inline-block;
     margin-left: 8px;
-    color: var(--border-color);
+    color: ${({ theme }) => theme.border};
     font-size: 11px;
     vertical-align: 1px;
   }
@@ -63,7 +63,7 @@ export const InfoItem = styled.span`
 
 export const Copyright = styled.p`
   font-size: 12px;
-  color: var(--text-disabled);
+  color: ${({ theme }) => theme.text.disabled};
   margin: 12px 0 0 0;
   font-family: sans-serif;
 `;
@@ -80,7 +80,7 @@ export const RightSection = styled.div`
 
 export const LinkItem = styled.a`
   font-size: 13px;
-  color: var(--text-secondary);
+  color: ${({ theme }) => theme.text.secondary};
   text-decoration: none;
   cursor: pointer;
   transition: color 0.2s;
@@ -89,7 +89,7 @@ export const LinkItem = styled.a`
   font-weight: ${props => props.$bold ? '700' : '400'};
 
   &:hover {
-    color: var(--primary-color);
+    color: ${({ theme }) => theme.colors.primary};
     text-decoration: underline;
   }
 `;

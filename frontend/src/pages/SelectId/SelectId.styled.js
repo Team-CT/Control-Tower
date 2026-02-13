@@ -26,22 +26,24 @@ export const S = {
     justify-content: center;
     width: 100vw;
     height: 100vh;
-    background: ${TOKENS.pageBg};
+    background: ${({ theme }) => theme.background.main || '#f3f4f6'};
+    /* background: ${TOKENS.pageBg}; */
     padding: 0;
     margin: 0;
     overflow: hidden;
   `,
 
   FindCard: styled.article`
-    background: ${TOKENS.cardBg};
+    background: ${({ theme }) => theme.background.paper || '#FFFFFF'};
     border-radius: 16px;
-    box-shadow: ${TOKENS.shadow};
+    box-shadow: ${({ theme }) => theme.shadow || '0 20px 40px rgba(0,0,0,0.08)'};
     padding: 48px 56px 56px;
     width: 100%;
     max-width: 520px;
     display: flex;
     flex-direction: column;
     gap: 32px;
+    border: 1px solid ${({ theme }) => theme.border};
 
     @media (max-width: 1024px) {
       max-width: 448px;
@@ -59,7 +61,7 @@ export const S = {
   Title: styled.h1`
     font-size: 32px;
     font-weight: 700;
-    color: ${TOKENS.textPrimary};
+    color: ${({ theme }) => theme.text.primary};
     margin: 0;
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -72,7 +74,7 @@ export const S = {
   Subtitle: styled.p`
     font-size: 17px;
     font-weight: 400;
-    color: ${TOKENS.textSecondary};
+    color: ${({ theme }) => theme.text.secondary};
     margin: 0;
     line-height: 1.5;
 
@@ -96,7 +98,7 @@ export const S = {
   Label: styled.label`
     font-size: 15px;
     font-weight: 400;
-    color: #0A0A0A;
+    color: ${({ theme }) => theme.text.primary};
     line-height: 1;
 
     @media (max-width: 1024px) {
@@ -107,27 +109,27 @@ export const S = {
   Input: styled.input`
     width: 100%;
     padding: 12px 16px;
-    background: ${TOKENS.inputBg};
-    border: 1px solid transparent;
+    background: ${({ theme }) => theme.background.input || '#F3F3F5'};
+    border: 1px solid ${({ theme }) => theme.border || 'transparent'};
     border-radius: 8px;
     font-size: 15px;
-    color: #0A0A0A;
+    color: ${({ theme }) => theme.text.primary};
     transition: all 0.2s ease;
     box-sizing: border-box;
 
     &::placeholder {
-      color: ${TOKENS.textTertiary};
+      color: ${({ theme }) => theme.text.tertiary || '#717182'};
     }
 
     &:focus {
       outline: none;
-      border-color: ${TOKENS.accent};
-      background: #FFFFFF;
-      box-shadow: 0 0 0 3px rgba(17,24,39,0.14);
+      border-color: ${({ theme }) => theme.colors.primary};
+      background: ${({ theme }) => theme.background.paper || '#FFFFFF'};
+      box-shadow: 0 0 0 3px ${({ theme }) => `${theme.colors.primary}20`};
     }
 
     &:hover:not(:focus) {
-      background: ${TOKENS.inputHoverBg};
+      background: ${({ theme }) => theme.background.hover || '#EBEBED'};
     }
 
     @media (max-width: 1024px) {
@@ -135,12 +137,11 @@ export const S = {
     }
   `,
 
-  /** ✅ 핵심 수정: 버튼을 진회색으로 고정해서 흰 글씨가 항상 보이게 */
   SubmitButton: styled.button`
     width: 100%;
     padding: 12px 20px;
-    background: ${TOKENS.accent};
-    color: #FFFFFF;
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.text.inverse || '#FFFFFF'};
     border: none;
     border-radius: 8px;
     font-size: 15px;
@@ -150,9 +151,9 @@ export const S = {
     margin-top: 8px;
 
     &:hover {
-      background: ${TOKENS.accentHover};
+      background: ${({ theme }) => theme.colors.primaryHover || theme.colors.primary};
       transform: translateY(-1px);
-      box-shadow: 0 10px 24px rgba(17,24,39,0.22);
+      box-shadow: 0 4px 16px ${({ theme }) => `${theme.colors.primary}50`};
     }
 
     &:active {
@@ -160,7 +161,7 @@ export const S = {
     }
 
     &:disabled {
-      background: #9CA3AF;
+      background: ${({ theme }) => theme.text.disabled || '#CCCCCC'};
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
@@ -171,14 +172,13 @@ export const S = {
     }
   `,
 
-  /** ✅ 결과 영역도 테마 의존 제거 */
   ResultSection: styled.div`
     display: flex;
     flex-direction: column;
     gap: 12px;
     padding: 20px;
-    background: ${TOKENS.accentSoft};
-    border: 1px solid ${TOKENS.accentSoftBorder};
+    background: ${({ theme }) => theme.background.secondary || '#f9fafb'};
+    border: 1px solid ${({ theme }) => theme.colors.primary};
     border-radius: 8px;
     text-align: center;
   `,
@@ -186,13 +186,13 @@ export const S = {
   ResultLabel: styled.span`
     font-size: 14px;
     font-weight: 500;
-    color: ${TOKENS.textSecondary};
+    color: ${({ theme }) => theme.text.secondary};
   `,
 
   ResultValue: styled.span`
     font-size: 20px;
     font-weight: 700;
-    color: ${TOKENS.accent};
+    color: ${({ theme }) => theme.colors.primary};
     letter-spacing: 0.05em;
   `,
 
@@ -207,7 +207,7 @@ export const S = {
   FooterLink: styled.button`
     background: none;
     border: none;
-    color: ${TOKENS.accent};
+    color: ${({ theme }) => theme.text.secondary};
     font-size: 16px;
     font-weight: 400;
     cursor: pointer;
@@ -216,7 +216,7 @@ export const S = {
     white-space: nowrap;
 
     &:hover {
-      color: ${TOKENS.accentHover};
+      color: ${({ theme }) => theme.text.primary};
       text-decoration: underline;
     }
 
@@ -226,7 +226,7 @@ export const S = {
   `,
 
   Divider: styled.span`
-    color: #99A1AE;
+    color: ${({ theme }) => theme.text.tertiary || '#99A1AE'};
     font-size: 14px;
     font-weight: 400;
     user-select: none;

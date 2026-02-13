@@ -57,6 +57,7 @@ import QnADetail from './pages/QnADetail/QnADetail.jsx';
 import MainLayout from './layout/MainLayout';
 import FindPassword from "./pages/SelectPwd/SelectPwd.jsx";
 import ResetPassword from "./pages/SelectPwd/ResetPassword.jsx";
+import ErrorBoundary from './components/ErrorBoundary';
 
 // SuperAdminDashboard는 CompanyRegistrationManagement를 사용
 const SuperAdminDashboard = CompanyRegistrationManagement;
@@ -68,91 +69,92 @@ const ThemedApp = () => {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <Routes>
-        {/* 1. 사이드바가 없는 페이지 (퍼블릭) */}
-        <Route path="/" element={<LandingPage />} />
+      <ErrorBoundary>
+        <Routes>
+          {/* 1. 사이드바가 없는 페이지 (퍼블릭) */}
+          <Route path="/" element={<LandingPage />} />
 
-        <Route path="/find-password" element={<FindPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/find-password" element={<FindPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/find-employee-id" element={<SelectId />} />
-        <Route path="/find-password" element={<SelectPwd />} />
-        <Route path="/work-login" element={<WorkLogin />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/find-employee-id" element={<SelectId />} />
+          <Route path="/work-login" element={<WorkLogin />} />
 
-        {/* 항공사 가입 신청 및 계정 활성화 */}
-        <Route path="/service-registration" element={<ServiceRegistration />} />
-        <Route path="/account-activation" element={<AccountActivation />} />
+          {/* 항공사 가입 신청 및 계정 활성화 */}
+          <Route path="/service-registration" element={<ServiceRegistration />} />
+          <Route path="/account-activation" element={<AccountActivation />} />
 
-        {/* 2. 사이드바/헤더/푸터가 있는 페이지 (MainLayout) */}
-        <Route element={<MainLayout />}>
-          {/* 기본 리다이렉트 */}
-          <Route path="/dashboard" element={<EmployeeDashboard />} />
+          {/* 2. 사이드바/헤더/푸터가 있는 페이지 (MainLayout) */}
+          <Route element={<MainLayout />}>
+            {/* 기본 리다이렉트 */}
+            <Route path="/dashboard" element={<EmployeeDashboard />} />
 
-          {/* 관리자/슈퍼관리자 대시보드 */}
-          <Route path="/dashboard/admin" element={<AdmDashboard />} />
-          <Route path="/super-admin-dashboard" element={<SuperAdminDashboard />} />
+            {/* 관리자/슈퍼관리자 대시보드 */}
+            <Route path="/dashboard/admin" element={<AdmDashboard />} />
+            <Route path="/super-admin-dashboard" element={<SuperAdminDashboard />} />
 
-          {/* [슈퍼 관리자 전용] */}
-          <Route path="/super-admin/tenants" element={<TenantManagement />} />
-          <Route path="/super-admin/tenants/:tenantId" element={<TenantDetail />} />
-          <Route path="/super-admin/registrations" element={<CompanyRegistrationManagement />} />
-          <Route path="/super-admin/airline-approval" element={<AirlineApprovalManagement />} />
+            {/* [슈퍼 관리자 전용] */}
+            <Route path="/super-admin/tenants" element={<TenantManagement />} />
+            <Route path="/super-admin/tenants/:tenantId" element={<TenantDetail />} />
+            <Route path="/super-admin/registrations" element={<CompanyRegistrationManagement />} />
+            <Route path="/super-admin/airline-approval" element={<AirlineApprovalManagement />} />
 
-          {/* [게시판] */}
-          <Route path="/board" element={<Board />} />
-          <Route path="/board/detail/:boardId" element={<BoardDetail />} />
-          <Route path="/board/edit/:boardId" element={<BoardEdit />} />
-          <Route path="/qna" element={<QnA />} />
-          <Route path="/qna/:id" element={<QnADetail />} />
-          {/* [인사 관리] */}
-          <Route path="/employee-list" element={<EmployeeManagement />} />
-          <Route path="/employee-list/detail" element={<EmployeeDetail />} />
-          <Route path="/admin-attendance" element={<AdminAttendance />} />
-          <Route path="/dept-manage" element={<DepartmentManagement />} />
-          <Route path="/dept-manage/detail" element={<DepartmentDetail />} />
+            {/* [게시판] */}
+            <Route path="/board" element={<Board />} />
+            <Route path="/board/detail/:boardId" element={<BoardDetail />} />
+            <Route path="/board/edit/:boardId" element={<BoardEdit />} />
+            <Route path="/qna" element={<QnA />} />
+            <Route path="/qna/:id" element={<QnADetail />} />
+            {/* [인사 관리] */}
+            <Route path="/employee-list" element={<EmployeeManagement />} />
+            <Route path="/employee-list/detail" element={<EmployeeDetail />} />
+            <Route path="/admin-attendance" element={<AdminAttendance />} />
+            <Route path="/dept-manage" element={<DepartmentManagement />} />
+            <Route path="/dept-manage/detail" element={<DepartmentDetail />} />
 
-          {/* [일정 관리] */}
-          <Route path="/flightschedule" element={<FlightSchedule />} />
-          <Route path="/flightschedule/:flightId" element={<FlightScheduleDetail />} />
-          <Route path="/crew/:crewId" element={<CrewMemberDetail />} />
+            {/* [일정 관리] */}
+            <Route path="/flightschedule" element={<FlightSchedule />} />
+            <Route path="/flightschedule/:flightId" element={<FlightScheduleDetail />} />
+            <Route path="/crew/:crewId" element={<CrewMemberDetail />} />
 
-          {/* [근태 관리] */}
-          <Route path="/my-attendance" element={<EmployeeAttendance />} />
-          <Route path="/employee-schedule" element={<EmployeeSchedule />} />
-          <Route path="/admin-attendance" element={<AdminAttendance />} />
-          <Route path="/staff-schedule-assignment" element={<StaffScheduleAssignment />} />
-          <Route path="/vacation" element={<LeaveApply />} />
-          <Route path="/leave-apply" element={<LeaveApply />} />
-          <Route path="/employee/leave-apply" element={<LeaveApply />} />
-          <Route path="/protest-apply" element={<ProtestApply />} />
-          <Route path="/my-application-history" element={<MyApplicationHistory />} />
-          <Route path="/approval" element={<LeaveApproval />} />
-          <Route path="/protest-approval" element={<ProtestApproval />} />
+            {/* [근태 관리] */}
+            <Route path="/my-attendance" element={<EmployeeAttendance />} />
+            <Route path="/employee-schedule" element={<EmployeeSchedule />} />
+            <Route path="/admin-attendance" element={<AdminAttendance />} />
+            <Route path="/staff-schedule-assignment" element={<StaffScheduleAssignment />} />
+            <Route path="/vacation" element={<LeaveApply />} />
+            <Route path="/leave-apply" element={<LeaveApply />} />
+            <Route path="/employee/leave-apply" element={<LeaveApply />} />
+            <Route path="/protest-apply" element={<ProtestApply />} />
+            <Route path="/my-application-history" element={<MyApplicationHistory />} />
+            <Route path="/approval" element={<LeaveApproval />} />
+            <Route path="/protest-approval" element={<ProtestApproval />} />
 
-          {/* [건강 관리] */}
-          <Route path="/health-dashboard" element={<Dashboard />} />
-          <Route path="/stress" element={<Stress />} />
-          <Route path="/employeehealthmanagement" element={<EmployeeHealthManagement />} />
-          <Route path="/employeehealthdetail/:empId" element={<EmployeeHealthDetail />} />
-          <Route path="/healthinfosubmission" element={<HealthInfoSubmission />} />
-          <Route path="/healthsubmissionhistory" element={<HealthSubmissionHistory />} />
-          <Route path="/healthprogrammanagement" element={<HealthProgramManagement />} />
-          <Route path="/healthprogramapply" element={<HealthProgramApply />} />
-          <Route path="/health-program-history" element={<HealthProgramHistory />} />
+            {/* [건강 관리] */}
+            <Route path="/health-dashboard" element={<Dashboard />} />
+            <Route path="/stress" element={<Stress />} />
+            <Route path="/employeehealthmanagement" element={<EmployeeHealthManagement />} />
+            <Route path="/employeehealthdetail/:empId" element={<EmployeeHealthDetail />} />
+            <Route path="/healthinfosubmission" element={<HealthInfoSubmission />} />
+            <Route path="/healthsubmissionhistory" element={<HealthSubmissionHistory />} />
+            <Route path="/healthprogrammanagement" element={<HealthProgramManagement />} />
+            <Route path="/healthprogramapply" element={<HealthProgramApply />} />
+            <Route path="/health-program-history" element={<HealthProgramHistory />} />
 
 
-          {/* [시스템 관리] */}
-          <Route path="/common-code" element={<CommonCodeManagement />} />
+            {/* [시스템 관리] */}
+            <Route path="/common-code" element={<CommonCodeManagement />} />
 
-          {/* [기타] */}
-          <Route path="/settings" element={<Settings />} />
-        </Route>
+            {/* [기타] */}
+            <Route path="/settings" element={<Settings />} />
+          </Route>
 
-        {/* 404 페이지 */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          {/* 404 페이지 */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </ErrorBoundary>
     </ThemeProvider>
   );
 };

@@ -36,6 +36,7 @@ import {
   SelectLabel,
   SelectBox,
   SelectHint,
+  EmptyHistory,
 } from './HealthProgramApply.styled';
 
 const HealthProgramApply = () => {
@@ -255,9 +256,9 @@ const HealthProgramApply = () => {
               <SectionTitle>최근 신청 내역</SectionTitle>
 
               {history.length === 0 ? (
-                <div style={{ padding: '20px', textAlign: 'center', color: '#888' }}>
+                <EmptyHistory>
                   신청 내역이 없습니다.
-                </div>
+                </EmptyHistory>
               ) : (
                 history.map((item) => (
                   <HistoryItem key={item.program_apply_id}>

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 export const DashboardContainer = styled.div`
   display: flex;
   min-height: 100%;
-  background: var(--bg-main);
+  background: ${({ theme }) => theme.background.secondary || theme.background.main};
   width: 100%;
 `;
 
@@ -21,7 +21,7 @@ export const MainContent = styled.main`
 
 // ============ 출퇴근 배너 ============
 export const AttendanceBanner = styled.div`
-  background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: linear-gradient(135deg, ${({ theme }) => theme.colors.primary} 0%, ${({ theme }) => theme.colors.secondary} 100%);
   border-radius: 16px;
   padding: 32px 40px;
   margin-bottom: 32px;
@@ -77,15 +77,15 @@ export const StatisticsGrid = styled.div`
 `;
 
 export const StatCard = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   padding: 24px;
-  border-left: 4px solid ${props => props.color || 'var(--primary-color)'};
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid ${props => props.color || props.theme.colors.primary};
+  box-shadow: ${({ theme }) => theme.shadow};
   transition: all 0.3s;
 
   &:hover {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    box-shadow: ${({ theme }) => theme.shadowHover};
     transform: translateY(-4px);
   }
 `;
@@ -103,28 +103,28 @@ export const StatIcon = styled.span`
 
 export const StatLabel = styled.span`
   font-size: 14px;
-  color: #7f8c8d;
+  color: ${({ theme }) => theme.text.secondary};
   font-weight: 500;
 `;
 
 export const StatValue = styled.div`
   font-size: 36px;
   font-weight: 700;
-  color: #1e2742;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 8px;
   line-height: 1;
 `;
 
 export const StatUnit = styled.span`
   font-size: 16px;
-  color: #95a5a6;
+  color: ${({ theme }) => theme.text.tertiary};
   font-weight: 500;
   margin-left: 4px;
 `;
 
 export const StatSubInfo = styled.div`
   font-size: 13px;
-  color: ${props => props.$positive ? '#27ae60' : '#7f8c8d'};
+  color: ${props => props.$positive ? props.theme.status.success : props.theme.text.secondary};
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -150,10 +150,10 @@ export const ContentGrid = styled.div`
 
 // ============ 일정 섹션 ============
 export const ScheduleSection = styled.section`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
 export const SectionHeader = styled.div`
@@ -166,22 +166,23 @@ export const SectionHeader = styled.div`
 export const SectionTitle = styled.h3`
   font-size: 18px;
   font-weight: 700;
-  color: #1e2742;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
 export const SectionAction = styled.button`
   background: none;
   border: none;
-  color: var(--primary-color);
+  color: ${({ theme }) => theme.colors.primary};
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   padding: 8px 16px;
   border-radius: 8px;
+  transition: all 0.2s;
 
   &:hover {
-    background: var(--primary-light);
+    background: ${({ theme }) => `${theme.colors.primary}15`};
   }
 `;
 
@@ -197,20 +198,20 @@ export const ScheduleItem = styled.div`
   gap: 20px;
   padding: 20px;
   border-radius: 12px;
-  background: #f8f9fa;
-  border: 1px solid #e1e8ed;
+  background: ${({ theme }) => theme.background.secondary};
+  border: 1px solid ${({ theme }) => theme.border};
   transition: all 0.2s;
 
   &:hover {
-    border-color: var(--primary-color);
-    background: var(--primary-light);
+    border-color: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => `${theme.colors.primary}05`};
   }
 `;
 
 export const ScheduleTime = styled.div`
   font-size: 16px;
   font-weight: 700;
-  color: #1e2742;
+  color: ${({ theme }) => theme.text.primary};
   min-width: 60px;
 `;
 
@@ -224,20 +225,20 @@ export const ScheduleContent = styled.div`
 export const ScheduleTitle = styled.h4`
   font-size: 16px;
   font-weight: 600;
-  color: #1e2742;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
 export const ScheduleSubtitle = styled.p`
   font-size: 14px;
-  color: #7f8c8d;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
 `;
 
 export const ScheduleStatus = styled.span`
   padding: 6px 16px;
   border-radius: 20px;
-  background: ${props => props.color || '#95a5a6'};
+  background: ${props => props.color || props.theme.text.tertiary};
   color: white;
   font-size: 13px;
   font-weight: 600;
@@ -252,10 +253,10 @@ export const RightPanel = styled.div`
 `;
 
 export const HealthSection = styled.section`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
 export const HealthScore = styled.div`
@@ -268,7 +269,7 @@ export const HealthScore = styled.div`
 export const ScoreValue = styled.div`
   font-size: 56px;
   font-weight: 700;
-  color: #1e2742;
+  color: ${({ theme }) => theme.text.primary};
   line-height: 1;
 `;
 
@@ -288,9 +289,9 @@ export const ScoreGrade = styled.div`
   height: 56px;
   border-radius: 12px;
   background: ${props => {
-    if (props.$grade === 'A') return '#27ae60';
-    if (props.$grade === 'B+') return '#f39c12';
-    return '#95a5a6';
+    if (props.$grade === 'A') return props.theme.status.success;
+    if (props.$grade === 'B+') return props.theme.status.warning;
+    return props.theme.text.tertiary;
   }};
   color: white;
   font-size: 20px;
@@ -303,35 +304,35 @@ export const ScoreGrade = styled.div`
 
 export const ScoreLabel = styled.span`
   font-size: 13px;
-  color: #7f8c8d;
+  color: ${({ theme }) => theme.text.secondary};
   font-weight: 500;
 `;
 
 export const HealthActionButton = styled.button`
   width: 100%;
   padding: 14px;
-  background: #f8f9fa;
-  border: 1px solid #e1e8ed;
+  background: ${({ theme }) => theme.background.secondary};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 10px;
   font-size: 15px;
   font-weight: 600;
-  color: #1e2742;
+  color: ${({ theme }) => theme.text.primary};
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: #4a90e2;
+    background: ${({ theme }) => theme.colors.primary};
     color: white;
-    border-color: #4a90e2;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 // ============ 알림 섹션 ============
 export const NotificationSection = styled.section`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
 export const NotificationList = styled.div`
@@ -345,13 +346,13 @@ export const NotificationItem = styled.div`
   gap: 16px;
   padding: 16px;
   border-radius: 12px;
-  background: #f8f9fa;
-  border: 1px solid #e1e8ed;
+  background: ${({ theme }) => theme.background.secondary};
+  border: 1px solid ${({ theme }) => theme.border};
   transition: all 0.2s;
 
   &:hover {
-    background: #f0f7ff;
-    border-color: #4a90e2;
+    background: ${({ theme }) => `${theme.colors.primary}05`};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -359,7 +360,7 @@ export const NotificationIcon = styled.div`
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: ${props => props.color || '#4a90e2'};
+  background: ${props => props.color || props.theme.colors.primary};
   color: white;
   font-size: 20px;
   display: flex;
@@ -378,32 +379,32 @@ export const NotificationContent = styled.div`
 export const NotificationTitle = styled.h4`
   font-size: 15px;
   font-weight: 600;
-  color: #1e2742;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
 export const NotificationMessage = styled.p`
   font-size: 14px;
-  color: #7f8c8d;
+  color: ${({ theme }) => theme.text.secondary};
   margin: 0;
 `;
 
 export const NotificationTime = styled.span`
   font-size: 12px;
-  color: #95a5a6;
+  color: ${({ theme }) => theme.text.tertiary};
 `;
 
 // ============ 성과 섹션 ============
 export const PerformanceSection = styled.section`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
 export const PerformanceButton = styled.button`
   padding: 10px 20px;
-  background: #4a90e2;
+  background: ${({ theme }) => theme.colors.primary};
   border: none;
   border-radius: 10px;
   color: white;
@@ -413,9 +414,9 @@ export const PerformanceButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: #357abd;
+    filter: brightness(0.9);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+    box-shadow: ${({ theme }) => theme.shadowHover};
   }
 `;
 
@@ -436,12 +437,12 @@ export const ChartBar = styled.div`
 export const ChartLabel = styled.span`
   font-size: 15px;
   font-weight: 600;
-  color: #1e2742;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const ChartProgress = styled.div`
   height: 12px;
-  background: #e1e8ed;
+  background: ${({ theme }) => theme.border};
   border-radius: 6px;
   overflow: hidden;
   position: relative;
@@ -450,7 +451,7 @@ export const ChartProgress = styled.div`
 export const ChartFill = styled.div`
   height: 100%;
   width: ${props => props.width}%;
-  background: ${props => props.color || '#4a90e2'};
+  background: ${props => props.color || props.theme.colors.primary};
   border-radius: 6px;
   transition: width 0.6s ease;
 `;
@@ -458,12 +459,12 @@ export const ChartFill = styled.div`
 export const ChartValue = styled.div`
   font-size: 18px;
   font-weight: 700;
-  color: #1e2742;
+  color: ${({ theme }) => theme.text.primary};
   text-align: right;
 `;
 
 export const ChartTotal = styled.span`
   font-size: 14px;
-  color: #95a5a6;
+  color: ${({ theme }) => theme.text.tertiary};
   font-weight: 500;
 `;

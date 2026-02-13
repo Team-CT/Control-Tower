@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const PageContainer = styled.div`
   width: 100%;
   min-height: 100%;
-  background-color: var(--bg-main);
+  background-color: ${({ theme }) => theme.background.secondary || theme.background.main};
 `;
 
 export const ContentWrapper = styled.div`
@@ -32,12 +32,12 @@ export const HeaderLeft = styled.div`
 export const PageTitle = styled.h1`
   font-size: 26px;
   font-weight: 700;
-  color: #1e2742;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
 export const EmployeeCount = styled.span`
-  color: #666;
+  color: ${({ theme }) => theme.text.secondary};
   font-size: 15px;
   font-weight: 500;
 `;
@@ -47,7 +47,7 @@ export const AddButton = styled.button`
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background-color: #4A90E2;
+  background-color: ${({ theme }) => theme.colors.primary};
   color: white;
   border: none;
   border-radius: 8px;
@@ -57,7 +57,7 @@ export const AddButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background-color: #357ABD;
+    filter: brightness(0.9);
     transform: translateY(-2px);
   }
 `;
@@ -78,15 +78,15 @@ export const FilterSection = styled.div`
 export const SearchForm = styled.form`
   display: flex;
   align-items: center;
-  background: white;
-  border: 1px solid #e1e8ed;
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   padding: 10px 16px;
   width: 300px;
   gap: 10px;
 
   &:focus-within {
-    border-color: #4A90E2;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -95,8 +95,11 @@ export const SearchInput = styled.input`
   outline: none;
   font-size: 14px;
   width: 100%;
+  background: transparent;
+  color: ${({ theme }) => theme.text.primary};
+
   &::placeholder {
-    color: #999;
+    color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
@@ -109,24 +112,24 @@ export const FilterGroup = styled.div`
 export const FilterButton = styled.button`
   padding: 8px 16px;
   border-radius: 20px;
-  border: 1px solid ${props => props.$active ? '#4A90E2' : '#e1e8ed'};
-  background: ${props => props.$active ? '#4A90E2' : 'white'};
-  color: ${props => props.$active ? 'white' : '#666'};
+  border: 1px solid ${props => props.$active ? props.theme.colors.primary : props.theme.border};
+  background: ${props => props.$active ? props.theme.colors.primary : props.theme.background.paper};
+  color: ${props => props.$active ? 'white' : props.theme.text.secondary};
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    border-color: #4A90E2;
-    color: ${props => props.$active ? 'white' : '#4A90E2'};
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${props => props.$active ? 'white' : props.theme.colors.primary};
   }
 `;
 
 export const TableContainer = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadow};
   overflow: hidden;
   margin-bottom: 32px;
 `;
@@ -139,20 +142,20 @@ export const Table = styled.table`
 export const Th = styled.th`
   text-align: left;
   padding: 16px 24px;
-  background: #f8f9fa;
-  color: #666;
+  background: ${({ theme }) => theme.background.secondary};
+  color: ${({ theme }) => theme.text.secondary};
   font-size: 13px;
   font-weight: 600;
-  border-bottom: 1px solid #e1e8ed;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   white-space: nowrap;
 `;
 
 export const Tr = styled.tr`
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   transition: background 0.2s;
 
   &:hover {
-    background: #f8faff;
+    background: ${({ theme }) => theme.background.hover};
   }
   
   &:last-child {
@@ -163,7 +166,7 @@ export const Tr = styled.tr`
 export const Td = styled.td`
   padding: 16px 24px;
   font-size: 14px;
-  color: #333;
+  color: ${({ theme }) => theme.text.primary};
   vertical-align: middle;
 `;
 
@@ -171,7 +174,7 @@ export const ProfileImage = styled.div`
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: ${props => props.color || '#ddd'};
+  background: ${props => props.color || props.theme.text.tertiary};
   color: white;
   display: flex;
   align-items: center;
@@ -188,17 +191,17 @@ export const NameInfo = styled.div`
 
 export const Name = styled.span`
   font-weight: 600;
-  color: #1e2742;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const Email = styled.span`
   font-size: 12px;
-  color: #888;
+  color: ${({ theme }) => theme.text.tertiary};
 `;
 
 export const DepartmentBadge = styled.span`
-  background: #f0f7ff;
-  color: #4A90E2;
+  background: ${({ theme }) => `${theme.colors.primary}15`};
+  color: ${({ theme }) => theme.colors.primary};
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 12px;
@@ -209,7 +212,7 @@ export const ContactInfo = styled.div`
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #666;
+  color: ${({ theme }) => theme.text.secondary};
   font-size: 13px;
 `;
 
@@ -222,13 +225,13 @@ export const StatusBadge = styled.span`
   ${props => {
     switch (props.$status) {
       case '재직':
-        return 'background: #e6fcf5; color: #20c997;';
+        return `background: ${props.theme.status.success}15; color: ${props.theme.status.success};`;
       case '휴직':
-        return 'background: #fff9db; color: #fcc419;';
+        return `background: ${props.theme.status.warning}15; color: ${props.theme.status.warning};`;
       case '퇴직':
-        return 'background: #fff5f5; color: #ff6b6b;';
+        return `background: ${props.theme.status.error}15; color: ${props.theme.status.error};`;
       default:
-        return 'background: #f1f3f5; color: #868e96;';
+        return `background: ${props.theme.text.tertiary}15; color: ${props.theme.text.tertiary};`;
     }
   }}
 `;
@@ -236,14 +239,14 @@ export const StatusBadge = styled.span`
 export const MoreButton = styled.button`
   background: none;
   border: none;
-  color: #999;
+  color: ${({ theme }) => theme.text.tertiary};
   cursor: pointer;
   padding: 4px;
   border-radius: 4px;
 
   &:hover {
-    background: #f1f3f5;
-    color: #333;
+    background: ${({ theme }) => theme.background.secondary};
+    color: ${({ theme }) => theme.text.primary};
   }
 `;
 
@@ -257,11 +260,11 @@ export const Pagination = styled.div`
 export const PaginationButton = styled.button`
   width: 36px;
   height: 36px;
-  border: 1px solid #e1e8ed;
-  background: white;
+  border: 1px solid ${({ theme }) => theme.border};
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 6px;
   cursor: pointer;
-  color: #666;
+  color: ${({ theme }) => theme.text.secondary};
 
   &:disabled {
     opacity: 0.5;
@@ -269,23 +272,23 @@ export const PaginationButton = styled.button`
   }
   
   &:hover:not(:disabled) {
-    border-color: #4A90E2;
-    color: #4A90E2;
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 export const PageNumber = styled.button`
   width: 36px;
   height: 36px;
-  border: 1px solid ${props => props.$active ? '#4A90E2' : '#e1e8ed'};
-  background: ${props => props.$active ? '#4A90E2' : 'white'};
-  color: ${props => props.$active ? 'white' : '#666'};
+  border: 1px solid ${props => props.$active ? props.theme.colors.primary : props.theme.border};
+  background: ${props => props.$active ? props.theme.colors.primary : props.theme.background.paper};
+  color: ${props => props.$active ? 'white' : props.theme.text.secondary};
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
 
   &:hover {
-    border-color: #4A90E2;
-    color: ${props => props.$active ? 'white' : '#4A90E2'};
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${props => props.$active ? 'white' : props.theme.colors.primary};
   }
 `;

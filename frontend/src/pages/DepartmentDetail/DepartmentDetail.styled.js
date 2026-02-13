@@ -4,7 +4,7 @@ import styled from "styled-components";
 export const MainContainer = styled.main`
   width: 100%;
   min-height: 100%;
-  background-color: var(--bg-main);
+  background-color: ${({ theme }) => theme.background.secondary || theme.background.main};
   position: relative;
   display: flex;
   flex-direction: column;
@@ -14,7 +14,7 @@ export const MainContainer = styled.main`
 export const BannerSection = styled.div`
   width: 100%;
   height: 240px;
-  background: linear-gradient(90deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+  background: linear-gradient(90deg, ${({ theme }) => theme.colors.primary} 0%, ${({ theme }) => theme.colors.secondary} 100%);
   position: absolute;
   top: 0;
   left: 0;
@@ -57,9 +57,9 @@ export const BackButton = styled.button`
 
 // --- Info Card Section ---
 export const InfoCard = styled.section`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: ${({ theme }) => theme.shadow};
   padding: 40px;
   display: flex;
   flex-direction: column;
@@ -80,20 +80,20 @@ export const CardHeader = styled.div`
     .dept-icon {
       width: 80px;
       height: 80px;
-      background-color: #eff6ff;
+      background-color: ${({ theme }) => `${theme.colors.primary}15`};
       border-radius: 12px;
     }
 
     h1 {
       font-size: 32px;
       font-weight: 700;
-      color: #111827;
+      color: ${({ theme }) => theme.text.primary};
       margin-bottom: 8px;
     }
 
     .eng-name {
       font-size: 16px;
-      color: #6b7280;
+      color: ${({ theme }) => theme.text.secondary};
     }
   }
 `;
@@ -111,17 +111,21 @@ export const ActionGroup = styled.div`
     transition: all 0.2s;
     
     &.primary {
-      background-color: var(--primary-color);
+      background-color: ${({ theme }) => theme.colors.primary};
       color: white;
       border: none;
-      &:hover { background-color: var(--primary-hover); }
+      &:hover {
+        filter: brightness(0.9);
+      }
     }
     
     &.secondary {
-      background-color: white;
-      color: #374151;
-      border: 1px solid #d1d5db;
-      &:hover { background-color: #f3f4f6; }
+      background-color: ${({ theme }) => theme.background.paper};
+      color: ${({ theme }) => theme.text.primary};
+      border: 1px solid ${({ theme }) => theme.border};
+      &:hover {
+        background-color: ${({ theme }) => theme.background.secondary};
+      }
     }
   }
 `;
@@ -131,7 +135,7 @@ export const StatsGrid = styled.div`
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   padding-top: 32px;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid ${({ theme }) => theme.border};
 
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
@@ -145,12 +149,12 @@ export const StatItem = styled.div`
 
   .label {
     font-size: 13px;
-    color: #6b7280;
+    color: ${({ theme }) => theme.text.secondary};
   }
 
   .value {
     font-size: 18px;
-    color: #111827;
+    color: ${({ theme }) => theme.text.primary};
     font-weight: 600;
   }
 `;
@@ -159,7 +163,7 @@ export const StatItem = styled.div`
 export const TabNavigation = styled.nav`
   display: flex;
   gap: 32px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   margin-bottom: 16px;
 `;
 
@@ -169,20 +173,20 @@ export const TabItem = styled.button`
   padding: 16px 0;
   font-size: 16px;
   font-weight: 600;
-  color: ${props => props.$isActive ? 'var(--primary-color)' : 'var(--text-sub)'};
-  border-bottom: 2px solid ${props => props.$isActive ? 'var(--primary-color)' : 'transparent'};
+  color: ${props => props.$isActive ? props.theme.colors.primary : props.theme.text.secondary};
+  border-bottom: 2px solid ${props => props.$isActive ? props.theme.colors.primary : 'transparent'};
   cursor: pointer;
   transition: color 0.1s;
 
   &:hover {
-    color: var(--primary-color);
+    color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 export const TableSection = styled.section`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid ${({ theme }) => theme.border};
   padding: 24px;
   min-height: 400px;
 `;
@@ -196,11 +200,11 @@ export const SectionHeader = styled.div`
   h3 {
     font-size: 18px;
     font-weight: 700;
-    color: #111827;
+    color: ${({ theme }) => theme.text.primary};
   }
 
   .add-btn {
-    color: #0064DE;
+    color: ${({ theme }) => theme.colors.primary};
     background: none;
     border: none;
     font-weight: 600;
@@ -221,21 +225,21 @@ const TableRowBase = styled.div`
   display: flex;
   align-items: center;
   padding: 16px 20px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid ${({ theme }) => theme.background.secondary};
 
-  .col-id { width: 60px; text-align: center; color: #9ca3af; }
-  .col-name { width: 200px; font-weight: 600; color: #111827; }
-  .col-leader { width: 150px; color: #4b5563; }
-  .col-count { width: 100px; text-align: center; }
-  .col-task { flex: 1; color: #6b7280; }
+  .col-id { width: 60px; text-align: center; color: ${({ theme }) => theme.text.tertiary}; }
+  .col-name { width: 200px; font-weight: 600; color: ${({ theme }) => theme.text.primary}; }
+  .col-leader { width: 150px; color: ${({ theme }) => theme.text.secondary}; }
+  .col-count { width: 100px; text-align: center; color: ${({ theme }) => theme.text.primary}; }
+  .col-task { flex: 1; color: ${({ theme }) => theme.text.secondary}; }
   .col-action { width: 80px; text-align: right; }
 `;
 
 export const TableHeader = styled(TableRowBase)`
-  background-color: #f9fafb;
+  background-color: ${({ theme }) => theme.background.secondary};
   border-radius: 8px;
   font-size: 13px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   font-weight: 500;
   border-bottom: none;
 `;
@@ -245,11 +249,11 @@ export const TableRow = styled(TableRowBase)`
   transition: background-color 0.1s;
 
   &:hover {
-    background-color: #f0f7ff;
+    background-color: ${({ theme }) => theme.background.hover};
   }
 
   .col-action .link {
-    color: #0064DE;
+    color: ${({ theme }) => theme.colors.primary};
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
@@ -257,8 +261,8 @@ export const TableRow = styled(TableRowBase)`
 `;
 
 export const StatusBadge = styled.span`
-  background-color: #ecfdf5;
-  color: #059669;
+  background-color: ${({ theme }) => `${theme.status.success}15`};
+  color: ${({ theme }) => theme.status.success};
   padding: 4px 10px;
   border-radius: 12px;
   font-size: 13px;

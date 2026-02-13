@@ -28,6 +28,12 @@ public class Airline extends BaseTimeEntity {
     @Column(length = 100)
     private String theme;
 
+    @Column(length = 7)
+    private String primaryColor;
+
+    @Column(length = 7)
+    private String secondaryColor;
+
     @Column(length = 50)
     private String mainNumber;
 
@@ -36,6 +42,9 @@ public class Airline extends BaseTimeEntity {
 
     @Column(length = 500)
     private String airlineDesc;
+    
+    @Column(length = 50)
+    private String businessNumber;
 
     // 테넌트 관리 필드
     @Column(length = 50)

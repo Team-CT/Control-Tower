@@ -63,6 +63,7 @@ const Settings = () => {
 
   const [profileImage, setProfileImage] = useState(null);
   const [profilePreview, setProfilePreview] = useState(null);
+  const [imageLoadError, setImageLoadError] = useState(false);
 
   // ✅ 비밀번호 변경 상태
   const [pwForm, setPwForm] = useState({
@@ -263,6 +264,10 @@ const Settings = () => {
     return profile.profileImageId ? `${API_BASE}/api/file/preview/${profile.profileImageId}` : null;
   }, [API_BASE, profile.profileImageId]);
 
+  useEffect(() => {
+    setImageLoadError(false);
+  }, [profile.profileImageId]);
+
   const handleImageUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -403,14 +408,14 @@ const Settings = () => {
                       alt="프로필"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
                     />
-                  ) : serverProfileUrl ? (
+                  ) : serverProfileUrl && !imageLoadError ? (
                     <img
                       src={serverProfileUrl}
                       alt="프로필"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
                       onError={(e) => {
-                        console.warn('프로필 이미지 로드 실패:', serverProfileUrl);
-                        e.currentTarget.style.display = 'none';
+                        console.warn('프로필 이미지 로드 실패 (ID:', profile.profileImageId, '):', serverProfileUrl);
+                        setImageLoadError(true);
                       }}
                     />
                   ) : (
@@ -556,8 +561,8 @@ const Settings = () => {
                 </SecurityCardHeader>
 
                 <SecurityCardBody>
-                  {pwError && <div style={{ padding: '10px 0', color: '#dc2626' }}>{pwError}</div>}
-                  {pwSuccess && <div style={{ padding: '10px 0', color: '#16a34a' }}>{pwSuccess}</div>}
+                  {pwError && <div style={{ padding: '10px 0', color: theme?.status?.error || '#dc2626' }}>{pwError}</div>}
+                  {pwSuccess && <div style={{ padding: '10px 0', color: theme?.status?.success || '#16a34a' }}>{pwSuccess}</div>}
 
                   <SecurityItem>
                     <SecurityItemLeft>
@@ -620,78 +625,6 @@ const Settings = () => {
                   </ActionButtons>
                 </SecurityCardBody>
               </SecurityCard>
-
-              <SecurityCard>
-                <SecurityCardHeader>
-                  <h3>🎨 테마</h3>
-                </SecurityCardHeader>
-                <SecurityCardBody>
-                  <SecurityItem>
-                    <SecurityItemLeft>
-                      <SecurityItemTitle>다크 모드</SecurityItemTitle>
-                      <SecurityItemDescription>어두운 테마로 전환하여 눈의 피로를 줄이세요</SecurityItemDescription>
-                    </SecurityItemLeft>
-                    <SecurityItemRight>
-                      <ToggleSwitch>
-                        <input type="checkbox" checked={isDarkMode} onChange={toggleDarkMode} style={{ display: 'none' }} />
-                        <ToggleSlider checked={isDarkMode} onClick={toggleDarkMode} />
-                      </ToggleSwitch>
-                    </SecurityItemRight>
-                  </SecurityItem>
-
-                  <SecurityItem>
-                    <SecurityItemLeft>
-                      <SecurityItemTitle>언어 선택</SecurityItemTitle>
-                      <SecurityItemDescription>시스템 언어를 설정하세요</SecurityItemDescription>
-                    </SecurityItemLeft>
-                    <SecurityItemRight>
-                      <LanguageSelect value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.target.value)}>
-                        <option value="ko">한국어</option>
-                        <option value="en">English</option>
-                        <option value="ja">日本語</option>
-                        <option value="zh">中文</option>
-                      </LanguageSelect>
-                    </SecurityItemRight>
-                  </SecurityItem>
-
-                  <SecurityItem>
-                    <SecurityItemLeft>
-                      <SecurityItemTitle>항공사 테마 (개발용)</SecurityItemTitle>
-                      <SecurityItemDescription>항공사별 브랜드 컬러를 테스트해보세요</SecurityItemDescription>
-                    </SecurityItemLeft>
-                    <SecurityItemRight>
-                      <LanguageSelect value={currentAirline} onChange={(e) => changeAirline(e.target.value)}>
-                        <option value="CONTROL_TOWER">Control Tower (기본)</option>
-                        <option value="KE">대한항공 (Korean Air)</option>
-                        <option value="LJ">진에어 (Jin Air)</option>
-                      </LanguageSelect>
-                    </SecurityItemRight>
-                  </SecurityItem>
-
-                  <SecurityItem>
-                    <SecurityItemLeft>
-                      <SecurityItemTitle>사용자 권한 (개발용)</SecurityItemTitle>
-                      <SecurityItemDescription>개발 테스트를 위한 권한 전환 (페이지 새로고침 필요)</SecurityItemDescription>
-                    </SecurityItemLeft>
-                    <SecurityItemRight>
-                      <LanguageSelect
-                        value={localStorage.getItem('userRole') || 'EMP'}
-                        onChange={(e) => {
-                          const newRole = e.target.value;
-                          localStorage.setItem('userRole', newRole);
-                          updateRole(newRole);
-                          alert(`권한이 ${newRole}로 변경되었습니다.`);
-                        }}
-                      >
-                        <option value="EMP">직원 (EMP)</option>
-                        <option value="ADMIN">관리자 (ADMIN)</option>
-                        <option value="SUPER_ADMIN">슈퍼 관리자 (SUPER_ADMIN)</option>
-                      </LanguageSelect>
-                    </SecurityItemRight>
-                  </SecurityItem>
-                </SecurityCardBody>
-              </SecurityCard>
-
               <ActionButtons>
                 <CancelButton>취소</CancelButton>
                 <SaveButton>변경사항 저장</SaveButton>

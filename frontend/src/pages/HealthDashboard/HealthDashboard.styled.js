@@ -14,15 +14,15 @@ export const MainContainer = styled.div`
 
 // Hero Section
 export const HeroSection = styled.div`
-  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  background: ${props => `linear-gradient(135deg, ${props.theme.colors.primary} 0%, ${props.theme.colors.secondary} 100%)`};
   border-radius: 20px;
   padding: 48px 56px;
-  color: white;
+  color: ${({ theme }) => theme.text.inverse || 'white'};
   margin-bottom: 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 8px 24px rgba(30, 64, 175, 0.2);
+  box-shadow: ${({ theme }) => theme.shadow};
 
   @media (max-width: 1024px) {
     flex-direction: column;
@@ -41,6 +41,7 @@ export const HeroTitle = styled.h1`
   font-weight: 700;
   margin-bottom: 12px;
   line-height: 1.3;
+  color: ${({ theme }) => theme.text.inverse || 'white'};
 
   @media (max-width: 1024px) {
     font-size: 1.75rem;
@@ -52,6 +53,7 @@ export const HeroDescription = styled.p`
   opacity: 0.95;
   margin-bottom: 28px;
   line-height: 1.6;
+  color: ${({ theme }) => theme.text.inverse || 'white'};
 `;
 
 export const HeroActions = styled.div`
@@ -80,16 +82,16 @@ export const HeroButton = styled.button`
   border: none;
 
   ${props => props.$variant === 'primary' ? `
-    background: white;
-    color: #1e40af;
+    background: ${props.theme.background.paper || 'white'};
+    color: ${props.theme.colors.primary};
     
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(255, 255, 255, 0.3);
+      box-shadow: ${({ theme }) => theme.shadowHover};
     }
   ` : `
     background: rgba(255, 255, 255, 0.15);
-    color: white;
+    color: ${({ theme }) => theme.text.inverse || 'white'};
     border: 2px solid rgba(255, 255, 255, 0.3);
     
     &:hover {
@@ -153,16 +155,16 @@ export const GradeCardsGrid = styled.div`
 `;
 
 export const GradeCard = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: ${({ theme }) => theme.shadow};
   transition: all 0.3s ease;
-  border: 1px solid #f3f4f6;
+  border: 1px solid ${({ theme }) => theme.border};
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    box-shadow: ${({ theme }) => theme.shadowHover};
   }
 `;
 
@@ -178,13 +180,13 @@ export const GradeInfo = styled.div`
 export const GradeCategory = styled.div`
   font-size: 0.95rem;
   font-weight: 600;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 6px;
 `;
 
 export const GradeDescription = styled.div`
   font-size: 0.85rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   line-height: 1.5;
 `;
 
@@ -202,7 +204,7 @@ export const GradeBadge = styled.div`
 export const GradeProgressBar = styled.div`
   width: 100%;
   height: 6px;
-  background: #f3f4f6;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 3px;
   overflow: hidden;
 `;
@@ -217,8 +219,8 @@ export const GradeProgress = styled.div`
 
 // Alert Banner
 export const AlertBanner = styled.div`
-  background: #fef3c7;
-  border: 1px solid #f59e0b;
+  background: ${({ theme }) => `${theme.status.warning}15` || '#fef3c7'};
+  border: 1px solid ${({ theme }) => theme.status.warning || '#f59e0b'};
   border-radius: 16px;
   padding: 20px 28px;
   margin-bottom: 32px;
@@ -234,7 +236,7 @@ export const AlertBanner = styled.div`
 
 export const AlertIcon = styled.i`
   font-size: 2rem;
-  color: #f59e0b;
+  color: ${({ theme }) => theme.status.warning || '#f59e0b'};
   flex-shrink: 0;
 `;
 
@@ -245,20 +247,21 @@ export const AlertContent = styled.div`
 export const AlertTitle = styled.div`
   font-size: 1.05rem;
   font-weight: 700;
-  color: #b45309;
+  color: ${({ theme }) => theme.status.warning || '#b45309'};
   margin-bottom: 4px;
 `;
 
 export const AlertPeriod = styled.div`
   font-size: 0.875rem;
-  color: #92400e;
+  color: ${({ theme }) => theme.status.warning || '#92400e'};
+  opacity: 0.9;
 `;
 
 export const AlertButton = styled.button`
   padding: 12px 24px;
-  background: white;
-  color: #f59e0b;
-  border: 2px solid #f59e0b;
+  background: ${({ theme }) => theme.background.paper || 'white'};
+  color: ${({ theme }) => theme.status.warning || '#f59e0b'};
+  border: 2px solid ${({ theme }) => theme.status.warning || '#f59e0b'};
   border-radius: 12px;
   font-size: 0.95rem;
   font-weight: 600;
@@ -270,8 +273,8 @@ export const AlertButton = styled.button`
   flex-shrink: 0;
 
   &:hover {
-    background: #f59e0b;
-    color: white;
+    background: ${({ theme }) => theme.status.warning || '#f59e0b'};
+    color: ${({ theme }) => theme.text.inverse || 'white'};
     transform: translateY(-2px);
   }
 
@@ -294,11 +297,11 @@ export const ContentGrid = styled.div`
 
 // Section Components
 export const ChartSection = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   padding: 28px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  border: 1px solid #f3f4f6;
+  box-shadow: ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const StatisticsSection = styled.div`
@@ -317,13 +320,13 @@ export const SectionHeader = styled.div`
 export const SectionTitle = styled.h3`
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   display: flex;
   align-items: center;
   gap: 10px;
 
   i {
-    color: #4a90c2;
+    color: ${({ theme }) => theme.colors.primary};
     font-size: 1.2rem;
   }
 `;
@@ -343,54 +346,54 @@ export const PeriodTab = styled.button`
   border: none;
   
   ${props => props.$active ? `
-    background: #4a90c2;
-    color: white;
+    background: ${props.theme.colors.primary};
+    color: ${props.theme.text.inverse || 'white'};
   ` : `
-    background: #f3f4f6;
-    color: #6b7280;
+    background: ${props.theme.background.main};
+    color: ${props.theme.text.secondary};
     
     &:hover {
-      background: #e5e7eb;
+      background: ${props.theme.background.hover};
     }
   `}
 `;
 
 export const ChartPlaceholder = styled.div`
   height: 350px;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 2px dashed #e5e7eb;
+  border: 2px dashed ${({ theme }) => theme.border};
 `;
 
 export const ChartIcon = styled.i`
   font-size: 4rem;
-  color: #d1d5db;
+  color: ${({ theme }) => theme.border};
   margin-bottom: 16px;
 `;
 
 export const ChartText = styled.div`
   font-size: 1.1rem;
   font-weight: 600;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 8px;
 `;
 
 export const ChartSubText = styled.div`
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.disabled || '#9ca3af'};
 `;
 
 // Statistics
 export const StatsGrid = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   padding: 28px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  border: 1px solid #f3f4f6;
+  box-shadow: ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
@@ -399,43 +402,43 @@ export const StatsGrid = styled.div`
 export const StatCard = styled.div`
   text-align: center;
   padding: 20px;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 12px;
 `;
 
 export const StatValue = styled.div`
   font-size: 2rem;
   font-weight: 700;
-  color: ${props => props.$color || '#4a90c2'};
+  color: ${props => props.$color || props.theme.colors.primary};
   margin-bottom: 8px;
 `;
 
 export const StatLabel = styled.div`
   font-size: 0.85rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   font-weight: 500;
 `;
 
 // Tips Section
 export const TipsSection = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   padding: 28px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  border: 1px solid #f3f4f6;
+  box-shadow: ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const TipsTitle = styled.h4`
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 8px;
 
   i {
-    color: #f59e0b;
+    color: ${({ theme }) => theme.status.warning || '#f59e0b'};
   }
 `;
 
@@ -450,13 +453,13 @@ export const TipItem = styled.div`
   align-items: flex-start;
   gap: 12px;
   padding: 16px;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 12px;
   transition: all 0.2s ease;
   cursor: pointer;
 
   &:hover {
-    background: #f3f4f6;
+    background: ${({ theme }) => theme.background.hover};
     transform: translateX(4px);
   }
 `;
@@ -473,13 +476,13 @@ export const TipContent = styled.div`
 export const TipCategory = styled.div`
   font-size: 0.8rem;
   font-weight: 600;
-  color: #4a90c2;
+  color: ${({ theme }) => theme.colors.primary};
   margin-bottom: 4px;
 `;
 
 export const TipTitle = styled.div`
   font-size: 0.9rem;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   line-height: 1.5;
 `;
 
@@ -490,8 +493,8 @@ export const ProgramsSection = styled.div`
 
 export const ViewAllButton = styled.button`
   padding: 10px 20px;
-  background: #f3f4f6;
-  color: #6b7280;
+  background: ${({ theme }) => theme.background.main};
+  color: ${({ theme }) => theme.text.secondary};
   border: none;
   border-radius: 10px;
   font-size: 0.9rem;
@@ -503,8 +506,8 @@ export const ViewAllButton = styled.button`
   gap: 8px;
 
   &:hover {
-    background: #e5e7eb;
-    color: #1f2937;
+    background: ${({ theme }) => theme.background.hover};
+    color: ${({ theme }) => theme.text.primary};
   }
 
   i {
@@ -528,11 +531,11 @@ export const ProgramsGrid = styled.div`
 
 export const ProgramCard = styled.div`
   background: ${props => {
-    switch(props.$type) {
-      case 'sleep': return 'linear-gradient(135deg, #10b 981 0%, #34d399 100%)';
+    switch (props.$type) {
+      case 'sleep': return 'linear-gradient(135deg, #10b981 0%, #34d399 100%)';
       case 'stress': return 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)';
       case 'exercise': return 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)';
-      default: return 'linear-gradient(135deg, #4a90c2 0%, #6bb3e0 100%)';
+      default: return `linear-gradient(135deg, ${props.theme.colors.primary} 0%, ${props.theme.colors.secondary} 100%)`;
     }
   }};
   border-radius: 16px;
@@ -543,7 +546,7 @@ export const ProgramCard = styled.div`
 
   &:hover {
     transform: translateY(-8px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+    box-shadow: ${({ theme }) => theme.shadowHover};
   }
 `;
 
@@ -589,18 +592,18 @@ export const ProgramMetaItem = styled.div`
 
 // Department Section
 export const DepartmentSection = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  border: 1px solid #f3f4f6;
+  box-shadow: ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const ExportButton = styled.button`
   padding: 10px 20px;
-  background: white;
-  color: #4a90c2;
-  border: 2px solid #4a90c2;
+  background: ${({ theme }) => theme.background.paper || 'white'};
+  color: ${({ theme }) => theme.colors.primary};
+  border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: 10px;
   font-size: 0.9rem;
   font-weight: 600;
@@ -611,8 +614,8 @@ export const ExportButton = styled.button`
   gap: 8px;
 
   &:hover {
-    background: #4a90c2;
-    color: white;
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.text.inverse || 'white'};
     transform: translateY(-2px);
   }
 
@@ -631,9 +634,9 @@ export const TableHeader = styled.div`
   grid-template-columns: 25% 15% 35% 15% 10%;
   gap: 16px;
   padding: 16px 20px;
-  background: #f9fafb;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 12px 12px 0 0;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid ${({ theme }) => theme.border};
 
   @media (max-width: 1024px) {
     display: none;
@@ -643,13 +646,13 @@ export const TableHeader = styled.div`
 export const TableHeaderCell = styled.div`
   font-size: 0.875rem;
   font-weight: 700;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   text-transform: uppercase;
   letter-spacing: 0.5px;
 `;
 
 export const TableBody = styled.div`
-  background: white;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 0 0 12px 12px;
 `;
 
@@ -658,7 +661,7 @@ export const TableRow = styled.div`
   grid-template-columns: 25% 15% 35% 15% 10%;
   gap: 16px;
   padding: 20px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   align-items: center;
   transition: all 0.2s ease;
 
@@ -667,7 +670,7 @@ export const TableRow = styled.div`
   }
 
   &:hover {
-    background: #f9fafb;
+    background: ${({ theme }) => theme.background.hover};
   }
 
   @media (max-width: 1024px) {
@@ -679,7 +682,7 @@ export const TableRow = styled.div`
 
 export const TableCell = styled.div`
   font-size: 0.95rem;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   display: flex;
   align-items: center;
 
@@ -689,7 +692,7 @@ export const TableCell = styled.div`
     &:before {
       content: attr(data-label);
       font-weight: 600;
-      color: #6b7280;
+      color: ${({ theme }) => theme.text.secondary};
       font-size: 0.85rem;
     }
   }
@@ -699,11 +702,11 @@ export const ScoreNumber = styled.span`
   font-size: 1.5rem;
   font-weight: 700;
   color: ${props => {
-    switch(props.$color) {
-      case 'good': return '#10b981';
-      case 'warning': return '#f59e0b';
-      case 'danger': return '#ef4444';
-      default: return '#6b7280';
+    switch (props.$color) {
+      case 'good': return props.theme.status.success || '#10b981';
+      case 'warning': return props.theme.status.warning || '#f59e0b';
+      case 'danger': return props.theme.status.error || '#ef4444';
+      default: return props.theme.text.secondary || '#6b7280';
     }
   }};
 `;
@@ -711,7 +714,7 @@ export const ScoreNumber = styled.span`
 export const ProgressBarContainer = styled.div`
   width: 100%;
   height: 10px;
-  background: #f3f4f6;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 5px;
   overflow: hidden;
 `;
@@ -720,7 +723,7 @@ export const ProgressBar = styled.div`
   width: ${props => props.$width}%;
   height: 100%;
   background: ${props => {
-    switch(props.$color) {
+    switch (props.$color) {
       case 'good': return 'linear-gradient(90deg, #10b981 0%, #34d399 100%)';
       case 'warning': return 'linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%)';
       case 'danger': return 'linear-gradient(90deg, #ef4444 0%, #f87171 100%)';
@@ -734,12 +737,12 @@ export const ProgressBar = styled.div`
 export const EmployeeCount = styled.span`
   font-size: 1.1rem;
   font-weight: 700;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const EmployeeLabel = styled.span`
   font-size: 0.85rem;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-left: 4px;
 `;
 
@@ -752,26 +755,26 @@ export const StatusBadge = styled.div`
   white-space: nowrap;
   
   ${props => {
-    switch(props.$status) {
+    switch (props.$status) {
       case 'good':
         return `
-          background: #d1fae5;
-          color: #059669;
+          background: ${props.theme.status.success}15;
+          color: ${props.theme.status.success};
         `;
       case 'warning':
         return `
-          background: #fef3c7;
-          color: #d97706;
+          background: ${props.theme.status.warning}15;
+          color: ${props.theme.status.warning};
         `;
       case 'danger':
         return `
-          background: #fee2e2;
-          color: #dc2626;
+          background: ${props.theme.status.error}15;
+          color: ${props.theme.status.error};
         `;
       default:
         return `
-          background: #f3f4f6;
-          color: #6b7280;
+          background: ${props.theme.background.main};
+          color: ${props.theme.text.secondary};
         `;
     }
   }}

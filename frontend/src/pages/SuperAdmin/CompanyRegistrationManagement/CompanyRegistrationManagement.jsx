@@ -34,7 +34,7 @@ const CompanyRegistrationManagement = () => {
       setLoading(true);
       setError(null);
       const response = await airlineApplyService.getApplications(searchKeyword);
-      
+
       // 백엔드 데이터를 프론트엔드 형식으로 변환
       const formattedData = response.data.map(app => ({
         id: app.id,
@@ -44,7 +44,7 @@ const CompanyRegistrationManagement = () => {
         documentStatus: formatDocumentStatus(app.documentStatus),
         status: app.status
       }));
-      
+
       setApplications(formattedData);
     } catch (err) {
       console.error('데이터 로드 실패:', err);
@@ -168,12 +168,12 @@ const CompanyRegistrationManagement = () => {
     return (
       <S.MainContainer>
         <S.ContentWrapper>
-          <div style={{ textAlign: 'center', padding: '50px', color: '#dc2626' }}>
+          <S.ErrorText>
             <p>{error}</p>
-            <button onClick={fetchApplications} style={{ marginTop: '20px', padding: '10px 20px', cursor: 'pointer' }}>
+            <S.RetryButton onClick={fetchApplications}>
               다시 시도
-            </button>
-          </div>
+            </S.RetryButton>
+          </S.ErrorText>
         </S.ContentWrapper>
       </S.MainContainer>
     );
@@ -192,8 +192,8 @@ const CompanyRegistrationManagement = () => {
         <S.SearchSection>
           <S.SearchInputWrapper>
             <S.SearchIcon>🔍</S.SearchIcon>
-            <S.SearchInput 
-              placeholder="항공사명, 이메일 검색..." 
+            <S.SearchInput
+              placeholder="항공사명, 이메일 검색..."
               value={searchKeyword}
               onChange={handleSearch}
               onKeyPress={(e) => e.key === 'Enter' && handleSearchSubmit()}
@@ -215,8 +215,8 @@ const CompanyRegistrationManagement = () => {
             <S.TableBody>
               {applications.length === 0 ? (
                 <S.TableRow>
-                  <S.TableCell colSpan="5" style={{ textAlign: 'center', padding: '40px' }}>
-                    신청 내역이 없습니다.
+                  <S.TableCell colSpan="5">
+                    <S.EmptyMessage>신청 내역이 없습니다.</S.EmptyMessage>
                   </S.TableCell>
                 </S.TableRow>
               ) : (
@@ -373,7 +373,7 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
                   <S.DocumentItem key={index}>
                     <S.DocumentIcon>📄</S.DocumentIcon>
                     <S.DocumentName>{doc.fileName}</S.DocumentName>
-                    <S.DownloadLink 
+                    <S.DownloadLink
                       href={`http://localhost:8001/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -383,7 +383,7 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
                   </S.DocumentItem>
                 ))
               ) : (
-                <p style={{ color: '#999', textAlign: 'center' }}>첨부된 서류가 없습니다.</p>
+                <S.EmptyMessage>첨부된 서류가 없습니다.</S.EmptyMessage>
               )}
             </S.DocumentList>
           </S.DocumentSection>
@@ -470,65 +470,32 @@ const ApprovedModal = ({ application, onClose }) => {
             <S.InfoSection>
               <S.InfoItem>
                 <S.InfoLabel>활성화 링크</S.InfoLabel>
-                <div style={{ 
-                  display: 'flex', 
-                  gap: '10px', 
-                  alignItems: 'center',
-                  marginTop: '8px'
-                }}>
-                  <input
+                <S.ActivationLinkWrapper>
+                  <S.ActivationInput
                     type="text"
                     value={application.activationLink}
                     readOnly
-                    style={{
-                      flex: 1,
-                      padding: '10px',
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '6px',
-                      fontSize: '14px',
-                      backgroundColor: '#f9fafb'
-                    }}
                   />
-                  <button
-                    onClick={handleCopyLink}
-                    style={{
-                      padding: '10px 20px',
-                      backgroundColor: '#3b82f6',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontSize: '14px'
-                    }}
-                  >
+                  <S.CopyButton onClick={handleCopyLink}>
                     복사
-                  </button>
-                </div>
-                <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
+                  </S.CopyButton>
+                </S.ActivationLinkWrapper>
+                <S.InfoMessage>
                   ℹ️ 이 링크를 항공사 관리자에게 전달하여 계정 활성화를 완료하도록 안내하세요.
-                </p>
+                </S.InfoMessage>
               </S.InfoItem>
             </S.InfoSection>
           )}
-          
+
           {/* 초기 설정 완료 안내 - Airline 테이블에 레코드가 생성되었을 때만 표시 */}
           {/* airlineId가 있으면 Airline 테이블에 레코드가 있는 것 = 초기 설정 완료 */}
           {application.airlineId && (
             <S.InfoSection>
               <S.InfoItem>
                 <S.InfoLabel>초기 설정 상태</S.InfoLabel>
-                <div style={{ 
-                  marginTop: '8px',
-                  padding: '12px',
-                  backgroundColor: '#f0fdf4',
-                  border: '1px solid #86efac',
-                  borderRadius: '6px',
-                  color: '#166534',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}>
+                <S.InitialSetupSuccessBox>
                   ✓ 초기 설정이 완료되었습니다. 활성화 링크는 더 이상 필요하지 않습니다.
-                </div>
+                </S.InitialSetupSuccessBox>
               </S.InfoItem>
             </S.InfoSection>
           )}
@@ -541,7 +508,7 @@ const ApprovedModal = ({ application, onClose }) => {
                   <S.DocumentItem key={index}>
                     <S.DocumentIcon>📄</S.DocumentIcon>
                     <S.DocumentName>{doc.fileName}</S.DocumentName>
-                    <S.DownloadLink 
+                    <S.DownloadLink
                       href={`http://localhost:8001/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -551,7 +518,7 @@ const ApprovedModal = ({ application, onClose }) => {
                   </S.DocumentItem>
                 ))
               ) : (
-                <p style={{ color: '#999', textAlign: 'center' }}>첨부된 서류가 없습니다.</p>
+                <S.EmptyMessage>첨부된 서류가 없습니다.</S.EmptyMessage>
               )}
             </S.DocumentList>
           </S.DocumentSection>
@@ -623,7 +590,7 @@ const RejectedModal = ({ application, onClose }) => {
                   <S.DocumentItem key={index}>
                     <S.DocumentIcon>📄</S.DocumentIcon>
                     <S.DocumentName>{doc.fileName}</S.DocumentName>
-                    <S.DownloadLink 
+                    <S.DownloadLink
                       href={`http://localhost:8001/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -633,7 +600,7 @@ const RejectedModal = ({ application, onClose }) => {
                   </S.DocumentItem>
                 ))
               ) : (
-                <p style={{ color: '#999', textAlign: 'center' }}>첨부된 서류가 없습니다.</p>
+                <S.EmptyMessage>첨부된 서류가 없습니다.</S.EmptyMessage>
               )}
             </S.DocumentList>
           </S.DocumentSection>
@@ -677,25 +644,17 @@ const AdminIdInputModal = ({ adminId, setAdminId, onConfirm, onCancel }) => {
           <S.InfoSection>
             <S.InfoItem>
               <S.InfoLabel>항공사 최고 관리자 아이디</S.InfoLabel>
-              <input
+              <S.AdminInput
                 type="text"
                 value={adminId}
                 onChange={(e) => setAdminId(e.target.value)}
                 placeholder="아이디를 입력하세요"
-                style={{
-                  width: '100%',
-                  padding: '10px',
-                  border: '1px solid #e5e7eb',
-                  borderRadius: '6px',
-                  fontSize: '14px',
-                  marginTop: '8px'
-                }}
                 onKeyPress={(e) => e.key === 'Enter' && onConfirm()}
               />
             </S.InfoItem>
-            <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '8px' }}>
+            <S.InfoMessage>
               ℹ️ 입력한 아이디로 항공사 관리자 계정이 생성됩니다.
-            </p>
+            </S.InfoMessage>
           </S.InfoSection>
         </S.ModalContent>
 
@@ -730,44 +689,20 @@ const ActivationLinkModal = ({ activationLink, onClose }) => {
           <S.InfoSection>
             <S.InfoItem>
               <S.InfoLabel>활성화 링크</S.InfoLabel>
-              <div style={{ 
-                display: 'flex', 
-                gap: '10px', 
-                alignItems: 'center',
-                marginTop: '8px'
-              }}>
-                <input
+              <S.ActivationLinkWrapper>
+                <S.ActivationInput
                   type="text"
                   value={activationLink}
                   readOnly
-                  style={{
-                    flex: 1,
-                    padding: '10px',
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    backgroundColor: '#f9fafb'
-                  }}
                 />
-                <button
-                  onClick={handleCopyLink}
-                  style={{
-                    padding: '10px 20px',
-                    backgroundColor: '#3b82f6',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontSize: '14px'
-                  }}
-                >
+                <S.CopyButton onClick={handleCopyLink}>
                   복사
-                </button>
-              </div>
+                </S.CopyButton>
+              </S.ActivationLinkWrapper>
+              <S.InfoMessage $marginTop="12px">
+                ℹ️ 이 링크를 항공사 관리자에게 전달하여 계정 활성화를 완료하도록 안내하세요.
+              </S.InfoMessage>
             </S.InfoItem>
-            <p style={{ fontSize: '12px', color: '#6b7280', marginTop: '12px' }}>
-              ℹ️ 이 링크를 항공사 관리자에게 전달하여 계정 활성화를 완료하도록 안내하세요.
-            </p>
           </S.InfoSection>
         </S.ModalContent>
 

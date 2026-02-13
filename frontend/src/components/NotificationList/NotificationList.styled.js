@@ -9,13 +9,13 @@ export const NotificationItem = styled.div`
   display: flex;
   align-items: flex-start;
   padding: 12px 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   cursor: pointer;
   transition: background-color 0.2s;
-  background-color: ${({ $isUnread }) => ($isUnread ? '#f8f9ff' : 'white')};
+  background-color: ${({ $isUnread, theme }) => ($isUnread ? theme.background.hover : theme.background.main)};
 
   &:hover {
-    background-color: ${({ $isUnread }) => ($isUnread ? '#f0f2ff' : '#f5f5f5')};
+    background-color: ${({ theme }) => theme.background.hover};
   }
 
   &:last-child {
@@ -31,7 +31,7 @@ export const NotificationContent = styled.div`
 export const NotificationText = styled.p`
   margin: 0 0 4px 0;
   font-size: 14px;
-  color: #333;
+  color: ${({ theme }) => theme.text.primary};
   line-height: 1.4;
   word-wrap: break-word;
 `;
@@ -41,15 +41,15 @@ export const NotificationMeta = styled.div`
   align-items: center;
   gap: 8px;
   font-size: 12px;
-  color: #999;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const NotificationTime = styled.span``;
 
 export const NotificationType = styled.span`
   padding: 2px 6px;
-  background-color: #e3f2fd;
-  color: #1976d2;
+  background-color: ${({ theme }) => theme.mode === 'dark' ? 'rgba(25, 118, 210, 0.2)' : '#e3f2fd'};
+  color: ${({ theme }) => theme.mode === 'dark' ? '#90caf9' : '#1976d2'};
   border-radius: 4px;
   font-size: 11px;
 `;
@@ -60,7 +60,7 @@ export const DeleteButton = styled.button`
   height: 24px;
   border: none;
   background: transparent;
-  color: #999;
+  color: ${({ theme }) => theme.text.tertiary};
   font-size: 20px;
   line-height: 1;
   cursor: pointer;
@@ -71,8 +71,8 @@ export const DeleteButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background-color: #ffebee;
-    color: #d32f2f;
+    background-color: ${({ theme }) => theme.mode === 'dark' ? 'rgba(211, 47, 47, 0.2)' : '#ffebee'};
+    color: ${({ theme }) => theme.colors.danger || '#d32f2f'};
   }
 `;
 
@@ -83,7 +83,7 @@ export const EmptyState = styled.div`
 
 export const EmptyText = styled.p`
   margin: 0;
-  color: #999;
+  color: ${({ theme }) => theme.text.secondary};
   font-size: 14px;
 `;
 

@@ -8,7 +8,7 @@ export const S = {
     width: 100%;
     height: 100%;
    
-    background: linear-gradient(135deg, ${props => props.theme.primary} 0%, ${props => props.theme.secondary} 100%);
+    background: linear-gradient(135deg, ${props => props.theme.colors.primary} 0%, ${props => props.theme.colors.secondary} 100%);
     padding: 40px 20px;
   `,
 
@@ -25,9 +25,9 @@ export const S = {
   `,
 
   LoginCard: styled.article`
-    background: #FFFFFF;
+    background: ${({ theme }) => theme.background.paper};
     border-radius: 20px;
-    box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
+    box-shadow: ${({ theme }) => theme.shadow || '0 12px 48px rgba(0, 0, 0, 0.15)'};
     padding: 56px 48px;
     width: 100%;
 
@@ -49,7 +49,7 @@ export const S = {
   Title: styled.h1`
     font-size: 28px;
     font-weight: 700;
-    color: #1A1A1A;
+    color: ${({ theme }) => theme.text.primary};
     margin: 0 0 12px 0;
     letter-spacing: -0.03em;
     line-height: 1.3;
@@ -63,7 +63,7 @@ export const S = {
   Subtitle: styled.p`
     font-size: 15px;
     font-weight: 400;
-    color: #666666;
+    color: ${({ theme }) => theme.text.secondary};
     margin: 0;
     line-height: 1.6;
 
@@ -94,7 +94,7 @@ export const S = {
     gap: 10px;
     font-size: 15px;
     font-weight: 600;
-    color: #333333;
+    color: ${({ theme }) => theme.text.primary};
 
     @media (max-width: 1024px) {
       font-size: 14px;
@@ -105,7 +105,7 @@ export const S = {
   UserIdIcon: styled.span`
     width: 18px;
     height: 18px;
-    background: ${props => props.theme.primary};
+    background: ${({ theme }) => theme.colors.primary};
     border-radius: 3px;
     display: inline-block;
     flex-shrink: 0;
@@ -120,7 +120,7 @@ export const S = {
   PasswordIcon: styled.span`
     width: 18px;
     height: 18px;
-    background: ${props => props.theme.primary};
+    background: ${({ theme }) => theme.colors.primary};
     border-radius: 3px;
     display: inline-block;
     position: relative;
@@ -134,7 +134,7 @@ export const S = {
       transform: translate(-50%, -50%);
       width: 9px;
       height: 9px;
-      background: #FFFFFF;
+      background: ${({ theme }) => theme.text.inverse};
       border-radius: 1.5px;
     }
 
@@ -154,25 +154,26 @@ export const S = {
   Input: styled.input`
     width: 100%;
     padding: 16px 18px;
-    border: 1.5px solid #E0E0E0;
+    border: 1.5px solid ${({ theme }) => theme.border};
     border-radius: 10px;
     font-size: 15px;
-    color: #1A1A1A;
+    color: ${({ theme }) => theme.text.primary};
+    background-color: ${({ theme }) => theme.background.input};
     transition: all 0.2s ease;
     box-sizing: border-box;
 
     &::placeholder {
-      color: #AAAAAA;
+      color: ${({ theme }) => theme.text.tertiary};
     }
 
     &:focus {
       outline: none;
-      border-color: ${props => props.theme.primary};
-      box-shadow: 0 0 0 4px ${props => props.theme.primary}20;
+      border-color: ${({ theme }) => theme.colors.primary};
+      box-shadow: 0 0 0 4px ${({ theme }) => `${theme.colors.primary}20`};
     }
 
     &:hover:not(:focus) {
-      border-color: #B8B8B8;
+      border-color: ${({ theme }) => theme.text.secondary};
     }
 
     @media (max-width: 1024px) {
@@ -190,8 +191,8 @@ export const S = {
     gap: 10px;
     width: 100%;
     padding: 16px 20px;
-    background: ${props => props.theme.primary};
-    color: #FFFFFF;
+    background: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.text.inverse};
     font-size: 17px;
     font-weight: 600;
     border: none;
@@ -201,9 +202,9 @@ export const S = {
     margin-top: 12px;
 
     &:hover {
-      background: ${props => props.theme.secondary};
+      background: ${({ theme }) => theme.colors.secondary};
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px ${props => props.theme.primary}50;
+      box-shadow: 0 6px 20px ${({ theme }) => `${theme.colors.primary}50`};
     }
 
     &:active {

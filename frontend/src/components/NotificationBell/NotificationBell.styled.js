@@ -35,8 +35,8 @@ export const Badge = styled.span`
   min-width: 18px;
   height: 18px;
   padding: 0 4px;
-  background-color: #ff4444;
-  color: white;
+  background-color: ${({ theme }) => theme.colors.danger || '#ff4444'};
+  color: ${({ theme }) => theme.text.inverse};
   border-radius: 9px;
   font-size: 11px;
   font-weight: 600;
@@ -52,9 +52,9 @@ export const Dropdown = styled.div`
   right: 0;
   width: 400px;
   max-height: 600px;
-  background: white;
+  background: ${({ theme }) => theme.background.main};
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 12px ${({ theme }) => theme.shadow};
   z-index: 1000;
   overflow: hidden;
   display: flex;
@@ -63,7 +63,7 @@ export const Dropdown = styled.div`
 
 export const DropdownHeader = styled.div`
   padding: 16px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -73,11 +73,11 @@ export const DropdownTitle = styled.h3`
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: #333;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const UnreadCount = styled.span`
   font-size: 14px;
-  color: #666;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 

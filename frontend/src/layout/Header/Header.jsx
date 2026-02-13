@@ -98,7 +98,7 @@ const Header = () => {
           <S.UserAvatar>{emp?.empName ? emp.empName.charAt(0) : 'G'}</S.UserAvatar>
           <S.UserInfo>
             <S.UserName>{emp?.empName || 'Guest'}</S.UserName>
-            <S.UserRole>{theme.name} {emp?.role === 'SUPER_ADMIN' ? '슈퍼 관리자' : emp?.role === 'AIRLINE_ADMIN' ? '관리자' : '직원'}</S.UserRole>
+            <S.UserRole>{theme.airline.name} {emp?.role === 'SUPER_ADMIN' ? '슈퍼 관리자' : emp?.role === 'AIRLINE_ADMIN' ? '관리자' : '직원'}</S.UserRole>
           </S.UserInfo>
         </S.UserProfile>
 

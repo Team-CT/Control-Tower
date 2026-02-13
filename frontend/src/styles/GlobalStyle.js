@@ -33,6 +33,12 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    
+    /* 모든 요소에 부드러운 테마 전환 적용 */
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease,
+                box-shadow 0.3s ease;
   }
 
   body {
@@ -45,9 +51,6 @@ const GlobalStyle = createGlobalStyle`
     /* 테마 배경 및 텍스트 적용 */
     background-color: var(--bg-main);
     color: var(--text-primary);
-    
-    /* 부드러운 다크모드 전환 애니메이션 */
-    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   code {
@@ -59,7 +62,6 @@ const GlobalStyle = createGlobalStyle`
   a {
     color: var(--primary-color);
     text-decoration: none;
-    transition: color 0.2s ease;
 
     &:hover {
       color: var(--secondary-color);
@@ -78,7 +80,6 @@ const GlobalStyle = createGlobalStyle`
     background-color: var(--bg-input);
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    transition: all 0.2s ease;
 
     &:focus {
       outline: none;

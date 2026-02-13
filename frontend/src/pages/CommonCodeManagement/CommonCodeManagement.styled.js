@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
-  background-color: #f5f7fa;
+  background-color: ${({ theme }) => theme.background.secondary};
   padding: 32px 40px;
   box-sizing: border-box;
 
@@ -52,7 +52,7 @@ export const SectionHeader = styled.div`
 export const SectionTitle = styled.h2`
   font-size: 24px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
@@ -61,35 +61,36 @@ export const AddButton = styled.button`
   align-items: center;
   gap: 6px;
   padding: 10px 20px;
-  background-color: #4d7cfe;
-  color: #ffffff;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse};
   border: none;
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 
   &:hover {
-    background-color: #3a63e0;
+    filter: brightness(0.9);
   }
-
-  &:active {
-    background-color: #2d4ec2;
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
 
 export const CodeGroupCard = styled.div`
-  background-color: #ffffff;
-  border: 1px solid #e0e6ed;
+  background-color: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 12px;
   padding: 20px;
   cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    border-color: #4d7cfe;
-    box-shadow: 0 4px 12px rgba(77, 124, 254, 0.1);
+    border-color: ${({ theme }) => theme.colors.primary};
+    box-shadow: ${({ theme }) => theme.shadow};
   }
 `;
 
@@ -103,14 +104,14 @@ export const CodeGroupCardHeader = styled.div`
 export const CodeGroupTitle = styled.h3`
   font-size: 18px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0 0 4px 0;
 `;
 
 export const CodeGroupSubtitle = styled.div`
   font-size: 13px;
   font-weight: 500;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -118,15 +119,15 @@ export const CodeGroupSubtitle = styled.div`
 
 export const CodeGroupLabel = styled.div`
   font-size: 14px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   margin-bottom: 8px;
 `;
 
 export const CodeCountBadge = styled.div`
   display: inline-block;
   padding: 4px 12px;
-  background-color: #eff6ff;
-  color: #4d7cfe;
+  background-color: ${({ theme }) => `${theme.colors.primary}15`};
+  color: ${({ theme }) => theme.colors.primary};
   border-radius: 12px;
   font-size: 13px;
   font-weight: 600;
@@ -144,31 +145,33 @@ export const SearchIcon = styled.span`
   transform: translateY(-50%);
   font-size: 18px;
   opacity: 0.5;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const SearchInput = styled.input`
   width: 100%;
   padding: 12px 16px 12px 48px;
-  border: 1px solid #e0e6ed;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
+  background-color: ${({ theme }) => theme.background.paper};
   box-sizing: border-box;
   transition: border-color 0.2s;
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.disabled};
   }
 
   &:focus {
     outline: none;
-    border-color: #4d7cfe;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 export const TableWrapper = styled.div`
-  background-color: #ffffff;
-  border: 1px solid #e0e6ed;
+  background-color: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 12px;
   overflow: hidden;
 `;
@@ -179,8 +182,8 @@ export const Table = styled.table`
 `;
 
 export const TableHeader = styled.thead`
-  background-color: #f9fafb;
-  border-bottom: 1px solid #e0e6ed;
+  background-color: ${({ theme }) => theme.background.secondary};
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const TableHeaderCell = styled.th`
@@ -188,7 +191,7 @@ export const TableHeaderCell = styled.th`
   text-align: left;
   font-size: 14px;
   font-weight: 600;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   white-space: nowrap;
 
   &:first-child {
@@ -212,11 +215,11 @@ export const TableHeaderCell = styled.th`
 export const TableBody = styled.tbody``;
 
 export const TableRow = styled.tr`
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #f9fafb;
+    background-color: ${({ theme }) => theme.background.hover};
   }
 
   &:last-child {
@@ -227,7 +230,7 @@ export const TableRow = styled.tr`
 export const TableCell = styled.td`
   padding: 16px 20px;
   font-size: 14px;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
   vertical-align: middle;
 
   &:last-child {
@@ -236,7 +239,7 @@ export const TableCell = styled.td`
 `;
 
 export const CodeLink = styled.a`
-  color: #4d7cfe;
+  color: ${({ theme }) => theme.colors.primary};
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
@@ -252,8 +255,8 @@ export const StatusBadge = styled.span`
   border-radius: 12px;
   font-size: 13px;
   font-weight: 600;
-  background-color: ${props => props.status === '사용' ? '#d1fae5' : '#fee2e2'};
-  color: ${props => props.status === '사용' ? '#059669' : '#dc2626'};
+  background-color: ${({ status, theme }) => status === '사용' ? `${theme.status.success}20` : `${theme.status.error}20`};
+  color: ${({ status, theme }) => status === '사용' ? theme.status.success : theme.status.error};
 `;
 
 export const ActionButton = styled.button`
@@ -265,18 +268,20 @@ export const ActionButton = styled.button`
   font-size: 18px;
   opacity: 0.6;
   transition: opacity 0.2s;
+  color: ${({ theme }) => theme.text.secondary};
 
   &:hover {
     opacity: 1;
+    color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 export const EditIcon = styled.span`
-  color: #4d7cfe;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 export const DeleteIcon = styled.span`
-  color: #d36060;
+  color: ${({ theme }) => theme.status.error};
 `;
 
 // Modal Styles
@@ -291,16 +296,17 @@ export const ModalOverlay = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 `;
 
 export const ModalContainer = styled.div`
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
 export const ModalHeader = styled.div`
@@ -308,13 +314,13 @@ export const ModalHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 24px;
-  border-bottom: 1px solid #e0e6ed;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const ModalTitle = styled.h2`
   font-size: 20px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 `;
 
@@ -322,7 +328,7 @@ export const CloseButton = styled.button`
   background: none;
   border: none;
   font-size: 28px;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   cursor: pointer;
   padding: 0;
   width: 32px;
@@ -333,7 +339,7 @@ export const CloseButton = styled.button`
   transition: color 0.2s;
 
   &:hover {
-    color: #1a1a1a;
+    color: ${({ theme }) => theme.text.primary};
   }
 `;
 
@@ -349,44 +355,45 @@ export const Label = styled.label`
   display: block;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
   margin-bottom: 8px;
 `;
 
 export const Input = styled.input`
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e0e6ed;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
+  background-color: ${({ theme }) => theme.background.input};
   box-sizing: border-box;
   transition: border-color 0.2s;
 
   &:focus {
     outline: none;
-    border-color: #4d7cfe;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.disabled};
   }
 `;
 
 export const Select = styled.select`
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e0e6ed;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
   box-sizing: border-box;
   transition: border-color 0.2s;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.background.input};
 
   &:focus {
     outline: none;
-    border-color: #4d7cfe;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -407,13 +414,13 @@ export const ModalFooter = styled.div`
   justify-content: flex-end;
   gap: 12px;
   padding: 24px;
-  border-top: 1px solid #e0e6ed;
+  border-top: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const CancelButton = styled.button`
   padding: 10px 20px;
-  background-color: #f3f4f6;
-  color: #374151;
+  background-color: ${({ theme }) => theme.background.secondary};
+  color: ${({ theme }) => theme.text.secondary};
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -422,7 +429,7 @@ export const CancelButton = styled.button`
   transition: background-color 0.2s;
 
   &:hover:not(:disabled) {
-    background-color: #e5e7eb;
+    background-color: ${({ theme }) => theme.background.hover};
   }
 
   &:disabled {
@@ -433,8 +440,8 @@ export const CancelButton = styled.button`
 
 export const SubmitButton = styled.button`
   padding: 10px 20px;
-  background-color: #4d7cfe;
-  color: #ffffff;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse};
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -443,7 +450,7 @@ export const SubmitButton = styled.button`
   transition: background-color 0.2s;
 
   &:hover:not(:disabled) {
-    background-color: #3a63e0;
+    filter: brightness(0.9);
   }
 
   &:disabled {
@@ -456,8 +463,8 @@ export const DeleteCodeGroupButton = styled.button`
   width: 500px;
   align-items: end;
   padding: 12px 24px;
-  background-color: #ef4444;
-  color: #ffffff;
+  background-color: ${({ theme }) => theme.status.error};
+  color: ${({ theme }) => theme.text.inverse};
   border: none;
   border-radius: 8px;
   font-size: 14px;
@@ -467,11 +474,11 @@ export const DeleteCodeGroupButton = styled.button`
   margin-top: 24px;
 
   &:hover {
-    background-color: #dc2626;
+    filter: brightness(0.9);
   }
 
   &:active {
-    background-color: #b91c1c;
+    filter: brightness(0.8);
   }
 `;
 
@@ -479,6 +486,15 @@ export const TextArea = styled.textarea`
   width: 100%;
   min-height: 120px;
   padding: 12px;
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.background.input};
+  color: ${({ theme }) => theme.text.primary};
+  
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
 `;
 
 // 항공사 필터 관련 스타일
@@ -493,18 +509,18 @@ export const AirlineSelectWrapper = styled.div`
 export const AirlineSelect = styled.select`
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e0e6ed;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
   box-sizing: border-box;
   transition: border-color 0.2s;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.background.input};
   cursor: pointer;
 
   &:focus {
     outline: none;
-    border-color: #4d7cfe;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -518,9 +534,11 @@ export const CodeGroupDeleteButton = styled.button`
   opacity: 0.6;
   transition: opacity 0.2s;
   margin-left: auto;
+  color: ${({ theme }) => theme.text.secondary};
 
   &:hover {
     opacity: 1;
+    color: ${({ theme }) => theme.status.error};
   }
 `;
 
@@ -533,22 +551,23 @@ export const FormTextarea = styled.textarea`
   width: 100%;
   min-height: 120px;
   padding: 12px 16px;
-  border: 1px solid #e0e6ed;
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   font-size: 14px;
-  color: #1a1a1a;
+  color: ${({ theme }) => theme.text.primary};
   box-sizing: border-box;
   transition: border-color 0.2s;
   font-family: inherit;
   resize: vertical;
+  background-color: ${({ theme }) => theme.background.input};
 
   &:focus {
     outline: none;
-    border-color: #4d7cfe;
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.text.disabled};
   }
 `;
 

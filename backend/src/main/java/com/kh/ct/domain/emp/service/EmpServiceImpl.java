@@ -352,4 +352,31 @@ public class EmpServiceImpl implements EmpService {
                 .orElseGet(EmpDto.FindIdResponse::fail);
     }
 
+    @Override
+    public com.kh.ct.domain.emp.dto.AirlineDto.DetailResponse getAirlineByEmpId(String empId) {
+        Emp emp = empRepository.findByIdWithDetails(empId)
+                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND,
+                        "직원을 찾을 수 없습니다. (empId: " + empId + ")"));
+
+        if (emp.getAirlineId() == null) {
+            throw new BusinessException(HttpStatus.NOT_FOUND,
+                    "해당 직원은 항공사에 소속되어 있지 않습니다.");
+        }
+
+        com.kh.ct.domain.emp.entity.Airline airline = emp.getAirlineId();
+
+        // AirlineDto.DetailResponse 생성
+        return com.kh.ct.domain.emp.dto.AirlineDto.DetailResponse.builder()
+                .id(airline.getAirlineId())
+                .name(airline.getAirlineName())
+                .primaryColor(airline.getPrimaryColor())
+                .secondaryColor(airline.getSecondaryColor())
+                .icon(airline.getIcon() != null ? airline.getIcon() : "✈️")
+                .businessNumber(airline.getBusinessNumber() != null ? airline.getBusinessNumber() : "")
+                .mainNumber(airline.getMainNumber() != null ? airline.getMainNumber() : "")
+                .address(airline.getAirlineAddress() != null ? airline.getAirlineAddress() : "")
+                .email(airline.getEmail() != null ? airline.getEmail() : "")
+                .build();
+    }
+
 }

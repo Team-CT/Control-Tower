@@ -2,6 +2,8 @@ package com.kh.ct.domain.attendance.controller;
 
 import com.kh.ct.domain.attendance.dto.ProtestDto;
 import com.kh.ct.domain.attendance.service.ProtestApplyService;
+import com.kh.ct.domain.attendance.service.VisionService;
+import com.kh.ct.global.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -21,7 +23,7 @@ import java.util.List;
 public class ProtestApplyController {
 
     private final ProtestApplyService protestApplyService;
-    private final com.kh.ct.domain.attendance.service.VisionService visionService;
+    private final VisionService visionService;
 
     /**
      * 근태 정정 신청
@@ -151,7 +153,7 @@ public class ProtestApplyController {
      * @return OCR 응답 (추출된 텍스트)
      */
     @PostMapping("/ocr")
-    public ResponseEntity<com.kh.ct.global.dto.ApiResponse<ProtestDto.OcrResponse>> extractTextFromImage(
+    public ResponseEntity<ApiResponse<ProtestDto.OcrResponse>> extractTextFromImage(
             @RequestParam("file") MultipartFile file) {
         
         log.info("POST /api/attendance/protest/ocr - 파일명: {}", file.getOriginalFilename());
@@ -168,7 +170,7 @@ public class ProtestApplyController {
 
             // ApiResponse 포맷으로 반환
             return ResponseEntity.ok(
-                    com.kh.ct.global.dto.ApiResponse.success("텍스트 추출 완료", response)
+                    ApiResponse.success("텍스트 추출 완료", response)
             );
         } catch (Exception e) {
             log.error("텍스트 추출 실패", e);

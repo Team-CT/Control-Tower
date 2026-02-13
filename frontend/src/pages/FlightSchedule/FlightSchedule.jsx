@@ -81,7 +81,7 @@ const FlightSchedule = () => {
 
       const response = await flightScheduleService.getFlightSchedules(params);
       const flights = response.data?.data || response.data || [];
-      
+
       // 디버깅: 응답 데이터 확인
       console.log('비행편 목록 응답:', response.data);
       console.log('비행편 목록:', flights);
@@ -90,7 +90,7 @@ const FlightSchedule = () => {
         console.log('첫 번째 비행편 flyScheduleId:', flights[0].flyScheduleId || flights[0].fly_schedule_id);
         console.log('첫 번째 비행편 airlineName:', flights[0].airlineName || flights[0].airline_name);
       }
-      
+
       setFlightList(flights);
     } catch (error) {
       console.error('비행편 목록 조회 실패:', error);
@@ -240,15 +240,15 @@ const FlightSchedule = () => {
       {/* Flight List */}
       <S.FlightListContainer>
         {loading ? (
-          <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+          <S.MessageContainer>
             로딩 중...
-          </div>
+          </S.MessageContainer>
         ) : displayedFlights.length > 0 ? (
           displayedFlights.map((flight) => {
             // flyScheduleId 확인 (snake_case 또는 camelCase 모두 지원)
             const flyScheduleId = flight.flyScheduleId || flight.fly_schedule_id;
             const airlineName = flight.airlineName || flight.airline_name;
-            
+
             if (!flyScheduleId) {
               console.warn('비행편에 flyScheduleId가 없습니다:', flight);
             }
@@ -262,7 +262,6 @@ const FlightSchedule = () => {
                     navigate(`/flightschedule/${flyScheduleId}`);
                   }
                 }}
-                style={{ cursor: "pointer" }}
               >
                 <S.CardHeader>
                   <S.FlightBadge>
@@ -315,9 +314,9 @@ const FlightSchedule = () => {
             );
           })
         ) : (
-          <div style={{ padding: '40px', textAlign: 'center', color: '#666' }}>
+          <S.MessageContainer>
             배정된 비행 일정이 없거나 조회 결과가 없습니다.
-          </div>
+          </S.MessageContainer>
         )}
       </S.FlightListContainer>
     </S.PageContainer>

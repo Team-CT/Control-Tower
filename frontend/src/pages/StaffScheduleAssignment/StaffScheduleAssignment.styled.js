@@ -5,7 +5,7 @@ export const PageLayout = styled.div`
   display: flex;
   min-height: 100%;
   width: 100%;
-  background: var(--bg-main);
+  background: ${({ theme }) => theme.background.main};
 `;
 
 // 메인 콘텐츠 영역 (사이드바 우측)
@@ -51,18 +51,18 @@ export const BreadcrumbItem = styled.span`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: ${props => props.$active ? '600' : '400'};
-  color: ${props => props.$active ? '#1d2838' : '#6b7280'};
+  color: ${props => props.$active ? props.theme.text.primary : props.theme.text.secondary};
   cursor: ${props => props.$active ? 'default' : 'pointer'};
   transition: color 0.2s ease;
 
   &:hover {
-    color: ${props => props.$active ? '#1d2838' : '#0284c7'};
+    color: ${props => props.$active ? props.theme.text.primary : props.theme.colors.primary};
   }
 `;
 
 export const BreadcrumbSeparator = styled.span`
   font-size: 14px;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.tertiary};
   user-select: none;
 `;
 
@@ -70,7 +70,7 @@ export const PageTitle = styled.h1`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 28px;
   font-weight: 700;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   margin: 0;
 
   @media (max-width: 768px) {
@@ -90,16 +90,17 @@ export const SearchButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 18px;
+  color: ${({ theme }) => theme.text.primary};
 
   &:hover {
-    background: #f9fafb;
-    border-color: #0284c7;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -110,16 +111,17 @@ export const NotificationButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 18px;
+  color: ${({ theme }) => theme.text.primary};
 
   &:hover {
-    background: #f9fafb;
-    border-color: #0284c7;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -132,13 +134,13 @@ export const NotificationBadge = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #ef4444;
+  background: ${({ theme }) => theme.status.error || '#ef4444'};
   color: #ffffff;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 11px;
   font-weight: 600;
   border-radius: 50%;
-  border: 2px solid #f0f7ff;
+  border: 2px solid ${({ theme }) => theme.background.paper};
 `;
 
 export const UserProfile = styled.div`
@@ -146,15 +148,15 @@ export const UserProfile = styled.div`
   align-items: center;
   gap: 12px;
   padding: 8px 16px 8px 8px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #f9fafb;
-    border-color: #0284c7;
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
@@ -164,7 +166,7 @@ export const UserAvatar = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0284c7;
+  background: ${({ theme }) => theme.colors.primary};
   color: #ffffff;
   border-radius: 50%;
   font-size: 18px;
@@ -180,7 +182,7 @@ export const UserName = styled.span`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   line-height: 1.2;
 `;
 
@@ -188,7 +190,7 @@ export const UserDepartment = styled.span`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 12px;
   font-weight: 400;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
   line-height: 1.2;
 `;
 
@@ -214,15 +216,15 @@ export const StatCard = styled.div`
   flex-direction: column;
   gap: 12px;
   padding: 24px;
-  background: #ffffff;
-  border-left: 4px solid ${props => props.$color || '#e5e7eb'};
+  background: ${({ theme }) => theme.background.paper};
+  border-left: 4px solid ${props => props.$color || props.theme.border};
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.shadow || '0 1px 3px rgba(0, 0, 0, 0.1)'};
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: ${({ theme }) => theme.shadowHover || '0 8px 16px rgba(0, 0, 0, 0.12)'};
   }
 `;
 
@@ -230,14 +232,14 @@ export const StatLabel = styled.div`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const StatValue = styled.span`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 36px;
   font-weight: 700;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   margin-right: 8px;
 
   @media (max-width: 768px) {
@@ -249,7 +251,7 @@ export const StatUnit = styled.span`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 18px;
   font-weight: 500;
-  color: #6b7280;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 // ==================== 컨트롤 패널 ====================
@@ -272,8 +274,8 @@ export const MonthNavigator = styled.div`
   align-items: center;
   gap: 16px;
   padding: 8px 16px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 10px;
 `;
 
@@ -283,16 +285,16 @@ export const NavButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f3f4f6;
+  background: ${({ theme }) => theme.background.input || '#f3f4f6'};
   border: none;
   border-radius: 6px;
   font-size: 18px;
-  color: #374151;
+  color: ${({ theme }) => theme.text.secondary};
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #0284c7;
+    background: ${({ theme }) => theme.colors.primary};
     color: #ffffff;
   }
 
@@ -305,7 +307,7 @@ export const CurrentMonth = styled.span`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 16px;
   font-weight: 600;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
   min-width: 120px;
   text-align: center;
 `;
@@ -318,15 +320,15 @@ export const RefreshButton = styled.button`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 500;
-  color: #0284c7;
-  background: #ffffff;
-  border: 1px solid #0284c7;
+  color: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.colors.primary};
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #0284c7;
+    background: ${({ theme }) => theme.colors.primary};
     color: #ffffff;
   }
 `;
@@ -337,7 +339,7 @@ export const FilterTabs = styled.div`
   display: flex;
   gap: 12px;
   margin-bottom: 24px;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid ${({ theme }) => theme.border};
   padding-bottom: 2px;
 
   @media (max-width: 768px) {
@@ -354,10 +356,10 @@ export const FilterTab = styled.button`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 15px;
   font-weight: ${props => props.$active ? '600' : '500'};
-  color: ${props => props.$active ? '#0284c7' : '#6b7280'};
-  background: ${props => props.$active ? '#eff6ff' : 'transparent'};
+  color: ${props => props.$active ? props.theme.colors.primary : props.theme.text.secondary};
+  background: ${props => props.$active ? `${props.theme.colors.primary}10` : 'transparent'};
   border: none;
-  border-bottom: 2px solid ${props => props.$active ? '#0284c7' : 'transparent'};
+  border-bottom: 2px solid ${props => props.$active ? props.theme.colors.primary : 'transparent'};
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
@@ -365,8 +367,8 @@ export const FilterTab = styled.button`
   bottom: -2px;
 
   &:hover {
-    color: #0284c7;
-    background: #f0f9ff;
+    color: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => `${theme.colors.primary}05`};
   }
 `;
 
@@ -379,15 +381,15 @@ export const TabLabel = styled.span``;
 export const TabBadge = styled.span`
   font-size: 13px;
   font-weight: 500;
-  color: ${props => props.$active ? '#0369a1' : '#9ca3af'};
+  color: ${props => props.$active ? props.theme.colors.primary : props.theme.text.tertiary};
 `;
 
 // ==================== 스케줄 테이블 ====================
 
 export const ScheduleTableWrapper = styled.div`
-  background: #ffffff;
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: ${({ theme }) => theme.shadow || '0 1px 3px rgba(0, 0, 0, 0.1)'};
   overflow: hidden;
 `;
 
@@ -397,8 +399,8 @@ export const ScheduleTable = styled.table`
 `;
 
 export const TableHeader = styled.thead`
-  background: #f9fafb;
-  border-bottom: 2px solid #e5e7eb;
+  background: ${({ theme }) => theme.background.secondary};
+  border-bottom: 2px solid ${({ theme }) => theme.border};
 `;
 
 export const TableHeaderCell = styled.th`
@@ -406,7 +408,7 @@ export const TableHeaderCell = styled.th`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.primary};
   text-align: left;
   white-space: nowrap;
 
@@ -422,11 +424,11 @@ export const TableHeaderCell = styled.th`
 export const TableBody = styled.tbody``;
 
 export const TableRow = styled.tr`
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid ${({ theme }) => theme.border};
   transition: background 0.2s ease;
 
   &:hover {
-    background: #f9fafb;
+    background: ${({ theme }) => theme.background.hover};
   }
 
   &:last-child {
@@ -438,7 +440,7 @@ export const TableCell = styled.td`
   padding: 16px 20px;
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 14px;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text.primary};
   vertical-align: middle;
 
   &:first-child {
@@ -452,17 +454,17 @@ export const TableCell = styled.td`
 
 export const FlightNumber = styled.span`
   font-weight: 600;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const RouteCode = styled.span`
   font-weight: 600;
-  color: #374151;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const RouteArrow = styled.span`
   margin: 0 8px;
-  color: #9ca3af;
+  color: ${({ theme }) => theme.text.tertiary};
 `;
 
 export const FlightTime = styled.span`
@@ -479,14 +481,14 @@ export const StatusBadge = styled.span`
   padding: 4px 10px;
   font-size: 12px;
   font-weight: 500;
-  color: ${props => props.$type === '완결' ? '#047857' : '#0369a1'};
-  background: ${props => props.$type === '완결' ? '#d1fae5' : '#dbeafe'};
+  color: ${props => props.$type === '완결' ? (props.theme.status?.success || '#047857') : (props.theme.colors?.primary || '#0369a1')};
+  background: ${props => props.$type === '완결' ? `${props.theme.status?.success}20` : `${props.theme.colors?.primary}20`};
   border-radius: 6px;
 `;
 
 export const PassengerCount = styled.span`
   font-weight: 500;
-  color: #374151;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const CrewSection = styled.div`
@@ -508,21 +510,21 @@ export const CrewRole = styled.span`
   font-size: 12px;
   font-weight: 600;
   color: #ffffff;
-  background: #0284c7;
+  background: ${({ theme }) => theme.colors.primary};
   border-radius: 6px;
 `;
 
 export const CrewName = styled.span`
   font-weight: 600;
-  color: #1d2838;
+  color: ${({ theme }) => theme.text.primary};
 `;
 
 export const CrewBadge = styled.span`
   padding: 4px 8px;
   font-size: 12px;
   font-weight: 500;
-  color: #6b7280;
-  background: #f3f4f6;
+  color: ${({ theme }) => theme.text.secondary};
+  background: ${({ theme }) => theme.background.secondary};
   border-radius: 4px;
 `;
 
@@ -534,15 +536,15 @@ export const ActionButton = styled.button`
   font-family: 'Noto Sans KR', sans-serif;
   font-size: 13px;
   font-weight: 500;
-  color: #0284c7;
-  background: #ffffff;
-  border: 1px solid #0284c7;
+  color: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.colors.primary};
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &:hover {
-    background: #0284c7;
+    background: ${({ theme }) => theme.colors.primary};
     color: #ffffff;
   }
 
