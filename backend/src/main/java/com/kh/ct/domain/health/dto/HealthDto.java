@@ -5,12 +5,11 @@ import com.kh.ct.domain.emp.entity.Emp;
 import com.kh.ct.domain.health.entity.EmpPhysicalTest;
 import com.kh.ct.domain.health.entity.ProgramApply;
 import com.kh.ct.global.entity.File;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class HealthDto {
     @Getter
@@ -403,6 +402,58 @@ public class HealthDto {
     public static class RejectRequest {
         private String programApplyId;
         private String reason; // 반려 사유
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class EmpHealthResponse {
+        @JsonProperty("emp_id")
+        private String empId;
+        @JsonProperty("health_point")
+        private Integer healthPoint;
+        @JsonProperty("stress_point")
+        private Integer stressPoint;
+        @JsonProperty("fatigue_point")
+        private Integer fatiguePoint;
+        @JsonProperty("physical_point")
+        private Integer physicalPoint;
+        @JsonProperty("emp_name")
+        private String empName;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class HealthTrendPoint {
+        private LocalDate date;
+        private Integer healthPoint;
+        private Integer physicalPoint;
+        private Integer stressPoint;
+        private Integer fatiguePoint;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class EmpHealthTrendResponse {
+        private String empId;
+        private int days;
+        private List<HealthTrendPoint> series;
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class EmpHealthRecordResponse {
+        private Long workTime;
+        private Integer surveyCnt;
+        private Integer programCnt;
+        private Integer scoreChg;
     }
 
 }

@@ -147,6 +147,24 @@ const healthService = {
     rejectApply: (data) => {
         return axios.patch('/api/health/admin/apply/reject', data);
     },
+
+    healthPoint: (empId) => {
+        return axios.get('/api/health/healthPoint', {
+            params: {empId}
+        })
+    },
+
+    healthPointTrend: (empId,days) => {
+        return axios.get('/api/health/healthPointTrend', {
+            params: {empId,days}
+        })
+    },
+
+    healthRecord: (empId) => {
+        return axios.get('/api/health/healthRecord', {
+            params: {empId}
+        })
+    }
 };
 
 // 하위 호환성을 위해 alias export 추가 (혹은 다른 파일에서 named import를 사용하는 경우 대비)

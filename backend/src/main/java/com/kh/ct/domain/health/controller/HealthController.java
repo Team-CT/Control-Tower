@@ -1,6 +1,7 @@
 package com.kh.ct.domain.health.controller;
 
 import com.kh.ct.domain.health.dto.HealthDto;
+import com.kh.ct.domain.health.entity.EmpHealth;
 import com.kh.ct.domain.health.service.HealthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -51,9 +52,7 @@ public class HealthController {
     public ResponseEntity<Long> save(@RequestParam("empId") String empId,
             @RequestPart("file") MultipartFile file,
             @RequestPart("data") HealthDto.PhysicalTestRequest data) {
-        System.out.println(empId);
-        System.out.println(file);
-        System.out.println(data);
+
         Long empPhysicalTestId = healthService.save(file, empId, data);
 
         return ResponseEntity.ok(empPhysicalTestId);
@@ -182,5 +181,44 @@ public class HealthController {
         healthService.rejectApply(request);
         return ResponseEntity.ok("반려 처리가 완료되었습니다.");
     }
+
+    /**
+     * 건강 현황
+     * @param empId
+     * @return
+     */
+    @GetMapping("/healthPoint")
+    public ResponseEntity<HealthDto.EmpHealthResponse> healthPoint(@RequestParam("empId") String empId) {
+
+        return ResponseEntity.ok(healthService.healthPoint(empId));
+    }
+
+
+    /**
+     * 최근 건강 추이
+     * @param empId
+     * @param days
+     * @return
+     */
+    @GetMapping("/healthPointTrend")
+    public ResponseEntity<HealthDto.EmpHealthTrendResponse> healthPointTrend(
+            @RequestParam String empId,
+            @RequestParam int days
+    ) {
+        return ResponseEntity.ok(healthService.healthPointTrend(empId, days));
+    }
+
+    /**
+     * 최근 기록
+     * @param empId
+     * @return
+     */
+    @GetMapping("/healthRecord")
+    public ResponseEntity<HealthDto.EmpHealthRecordResponse> healthRecord(@RequestParam String empId) {
+
+
+        return ResponseEntity.ok(healthService.healthRecord(empId));
+    }
+
 
 }
