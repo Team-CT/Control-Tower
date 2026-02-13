@@ -274,51 +274,51 @@ export const ScheduleBadge = styled.div`
 
 /* ===== 사이드 패널 (건강점수 & 빠른 메뉴) ===== */
 export const SidePanel = styled.div`
-display: flex;
-flex - direction: column;
-gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 `;
 
 export const HealthScoreCard = styled(ScheduleSection)`
-background: ${({ theme }) => `linear-gradient(135deg, ${theme.background.paper} 0%, ${theme.background.secondary} 100%)`};
-min - height: 250px; /* 높이 확보 */
-display: flex;
-flex - direction: column;
-justify - content: space - between;
+  background: ${({ theme }) => `linear-gradient(135deg, ${theme.background.paper} 0%, ${theme.background.secondary} 100%)`};
+  min-height: 250px; /* 높이 확보 */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `;
 
 export const HealthScoreDisplay = styled.div`
-text - align: center;
-padding: 20px 0;
+  text-align: center;
+  padding: 20px 0;
 `;
 
 export const TotalScore = styled.div`
-font - size: 56px;
-font - weight: 800;
-color: ${({ theme }) => theme.colors.primary};
-line - height: 1;
-margin - bottom: 16px;
-text - shadow: ${({ theme }) => `0 4px 12px ${theme.colors.primary}33`};
+  font-size: 56px;
+  font-weight: 800;
+  color: ${({ theme }) => theme.colors.primary};
+  line-height: 1;
+  margin-bottom: 16px;
+  text-shadow: ${({ theme }) => `0 4px 12px ${theme.colors.primary}33`};
 `;
 
 export const HealthMetrics = styled.div`
-display: flex;
-justify - content: center;
-gap: 32px;
-margin - top: 24px;
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  margin-top: 24px;
 `;
 
 export const HealthMetric = styled.div`
-display: flex;
-flex - direction: column;
-align - items: center;
-gap: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
 `;
 
 export const HealthGrade = styled.div`
-width: 48px;
-height: 48px;
-border - radius: 50 %;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   background: ${({ color, theme }) => color ? `${color}15` : theme.background.secondary};
   color: ${({ color, theme }) => color || theme.text.primary};
   display: flex;
@@ -330,70 +330,70 @@ border - radius: 50 %;
 `;
 
 export const MetricLabel = styled.div`
-font - size: 13px;
-color: ${({ theme }) => theme.text.secondary};
-font - weight: 500;
+  font-size: 13px;
+  color: ${({ theme }) => theme.text.secondary};
+  font-weight: 500;
 `;
 
 export const ViewReportButton = styled.button`
-width: 100 %;
-padding: 14px;
-background: ${({ theme }) => theme.colors.primary};
-color: ${({ theme }) => theme.text.inverse};
-border: none;
-border - radius: 12px;
-font - size: 14px;
-font - weight: 600;
-cursor: pointer;
-transition: all 0.2s;
-margin - top: 10px;
+  width: 100%;
+  padding: 14px;
+  background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse};
+  border: none;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
 
   &:hover {
-  background: ${({ theme }) => theme.colors.primaryHover};
-  transform: translateY(-2px);
-  box - shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
-}
+    background: ${({ theme }) => theme.colors.primaryHover};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+  }
 `;
 
 export const QuickMenuCard = styled(ScheduleSection)`
-flex: 1;
+  flex: 1;
 `;
 
 export const QuickMenuList = styled.div`
-display: flex;
-flex - direction: column;
-gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 export const QuickMenuItem = styled.div`
-display: flex;
-align - items: center;
-padding: 16px;
-background: ${({ theme }) => theme.background.main};
-border - radius: 12px;
-cursor: pointer;
-transition: all 0.2s;
-border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: ${({ theme }) => theme.background.main};
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
 
   &:hover {
-  background: ${({ theme }) => theme.background.hover};
-  border - color: ${({ theme }) => theme.colors.primary};
-  transform: translateX(4px);
-  box - shadow: ${({ theme }) => theme.shadow};
-}
+    background: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.colors.primary};
+    transform: translateX(4px);
+    box-shadow: ${({ theme }) => theme.shadow};
+  }
 `;
 
 export const QuickMenuIcon = styled.div`
-width: 40px;
-height: 40px;
-background: ${({ theme }) => theme.background.secondary};
-border - radius: 10px;
-display: flex;
-align - items: center;
-justify - content: center;
-font - size: 20px;
-margin - right: 16px;
-color: ${({ theme }) => theme.colors.primary};
+  width: 40px;
+  height: 40px;
+  background: ${({ theme }) => theme.background.secondary};
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-right: 16px;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 export const QuickMenuContent = styled.div`
@@ -401,79 +401,79 @@ flex: 1;
 `;
 
 export const QuickMenuTitle = styled.div`
-font - size: 14px;
-font - weight: 600;
-color: ${({ theme }) => theme.text.primary};
-margin - bottom: 2px;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.text.primary};
+  margin-bottom: 2px;
 `;
 
 export const QuickMenuStatus = styled.div`
-font - size: 13px;
-color: ${({ theme }) => theme.text.secondary};
+  font-size: 13px;
+  color: ${({ theme }) => theme.text.secondary};
 `;
 
 export const QuickMenuTime = styled.div`
-font - size: 12px;
-color: ${({ theme }) => theme.text.tertiary};
-margin - left: auto;
-font - weight: 500;
+  font-size: 12px;
+  color: ${({ theme }) => theme.text.tertiary};
+  margin-left: auto;
+  font-weight: 500;
 `;
 
 export const CheckIcon = styled.div`
-color: ${({ theme }) => theme.status.success};
-font - weight: bold;
-margin - right: 8px;
+  color: ${({ theme }) => theme.status.success};
+  font-weight: bold;
+  margin-right: 8px;
 `;
 
 /* ===== 진행률 섹션 ===== */
 export const ProgressSection = styled(ScheduleSection)`
-margin - top: 0;
+  margin-top: 0;
 `;
 
 export const ProgressGrid = styled.div`
-display: grid;
-grid - template - columns: repeat(3, 1fr);
-gap: 32px;
-padding: 0 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  padding: 0 16px;
 
-@media(max - width: 1024px) {
-  grid - template - columns: 1fr;
-  gap: 24px;
-}
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
 `;
 
 export const ProgressBar = styled.div`
-display: flex;
-flex - direction: column;
-gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 `;
 
 export const ProgressLabel = styled.div`
-font - size: 14px;
-font - weight: 600;
-color: ${({ theme }) => theme.text.secondary};
-margin - bottom: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.text.secondary};
+  margin-bottom: 4px;
 `;
 
 export const ProgressTrack = styled.div`
-width: 100 %;
-height: 8px;
-background: ${({ theme }) => theme.background.main};
-border - radius: 4px;
-overflow: hidden;
+  width: 100%;
+  height: 8px;
+  background: ${({ theme }) => theme.background.main};
+  border-radius: 4px;
+  overflow: hidden;
 `;
 
 export const ProgressFill = styled.div`
-height: 100 %;
-background: ${props => props.color || props.theme.colors.primary};
-width: ${props => props.width}%;
-border - radius: 4px;
-transition: width 1s ease -in -out;
+  height: 100%;
+  background: ${props => props.color || props.theme.colors.primary};
+  width: ${props => props.width}%;
+  border-radius: 4px;
+  transition: width 1s ease-in-out;
 `;
 
 export const ProgressValue = styled.div`
-font - size: 13px;
-color: ${({ theme }) => theme.text.tertiary};
-text - align: right;
-font - weight: 500;
+  font-size: 13px;
+  color: ${({ theme }) => theme.text.tertiary};
+  text-align: right;
+  font-weight: 500;
 `;
