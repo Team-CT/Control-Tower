@@ -48,5 +48,11 @@ public class CommonEnums {
         EARLY_LEAVE, // 조퇴
         ABSENT       // 결근
     }
+
+    public enum AirlineStatus {
+        ACTIVE,           // 정상 서비스 중
+        PAYMENT_PENDING,  // 결제 대기 중
+        INACTIVE          // 서비스 정지
+    }
 }
 

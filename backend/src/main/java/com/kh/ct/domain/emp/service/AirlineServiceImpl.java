@@ -2,7 +2,6 @@ package com.kh.ct.domain.emp.service;
 
 import com.kh.ct.domain.emp.dto.AirlineDto;
 import com.kh.ct.domain.emp.entity.Airline;
-import com.kh.ct.domain.emp.entity.AirlineStatus;
 import com.kh.ct.domain.emp.entity.Emp;
 import com.kh.ct.domain.emp.repository.AirlineRepository;
 import com.kh.ct.domain.emp.repository.EmpRepository;
@@ -55,19 +54,19 @@ public class AirlineServiceImpl implements AirlineService {
         Airline airline = airlineRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 항공사를 찾을 수 없습니다. ID: " + id));
         
-        AirlineStatus newStatus = AirlineStatus.valueOf(status.toUpperCase());
+        CommonEnums.AirlineStatus newStatus = CommonEnums.AirlineStatus.valueOf(status.toUpperCase());
         airline.updateStatus(newStatus);
         
         // 항공사 관리자 계정 상태 업데이트
         List<Emp> adminEmployees =
                 empRepository.findByAirlineId_AirlineIdAndJob(id, "항공사 관리자");
         
-        if (newStatus == AirlineStatus.INACTIVE) {
+        if (newStatus == CommonEnums.AirlineStatus.INACTIVE) {
             // 계정 정지: 관리자 emp_status를 'S'로 변경
             for (Emp emp : adminEmployees) {
                 emp.updateEmpStatus(CommonEnums.EmpStatus.S);
             }
-        } else if (newStatus == AirlineStatus.ACTIVE) {
+        } else if (newStatus == CommonEnums.AirlineStatus.ACTIVE) {
             // 계정 활성화: 관리자 emp_status를 'Y'로 변경
             for (Emp emp : adminEmployees) {
                 emp.updateEmpStatus(CommonEnums.EmpStatus.Y);

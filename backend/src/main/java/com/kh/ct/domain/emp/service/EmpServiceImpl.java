@@ -327,4 +327,29 @@ public class EmpServiceImpl implements EmpService {
         empRepository.save(emp);
     }
 
+    @Override
+    public EmpDto.FindIdResponse findEmpId(EmpDto.FindIdRequest request) {
+
+        if (request == null) {
+            throw new IllegalArgumentException("요청값(request)은 필수입니다.");
+        }
+
+        // 공백/입력 흔들림 방지 (프론트에서 ' ' 포함해서 오는 경우가 꽤 있음)
+        String empName = request.getEmpName() != null ? request.getEmpName().trim() : null;
+        String email = request.getEmail() != null ? request.getEmail().trim() : null;
+
+        if (empName == null || empName.isBlank()) {
+            throw new IllegalArgumentException("이름(empName)은 필수입니다.");
+        }
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("이메일(email)은 필수입니다.");
+        }
+
+        // ✅ 프로젝트 정책상 활성 상태 = Y 로 이미 쓰고 있으니 그대로 사용
+        return empRepository
+                .findByEmpNameAndEmailAndEmpStatus(empName, email, CommonEnums.EmpStatus.Y)
+                .map(emp -> EmpDto.FindIdResponse.success(emp.getEmpId()))
+                .orElseGet(EmpDto.FindIdResponse::fail);
+    }
+
 }

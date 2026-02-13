@@ -1,46 +1,55 @@
-import React, { useState } from 'react';
-import { S } from './SelectPwd.styled';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { S } from "./SelectPwd.styled";
+import { useNavigate } from "react-router-dom";
+import {passwordResetService} from "../../api/auth/passwordResetService";
 
 const FindPassword = () => {
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
-    employeeId: '',
-    email: ''
+    employeeId: "",
+    email: "",
   });
 
-  const [verificationSent, setVerificationSent] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [mailSent, setMailSent] = useState(false);
+  const [message, setMessage] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleVerificationCodeChange = (e) => {
-    setVerificationCode(e.target.value);
-  };
-
-  const handleSendVerification = (e) => {
+  const handleSendResetLink = async (e) => {
     e.preventDefault();
-    // TODO: Zustand store action - sendPasswordResetEmail(formData)
-    console.log('Send verification email:', formData);
-    setVerificationSent(true);
+
+    setLoading(true);
+    setMessage("");
+    setMailSent(false);
+
+    try {
+      // ✅ 백엔드 DTO는 empId를 받음 → employeeId를 empId로 매핑
+      await passwordResetService.sendResetLink({
+        empId: formData.employeeId,
+        email: formData.email,
+      });
+
+      // ✅ 백엔드가 “계정 없으면 그냥 return” 처리(보안) 하니까
+      // 프론트는 항상 동일 문구로 안내하는 게 맞음
+      setMailSent(true);
+      setMessage("요청이 접수되었습니다. 이메일을 확인해 비밀번호 재설정 링크로 이동해주세요.");
+    } catch (err) {
+      console.error(err);
+      setMessage("요청 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleVerifyAndReset = (e) => {
-    e.preventDefault();
-    // TODO: Zustand store action - verifyAndResetPassword(formData, verificationCode)
-    console.log('Verify code and reset password:', { ...formData, verificationCode });
-  };
-
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
+  const handleNavigation = (path) => navigate(path);
 
   return (
     <S.Container>
@@ -50,7 +59,7 @@ const FindPassword = () => {
           <S.Subtitle>가입 시 입력한 정보를 입력하세요</S.Subtitle>
         </S.CardHeader>
 
-        <S.FindForm onSubmit={verificationSent ? handleVerifyAndReset : handleSendVerification}>
+        <S.FindForm onSubmit={handleSendResetLink}>
           <S.InputGroup>
             <S.Label>아이디</S.Label>
             <S.Input
@@ -59,7 +68,7 @@ const FindPassword = () => {
               placeholder="아이디를 입력하세요"
               value={formData.employeeId}
               onChange={handleInputChange}
-              disabled={verificationSent}
+              disabled={loading || mailSent}
               required
             />
           </S.InputGroup>
@@ -72,48 +81,26 @@ const FindPassword = () => {
               placeholder="example@email.com"
               value={formData.email}
               onChange={handleInputChange}
-              disabled={verificationSent}
+              disabled={loading || mailSent}
               required
             />
           </S.InputGroup>
 
-          {verificationSent && (
-            <S.InputGroup>
-              <S.Label>인증 코드</S.Label>
-              <S.Input
-                type="text"
-                name="verificationCode"
-                placeholder="이메일로 받은 인증 코드를 입력하세요"
-                value={verificationCode}
-                onChange={handleVerificationCodeChange}
-                required
-              />
-            </S.InputGroup>
-          )}
-
-          <S.SubmitButton type="submit">
-            {verificationSent ? '비밀번호 재설정' : '이메일 인증'}
+          <S.SubmitButton type="submit" disabled={loading}>
+            {loading ? "처리 중..." : "재설정 링크 보내기"}
           </S.SubmitButton>
         </S.FindForm>
 
-        {verificationSent && (
-          <S.InfoMessage>
-            인증 메일이 발송되었습니다. 이메일을 확인해주세요.
-          </S.InfoMessage>
-        )}
+        {(mailSent || message) && <S.InfoMessage>{message}</S.InfoMessage>}
 
         <S.FooterLinks>
-          <S.FooterLink onClick={() => handleNavigation('/login')}>
-            로그인
-          </S.FooterLink>
+          <S.FooterLink onClick={() => handleNavigation("/login")}>로그인</S.FooterLink>
           <S.Divider>|</S.Divider>
-          <S.FooterLink onClick={() => handleNavigation('/find-employee-id')}>
+          <S.FooterLink onClick={() => handleNavigation("/find-employee-id")}>
             아이디 찾기
           </S.FooterLink>
           <S.Divider>|</S.Divider>
-          <S.FooterLink onClick={() => handleNavigation('/register')}>
-            회원가입
-          </S.FooterLink>
+          <S.FooterLink onClick={() => handleNavigation("/register")}>회원가입</S.FooterLink>
         </S.FooterLinks>
       </S.FindCard>
     </S.Container>

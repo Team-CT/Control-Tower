@@ -1,4 +1,23 @@
-import styled from 'styled-components';
+import styled from "styled-components";
+
+/** ✅ 단일 그레이 토큰: 테마(primary/secondary)에 의존하지 않음 */
+const TOKENS = {
+  pageBg: "linear-gradient(117deg, rgba(17,24,39,0.08) 0%, #FFFFFF 100%)",
+  cardBg: "#FFFFFF",
+  textPrimary: "#1D2838",
+  textSecondary: "#495565",
+  textTertiary: "#717182",
+  inputBg: "#F3F3F5",
+  inputHoverBg: "#EBEBED",
+  border: "rgba(17,24,39,0.12)",
+  shadow: "0px 8px 10px -6px rgba(0, 0, 0, 0.1), 0px 20px 25px -5px rgba(0, 0, 0, 0.1)",
+
+  // ✅ 버튼/포인트 색 (진회색)
+  accent: "#111827",
+  accentHover: "#0B1220",     // hover 시 살짝 더 진하게
+  accentSoft: "rgba(17,24,39,0.06)",
+  accentSoftBorder: "rgba(17,24,39,0.18)",
+};
 
 export const S = {
   Container: styled.main`
@@ -7,17 +26,16 @@ export const S = {
     justify-content: center;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(117deg, ${props => props.theme.hover} 0%, #FFFFFF 100%);
+    background: ${TOKENS.pageBg};
     padding: 0;
     margin: 0;
     overflow: hidden;
   `,
 
   FindCard: styled.article`
-    background: #FFFFFF;
+    background: ${TOKENS.cardBg};
     border-radius: 16px;
-    box-shadow: 0px 8px 10px -6px rgba(0, 0, 0, 0.1), 
-                0px 20px 25px -5px rgba(0, 0, 0, 0.1);
+    box-shadow: ${TOKENS.shadow};
     padding: 48px 56px 56px;
     width: 100%;
     max-width: 520px;
@@ -27,7 +45,7 @@ export const S = {
 
     @media (max-width: 1024px) {
       max-width: 448px;
-      padding: 32px 32px 32px;
+      padding: 32px;
     }
   `,
 
@@ -41,7 +59,7 @@ export const S = {
   Title: styled.h1`
     font-size: 32px;
     font-weight: 700;
-    color: #1D2838;
+    color: ${TOKENS.textPrimary};
     margin: 0;
     letter-spacing: -0.02em;
     line-height: 1.2;
@@ -54,7 +72,7 @@ export const S = {
   Subtitle: styled.p`
     font-size: 17px;
     font-weight: 400;
-    color: #495565;
+    color: ${TOKENS.textSecondary};
     margin: 0;
     line-height: 1.5;
 
@@ -89,7 +107,7 @@ export const S = {
   Input: styled.input`
     width: 100%;
     padding: 12px 16px;
-    background: #F3F3F5;
+    background: ${TOKENS.inputBg};
     border: 1px solid transparent;
     border-radius: 8px;
     font-size: 15px;
@@ -98,18 +116,18 @@ export const S = {
     box-sizing: border-box;
 
     &::placeholder {
-      color: #717182;
+      color: ${TOKENS.textTertiary};
     }
 
     &:focus {
       outline: none;
-      border-color: ${props => props.theme.primary};
+      border-color: ${TOKENS.accent};
       background: #FFFFFF;
-      box-shadow: 0 0 0 3px ${props => props.theme.primary}20;
+      box-shadow: 0 0 0 3px rgba(17,24,39,0.14);
     }
 
     &:hover:not(:focus) {
-      background: #EBEBED;
+      background: ${TOKENS.inputHoverBg};
     }
 
     @media (max-width: 1024px) {
@@ -117,10 +135,11 @@ export const S = {
     }
   `,
 
+  /** ✅ 핵심 수정: 버튼을 진회색으로 고정해서 흰 글씨가 항상 보이게 */
   SubmitButton: styled.button`
     width: 100%;
     padding: 12px 20px;
-    background: ${props => props.theme.primary};
+    background: ${TOKENS.accent};
     color: #FFFFFF;
     border: none;
     border-radius: 8px;
@@ -131,9 +150,9 @@ export const S = {
     margin-top: 8px;
 
     &:hover {
-      background: ${props => props.theme.secondary};
+      background: ${TOKENS.accentHover};
       transform: translateY(-1px);
-      box-shadow: 0 4px 16px ${props => props.theme.primary}50;
+      box-shadow: 0 10px 24px rgba(17,24,39,0.22);
     }
 
     &:active {
@@ -141,9 +160,10 @@ export const S = {
     }
 
     &:disabled {
-      background: #CCCCCC;
+      background: #9CA3AF;
       cursor: not-allowed;
       transform: none;
+      box-shadow: none;
     }
 
     @media (max-width: 1024px) {
@@ -151,13 +171,14 @@ export const S = {
     }
   `,
 
+  /** ✅ 결과 영역도 테마 의존 제거 */
   ResultSection: styled.div`
     display: flex;
     flex-direction: column;
     gap: 12px;
     padding: 20px;
-    background: ${props => props.theme.hover};
-    border: 1px solid ${props => props.theme.primary};
+    background: ${TOKENS.accentSoft};
+    border: 1px solid ${TOKENS.accentSoftBorder};
     border-radius: 8px;
     text-align: center;
   `,
@@ -165,13 +186,13 @@ export const S = {
   ResultLabel: styled.span`
     font-size: 14px;
     font-weight: 500;
-    color: #495565;
+    color: ${TOKENS.textSecondary};
   `,
 
   ResultValue: styled.span`
     font-size: 20px;
     font-weight: 700;
-    color: ${props => props.theme.primary};
+    color: ${TOKENS.accent};
     letter-spacing: 0.05em;
   `,
 
@@ -186,7 +207,7 @@ export const S = {
   FooterLink: styled.button`
     background: none;
     border: none;
-    color: ${props => props.theme.primary};
+    color: ${TOKENS.accent};
     font-size: 16px;
     font-weight: 400;
     cursor: pointer;
@@ -195,7 +216,7 @@ export const S = {
     white-space: nowrap;
 
     &:hover {
-      color: ${props => props.theme.secondary};
+      color: ${TOKENS.accentHover};
       text-decoration: underline;
     }
 
@@ -209,5 +230,5 @@ export const S = {
     font-size: 14px;
     font-weight: 400;
     user-select: none;
-  `
+  `,
 };

@@ -19,4 +19,6 @@ public interface EmpService {
 
     EmpDto updateMyProfile(String empId, EmpDto.UpdateMyProfileRequest request);
     void changeMyPassword(String empId, String currentPassword, String newPassword);
+
+    EmpDto.FindIdResponse findEmpId(EmpDto.FindIdRequest request);
 }

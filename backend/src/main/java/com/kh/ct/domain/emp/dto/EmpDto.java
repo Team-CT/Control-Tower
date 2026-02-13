@@ -261,4 +261,156 @@ public class EmpDto {
                     .build();
         }
     }
+
+    // ===============================
+    // 아이디 찾기 DTO
+    // ===============================
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class FindIdRequest {
+
+        @JsonProperty("emp_name")
+        @NotBlank(message = "이름(empName)은 필수입니다.")
+        @Size(max = 100, message = "이름은 100자 이하여야 합니다.")
+        private String empName;
+
+        @JsonProperty("email")
+        @Email(message = "이메일 형식이 올바르지 않습니다.")
+        @NotBlank(message = "이메일(email)은 필수입니다.")
+        @Size(max = 150, message = "이메일은 150자 이하여야 합니다.")
+        private String email;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class FindIdResponse {
+
+        @JsonProperty("found")
+        private boolean found;
+
+        @JsonProperty("emp_id")
+        private String empId;
+
+        @JsonProperty("message")
+        private String message;
+
+        public static FindIdResponse success(String empId) {
+            return FindIdResponse.builder()
+                    .found(true)
+                    .empId(empId)
+                    .message("아이디를 찾았습니다.")
+                    .build();
+        }
+
+        public static FindIdResponse fail() {
+            return FindIdResponse.builder()
+                    .found(false)
+                    .empId(null)
+                    .message("일치하는 정보가 없습니다.")
+                    .build();
+        }
+    }
+
+    // ===============================
+    // 비밀번호 재설정(링크/토큰) DTO
+    // ===============================
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class SendPasswordResetLinkRequest {
+
+        @JsonProperty("empId")
+        @NotBlank(message = "아이디(empId)는 필수입니다.")
+        @Size(max = 50, message = "아이디는 50자 이하여야 합니다.")
+        private String empId;
+
+        @JsonProperty("email")
+        @Email(message = "이메일 형식이 올바르지 않습니다.")
+        @NotBlank(message = "이메일(email)은 필수입니다.")
+        @Size(max = 150, message = "이메일은 150자 이하여야 합니다.")
+        private String email;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class SendPasswordResetLinkResponse {
+
+        @JsonProperty("message")
+        private String message;
+
+        public static SendPasswordResetLinkResponse ok() {
+            // ✅ 보안상 계정 존재 여부를 노출하지 않도록 "항상 같은 메시지" 권장
+            return SendPasswordResetLinkResponse.builder()
+                    .message("입력하신 정보가 확인되면 이메일이 발송됩니다.")
+                    .build();
+        }
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class ValidatePasswordTokenResponse {
+
+        @JsonProperty("valid")
+        private boolean valid;
+
+        @JsonProperty("message")
+        private String message;
+
+        public static ValidatePasswordTokenResponse valid() {
+            return ValidatePasswordTokenResponse.builder()
+                    .valid(true)
+                    .message("사용 가능한 토큰입니다.")
+                    .build();
+        }
+
+        public static ValidatePasswordTokenResponse invalid(String message) {
+            return ValidatePasswordTokenResponse.builder()
+                    .valid(false)
+                    .message(message)
+                    .build();
+        }
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class ResetPasswordByTokenRequest {
+
+        @JsonProperty("token")
+        @NotBlank(message = "토큰(token)은 필수입니다.")
+        private String token; // ✅ raw token (URL에 들어있는 값)
+
+        @JsonProperty("newPassword")
+        @NotBlank(message = "새 비밀번호(new_password)는 필수입니다.")
+        @Size( max = 255)
+        private String newPassword;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class ResetPasswordByTokenResponse {
+
+        @JsonProperty("message")
+        private String message;
+
+        public static ResetPasswordByTokenResponse ok() {
+            return ResetPasswordByTokenResponse.builder()
+                    .message("비밀번호가 변경되었습니다.")
+                    .build();
+        }
+    }
+
 }

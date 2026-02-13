@@ -12,4 +12,7 @@ export const passwordCodeService = {
     // 백엔드가 { email, code } 형태를 받는다고 가정
     return api.post('/api/passwordCode/verify', { email, code });
   },
+  reset: ({ email, code, newPassword }) => {
+    return api.post("/api/passwordCode/reset", { email, code, newPassword });
+  },
 };

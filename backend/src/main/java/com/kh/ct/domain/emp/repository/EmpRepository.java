@@ -26,6 +26,10 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
 
     List<Emp> findByAirlineId_AirlineIdAndJob(Long airlineId, String job);
 
+    Optional<Emp> findByEmpNameAndEmailAndEmpStatus(String empName, String email, CommonEnums.EmpStatus status);
+
+    Optional<Emp> findByEmpIdAndEmailAndEmpStatus(String empId, String email, CommonEnums.EmpStatus status);
+
     // 직원 상세 정보 조회 (JOIN FETCH로 LAZY 직렬화 문제 방지)
     @Query("SELECT e FROM Emp e " +
            "LEFT JOIN FETCH e.departmentId dept " +
