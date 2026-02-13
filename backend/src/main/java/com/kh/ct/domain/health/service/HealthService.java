@@ -61,4 +61,11 @@ public interface HealthService {
     void approveApply(HealthDto.ApproveRequest request);
 
     void rejectApply(HealthDto.RejectRequest request);
+
+    public HealthDto.EmpHealthResponse healthPoint(String empId);
+
+    public HealthDto.EmpHealthTrendResponse healthPointTrend(String empId, int days);
+
+    public HealthDto.EmpHealthRecordResponse healthRecord(String empId);
+
 }

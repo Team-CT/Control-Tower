@@ -1,16 +1,18 @@
 package com.kh.ct.domain.health.service;
 
+import com.kh.ct.domain.attendance.entity.Attendance;
+import com.kh.ct.domain.attendance.repository.AttendanceRepository;
 import com.kh.ct.domain.emp.entity.Emp;
 import com.kh.ct.domain.emp.repository.EmpRepository;
 import com.kh.ct.domain.health.dto.HealthDto;
 import com.kh.ct.domain.health.entity.EmpHealth;
 import com.kh.ct.domain.health.entity.EmpPhysicalTest;
+import com.kh.ct.domain.health.entity.HealthScoreRule;
 import com.kh.ct.domain.health.entity.ProgramApply;
-import com.kh.ct.domain.health.repository.EmpHealthRepository;
-import com.kh.ct.domain.health.repository.HealthRepository;
-import com.kh.ct.domain.health.repository.ProgramApplyRepository;
+import com.kh.ct.domain.health.repository.*;
 import com.kh.ct.domain.health.service.parser.HealthLabelParser;
 import com.kh.ct.domain.health.service.parser.PdfTextExtractor;
+import com.kh.ct.global.common.CommonEnums;
 import com.kh.ct.global.entity.File;
 import com.kh.ct.global.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +26,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,6 +50,9 @@ public class HealthServiceImpl implements HealthService {
     private final ProgramApplyRepository programApplyRepository; // DDD - Repository 주입
     private final com.kh.ct.domain.schedule.repository.AllScheduleRepository allScheduleRepository;
     private final com.kh.ct.domain.health.repository.ProgramRepository programRepository;
+    private final HealthScoreRuleRepository healthScoreRuleRepository;
+    private final SurveyRepository surveyRepository;
+    private final AttendanceRepository attendanceRepository;;
 
     private final Path baseDir = Paths.get("uploads", "pdf").toAbsolutePath().normalize();
 
@@ -58,10 +65,9 @@ public class HealthServiceImpl implements HealthService {
         }
 
         String text = pdfTextExtractor.extract(pdfFile);
-        System.out.println("TEST" + text);
+
         HealthDto.PhysicalTestRequest parsed = healthLabelParser.parse(text);
-        System.out.println("TEST" + parsed);
-        System.out.println("TEST" + parsed.getWeight());
+
 
         return HealthDto.PhysicalTestResponse.from(parsed);
     }
@@ -75,9 +81,7 @@ public class HealthServiceImpl implements HealthService {
 
         Emp emp = empRepository.findById(empId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 empId: " + empId));
-        System.out.println("TEST!!!!" + body);
-        System.out.println("TEST!!!!" + body.getBmi());
-        System.out.println("TEST!!!!" + body.getBloodSugar());
+
         // 1) 파일 디스크 저장 + File row 저장
         String originalName = Optional.ofNullable(pdfFile.getOriginalFilename()).orElse("unknown.pdf");
         long size = pdfFile.getSize();
@@ -120,6 +124,47 @@ public class HealthServiceImpl implements HealthService {
                 .build();
 
         EmpPhysicalTest saved = healthRepository.save(req.toEntity());
+
+        Integer bloodSugarScore = scoreOf("BLOOD_SUGAR", toBD(body.getBloodSugar()));
+        Integer sysScore        = scoreOf("SYSTOLIC_BLOOD_PRESSURE", toBD(body.getSystolicBloodPressure()));
+        Integer diaScore        = scoreOf("DIASTOLIC_BLOOD_PRESSURE", toBD(body.getDiastolicBloodPressure()));
+        Integer cholScore       = scoreOf("CHOLESTEROL", toBD(body.getCholesterol()));
+        Integer hrScore         = scoreOf("HEART_RATE", toBD(body.getHeartRate()));
+        Integer bmiScore        = scoreOf("BMI", toBD(body.getBmi()));
+        Integer fatScore        = scoreOf("BODY_FAT", toBD(body.getBodyFat()));
+
+        // 혈압은 하나로 합치기(추천): 둘 다 있으면 min, 하나만 있으면 그 값
+        Integer bpScore = null;
+        if (sysScore != null && diaScore != null) bpScore = Math.min(sysScore, diaScore);
+        else if (sysScore != null) bpScore = sysScore;
+        else if (diaScore != null) bpScore = diaScore;
+
+        Integer physicalPoint = avgScore(List.of(
+                bloodSugarScore, bpScore, cholScore, hrScore, bmiScore, fatScore
+        ));
+
+        EmpHealth prev = empHealthRepository
+                .findTopByEmpId_EmpIdOrderByEmpHealthIdDesc(empId)
+                .orElse(null);
+
+        Integer prevStress  = (prev != null) ? prev.getStressPoint()  : null;
+        Integer prevFatigue = (prev != null) ? prev.getFatiguePoint() : null;
+
+        // 3) health_point = 3개 평균 (null 제외)
+        Integer healthPoint = avgNonNull(physicalPoint, prevStress, prevFatigue);
+
+        // 4) 새 row INSERT (stress/fatigue는 직전 값 복사)
+        EmpHealth newRow = EmpHealth.builder()
+                .empId(emp)                       // Emp 엔티티
+                .physicalPoint(physicalPoint)     // 새로 계산
+                .stressPoint(prevStress)          // 직전 값 복사
+                .fatiguePoint(prevFatigue)        // 직전 값 복사
+                .healthPoint(healthPoint)         // 평균(null 제외)
+                .build();
+
+        empHealthRepository.save(newRow);
+
+
         return saved.getPhysicalTestId();
 
     }
@@ -435,5 +480,195 @@ public class HealthServiceImpl implements HealthService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 신청 내역입니다."));
 
         apply.reject(request.getReason());
+    }
+
+    @Override
+    public HealthDto.EmpHealthResponse healthPoint(String empId) {
+
+        Emp emp = empRepository.findById(empId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 empId: " + empId));
+
+        EmpHealth eh = empHealthRepository
+                .findTopByEmpId_EmpIdOrderByEmpHealthIdDesc(empId)
+                .orElse(null);
+
+        return HealthDto.EmpHealthResponse.builder()
+                .empId(empId)
+                .empName(emp.getEmpName())
+                .healthPoint(eh != null ? eh.getHealthPoint() : null)
+                .physicalPoint(eh != null ? eh.getPhysicalPoint() : null)
+                .stressPoint(eh != null ? eh.getStressPoint() : null)
+                .fatiguePoint(eh != null ? eh.getFatiguePoint() : null)
+                .build();
+    }
+
+
+
+    @Override
+    public HealthDto.EmpHealthTrendResponse healthPointTrend(String empId, int days) {
+        if (days != 7 && days != 30 && days != 90) {
+            throw new IllegalArgumentException("days는 7/30/90만 허용합니다.");
+        }
+
+        // 1) DB에서 일자별 최신값 조회
+        List<Object[]> rows = empHealthRepository.findDailyLatestScores(empId, days);
+
+        // 2) Map<LocalDate, Point>로 변환
+        Map<LocalDate, HealthDto.HealthTrendPoint> byDate = new HashMap<>();
+        for (Object[] r : rows) {
+            // day: java.sql.Date or String로 올 수 있음 (드라이버 설정에 따라 다름)
+            LocalDate day = null;
+            Object dayObj = r[0];
+            if (dayObj instanceof java.sql.Date d) {
+                day = d.toLocalDate();
+            } else {
+                day = LocalDate.parse(String.valueOf(dayObj));
+            }
+
+            byDate.put(day, HealthDto.HealthTrendPoint.builder()
+                    .date(day)
+                    .healthPoint(toInt(r[1]))
+                    .physicalPoint(toInt(r[2]))
+                    .stressPoint(toInt(r[3]))
+                    .fatiguePoint(toInt(r[4]))
+                    .build());
+        }
+
+        // 3) 기간 날짜 생성 (오늘 포함)
+        LocalDate end = LocalDate.now();
+        LocalDate start = end.minusDays(days - 1L);
+
+        List<HealthDto.HealthTrendPoint> series = new ArrayList<>(days);
+
+        // forward fill용 "직전 값"
+        Integer lastHealth = null;
+        Integer lastPhysical = null;
+        Integer lastStress = null;
+        Integer lastFatigue = null;
+
+        for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
+            HealthDto.HealthTrendPoint cur = byDate.get(d);
+
+            if (cur != null) {
+                // 값이 있는 날: 갱신 + last 업데이트
+                if (cur.getHealthPoint() != null) lastHealth = cur.getHealthPoint();
+                if (cur.getPhysicalPoint() != null) lastPhysical = cur.getPhysicalPoint();
+                if (cur.getStressPoint() != null) lastStress = cur.getStressPoint();
+                if (cur.getFatiguePoint() != null) lastFatigue = cur.getFatiguePoint();
+
+                series.add(cur);
+            } else {
+                // 값이 없는 날: 직전값으로 채움
+                series.add(HealthDto.HealthTrendPoint.builder()
+                        .date(d)
+                        .healthPoint(lastHealth)
+                        .physicalPoint(lastPhysical)
+                        .stressPoint(lastStress)
+                        .fatiguePoint(lastFatigue)
+                        .build());
+            }
+        }
+
+        return HealthDto.EmpHealthTrendResponse.builder()
+                .empId(empId)
+                .days(days)
+                .series(series)
+                .build();
+    }
+
+    @Override
+    public HealthDto.EmpHealthRecordResponse healthRecord(String empId) {
+
+        // emp 존재 검증 (선택)
+        empRepository.findById(empId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 empId: " + empId));
+
+        Integer surveyCnt = surveyRepository.countByEmpId(empId);
+
+        Integer programCnt = programApplyRepository.countApprovedByEmpId(empId, CommonEnums.ApplyStatus.APPROVED);
+
+        Integer scoreDelta = 0;
+
+        List<Attendance> list = attendanceRepository.findByEmpId(empId);
+
+        Long totalWork = list.stream()
+                .mapToLong(a -> calcMinutes(a.getInTime(), a.getOutTime()))
+                .sum();
+
+        List<EmpHealth> lastTwo = empHealthRepository
+                .findTop2ByEmpId_EmpIdOrderByEmpHealthIdDesc(empId);
+
+        if (lastTwo.size() >= 2) {
+            Integer latest = lastTwo.get(0).getHealthPoint();   // 최신
+            Integer prev   = lastTwo.get(1).getHealthPoint();   // 직전
+
+            // null 방어: 둘 중 하나라도 null이면 0
+            if (latest != null && prev != null) {
+                scoreDelta = latest - prev;
+            }
+        }
+
+
+
+        return HealthDto.EmpHealthRecordResponse.builder()
+                .programCnt(programCnt)
+                .surveyCnt(surveyCnt)
+                .scoreChg(scoreDelta)
+                .workTime(totalWork)
+                .build();
+    }
+
+
+    private Integer toInt(Object o) {
+        if (o == null) return null;
+        if (o instanceof Number n) return n.intValue();
+        return Integer.valueOf(String.valueOf(o));
+    }
+
+
+    private Integer scoreOf(String kind, BigDecimal v) {
+        if (v == null) return null;
+        return healthScoreRuleRepository.findMatchedRule(kind, v)
+                .map(HealthScoreRule::getScore)
+                .orElse(null);
+    }
+
+    private Integer avgScore(List<Integer> scores) {
+        List<Integer> valid = scores.stream().filter(Objects::nonNull).toList();
+        if (valid.isEmpty()) return null;
+        double avg = valid.stream().mapToInt(i -> i).average().orElse(0);
+        return (int) Math.round(avg);
+    }
+
+    private BigDecimal toBD(Number n) {
+        if (n == null) return null;
+        return new BigDecimal(String.valueOf(n));
+    }
+
+    private Integer avgNonNull(Integer... values) {
+        int sum = 0;
+        int cnt = 0;
+        for (Integer v : values) {
+            if (v != null) {
+                sum += v;
+                cnt++;
+            }
+        }
+        if (cnt == 0) return null;          // 평균 대상이 없으면 null
+        return (int) Math.round((double) sum / cnt);
+    }
+
+    private long calcMinutes(LocalTime inTime, LocalTime outTime) {
+        if (inTime == null || outTime == null) return 0;
+
+        long minutes = Duration.between(inTime, outTime).toMinutes();
+
+        // 야간근무(자정 넘어감) 보정
+        if (minutes < 0) minutes += 24 * 60;
+
+        // 음수 방어
+        if (minutes < 0) return 0;
+
+        return minutes;
     }
 }

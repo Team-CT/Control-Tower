@@ -1,6 +1,7 @@
 package com.kh.ct.domain.health.repository;
 
 import com.kh.ct.domain.health.entity.ProgramApply;
+import com.kh.ct.global.common.CommonEnums;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -62,4 +63,14 @@ public interface ProgramApplyRepository extends JpaRepository<ProgramApply, Stri
            "ORDER BY pa.programApplyDate DESC")
     List<ProgramApply> findAllByFilters(@Param("status") com.kh.ct.global.common.CommonEnums.ApplyStatus status, 
                                       @Param("programName") String programName);
+
+
+    @Query("""
+        select count(p)
+        from ProgramApply p
+        where p.programApplyApplicant.empId = :empId
+          and p.programApplyStatus = :status
+    """)
+    Integer countApprovedByEmpId(@Param("empId") String empId,
+                              @Param("status") CommonEnums.ApplyStatus status);
 }
