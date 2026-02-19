@@ -92,5 +92,13 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
             @Param("role") CommonEnums.Role role,
             @Param("airlineId") Long airlineId
     );
+
+
+    List<Emp> findByAirlineId_AirlineIdAndDepartmentId_DepartmentIdAndEmpStatusAndEmpIdNot(
+            Long airlineId,
+            Long departmentId,
+            CommonEnums.EmpStatus empStatus,
+            String empIdNot
+    );
 }
 

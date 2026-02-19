@@ -164,7 +164,44 @@ const healthService = {
         return axios.get('/api/health/healthRecord', {
             params: {empId}
         })
+    },
+
+    chatFriendList : () => {
+        return axios.get('/api/chat/friends')
+    },
+
+    // chatRoom: (roomKey) => {
+    //     return axios.post("/api/chat/room", 
+    //     { roomKey })
+    // },
+   
+    getMessages: (roomKey) => {
+        return axios.get("/api/chat/messages", 
+            { params: { room_key: roomKey } 
+        });
+    },
+        
+    sendMessage: (roomKey, content) => {
+        return axios.post("/api/chat/messages", 
+            { room_key: roomKey, content }
+        );
+    },
+    chatRecentList: (limit = 30) => {
+        return axios.get("/api/chat/conversations", 
+            { params: { limit } }
+        );
+    },
+    getRecentMessages: (roomKey) => {
+        return axios.get("/api/chat/messages", 
+            { params: { roomKey } }
+        );
+    },
+    chatRoom: (roomKey) => {
+        return axios.post("/api/chat/room", 
+            { roomKey: roomKey }
+        );
     }
+        
 };
 
 // 하위 호환성을 위해 alias export 추가 (혹은 다른 파일에서 named import를 사용하는 경우 대비)
