@@ -86,6 +86,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/notifications/**").authenticated() // 나머지 알림 API는 인증 필요
                         //나머지경로
                         .requestMatchers("/api/settings/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

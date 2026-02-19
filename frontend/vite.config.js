@@ -4,6 +4,19 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // ✅ 추가: global 치환(런타임)
+  define: {
+    global: 'globalThis',
+  },
+
+  // ✅ 추가: global 치환(사전 번들링 단계)
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {
