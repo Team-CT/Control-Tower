@@ -12,7 +12,7 @@ public class ChatService {
     public ChatService(ChatClient.Builder builder) {
         this.chatClient = builder
                 .defaultSystem("너는 항공 시스템 지원 센터의 상담원이야.")
-                .defaultToolNames("getFlightSchedule", "getLeaveStatus", "getHealthInfo", "getRecentAlarms")
+                .defaultFunctions("getFlightSchedule", "getLeaveStatus", "getHealthInfo", "getRecentAlarms")
                 .build();
     }
 

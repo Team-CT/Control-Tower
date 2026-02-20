@@ -48,15 +48,13 @@ spring:
       max-request-size: 100MB
 
   # ⭐ 중요: ai 설정은 spring 하위에 있어야 합니다!
+
   ai:
-    google:
-      genai:
-        api-key: ${APIKEY}
-        project-id: connected-device-415802
-        chat:
-          options:
-            model: gemini-flash-latest
-            temperature: 0.7
+    openai:
+      api-key: ${APIKEY}
+      chat:
+        options:
+          model: gpt-4o-mini
 #    ollama:
 #      base-url: http://localhost:11434
 #      chat:
