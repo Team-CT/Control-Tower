@@ -68,4 +68,7 @@ public interface HealthService {
 
     public HealthDto.EmpHealthRecordResponse healthRecord(String empId);
 
+    HealthDto.HealthReportDto healthReport(HealthDto.HealthReportPreviewRequest req, int days);
+
+    byte[] healthReportPdf(HealthDto.HealthReportPreviewRequest req, int days);
 }

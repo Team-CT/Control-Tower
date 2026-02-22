@@ -29,6 +29,49 @@ const HealthDashboard = () => {
   // {/* TODO: Zustand state mapping */}
 
 
+const handleHealthReportClick = async () => {
+    try {
+      const days = periodToDays(selectedPeriod);
+      if (!empId) return;
+
+      const req = {
+        empId,
+        healthPoint: apiData?.health_point ?? null,
+        physicalPoint: apiData?.physical_point ?? null,
+        stressPoint: apiData?.stress_point ?? null,
+        fatiguePoint: apiData?.fatigue_point ?? null,
+        trend: (Array.isArray(trend) ? trend : []).map((p) => ({
+          date: p.date,
+          healthPoint: p.healthPoint ?? 0,
+        })),
+        record: {
+          workTimeHours: record?.workTimeHours ?? 0,
+          surveyCnt: record?.surveyCnt ?? 0,
+          programCnt: record?.programCnt ?? 0,
+          scoreChg: record?.scoreChg ?? 0,
+        },
+        tips: (healthData.healthTips ?? []).map((t) => ({
+          category: t.category,
+          title: t.title,
+        })),
+      };
+
+      const res = await healthService.healthReportPdf(days, req);
+
+      const blob = new Blob([res.data], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `health-report-${empId}.pdf`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error(e);
+      alert("PDF 호출 실패(콘솔 확인)");
+    }
+  };
+
+
 
   useEffect(() => {
     const fetchHealthRecord = async () => {
@@ -310,7 +353,7 @@ const HealthDashboard = () => {
           <S.HeroTitle>{healthData.greeting}</S.HeroTitle>
           <S.HeroDescription>{healthData.message}</S.HeroDescription>
           <S.HeroActions>
-            <S.HeroButton $variant="primary">
+            <S.HeroButton $variant="primary" onClick={handleHealthReportClick}>
               <i className="fas fa-heartbeat" /> 건강 리포트
             </S.HeroButton>
             <S.HeroButton $variant="secondary">

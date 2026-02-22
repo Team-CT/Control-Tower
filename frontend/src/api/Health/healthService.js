@@ -200,8 +200,26 @@ const healthService = {
         return axios.post("/api/chat/room", 
             { roomKey: roomKey }
         );
-    }
-        
+    },
+    healthReport: (days, req) => {
+        return axios.post(
+            `/api/health/healthReport?days=${days}`,
+            req
+        );
+    },
+    healthReportPdf: (days, req) => {
+        return axios.post(
+            `/api/health/healthReport/pdf?days=${days}`,
+            req,
+            {
+            responseType: "blob",
+            headers: {
+                // ✅ 성공(PDF)도 받고, 실패 시 JSON 에러도 받을 수 있게
+                Accept: "application/pdf, application/json;q=0.9, */*;q=0.8",
+            },
+            }
+        );
+        }
 };
 
 // 하위 호환성을 위해 alias export 추가 (혹은 다른 파일에서 named import를 사용하는 경우 대비)

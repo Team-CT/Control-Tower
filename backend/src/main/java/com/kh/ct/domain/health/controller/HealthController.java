@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -220,5 +221,33 @@ public class HealthController {
         return ResponseEntity.ok(healthService.healthRecord(empId));
     }
 
+        @PostMapping("/healthReport")
+    public ResponseEntity<HealthDto.HealthReportDto> preview(
+            @RequestParam(defaultValue = "7") int days,
+            @RequestBody HealthDto.HealthReportPreviewRequest req
+    ) {
+        // days는 현재 프론트 탭 선택값 검증용 (원하면 제거 가능)
+        if (days != 7 && days != 30 && days != 90) days = 7;
+
+        HealthDto.HealthReportDto dto = healthService.healthReport(req, days);
+        return ResponseEntity.ok(dto);
+    }
+
+    @PostMapping(value = "/healthReport/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
+    public ResponseEntity<byte[]> downloadHealthReportPdf(
+            @RequestParam(defaultValue = "7") int days,
+            @RequestBody HealthDto.HealthReportPreviewRequest req
+    ) {
+        if (days != 7 && days != 30 && days != 90) days = 7;
+
+        byte[] pdfBytes = healthService.healthReportPdf(req, days);
+
+        String filename = "health-report-" + req.getEmpId() + ".pdf";
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .body(pdfBytes);
+    }
 
 }
