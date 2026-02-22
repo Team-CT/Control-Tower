@@ -33,6 +33,7 @@ import {
   EmptyState,
   EmptyIcon,
   EmptyText,
+  CardTitleGroup
 } from './HealthSubmissionHistory.styled';
 import { empPhysicalTestService } from '../../api/Health/healthService';
 import useAuthStore from '../../store/authStore';
@@ -197,12 +198,12 @@ const HealthSubmissionHistory = () => {
               {filteredHistory.map((item) => (
                 <HistoryCard key={item.id} $hasAdminNote={!!item.adminNote}>
                   <CardHeader>
-                    <S.CardTitleGroup>
+                    <CardTitleGroup>
                       <CardIcon type={item.type}>
                         {getCardIcon(item.type)}
                       </CardIcon>
                       <CardTitle>{item.title}</CardTitle>
-                    </S.CardTitleGroup>
+                    </CardTitleGroup>
                     <CardDate>
                       <SubmitButton type="button"
                         onClick={() => handleDownload(item.file_id)} // fileId 필요
