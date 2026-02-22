@@ -456,4 +456,93 @@ public class HealthDto {
         private Integer scoreChg;
     }
 
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class HealthReportPreviewRequest {
+        private String empId;
+
+        private Integer healthPoint;
+        private Integer physicalPoint;
+        private Integer stressPoint;
+        private Integer fatiguePoint;
+
+        private List<TrendPoint> trend;
+        private Record record;
+        private List<Tip> tips;
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
+        public static class TrendPoint {
+            private LocalDate date;
+            private Integer healthPoint;
+        }
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
+        public static class Record {
+            private Integer workTimeHours;
+            private Integer surveyCnt;
+            private Integer programCnt;
+            private Integer scoreChg;
+        }
+
+        @Getter
+        @NoArgsConstructor
+        @AllArgsConstructor
+        @Builder
+        public static class Tip {
+            private String category;
+            private String title;
+        }
+
+    }
+
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class HealthReportDto {
+        private String empId;
+        private String empName;
+        private String deptName;
+
+        private Integer healthPoint;
+        private Integer physicalPoint;
+        private Integer stressPoint;
+        private Integer fatiguePoint;
+
+        private List<TrendPointDto> trend;
+        private RecordDto record;
+        private List<TipDto> tips;
+
+        private LocalDateTime generatedAt;
+
+        @Getter @AllArgsConstructor @Builder
+        public static class TrendPointDto {
+            private LocalDate date;
+            private Integer healthPoint;
+        }
+
+        @Getter @AllArgsConstructor @Builder
+        public static class RecordDto {
+            private Integer workTimeHours;
+            private Integer surveyCnt;
+            private Integer programCnt;
+            private Integer scoreChg;
+        }
+
+        @Getter @AllArgsConstructor @Builder
+        public static class TipDto {
+            private String category;
+            private String title;
+        }
+    }
+
 }

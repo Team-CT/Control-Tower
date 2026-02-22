@@ -35,6 +35,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -58,6 +59,7 @@ public class HealthServiceImpl implements HealthService {
     private final HealthScoreRuleRepository healthScoreRuleRepository;
     private final SurveyRepository surveyRepository;
     private final AttendanceRepository attendanceRepository;
+    private final PdfRenderService pdfRenderService;
 
     private final Path baseDir = Paths.get("uploads", "pdf").toAbsolutePath().normalize();
 
@@ -605,6 +607,106 @@ public class HealthServiceImpl implements HealthService {
                 .scoreChg(scoreDelta)
                 .workTime(totalWork)
                 .build();
+    }
+
+    @Override
+    public HealthDto.HealthReportDto healthReport(HealthDto.HealthReportPreviewRequest req, int days) {
+        // 1) 방어 코드
+        if (req == null) {
+            throw new IllegalArgumentException("요청 바디가 비었습니다.");
+        }
+
+        // record면 req.empId(), lombok getter면 req.getEmpId()
+        final String empId = extractEmpId(req);
+        if (empId == null || empId.isBlank()) {
+            throw new IllegalArgumentException("empId가 필요합니다.");
+        }
+
+        // (권장) days 검증: 컨트롤러에서도 했지만 서비스에서도 한번 더
+        if (days != 7 && days != 30 && days != 90) {
+            days = 7;
+        }
+
+        // 2) 사원 정보 조회(JPA)
+        Emp emp = empRepository.findById(empId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 사원입니다. empId=" + empId));
+
+        // 3) 요청 데이터 + 사원 정보 합쳐서 DTO 생성
+        // DTO가 record면 "new HealthDto.HealthReportDto(...)" 형태로 생성 가능
+        // (아래는 record/생성자 기반이라는 가정)
+        return new HealthDto.HealthReportDto(
+                empId,
+                emp.getEmpName(),          // 사원명
+                emp.getDepartmentId().getDepartmentName(),         // 없으면 제거
+
+                req.getHealthPoint(),
+                req.getPhysicalPoint(),
+                req.getStressPoint(),
+                req.getFatiguePoint(),
+
+                mapTrend(req.getTrend()),
+                mapRecord(req.getRecord()),
+                mapTips(req.getTips()),
+
+                LocalDateTime.now()
+        );
+    }
+
+    @Override
+    public byte[] healthReportPdf(HealthDto.HealthReportPreviewRequest req, int days) {
+        if (days != 7 && days != 30 && days != 90) days = 7;
+
+        // 기존 DTO 합치기 로직 재사용
+        HealthDto.HealthReportDto dto = healthReport(req, days);
+
+        // 여기서 "방금 만든 PDF 서비스" 호출
+        return pdfRenderService.renderHealthReport(dto, days);
+    }
+
+    private String extractEmpId(HealthDto.HealthReportPreviewRequest req) {
+        // 1) record라면: return req.empId();
+        // 2) lombok getter라면:
+        return req.getEmpId();
+    }
+
+    private List<HealthDto.HealthReportDto.TrendPointDto> mapTrend(
+            List<HealthDto.HealthReportPreviewRequest.TrendPoint> trend
+    ) {
+        if (trend == null) return List.of();
+
+        return trend.stream()
+                .map(p -> new HealthDto.HealthReportDto.TrendPointDto(
+                        p.getDate(),
+                        p.getHealthPoint()
+                ))
+                .toList(); // Java 16+ / 17이면 OK
+    }
+
+    private HealthDto.HealthReportDto.RecordDto mapRecord(
+            HealthDto.HealthReportPreviewRequest.Record record
+    ) {
+        if (record == null) {
+            return new HealthDto.HealthReportDto.RecordDto(0, 0, 0, 0);
+        }
+        return new HealthDto.HealthReportDto.RecordDto(
+                record.getWorkTimeHours(),
+                record.getSurveyCnt(),
+                record.getProgramCnt(),
+                record.getScoreChg()
+        );
+    }
+
+    private List<HealthDto.HealthReportDto.TipDto> mapTips(
+            List<HealthDto.HealthReportPreviewRequest.Tip> tips
+    ) {
+        if (tips == null) return List.of();
+
+        return tips.stream()
+                .map(t -> new HealthDto.HealthReportDto.TipDto(
+                        t.getCategory(),
+                        t.getTitle()
+                ))
+                .toList();
     }
 
     private Integer toInt(Object o) {
