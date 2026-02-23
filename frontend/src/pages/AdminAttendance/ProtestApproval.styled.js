@@ -438,37 +438,38 @@ export const RejectButton = styled.button`
 
 export const ModalOverlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;                  /* top: 0; left: 0; right: 0; bottom: 0 */
+  background: rgba(15, 23, 42, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
-  padding: 20px;
+  z-index: 99999;            /* 사이드바(z-index~1000)보다 높게 */
+  padding: 24px;
   backdrop-filter: blur(4px);
 `;
 
 export const ModalContent = styled.div`
-  background: ${({ theme }) => theme.background.paper};
+  background: ${({ theme }) =>
+    theme.mode === 'dark' ? theme.background.paper : '#ffffff'};
   border-radius: 16px;
-  max-width: 700px;
   width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: ${({ theme }) => theme.shadow};
-  animation: modalSlideIn 0.3s ease;
+  max-width: 820px;          /* 700 → 820px 확장 */
+  min-width: 340px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;    /* header / body / footer 분리 */
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  animation: modalSlideIn 0.25s ease;
 
   @keyframes modalSlideIn {
     from {
       opacity: 0;
-      transform: translateY(-20px);
+      transform: translateY(-16px) scale(0.98);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
     }
   }
 `;
@@ -511,6 +512,8 @@ export const CloseButton = styled.button`
 
 export const ModalBody = styled.div`
   padding: 28px;
+  overflow-y: auto;          /* body만 스크롤 */
+  flex: 1;
 `;
 
 export const DetailSection = styled.div`
@@ -773,7 +776,7 @@ export const PreviewModalOverlay = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
+  z-index: 999999; /* ModalOverlay(99999)보다 높게 */
   padding: 20px;
   backdrop-filter: blur(8px);
 `;

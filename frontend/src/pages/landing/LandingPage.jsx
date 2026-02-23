@@ -51,7 +51,7 @@ const HeroSection = ({ theme }) => (
       ].map((item, idx) => (
         <S.HeroStatCard key={idx}>
           <S.CenteredIconWrapper>
-            <item.icon size={32} color={theme.colors.secondary} />
+            <item.icon size={32} color={theme.mode === 'dark' ? theme.colors.primary : theme.colors.secondary} />
           </S.CenteredIconWrapper>
           <S.StatValue theme={theme}>
             {item.value}
@@ -86,7 +86,6 @@ const ActionCard = ({ theme }) => {
           <ActionButton
             icon={LogIn}
             label="일반 로그인"
-            description="관리자 및 직원 포털 접속"
             color={theme.colors.secondary}
             onClick={() => navigate('/login')}
             variant="outline"
@@ -96,14 +95,14 @@ const ActionCard = ({ theme }) => {
 
         <S.ActionRegisterWrapper>
           <S.CheckIconWrapper>
-             <CheckCircle size={20} color={theme.colors.primary} />
+            <CheckCircle size={20} color={theme.mode === 'dark' ? theme.colors.primary : theme.colors.primary} />
           </S.CheckIconWrapper>
           <S.ActionRegisterTitle>효율적인 HR 관리를 하고싶나요?</S.ActionRegisterTitle>
-           항공사 인사담당팀을 위한 SkyHR 서비스에 가입하세요.
-           <br/>
-           <S.ActionRegisterButton theme={theme} onClick={() => navigate('/service-registration')}>
-             새 항공사 등록하기 <ArrowRight size={14} />
-           </S.ActionRegisterButton>
+          항공사 인사담당팀을 위한 SkyHR 서비스에 가입하세요.
+          <br />
+          <S.ActionRegisterButton theme={theme} onClick={() => navigate('/service-registration')}>
+            새 항공사 등록하기 <ArrowRight size={14} />
+          </S.ActionRegisterButton>
         </S.ActionRegisterWrapper>
       </S.ActionCardContent>
     </S.ActionCardContainer>
@@ -112,6 +111,12 @@ const ActionCard = ({ theme }) => {
 
 const ActionButton = ({ icon: Icon, label, subText, color, onClick, variant = 'solid' }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { theme } = useAirlineTheme();
+
+  const getIconColor = () => {
+    if (isHovered) return theme.mode === 'dark' ? theme.text.inverse : 'white';
+    return color;
+  };
 
   return (
     <S.ActionButtonStyled
@@ -123,7 +128,7 @@ const ActionButton = ({ icon: Icon, label, subText, color, onClick, variant = 's
       $isHovered={isHovered}
     >
       <S.ActionIconWrapper $variant={variant} $color={color} $isHovered={isHovered}>
-        <Icon size={28} color={variant === 'solid' ? (isHovered ? color : 'white') : color} strokeWidth={2.5} />
+        <Icon size={28} color={getIconColor()} strokeWidth={2.5} />
       </S.ActionIconWrapper>
       <S.ActionTextWrapper>
         <S.ActionLabel $variant={variant} $color={color} $isHovered={isHovered}>
@@ -148,7 +153,7 @@ const LandingPageContent = () => {
   return (
     <S.PageWrapper theme={theme}>
       <Header theme={theme} navigate={navigate} />
-      
+
       <S.MainContainer>
         <HeroSection theme={theme} />
         <ActionCard theme={theme} />

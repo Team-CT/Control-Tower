@@ -1,54 +1,27 @@
 package com.kh.ct.domain.auth.service;
 
 import com.kh.ct.domain.auth.dto.AuthDto;
-import com.kh.ct.domain.emp.entity.Emp;
-import com.kh.ct.domain.emp.repository.EmpRepository;
-import com.kh.ct.global.security.JwtTokenProvider;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-@Service
-@RequiredArgsConstructor
-public class AuthService {
+public interface AuthService {
 
-    private final EmpRepository empRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
+    /**
+     * 로그인 처리 후 JWT 토큰 반환
+     */
+    AuthDto.LoginResponse login(AuthDto.LoginRequest request);
 
-    @Transactional(readOnly = true)
-    public AuthDto.LoginResponse login(AuthDto.LoginRequest request) {
+    /**
+     * 현재 로그인된 사용자 정보 반환
+     */
+    AuthDto.MeResponse me(String empId);
 
-        // 1) 회원 조회 (empId 기준 조회가 안전)
-        Emp emp = empRepository.findById(request.getEmpId())
-                .orElseThrow(() -> new IllegalArgumentException("아이디나 비밀번호가 일치하지 않습니다."));
+    /**
+     * 명함 이미지 OCR - DB 저장 없음, 폼 자동완성 전용
+     */
+    AuthDto.BusinessCardOcrResponse extractBusinessCard(MultipartFile file);
 
-        // 2) 비밀번호 검증
-        if (!passwordEncoder.matches(request.getEmpPwd(), emp.getEmpPwd())) {
-            throw new IllegalArgumentException("아이디나 비밀번호가 일치하지 않습니다.");
-        }
-
-        // 3) 토큰 발급
-        String empId = emp.getEmpId();
-        String role = emp.getRole().name();
-        String token = jwtTokenProvider.generateToken(empId, role);
-
-        // 4) 분리형: 토큰만 반환
-        return AuthDto.LoginResponse.builder()
-                .token(token)
-                .build();
-    }
-    @Transactional(readOnly = true)
-    public AuthDto.MeResponse me(String empId) {
-        Emp emp = empRepository.findById(empId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다: " + empId));
-
-        return AuthDto.MeResponse.builder()
-                .empId(emp.getEmpId())
-                .empName(emp.getEmpName())
-                .role(emp.getRole().name()) // role이 Enum이면 .name()
-                .airlineId(emp.getAirlineId() != null ? emp.getAirlineId().getAirlineId() : null)
-                .build();
-    }
+    /**
+     * 최종 회원가입 - Emp 엔티티 DB 저장
+     */
+    void signUp(AuthDto.SignUpRequest request);
 }

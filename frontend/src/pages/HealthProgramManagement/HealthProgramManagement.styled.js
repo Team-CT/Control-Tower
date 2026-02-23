@@ -410,27 +410,27 @@ export const EmptyText = styled.p`
 
 export const ModalOverlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 99999;
   padding: 24px;
   backdrop-filter: blur(4px);
 `;
 
 export const ModalContainer = styled.div`
-  background: ${({ theme }) => theme.background.paper};
+  background: ${({ theme }) =>
+    theme.mode === 'dark' ? theme.background.paper : '#ffffff'};
   border-radius: 12px;
   width: 100%;
-  max-width: 600px; // 상세 모달 크기 적절히 조절
+  max-width: 600px;
   max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: ${({ theme }) => theme.shadow};
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
   animation: modalFadeIn 0.2s ease-out;
 
   @keyframes modalFadeIn {
@@ -469,6 +469,8 @@ export const ModalCloseButton = styled.button`
 
 export const ModalBody = styled.div`
   padding: 24px;
+  overflow-y: auto;
+  flex: 1;
 `;
 
 export const ModalSection = styled.div`

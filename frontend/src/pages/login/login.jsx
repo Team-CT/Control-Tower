@@ -99,7 +99,7 @@ const Login = () => {
           <S.BrandHeader>
             <S.ServiceTitle>
               <S.LogoIcon />
-              SkyHR
+              Control Tower
             </S.ServiceTitle>
           </S.BrandHeader>
 
