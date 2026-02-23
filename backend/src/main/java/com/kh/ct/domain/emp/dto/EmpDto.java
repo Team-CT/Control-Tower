@@ -72,11 +72,13 @@ public class EmpDto {
         @Size(max = 255, message = "주소는 255자 이하여야 합니다.")
         private String address;
 
+        @JsonProperty("job")
+        @Size(max = 100, message = "직급/직책은 100자 이하여야 합니다.")
+        private String job;
 
         @JsonProperty("profile_image_id")
         private Long profileImageId;
     }
-
 
     @Getter
     @AllArgsConstructor
@@ -105,7 +107,6 @@ public class EmpDto {
         }
     }
 
-
     @Getter
     @AllArgsConstructor
     @Builder
@@ -132,7 +133,7 @@ public class EmpDto {
             return EmpNoPreviewResponse.builder().empNo(empNo).build();
         }
     }
-    
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -141,19 +142,19 @@ public class EmpDto {
     public static class EmployeeListItem {
         @JsonProperty("emp_id")
         private String empId;
-        
+
         @JsonProperty("emp_name")
         private String empName;
-        
+
         @JsonProperty("role")
         private String role;
-        
+
         @JsonProperty("job")
         private String job;
-        
+
         @JsonProperty("department_name")
         private String departmentName;
-        
+
         @JsonProperty("airline_name")
         private String airlineName;
     }
@@ -394,7 +395,7 @@ public class EmpDto {
 
         @JsonProperty("newPassword")
         @NotBlank(message = "새 비밀번호(new_password)는 필수입니다.")
-        @Size( max = 255)
+        @Size(max = 255)
         private String newPassword;
     }
 

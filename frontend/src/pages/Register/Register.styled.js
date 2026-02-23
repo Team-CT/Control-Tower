@@ -424,3 +424,135 @@ export const Form = styled.form``;
 export const Label = styled.label``;
 export const Select = styled.select``;
 export const Footer = styled.div``;
+
+/* ---------- 명함 OCR ---------- */
+export const OcrSection = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+`;
+
+export const OcrButton = styled.button`
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.primary};
+  border: 2px dashed ${({ theme }) => theme.colors.primary};
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: ${({ theme }) => `${theme.colors.primary}12`};
+    box-shadow: ${({ theme }) => theme.shadowHover || '0 4px 12px rgba(0,0,0,0.1)'};
+    transform: translateY(-1px);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+    border-style: solid;
+  }
+`;
+
+export const OcrHelperText = styled.p`
+  font-size: 12px;
+  color: ${({ theme }) => theme.text.tertiary};
+  margin: 0;
+  text-align: center;
+`;
+
+export const Divider = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: ${({ theme }) => theme.text.tertiary};
+  font-size: 13px;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: ${({ theme }) => theme.border};
+  }
+
+  span {
+    white-space: nowrap;
+  }
+`;
+
+export const Spinner = styled.span`
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2.5px solid ${({ theme }) => `${theme.colors.primary}40`};
+  border-top-color: ${({ theme }) => theme.colors.primary};
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+`;
+
+/* ---------- Toast ---------- */
+export const ToastWrapper = styled.div`
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+`;
+
+export const Toast = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+  animation: fadeInDown 0.25s ease;
+  pointer-events: auto;
+  max-width: 420px;
+  word-break: keep-all;
+
+  background: ${({ $type }) =>
+    $type === 'error' ? '#fee2e2' :
+      $type === 'success' ? '#dcfce7' :
+        $type === 'warn' ? '#fef9c3' : '#f0f9ff'};
+
+  color: ${({ $type }) =>
+    $type === 'error' ? '#b91c1c' :
+      $type === 'success' ? '#15803d' :
+        $type === 'warn' ? '#854d0e' : '#0369a1'};
+
+  border: 1px solid ${({ $type }) =>
+    $type === 'error' ? '#fca5a5' :
+      $type === 'success' ? '#86efac' :
+        $type === 'warn' ? '#fde047' : '#7dd3fc'};
+
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+`;

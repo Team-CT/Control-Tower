@@ -48,18 +48,12 @@ spring:
       max-request-size: 100MB
 
   # ⭐ 중요: ai 설정은 spring 하위에 있어야 합니다!
-
   ai:
     openai:
       api-key: ${APIKEY}
       chat:
         options:
           model: gpt-4o-mini
-#    ollama:
-#      base-url: http://localhost:11434
-#      chat:
-#        options:
-#          model: llama3.1
 
 server:
   port: 8001

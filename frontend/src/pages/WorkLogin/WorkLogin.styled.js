@@ -6,10 +6,16 @@ export const S = {
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 100%;
+    height: 100vh;
    
-    background: linear-gradient(135deg, ${props => props.theme.colors.primary} 0%, ${props => props.theme.colors.secondary} 100%);
+    background: ${({ theme }) =>
+      theme.mode === 'dark'
+        ? `linear-gradient(180deg, ${theme.background.main} 0%, #0f172a 100%)`
+        : `linear-gradient(180deg, #FFFFFF 0%, #f1f5f9 100%)`
+    };
+    position: relative;
     padding: 40px 20px;
+    color: ${({ theme }) => theme.text.primary};
   `,
 
   LoginWrapper: styled.div`

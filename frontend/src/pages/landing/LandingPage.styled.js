@@ -295,15 +295,15 @@ export const ActionIconWrapper = styled.div`
   width: 56px;
   height: 56px;
   border-radius: 16px;
-  background-color: ${({ $isHovered, theme }) =>
-    $isHovered ? theme.colors.primary : theme.background.main};
+  background-color: ${({ $isHovered, theme, $color }) =>
+    $isHovered ? $color : `${$color}15`};
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   transition: all 0.25s ease;
   color: ${({ $isHovered, theme }) =>
-    $isHovered ? (theme.text.inverse || 'white') : theme.text.primary};
+    $isHovered ? (theme.mode === 'dark' ? theme.text.inverse : 'white') : theme.text.primary};
 `;
 
 export const ActionTextWrapper = styled.div`

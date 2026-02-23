@@ -59,8 +59,7 @@ public class EmpServiceImpl implements EmpService {
         if (request.getProfileImageId() != null) {
             profileImage = fileRepository.findById(request.getProfileImageId())
                     .orElseThrow(() -> new IllegalArgumentException(
-                            "프로필 이미지 파일이 존재하지 않습니다. fileId=" + request.getProfileImageId()
-                    ));
+                            "프로필 이미지 파일이 존재하지 않습니다. fileId=" + request.getProfileImageId()));
         }
 
         Emp emp = Emp.builder()
@@ -76,7 +75,7 @@ public class EmpServiceImpl implements EmpService {
 
                 // 기본값 (정책)
                 .role(CommonEnums.Role.CABIN_CREW)
-                .job(null)
+                .job(request.getJob() != null ? request.getJob() : "")
                 .empStatus(CommonEnums.EmpStatus.Y)
 
                 // 기본값(정책)
@@ -104,13 +103,13 @@ public class EmpServiceImpl implements EmpService {
         // JOIN FETCH를 사용하여 Department와 Airline을 한 번에 가져옴 (LAZY 직렬화 문제 방지)
         Emp emp = empRepository.findByIdWithDetails(empId)
                 .orElseThrow(() -> new IllegalArgumentException("직원을 찾을 수 없습니다. (empId: " + empId + ")"));
-        
+
         // Department 정보 (이미 JOIN FETCH로 로드됨)
         String departmentName = null;
         if (emp.getDepartmentId() != null) {
             departmentName = emp.getDepartmentId().getDepartmentName();
         }
-        
+
         // Airline 정보 (이미 JOIN FETCH로 로드됨)
         String airlineName = null;
         if (emp.getAirlineId() != null) {
@@ -118,10 +117,10 @@ public class EmpServiceImpl implements EmpService {
         }
 
         Long profileImageId = null;
-        if(emp.getProfileImage() != null) {
+        if (emp.getProfileImage() != null) {
             profileImageId = emp.getProfileImage().getFileId();
         }
-        
+
         // DTO로 변환 (엔티티를 직접 반환하지 않아 순환 참조 방지)
         return EmpDto.builder()
                 .empId(emp.getEmpId())
@@ -216,7 +215,8 @@ public class EmpServiceImpl implements EmpService {
     @Transactional
     public EmpDto updateEmpRoleAndJob(String empId, EmpDto.UpdateRoleAndJobRequest request) {
         Emp emp = empRepository.findByIdWithDetails(empId)
-                .orElseThrow(() -> new BusinessException(HttpStatus.NOT_FOUND, "직원을 찾을 수 없습니다. (empId: " + empId + ")"));
+                .orElseThrow(
+                        () -> new BusinessException(HttpStatus.NOT_FOUND, "직원을 찾을 수 없습니다. (empId: " + empId + ")"));
 
         // Role enum 변환
         CommonEnums.Role roleEnum;
@@ -259,6 +259,7 @@ public class EmpServiceImpl implements EmpService {
                 .airlineName(airlineName)
                 .build();
     }
+
     @Override
     @Transactional
     public EmpDto updateMyProfile(String empId, EmpDto.UpdateMyProfileRequest request) {
@@ -273,8 +274,7 @@ public class EmpServiceImpl implements EmpService {
                 request.getAge(),
                 request.getEmail(),
                 request.getPhone(),
-                request.getAddress()
-        );
+                request.getAddress());
 
         // 2) 이미지 업데이트 (있을 때만)
         if (request.getProfileImageId() != null) {

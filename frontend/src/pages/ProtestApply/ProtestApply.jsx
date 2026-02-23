@@ -39,13 +39,17 @@ const ProtestApply = () => {
         { value: 'EARLY_LEAVE', label: '조퇴' },
         { value: 'ABSENT', label: '결근' },
         { value: 'LEAVE', label: '휴가' },
-        { value: 'HALF_LEAVE', label: '반차' }
+        { value: 'HALF_LEAVE', label: '반차' },
+        { value: 'SICK', label: '병가' },
+        { value: 'UNPAID', label: '무급휴가' },
     ];
 
-    // 휴가 관련 옵션만
+    // 휴가 관련 옵션만 (미래 날짜 선택 시)
     const leaveOnlyOptions = [
         { value: 'LEAVE', label: '휴가' },
-        { value: 'HALF_LEAVE', label: '반차' }
+        { value: 'HALF_LEAVE', label: '반차' },
+        { value: 'SICK', label: '병가' },
+        { value: 'UNPAID', label: '무급휴가' },
     ];
 
     // 날짜에 따라 근무 유형 옵션 필터링
