@@ -1,7 +1,10 @@
 package com.kh.ct.domain.auth.controller;
 
 import com.kh.ct.domain.auth.dto.AuthDto;
+import com.kh.ct.domain.auth.service.AuthRefreshService;
 import com.kh.ct.domain.auth.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,15 +19,53 @@ import org.springframework.web.multipart.MultipartFile;
 public class AuthController {
 
     private final AuthService authService;
+    private final AuthRefreshService authRefreshService;
 
     /**
      * 로그인
      * POST /api/auth/login
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody AuthDto.LoginRequest request) {
-        AuthDto.LoginResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<AuthDto.LoginResponse> login(
+            @Valid @RequestBody AuthDto.LoginRequest request,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse
+    ) {
+        String ip = httpRequest.getRemoteAddr();
+        String userAgent = httpRequest.getHeader("User-Agent");
+
+        // ✅ 여기서 refresh 쿠키 세팅까지 authService.login이 처리
+        return ResponseEntity.ok(authService.login(request, ip, userAgent, httpResponse));
+    }
+
+    /**
+     * AccessToken 재발급 (RefreshToken은 쿠키로 받음)
+     * POST /api/auth/refresh
+     */
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthDto.RefreshResponse> refresh(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            HttpServletRequest httpRequest,
+            HttpServletResponse httpResponse
+    ) {
+        String ip = httpRequest.getRemoteAddr();
+        String userAgent = httpRequest.getHeader("User-Agent");
+
+        return ResponseEntity.ok(authRefreshService.refresh(refreshToken, ip, userAgent, httpResponse));
+    }
+
+    /**
+     * 로그아웃 (RefreshToken 폐기 + 쿠키 삭제)
+     * POST /api/auth/logout
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @CookieValue(name = "refreshToken", required = false) String refreshToken,
+            HttpServletResponse httpResponse
+    ) {
+        authService.logout(refreshToken);
+        authService.clearRefreshCookie(httpResponse);
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -34,8 +75,7 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<AuthDto.MeResponse> me(Authentication authentication) {
         String empId = authentication.getName();
-        AuthDto.MeResponse response = authService.me(empId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(authService.me(empId));
     }
 
     /**
@@ -47,7 +87,8 @@ public class AuthController {
      */
     @PostMapping("/ocr-business-card")
     public ResponseEntity<AuthDto.BusinessCardOcrResponse> ocrBusinessCard(
-            @RequestPart("file") MultipartFile file) {
+            @RequestPart("file") MultipartFile file
+    ) {
         AuthDto.BusinessCardOcrResponse response = authService.extractBusinessCard(file);
         return ResponseEntity.ok(response);
     }
