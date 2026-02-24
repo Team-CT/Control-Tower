@@ -51,6 +51,9 @@ const InitialSetup = ({ token, initialData }) => {
       setLoading(true);
       setError(null);
       
+      console.log('🔵 [InitialSetup] API 호출 시작...');
+      console.log('🔵 [InitialSetup] 현재 상태 - isSetupComplete:', isSetupComplete);
+      
       const formData = {
         airlineName,
         airlineAddress,
@@ -62,16 +65,63 @@ const InitialSetup = ({ token, initialData }) => {
       };
       
       const response = await accountActivationService.completeInitialSetup(token, formData, logoFile);
+      
+      console.log('🟢 [InitialSetup] API 호출 성공');
+      console.log('🟢 [InitialSetup] 응답 전체:', response);
+      console.log('🟢 [InitialSetup] response.data:', response.data);
+      
+      // 응답 데이터 검증
+      if (!response || !response.data) {
+        console.error('❌ [InitialSetup] 응답 데이터가 없습니다:', response);
+        throw new Error('서버 응답이 올바르지 않습니다.');
+      }
+      
+      // 응답 데이터 저장
       setSetupResponse(response.data);
-      alert('초기 설정이 완료되었습니다.');
+      console.log('🟢 [InitialSetup] setupResponse 설정 완료:', response.data);
+      
+      // 상태 업데이트 전 로그
+      console.log('🟡 [InitialSetup] 상태 업데이트 전 - isSetupComplete:', isSetupComplete);
+      
+      // alert를 setTimeout으로 지연 처리하여 상태 업데이트가 먼저 실행되도록 함
       setIsSetupComplete(true);
+      
+      console.log('🟢 [InitialSetup] setIsSetupComplete(true) 호출 완료');
+      
+      // 상태 업데이트 후 로그는 useEffect나 다음 렌더에서 확인 가능
+      setTimeout(() => {
+        console.log('🟢 [InitialSetup] 초기 설정이 완료되었습니다.');
+      }, 100);
+      
     } catch (err) {
-      console.error('초기 설정 실패:', err);
-      const errorMessage = err.response?.data?.message || '초기 설정에 실패했습니다.';
+      console.error('❌ [InitialSetup] 초기 설정 실패:', err);
+      console.error('❌ [InitialSetup] 에러 상세:', {
+        message: err.message,
+        response: err.response,
+        responseData: err.response?.data
+      });
+      
+      let errorMessage = '초기 설정에 실패했습니다.';
+      
+      if (err.response) {
+        // 서버 에러 응답이 있는 경우
+        errorMessage = err.response?.data?.message || err.response?.data?.error || errorMessage;
+        console.error('❌ [InitialSetup] 서버 에러 응답:', err.response.data);
+      } else if (err.request) {
+        // 요청은 보냈지만 응답을 받지 못한 경우
+        errorMessage = '서버에 연결할 수 없습니다. 네트워크를 확인해주세요.';
+        console.error('❌ [InitialSetup] 네트워크 에러:', err.request);
+      } else {
+        // 요청 설정 중 에러가 발생한 경우
+        errorMessage = err.message || errorMessage;
+        console.error('❌ [InitialSetup] 요청 설정 에러:', err.message);
+      }
+      
       setError(errorMessage);
       alert(errorMessage);
     } finally {
       setLoading(false);
+      console.log('🔵 [InitialSetup] 로딩 상태 해제');
     }
   };
 

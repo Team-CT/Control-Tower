@@ -92,6 +92,20 @@ public class LeaveApplyServiceImpl implements LeaveApplyService {
         // Attendance 자동 생성 (휴가 대기 상태)
         createAttendanceForLeave(leaveApply);
 
+        // 해당 직원과 항공사 ID가 같은 AIRLINE_ADMIN 계정들에게 알림 발행
+        if (applicant.getAirlineId() != null) {
+            Long airlineId = applicant.getAirlineId().getAirlineId();
+            List<Emp> admins = empRepository.findByRoleAndAirlineId(CommonEnums.Role.AIRLINE_ADMIN, airlineId);
+            String alarmContent = String.format("[%s]님이 휴가를 신청했습니다. (신청 코드: %s)",
+                    applicant.getEmpName(), leaveCode);
+            String alarmType = "LEAVE_APPLIED";
+            String alarmLink = "/approval";
+            for (Emp admin : admins) {
+                notificationEventPublisher.publishNotificationEvent(admin.getEmpId(), alarmContent, alarmType, alarmLink);
+            }
+            log.info("휴가 신청 알림 발행 - airlineId: {}, admin 수: {}", airlineId, admins.size());
+        }
+
         log.info("휴가 신청 완료 - empId: {}, leaveCode: {}, leaveDays: {}, isUnpaid: {}", empId, leaveCode, leaveDays,
                 isUnpaid);
 

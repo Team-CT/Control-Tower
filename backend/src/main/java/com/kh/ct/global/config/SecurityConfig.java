@@ -92,7 +92,9 @@ public class SecurityConfig {
                         // 알림 API: SSE 스트림은 EventSource 특성상 커스텀 헤더를 보낼 수 없어 permitAll 처리
                         .requestMatchers("/api/notifications/stream").permitAll() // SSE 연결 (컨트롤러에서 토큰 검증)
                         .requestMatchers("/api/notifications/**").authenticated() // 나머지 알림 API는 인증 필요
-                        // 나머지경로
+                        // 알림 API: 인증 필요 (SSE는 쿼리 파라미터로 토큰 전달)
+                        .requestMatchers("/api/notifications/**").authenticated()
+                        //나머지경로
                         .requestMatchers("/api/settings/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
                         .anyRequest().authenticated())

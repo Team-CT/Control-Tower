@@ -31,6 +31,10 @@ export default defineConfig({
           });
           proxy.on('proxyReq', (proxyReq, req, _res) => {
             console.log('프록시 요청:', req.method, req.url);
+            // 쿼리 파라미터가 제대로 전달되는지 확인
+            if (req.url.includes('token=')) {
+              console.log('토큰 포함된 요청:', req.url);
+            }
           });
         },
       }
