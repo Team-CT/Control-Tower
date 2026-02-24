@@ -1,11 +1,13 @@
 package com.kh.ct.domain.schedule.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kh.ct.domain.schedule.dto.FlyScheduleDto;
 import com.kh.ct.domain.schedule.service.FlightSyncService;
 import com.kh.ct.domain.schedule.service.FlyScheduleService;
 import com.kh.ct.global.dto.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/flight-schedules")
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ public class FlyScheduleController {
     
     private final FlyScheduleService flyScheduleService;
     private final FlightSyncService flightSyncService;
+    private final ObjectMapper objectMapper;
 
     /**
      * 비행편 목록 조회
@@ -62,7 +66,50 @@ public class FlyScheduleController {
             Authentication authentication
     ) {
         FlyScheduleDto schedule = flyScheduleService.getFlightScheduleDetailWithAuth(authentication, flyScheduleId);
-        return ResponseEntity.ok(ApiResponse.success("비행편 상세 조회 성공", schedule));
+        
+        // ✅ 1단계: 실제 응답 JSON 구조 확인 (가장 중요)
+        int crewCount = schedule.getCrewMembers() != null ? schedule.getCrewMembers().size() : 0;
+        
+        log.info("========================================");
+        log.info("✅ [컨트롤러] 비행편 상세 조회 응답 검증");
+        log.info("  - flyScheduleId: {}", flyScheduleId);
+        log.info("  - crewMembers 필드 존재 여부: {}", schedule.getCrewMembers() != null);
+        log.info("  - crewMembers 배열 크기: {}", crewCount);
+        
+        if (crewCount > 0) {
+            log.info("  - 첫 번째 crew 정보: empId={}, empName={}, role={}", 
+                    schedule.getCrewMembers().get(0).getEmpId(),
+                    schedule.getCrewMembers().get(0).getEmpName(),
+                    schedule.getCrewMembers().get(0).getRole());
+        } else {
+            log.warn("  ⚠️ WARNING: crewMembers가 비어있거나 null입니다!");
+        }
+        
+        // ApiResponse로 래핑된 최종 응답 JSON 확인
+        ApiResponse<FlyScheduleDto> apiResponse = ApiResponse.success("비행편 상세 조회 성공", schedule);
+        try {
+            String jsonResponse = objectMapper.writeValueAsString(apiResponse);
+            log.info("  - 최종 응답 JSON (ApiResponse 래핑):");
+            log.info("    {}", jsonResponse);
+            
+            // crewMembers 필드가 JSON에 포함되어 있는지 확인
+            if (jsonResponse.contains("\"crewMembers\"") || jsonResponse.contains("\"crew_members\"")) {
+                log.info("  ✅ crewMembers 필드가 JSON에 포함되어 있습니다!");
+                if (jsonResponse.contains("\"crewMembers\":[]") || jsonResponse.contains("\"crew_members\":[]")) {
+                    log.warn("  ⚠️ crewMembers가 빈 배열입니다! (DB 조회 문제 가능성)");
+                } else if (jsonResponse.contains("\"crewMembers\":[") || jsonResponse.contains("\"crew_members\":[")) {
+                    log.info("  ✅ crewMembers 배열에 데이터가 있습니다!");
+                }
+            } else {
+                log.error("  ❌ ERROR: crewMembers 필드가 JSON에 없습니다! (직렬화 문제)");
+            }
+        } catch (Exception e) {
+            log.error("JSON 직렬화 중 오류 발생", e);
+        }
+        
+        log.info("========================================");
+        
+        return ResponseEntity.ok(apiResponse);
     }
     
     /**

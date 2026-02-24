@@ -65,4 +65,9 @@ public interface FlyScheduleService {
      * 권한 기반 승무원 삭제 (관리자만 가능)
      */
     void removeCrewMemberWithAuth(Authentication authentication, Long flyScheduleId, String empId);
+    
+    /**
+     * 월별 항공편 수 조회
+     */
+    long countFlightsByMonth(Long airlineId, java.time.YearMonth yearMonth);
 }

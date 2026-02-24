@@ -49,16 +49,46 @@ const FlightScheduleDetail = () => {
       console.log('비행편 상세 조회 요청 - flyScheduleId:', flyScheduleId);
 
       const response = await flightScheduleService.getFlightScheduleDetail(flyScheduleId);
-      const data = response.data?.data || response.data;
-
-      console.log('비행편 상세 조회 응답:', data);
-      console.log('크루 멤버 데이터 (crewMembers):', data?.crewMembers);
-      console.log('크루 멤버 데이터 (crew_members):', data?.crew_members);
-      console.log('크루 멤버 수:', (data?.crewMembers || data?.crew_members)?.length || 0);
+      
+      // ✅ 1단계: API 응답 구조 확인
+      console.log('========================================');
+      console.log('✅ [프론트] 비행편 상세 조회 응답 구조 확인');
+      console.log('  - 전체 응답:', response);
+      console.log('  - response.data:', response.data);
+      console.log('  - response.data?.data:', response.data?.data);
+      console.log('  - response.data?.success:', response.data?.success);
+      console.log('  - response.data?.message:', response.data?.message);
+      
+      // ApiResponse 구조: { success: true, message: "...", data: { ... } }
+      const apiResponse = response.data;
+      const data = apiResponse?.data || apiResponse;
+      
+      console.log('  - 최종 추출된 data:', data);
+      console.log('  - data.crewMembers:', data?.crewMembers);
+      console.log('  - data.crew_members:', data?.crew_members);
+      console.log('  - crewMembers 타입:', typeof data?.crewMembers);
+      console.log('  - crewMembers 배열 여부:', Array.isArray(data?.crewMembers));
+      console.log('  - crewMembers 길이:', (data?.crewMembers || data?.crew_members)?.length || 0);
+      
+      if (data?.crewMembers && data.crewMembers.length > 0) {
+        console.log('  ✅ crewMembers 데이터 존재!');
+        console.log('  - 첫 번째 멤버:', data.crewMembers[0]);
+      } else if (data?.crew_members && data.crew_members.length > 0) {
+        console.log('  ✅ crew_members 데이터 존재! (snake_case)');
+        console.log('  - 첫 번째 멤버:', data.crew_members[0]);
+      } else {
+        console.warn('  ⚠️ WARNING: crewMembers가 비어있거나 null입니다!');
+        console.warn('  - 원인 가능성:');
+        console.warn('    1) DB에 emp_fly_schedule 데이터가 없음');
+        console.warn('    2) 백엔드에서 crewMembers 조회 실패');
+        console.warn('    3) JSON 직렬화 문제');
+      }
+      console.log('========================================');
 
       // crewMembers 필드명 매핑 (snake_case 또는 camelCase 모두 지원)
       if (data && !data.crewMembers && data.crew_members) {
         data.crewMembers = data.crew_members;
+        console.log('✅ crew_members를 crewMembers로 매핑 완료');
       }
 
       setFlightDetail(data);
@@ -459,13 +489,71 @@ const FlightScheduleDetail = () => {
       ) : (
         <S.CrewSection>
           <S.CrewSectionHeader>
-            <S.CrewSectionTitle>배정된 승무원이 없습니다</S.CrewSectionTitle>
+            <S.CrewSectionTitle>배정된 직원 명단</S.CrewSectionTitle>
             {isAdmin && (
               <S.AddCrewButton onClick={() => handleOpenAddCrewModal('PILOT')}>
                 + 승무원 추가
               </S.AddCrewButton>
             )}
           </S.CrewSectionHeader>
+          <S.EmptyCrewMessage>
+            현재 배정된 직원이 없습니다.
+          </S.EmptyCrewMessage>
+        </S.CrewSection>
+      )}
+
+      {/* 배정된 직원 명단 테이블 (추가 섹션) */}
+      {crewMembers && crewMembers.length > 0 && (
+        <S.CrewSection>
+          <S.CrewSectionHeader>
+            <S.CrewSectionTitle>배정된 직원 명단</S.CrewSectionTitle>
+          </S.CrewSectionHeader>
+          <S.CrewTable>
+            <S.CrewTableHeader>
+              <S.CrewTableRow>
+                <S.CrewTableHeaderCell>사번</S.CrewTableHeaderCell>
+                <S.CrewTableHeaderCell>이름</S.CrewTableHeaderCell>
+                <S.CrewTableHeaderCell>직무</S.CrewTableHeaderCell>
+                <S.CrewTableHeaderCell>역할</S.CrewTableHeaderCell>
+                <S.CrewTableHeaderCell>부서</S.CrewTableHeaderCell>
+                {isAdmin && <S.CrewTableHeaderCell>관리</S.CrewTableHeaderCell>}
+              </S.CrewTableRow>
+            </S.CrewTableHeader>
+            <S.CrewTableBody>
+              {crewMembers.map((member, index) => {
+                const empId = member.empId || member.emp_id;
+                const empName = member.empName || member.emp_name;
+                const empNo = member.empNo || member.emp_no || '-';
+                const job = member.job || '-';
+                const role = member.role || '기타';
+                const departmentName = member.departmentName || member.department_name || '-';
+                
+                return (
+                  <S.CrewTableRow key={empId || index}>
+                    <S.CrewTableCell>{empNo}</S.CrewTableCell>
+                    <S.CrewTableCell>
+                      <S.CrewNameLink onClick={() => navigate(`/crew/${empId}`)}>
+                        {empName}
+                      </S.CrewNameLink>
+                    </S.CrewTableCell>
+                    <S.CrewTableCell>{job}</S.CrewTableCell>
+                    <S.CrewTableCell>{getRoleName(role)}</S.CrewTableCell>
+                    <S.CrewTableCell>{departmentName}</S.CrewTableCell>
+                    {isAdmin && (
+                      <S.CrewTableCell>
+                        <S.DeleteCrewButton
+                          onClick={(e) => handleRemoveCrewMember(empId, empName, e)}
+                          title="승무원 삭제"
+                        >
+                          🗑️
+                        </S.DeleteCrewButton>
+                      </S.CrewTableCell>
+                    )}
+                  </S.CrewTableRow>
+                );
+              })}
+            </S.CrewTableBody>
+          </S.CrewTable>
         </S.CrewSection>
       )}
 

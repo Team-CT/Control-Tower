@@ -1,5 +1,7 @@
 package com.kh.ct.domain.schedule.service;
 
+import com.kh.ct.domain.emp.entity.Airline;
+import com.kh.ct.domain.emp.repository.AirlineRepository;
 import com.kh.ct.domain.schedule.dto.FlightApiResponseDto;
 import com.kh.ct.domain.schedule.dto.FlyScheduleDto;
 import com.kh.ct.domain.schedule.entity.AllSchedule;
@@ -7,6 +9,7 @@ import com.kh.ct.domain.schedule.entity.FlySchedule;
 import com.kh.ct.domain.schedule.repository.AllScheduleRepository;
 import com.kh.ct.domain.schedule.repository.FlyScheduleRepository;
 import com.kh.ct.global.common.CommonEnums;
+import com.kh.ct.global.exception.BusinessException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +40,7 @@ public class FlightSyncServiceImpl implements FlightSyncService {
 
     private final AllScheduleRepository allScheduleRepository;
     private final FlyScheduleRepository flyScheduleRepository;
+    private final AirlineRepository airlineRepository;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${api.flight.service-key:}")
@@ -424,22 +428,27 @@ public class FlightSyncServiceImpl implements FlightSyncService {
      */
     private Long extractAirlineId(String flightNumber) {
         if (flightNumber == null || flightNumber.length() < 2) {
-            return 0L; // 편명이 없거나 너무 짧으면 기본값 0
+            return 1L; // 편명이 없거나 너무 짧으면 기본값 1 (대한항공)
         }
-
+        
         // 앞 두 글자 추출 (예: "KE")
         String iataCode = flightNumber.substring(0, 2).toUpperCase();
-
-        // 현재 DB의 AIRLINE 테이블에 등록된 ID 숫자로 매핑하세요.
-        return switch (iataCode) {
+        log.debug("편명에서 추출한 IATA 코드: {}", iataCode);
+        
+        // 현재 DB의 AIRLINE 테이블에 등록된 ID 숫자로 매핑
+        Long airlineId = switch (iataCode) {
             case "KE" -> 1L; // 대한항공
             case "OZ" -> 2L; // 아시아나
             case "ZE" -> 3L; // 이스타항공
             case "JL" -> 4L; // 일본항공
             case "CZ" -> 5L; // 중국남방항공
-            case "NH" -> 6L; //  에이엔에이항공
-            default -> 1L;   // 알 수 없는 항공사
+            case "NH" -> 6L; // 에이엔에이항공
+            default -> 1L; // 알 수 없는 항공사 (기본값: 대한항공)
         };
+        
+        log.info("항공사 코드 매핑 완료 - IATA: {}, AirlineId: {}", iataCode, airlineId);
+        
+        return airlineId;
     }
 
 }

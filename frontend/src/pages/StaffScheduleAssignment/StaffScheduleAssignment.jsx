@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   MainContentArea,
   PageHeader,
@@ -15,7 +16,6 @@ import {
   RefreshButton,
   FilterTabs,
   FilterTab,
-  TabIcon,
   TabLabel,
   TabBadge,
   ScheduleTableWrapper,
@@ -25,154 +25,260 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  FlightNumber,
-  RouteCode,
-  RouteArrow,
-  FlightTime,
-  Duration,
-  StatusBadge,
-  PassengerCount,
-  CrewSection,
-  CrewMember,
-  CrewRole,
-  CrewName,
-  CrewBadge,
+  EmpName,
+  ScheduleCode,
   ActionButton,
+  LoadingContainer,
+  ErrorContainer,
+  ErrorMessage,
+  RetryButton,
 } from './StaffScheduleAssignment.styled';
+import { empScheduleService } from '../../api/empSchedule/services';
+import { empService } from '../../api/emp/services';
+import useAuthStore from '../../store/authStore';
 
 const StaffScheduleAssignment = () => {
-  // TODO: Zustand state mapping
-  // const { schedules, stats, fetchSchedules } = useScheduleStore();
+  const { getRole, emp } = useAuthStore();
+  const userRole = getRole();
+  const isAdmin = userRole === 'AIRLINE_ADMIN' || userRole === 'SUPER_ADMIN';
+  const airlineId = emp?.airlineId;
 
-  const [currentMonth, setCurrentMonth] = useState('2026년 1월');
-  const [activeTab, setActiveTab] = useState('assigned');
+  // 일정 조회 관련 상태
+  const [scheduleList, setScheduleList] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [selectedRole, setSelectedRole] = useState(null); // null = 전체
+  const [roleCounts, setRoleCounts] = useState({}); // 역할별 카운트
+  const [generating, setGenerating] = useState(false); // 일정 배정 중 상태
+  const [flightCount, setFlightCount] = useState(0); // 항공편 수
 
-  // Mock data - Replace with Zustand
+  // UI 상태
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const currentMonth = `${currentDate.getFullYear()}년 ${currentDate.getMonth() + 1}월`;
+
+  // 역할 옵션
+  const roleOptions = [
+    { value: null, label: '전체' },
+    { value: 'PILOT', label: '기장' },
+    { value: 'CABIN_CREW', label: '객실승무원' },
+    { value: 'GROUND_STAFF', label: '지상직승무원' },
+    { value: 'MAINTENANCE', label: '정비사' },
+  ];
+
+  // 역할별 직원 수 조회 함수
+  const loadRoleCounts = async () => {
+    try {
+      const counts = {};
+      for (const roleOption of roleOptions) {
+        if (roleOption.value) {
+          // 역할별 직원 수 조회
+          const params = { role: roleOption.value };
+          if (airlineId) {
+            params.airlineId = airlineId;
+          }
+          const response = await empService.getEmployees(params);
+          const employees = response.data?.data || [];
+          
+          // 중복 제거 (empId 기준) - null/undefined 제외
+          const uniqueEmpIds = new Set();
+          employees.forEach(emp => {
+            const empId = emp.empId || emp.emp_id;
+            if (empId) {
+              uniqueEmpIds.add(empId);
+            }
+          });
+          
+          // 직원 ID가 같으면 1명으로 카운트
+          counts[roleOption.value] = uniqueEmpIds.size;
+        }
+        // '전체'는 항공편 수로 설정 (loadFlightCount에서 설정됨)
+      }
+      setRoleCounts(counts);
+    } catch (e) {
+      console.error('역할별 직원 수 조회 실패:', e);
+    }
+  };
+
+  // 항공편 수 조회 함수
+  const loadFlightCount = async () => {
+    try {
+      const yearMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+      const response = await empScheduleService.getFlightCount(yearMonth);
+      const count = response.data?.data || 0;
+      setFlightCount(count);
+    } catch (e) {
+      console.error('항공편 수 조회 실패:', e);
+      setFlightCount(0);
+    }
+  };
+
+  // 일정 조회 함수
+  const loadSchedules = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = {};
+      if (selectedRole) {
+        params.role = selectedRole;
+      }
+      console.log('일정 조회 요청 - params:', params);
+      const response = await empScheduleService.getEmpSchedules(params);
+      console.log('일정 조회 응답:', response);
+      const schedules = response.data?.data || response.data || [];
+      console.log('일정 목록:', schedules);
+      console.log('일정 수:', schedules.length);
+      setScheduleList(schedules);
+    } catch (e) {
+      console.error('일정 조회 실패:', e);
+      console.error('에러 상세:', e.response?.data || e.message);
+      setError('일정을 불러오는데 실패했습니다: ' + (e.response?.data?.message || e.message));
+      setScheduleList([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 초기 로드 및 역할 변경 시 일정 조회 및 카운트 갱신
+  useEffect(() => {
+    if (isAdmin) {
+      loadRoleCounts(); // 역할별 카운트 먼저 로드
+      loadSchedules();  // 선택된 역할의 일정 로드
+      loadFlightCount(); // 항공편 수 조회
+    }
+  }, [isAdmin, selectedRole, currentDate]);
+
+  // 통계 계산
   const stats = [
-    { label: '전체 항공편', value: 100, unit: '편', color: '#e0e7ff' },
-    { label: '배정 완료', value: 100, unit: '편', color: '#d1fae5' },
-    { label: '수정 필요', value: 0, unit: '편', color: '#fef3c7' },
-    { label: '총 직원', value: 310, unit: '명', color: '#e5e7eb' },
+    { label: '전체 일정', value: flightCount || 0, unit: '건', color: '#e0e7ff' },
+    { label: '배정 완료', value: scheduleList.filter(s => s.scheduleCode).length, unit: '건', color: '#d1fae5' },
+    { label: '수정 필요', value: scheduleList.filter(s => !s.scheduleCode).length, unit: '건', color: '#fef3c7' },
+    { label: '총 직원', value: new Set(scheduleList.map(s => s.empId)).size, unit: '명', color: '#e5e7eb' },
   ];
 
-  const filterTabs = [
-    { id: 'assigned', label: '배정 완료', icon: '✓', count: 100 },
-    { id: 'pending', label: '수정 필요', icon: '⚠', count: 0 },
-    { id: 'scheduled', label: '직원별 스케줄', icon: '📅', count: 190 },
-  ];
-
-  const scheduleData = [
-    {
-      id: 'KE101',
-      route: { from: 'ICN', to: 'AMS' },
-      departure: '01/15 06:15',
-      duration: '11.4h',
-      status: '완결',
-      passengers: 270,
-      crew: [
-        { role: '캡틴', name: '김영수 (CP)', badges: ['김인식', '이서연', '박지원', '+6명'] }
-      ]
-    },
-    {
-      id: 'KE102',
-      route: { from: 'ICN', to: 'NRT' },
-      departure: '01/15 07:30',
-      duration: '2h',
-      status: '단계별',
-      passengers: 250,
-      crew: [
-        { role: '캡틴', name: '이영호 (CP)', badges: ['원승익', '민서인', '오수빈', '+2명'] }
-      ]
-    },
-    {
-      id: 'KE103',
-      route: { from: 'ICN', to: 'BKK' },
-      departure: '01/15 08:45',
-      duration: '5.2h',
-      status: '단계별',
-      passengers: 290,
-      crew: [
-        { role: '캡틴', name: '박준형 (CP)', badges: ['최나은', '송지아', '백서준', '+3명'] }
-      ]
-    },
-    {
-      id: 'KE104',
-      route: { from: 'ICN', to: 'SIN' },
-      departure: '01/15 09:45',
-      duration: '6.8h',
-      status: '단계별',
-      passengers: 260,
-      crew: [
-        { role: '캡틴', name: '최동훈 (CP)', badges: ['안소희', '홍지현', '전민서', '+3명'] }
-      ]
-    },
-    {
-      id: 'KE105',
-      route: { from: 'ICN', to: 'FCO' },
-      departure: '01/15 10:00',
-      duration: '11.7h',
-      status: '완결',
-      passengers: 260,
-      crew: [
-        { role: '캡틴', name: '정승우 (CP)', badges: ['백수현', '양지혜', '우채원', '+6명'] }
-      ]
-    },
-    {
-      id: 'KE106',
-      route: { from: 'ICN', to: 'JFK' },
-      departure: '01/15 12:30',
-      duration: '13.7h',
-      status: '완결',
-      passengers: 280,
-      crew: [
-        { role: '캡틴', name: '김민수 (CP)', badges: ['곽준석', '공지명', '민서아', '+6명'] }
-      ]
-    },
-    {
-      id: 'KE107',
-      route: { from: 'ICN', to: 'SYD' },
-      departure: '01/15 13:15',
-      duration: '10.6h',
-      status: '완결',
-      passengers: 290,
-      crew: [
-        { role: '캡틴', name: '오재민 (CP)', badges: ['박민주', '표지현', '원소영', '+6명'] }
-      ]
-    },
-    {
-      id: 'KE108',
-      route: { from: 'ICN', to: 'FRA' },
-      departure: '01/15 14:45',
-      duration: '11h',
-      status: '완결',
-      passengers: 270,
-      crew: [
-        { role: '캡틴', name: '유성민 (CP)', badges: ['김소희', '나예은', '단지인', '+6명'] }
-      ]
-    },
-  ];
-
+  // 월 변경 핸들러
   const handleMonthChange = (direction) => {
-    // TODO: Implement month navigation
-    console.log('Month navigation:', direction);
+    setCurrentDate(prevDate => {
+      const newDate = new Date(prevDate);
+      if (direction === 'prev') {
+        newDate.setMonth(newDate.getMonth() - 1);
+      } else {
+        newDate.setMonth(newDate.getMonth() + 1);
+      }
+      return newDate;
+    });
   };
 
+  // 새로고침 핸들러
   const handleRefresh = () => {
-    // TODO: Implement data refresh with Zustand
-    console.log('Refreshing schedule data...');
+    loadRoleCounts();
+    loadSchedules();
+    loadFlightCount();
   };
 
-  const handleEdit = (scheduleId) => {
-    // TODO: Navigate to edit page
-    console.log('Edit schedule:', scheduleId);
+  // 일정 배정 핸들러
+  const handleGenerateSchedules = async () => {
+    if (generating) return; // 이미 실행 중이면 무시
+    
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+    const yearMonth = `${year}-${String(month).padStart(2, '0')}`;
+    
+    // 확인 다이얼로그
+    const confirmMessage = `${year}년 ${month}월 일정을 자동 배정하시겠습니까?\n기존 일정이 있다면 수정됩니다.`;
+    if (!window.confirm(confirmMessage)) {
+      return;
+    }
+    
+    setGenerating(true);
+    setError(null);
+    
+    try {
+      const response = await empScheduleService.generateMonthlySchedules(yearMonth, airlineId);
+      const count = response.data?.data || 0;
+      
+      alert(`일정 배정이 완료되었습니다.\n총 ${count}건의 일정이 생성/수정되었습니다.`);
+      
+      // 일정 목록 새로고침
+      await loadRoleCounts();
+      await loadSchedules();
+    } catch (e) {
+      console.error('일정 배정 실패:', e);
+      const errorMessage = e.response?.data?.message || e.message || '일정 배정에 실패했습니다.';
+      alert('일정 배정 실패: ' + errorMessage);
+      setError(errorMessage);
+    } finally {
+      setGenerating(false);
+    }
   };
+
+  // 일정 수정 핸들러
+  const handleEdit = async (empScheduleId, currentSchedule) => {
+    const newScheduleCode = prompt(`일정 코드 수정 (${currentSchedule.scheduleCode || '없음'}):`, currentSchedule.scheduleCode || '');
+    if (newScheduleCode === null) return; // 취소 시
+
+    const newStartDateStr = prompt(`시작 날짜 수정 (YYYY-MM-DD HH:mm, 현재: ${currentSchedule.startDate ? new Date(currentSchedule.startDate).toLocaleString('ko-KR') : '없음'}):`, 
+      currentSchedule.startDate ? new Date(currentSchedule.startDate).toISOString().slice(0, 16) : '');
+    if (newStartDateStr === null) return;
+
+    const newEndDateStr = prompt(`종료 날짜 수정 (YYYY-MM-DD HH:mm, 현재: ${currentSchedule.endDate ? new Date(currentSchedule.endDate).toLocaleString('ko-KR') : '없음'}):`,
+      currentSchedule.endDate ? new Date(currentSchedule.endDate).toISOString().slice(0, 16) : '');
+    if (newEndDateStr === null) return;
+
+    try {
+      const newStartDate = new Date(newStartDateStr);
+      const newEndDate = new Date(newEndDateStr);
+
+      if (isNaN(newStartDate.getTime()) || isNaN(newEndDate.getTime())) {
+        alert('유효하지 않은 날짜 형식입니다. YYYY-MM-DD HH:mm 형식으로 입력해주세요.');
+        return;
+      }
+
+      await empScheduleService.updateEmpSchedule(empScheduleId, {
+        scheduleCode: newScheduleCode,
+        startDate: newStartDate.toISOString(),
+        endDate: newEndDate.toISOString(),
+      });
+      alert('일정이 성공적으로 수정되었습니다.');
+      loadRoleCounts(); // 카운트 새로고침
+      loadSchedules(); // 목록 새로고침
+    } catch (e) {
+      console.error('일정 수정 실패:', e);
+      alert('일정 수정에 실패했습니다: ' + (e.response?.data?.message || e.message));
+    }
+  };
+
+  // 일정 코드 한글 변환
+  const getScheduleCodeText = (code) => {
+    const codeMap = {
+      'FLIGHT': '비행',
+      'STANDBY': '대기',
+      'OFF': '휴무',
+      'COUNSEL': '상담',
+      'EXERCISE': '운동',
+      'REST': '휴식',
+      'SHIFT_D': '주간근무',
+      'SHIFT_E': '오후근무',
+      'SHIFT_N': '야간근무',
+    };
+    return codeMap[code] || code || '-';
+  };
+
+  if (!isAdmin) {
+    return (
+      <MainContentArea>
+        <ErrorContainer>
+          <ErrorMessage>관리자만 접근할 수 있는 페이지입니다.</ErrorMessage>
+        </ErrorContainer>
+      </MainContentArea>
+    );
+  }
 
   return (
     <MainContentArea>
       {/* Page Header */}
       <PageHeader>
         <div>
-          <PageTitle>관리자 근태 현황</PageTitle>
+          <PageTitle>직원 일정 배정 및 관리</PageTitle>
         </div>
       </PageHeader>
 
@@ -193,98 +299,105 @@ const StaffScheduleAssignment = () => {
       <ControlPanel>
         <MonthNavigator>
           <NavButton onClick={() => handleMonthChange('prev')}>
-            ‹
+            <ChevronLeft size={18} />
           </NavButton>
           <CurrentMonth>{currentMonth}</CurrentMonth>
           <NavButton onClick={() => handleMonthChange('next')}>
-            ›
+            <ChevronRight size={18} />
           </NavButton>
         </MonthNavigator>
 
-        <RefreshButton onClick={handleRefresh}>
-          ↻ 자동 배정 실행
-        </RefreshButton>
-        <RefreshButton onClick={handleRefresh}>
-          ↻ 초기화
+        <RefreshButton 
+          onClick={handleGenerateSchedules}
+          disabled={generating}
+        >
+          {generating ? '⏳ 배정 중...' : '📅 일정배정'}
         </RefreshButton>
       </ControlPanel>
 
-      {/* Filter Tabs */}
+      {/* 역할 필터 탭 */}
       <FilterTabs>
-        {filterTabs.map((tab) => (
-          <FilterTab
-            key={tab.id}
-            $active={activeTab === tab.id}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            <TabIcon>{tab.icon}</TabIcon>
-            <TabLabel>{tab.label}</TabLabel>
-            <TabBadge $active={activeTab === tab.id}>
-              ({tab.count}건)
-            </TabBadge>
-          </FilterTab>
-        ))}
+        {roleOptions.map((role) => {
+          // 전체는 항공편 수, 역할별은 직원 수
+          const count = role.value ? (roleCounts[role.value] || 0) : (flightCount || 0);
+          const unit = role.value ? '명' : '건';
+          
+          return (
+            <FilterTab
+              key={role.value || 'all'}
+              $active={selectedRole === role.value}
+              onClick={() => setSelectedRole(role.value)}
+            >
+              <TabLabel>{role.label}</TabLabel>
+              <TabBadge $active={selectedRole === role.value}>
+                ({count}{unit})
+              </TabBadge>
+            </FilterTab>
+          );
+        })}
       </FilterTabs>
 
       {/* Schedule Table */}
       <ScheduleTableWrapper>
-        <ScheduleTable>
-          <TableHeader>
-            <tr>
-              <TableHeaderCell>편명</TableHeaderCell>
-              <TableHeaderCell>노선</TableHeaderCell>
-              <TableHeaderCell>출발시간</TableHeaderCell>
-              <TableHeaderCell>비행시간</TableHeaderCell>
-              <TableHeaderCell>승객수</TableHeaderCell>
-              <TableHeaderCell>배정 승무원</TableHeaderCell>
-              <TableHeaderCell>관리</TableHeaderCell>
-            </tr>
-          </TableHeader>
-          <TableBody>
-            {scheduleData.map((schedule) => (
-              <TableRow key={schedule.id}>
-                <TableCell>
-                  <FlightNumber>{schedule.id}</FlightNumber>
-                </TableCell>
-                <TableCell>
-                  <RouteCode>{schedule.route.from}</RouteCode>
-                  <RouteArrow>→</RouteArrow>
-                  <RouteCode>{schedule.route.to}</RouteCode>
-                </TableCell>
-                <TableCell>
-                  <FlightTime>{schedule.departure}</FlightTime>
-                </TableCell>
-                <TableCell>
-                  <Duration>{schedule.duration}</Duration>
-                  <StatusBadge $type={schedule.status}>
-                    {schedule.status}
-                  </StatusBadge>
-                </TableCell>
-                <TableCell>
-                  <PassengerCount>{schedule.passengers}명</PassengerCount>
-                </TableCell>
-                <TableCell>
-                  <CrewSection>
-                    {schedule.crew.map((member, idx) => (
-                      <CrewMember key={idx}>
-                        <CrewRole>{member.role}</CrewRole>
-                        <CrewName>{member.name}</CrewName>
-                        {member.badges.map((badge, bidx) => (
-                          <CrewBadge key={bidx}>{badge}</CrewBadge>
-                        ))}
-                      </CrewMember>
-                    ))}
-                  </CrewSection>
-                </TableCell>
-                <TableCell>
-                  <ActionButton onClick={() => handleEdit(schedule.id)}>
-                    ✏️ 수정
-                  </ActionButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </ScheduleTable>
+        {loading && scheduleList.length === 0 ? (
+          <LoadingContainer>데이터를 불러오는 중...</LoadingContainer>
+        ) : error ? (
+          <ErrorContainer>
+            <ErrorMessage>{error}</ErrorMessage>
+            <RetryButton onClick={handleRefresh}>다시 시도</RetryButton>
+          </ErrorContainer>
+        ) : (
+          <ScheduleTable>
+            <TableHeader>
+              <tr>
+                <TableHeaderCell>직원 ID</TableHeaderCell>
+                <TableHeaderCell>직원 이름</TableHeaderCell>
+                <TableHeaderCell>일정 코드</TableHeaderCell>
+                <TableHeaderCell>시작 일시</TableHeaderCell>
+                <TableHeaderCell>종료 일시</TableHeaderCell>
+                <TableHeaderCell>관리</TableHeaderCell>
+              </tr>
+            </TableHeader>
+            <TableBody>
+              {scheduleList.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} style={{ textAlign: 'center', padding: '40px' }}>
+                    조회된 일정이 없습니다.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                scheduleList.map((schedule) => (
+                  <TableRow key={schedule.empScheduleId}>
+                    <TableCell>{schedule.empId}</TableCell>
+                    <TableCell>
+                      <EmpName>{schedule.empName || '-'}</EmpName>
+                    </TableCell>
+                    <TableCell>
+                      <ScheduleCode>{getScheduleCodeText(schedule.scheduleCode)}</ScheduleCode>
+                    </TableCell>
+                    <TableCell>
+                      {schedule.startDate 
+                        ? new Date(schedule.startDate).toLocaleString('ko-KR')
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>
+                      {schedule.endDate 
+                        ? new Date(schedule.endDate).toLocaleString('ko-KR')
+                        : '-'
+                      }
+                    </TableCell>
+                    <TableCell>
+                      <ActionButton onClick={() => handleEdit(schedule.empScheduleId, schedule)}>
+                        ✏️ 수정
+                      </ActionButton>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </ScheduleTable>
+        )}
       </ScheduleTableWrapper>
     </MainContentArea>
   );

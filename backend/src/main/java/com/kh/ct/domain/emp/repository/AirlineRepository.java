@@ -29,5 +29,14 @@ public interface AirlineRepository extends JpaRepository<Airline, Long> {
     // AirlineApply ID로 Airline 존재 여부 확인
     @Query("SELECT COUNT(a) > 0 FROM Airline a WHERE a.airlineApplyId.airlineApplyId = :airlineApplyId")
     boolean existsByAirlineApplyId(@Param("airlineApplyId") Long airlineApplyId);
+    
+    /**
+     * IATA 코드로 항공사 조회
+     * 편명의 앞 2글자(IATA 코드)로 항공사를 찾기 위한 메서드
+     * airlineName에 IATA 코드가 포함되어 있거나, 별도 필드가 있을 경우 사용
+     * 현재는 airlineName에서 매칭하지만, 추후 iataCode 필드 추가 시 수정 필요
+     */
+    @Query("SELECT a FROM Airline a WHERE UPPER(a.airlineName) LIKE CONCAT('%', UPPER(:iataCode), '%')")
+    java.util.Optional<Airline> findByIataCode(@Param("iataCode") String iataCode);
 }
 

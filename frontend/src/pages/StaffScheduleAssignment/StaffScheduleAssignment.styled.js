@@ -327,9 +327,14 @@ export const RefreshButton = styled.button`
   cursor: pointer;
   transition: all 0.2s ease;
 
-  &:hover {
+  &:hover:not(:disabled) {
     background: ${({ theme }) => theme.colors.primary};
     color: #ffffff;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `;
 
@@ -546,6 +551,74 @@ export const ActionButton = styled.button`
   &:hover {
     background: ${({ theme }) => theme.colors.primary};
     color: #ffffff;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+`;
+
+// ==================== 직원 일정 관련 스타일 ====================
+
+export const EmpName = styled.span`
+  font-weight: 600;
+  color: ${({ theme }) => theme.text.primary};
+`;
+
+export const ScheduleCode = styled.span`
+  display: inline-block;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }) => `${theme.colors.primary}15`};
+  border-radius: 6px;
+`;
+
+export const LoadingContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  color: ${({ theme }) => theme.text.secondary};
+`;
+
+export const ErrorContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 20px;
+`;
+
+export const ErrorMessage = styled.div`
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 15px;
+  color: ${({ theme }) => theme.status?.error || '#ef4444'};
+  text-align: center;
+`;
+
+export const RetryButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 20px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  background: ${({ theme }) => theme.colors.primary};
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
   }
 
   &:active {
