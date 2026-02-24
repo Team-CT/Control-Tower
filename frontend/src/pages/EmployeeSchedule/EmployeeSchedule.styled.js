@@ -555,3 +555,279 @@ export const ActionButton = styled.button`
     transform: scale(0.98);
   }
 `;
+
+// ==================== 캘린더 관련 스타일 ====================
+
+export const CalendarSection = styled.div`
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+`;
+
+export const CalendarHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+`;
+
+export const MonthTitle = styled.h2`
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1d2838;
+  margin: 0;
+`;
+
+export const NavButtons = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+export const CalendarGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
+`;
+
+export const DayHeader = styled.div`
+  text-align: center;
+  padding: 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: ${props => props.$isWeekend ? '#ef4444' : '#6b7280'};
+`;
+
+export const DayCell = styled.div`
+  aspect-ratio: 1;
+  border: 1px solid ${props => props.$isToday ? '#2563eb' : '#e5e7eb'};
+  border-radius: 8px;
+  padding: 8px;
+  cursor: pointer;
+  background: ${props => {
+    if (props.$isSelected) return '#1e40af';
+    if (props.$isToday) return '#dbeafe';
+    return 'white';
+  }};
+  color: ${props => {
+    if (props.$isSelected) return 'white';
+    if (props.$isOtherMonth) return '#d1d5db';
+    return '#1f2937';
+  }};
+  position: relative;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  &:hover {
+    background: ${props => props.$isSelected ? '#1e40af' : '#f9fafb'};
+    border-color: ${props => props.$isSelected ? '#1e40af' : '#d1d5db'};
+  }
+`;
+
+export const DayNumber = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+`;
+
+export const ScheduleDot = styled.div`
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: ${props => Math.min(props.$count * 6, 24)}px;
+  height: 6px;
+  background: ${props => props.$color || props.theme.colors?.primary || '#3b82f6'};
+  border-radius: 3px;
+`;
+
+export const ScheduleDotOld = styled.div`
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #3b82f6;
+  margin-top: 4px;
+`;
+
+export const Legend = styled.div`
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+`;
+
+export const LegendItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #6b7280;
+`;
+
+export const LegendDot = styled.div`
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: ${props => props.$color || '#6b7280'};
+`;
+
+export const ScheduleListSection = styled.div`
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+`;
+
+export const ScheduleListTitle = styled.h3`
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1d2838;
+  margin: 0 0 16px 0;
+`;
+
+export const ScheduleList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+export const ScheduleItem = styled.div`
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: #0284c7;
+    background: #eff6ff;
+  }
+`;
+
+export const ScheduleItemHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+`;
+
+export const ScheduleItemTitle = styled.div`
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #1d2838;
+`;
+
+export const ScheduleItemCode = styled.span`
+  font-size: 12px;
+  padding: 4px 8px;
+  background: #e0e7ff;
+  color: #4f46e5;
+  border-radius: 4px;
+  font-weight: 500;
+`;
+
+export const ScheduleItemTime = styled.div`
+  font-size: 14px;
+  color: #6b7280;
+`;
+
+export const EmptyMessage = styled.div`
+  text-align: center;
+  padding: 40px;
+  color: #9ca3af;
+  font-size: 14px;
+`;
+
+// ==================== 관리자용 스타일 ====================
+
+export const RoleFilter = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+`;
+
+export const RoleFilterLabel = styled.span`
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+`;
+
+export const RoleFilterButton = styled.button`
+  padding: 8px 16px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${props => props.$active ? '#ffffff' : '#6b7280'};
+  background: ${props => props.$active ? '#0284c7' : '#ffffff'};
+  border: 1px solid ${props => props.$active ? '#0284c7' : '#e5e7eb'};
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: ${props => props.$active ? '#0284c7' : '#f9fafb'};
+    border-color: #0284c7;
+  }
+`;
+
+export const EmpName = styled.span`
+  font-weight: 600;
+  color: #1d2838;
+`;
+
+export const ScheduleCode = styled.span`
+  padding: 4px 8px;
+  background: #e0e7ff;
+  color: #4f46e5;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+`;
+
+// ==================== 공통 스타일 ====================
+
+export const LoadingContainer = styled.div`
+  text-align: center;
+  padding: 60px;
+  color: #6b7280;
+  font-size: 16px;
+`;
+
+export const ErrorContainer = styled.div`
+  text-align: center;
+  padding: 60px;
+`;
+
+export const ErrorMessage = styled.div`
+  color: #ef4444;
+  font-size: 16px;
+  margin-bottom: 16px;
+`;
+
+export const RetryButton = styled.button`
+  padding: 10px 20px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #ffffff;
+  background: #0284c7;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #0369a1;
+  }
+`;

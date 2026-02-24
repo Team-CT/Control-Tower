@@ -30,4 +30,8 @@ public class BusinessException extends RuntimeException {
     public static BusinessException forbidden(String message) {
         return new BusinessException(HttpStatus.FORBIDDEN, message);
     }
+
+    public static BusinessException internalServerError(String message) {
+        return new BusinessException(HttpStatus.INTERNAL_SERVER_ERROR, message);
+    }
 }

@@ -11,6 +11,7 @@ import com.kh.ct.global.exception.BusinessException;
 import com.kh.ct.global.exception.EmpNoConflictException;
 import com.kh.ct.global.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -166,48 +168,56 @@ public class EmpServiceImpl implements EmpService {
             if (role != null && !role.isEmpty()) {
                 try {
                     roleEnum = CommonEnums.Role.valueOf(role.toUpperCase());
-                    System.out.println("역할 필터링: " + roleEnum);
+                    log.info("역할 필터링: {}", roleEnum);
                 } catch (IllegalArgumentException e) {
                     // 잘못된 역할 값이면 null로 처리하여 전체 조회
-                    System.out.println("잘못된 역할 값: " + role + ", 전체 조회로 처리");
+                    log.warn("잘못된 역할 값: {}, 전체 조회로 처리", role);
                     roleEnum = null;
                 }
             }
 
-            System.out.println("직원 조회 파라미터 - role: " + roleEnum + ", airlineId: " + airlineId);
+            log.info("직원 조회 파라미터 - role: {}, airlineId: {}", roleEnum, airlineId);
 
             // JOIN FETCH를 사용한 쿼리로 조회 (LAZY 직렬화 문제 방지)
             employees = empRepository.findByRoleAndAirlineId(roleEnum, airlineId);
 
-            System.out.println("조회된 직원 수: " + employees.size());
+            log.info("조회된 직원 수: {}", employees.size());
 
             // DTO로 변환
             return employees.stream()
+                    .filter(emp -> emp != null) // null 체크
                     .map(emp -> {
-                        String departmentName = null;
-                        if (emp.getDepartmentId() != null) {
-                            departmentName = emp.getDepartmentId().getDepartmentName();
-                        }
+                        try {
+                            String departmentName = null;
+                            if (emp.getDepartmentId() != null) {
+                                departmentName = emp.getDepartmentId().getDepartmentName();
+                            }
 
-                        String airlineName = null;
-                        if (emp.getAirlineId() != null) {
-                            airlineName = emp.getAirlineId().getAirlineName();
-                        }
+                            String airlineName = null;
+                            if (emp.getAirlineId() != null) {
+                                airlineName = emp.getAirlineId().getAirlineName();
+                            }
 
-                        return EmpDto.EmployeeListItem.builder()
-                                .empId(emp.getEmpId())
-                                .empName(emp.getEmpName())
-                                .role(emp.getRole() != null ? emp.getRole().name() : null)
-                                .job(emp.getJob())
-                                .departmentName(departmentName)
-                                .airlineName(airlineName)
-                                .build();
+                            return EmpDto.EmployeeListItem.builder()
+                                    .empId(emp.getEmpId())
+                                    .empName(emp.getEmpName())
+                                    .role(emp.getRole() != null ? emp.getRole().name() : null)
+                                    .job(emp.getJob())
+                                    .departmentName(departmentName)
+                                    .airlineName(airlineName)
+                                    .build();
+                        } catch (Exception e) {
+                            log.error("직원 DTO 변환 실패 - empId: {}, error: {}", 
+                                    emp.getEmpId(), e.getMessage(), e);
+                            return null;
+                        }
                     })
+                    .filter(dto -> dto != null) // 변환 실패한 항목 제거
                     .collect(java.util.stream.Collectors.toList());
         } catch (Exception e) {
-            System.err.println("직원 목록 조회 중 오류 발생: " + e.getMessage());
-            e.printStackTrace();
-            throw new RuntimeException("직원 목록 조회 중 오류가 발생했습니다: " + e.getMessage(), e);
+            log.error("직원 목록 조회 중 오류 발생 - role: {}, airlineId: {}", role, airlineId, e);
+            throw new BusinessException(HttpStatus.INTERNAL_SERVER_ERROR, 
+                    "직원 목록 조회 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 

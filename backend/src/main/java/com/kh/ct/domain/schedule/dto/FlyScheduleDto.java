@@ -26,6 +26,9 @@ public class FlyScheduleDto {
     private Integer crewCount;
     private CommonEnums.flightStatus flightStatus;
     private Integer seatCount;
+    
+    // ✅ camelCase로 통일 (프론트엔드가 camelCase를 우선 사용)
+    // @JsonProperty 제거하여 기본 camelCase 사용
     private List<CrewMemberResponse> crewMembers;
     
     // 항공사 정보
@@ -42,26 +45,77 @@ public class FlyScheduleDto {
     @AllArgsConstructor
     @Builder
     public static class CrewMemberResponse {
-        @JsonProperty("emp_id")
+        // ✅ camelCase로 통일 (프론트엔드가 camelCase를 우선 사용)
+        // @JsonProperty 제거하여 기본 camelCase 사용
         private String empId;
-        
-        @JsonProperty("emp_name")
         private String empName;
-        
-        @JsonProperty("role")
+        private String empNo;
         private String role;
-        
-        @JsonProperty("job")
         private String job;
-        
-        @JsonProperty("department_name")
         private String departmentName;
-        
-        @JsonProperty("emp_status")
         private String empStatus;
-        
-        @JsonProperty("emp_fly_schedule_id")
         private Long empFlyScheduleId;
+    }
+    
+    /**
+     * 항공편 상세 조회 응답 DTO
+     * 항공편 정보 + 배정된 직원 목록 포함
+     */
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class DetailResponse {
+        @JsonProperty("fly_schedule_id")
+        private Long flyScheduleId;
+        
+        @JsonProperty("flight_number")
+        private String flightNumber;
+        
+        @JsonProperty("airplane_type")
+        private String airplaneType;
+        
+        @JsonProperty("departure")
+        private String departure;
+        
+        @JsonProperty("destination")
+        private String destination;
+        
+        @JsonProperty("fly_start_time")
+        private LocalDateTime flyStartTime;
+        
+        @JsonProperty("fly_end_time")
+        private LocalDateTime flyEndTime;
+        
+        @JsonProperty("gate")
+        private String gate;
+        
+        @JsonProperty("crew_count")
+        private Integer crewCount;
+        
+        @JsonProperty("flight_status")
+        private CommonEnums.flightStatus flightStatus;
+        
+        @JsonProperty("seat_count")
+        private Integer seatCount;
+        
+        @JsonProperty("airline_id")
+        private Long airlineId;
+        
+        @JsonProperty("airline_name")
+        private String airlineName;
+        
+        @JsonProperty("departure_time")
+        private String departureTime;
+        
+        @JsonProperty("arrival_time")
+        private String arrivalTime;
+        
+        @JsonProperty("duration")
+        private String duration;
+        
+        @JsonProperty("crew_members")
+        private List<CrewMemberResponse> crewMembers;
     }
     
     @Getter

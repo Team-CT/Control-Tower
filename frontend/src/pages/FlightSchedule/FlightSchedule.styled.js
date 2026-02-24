@@ -321,3 +321,232 @@ export const RouteDuration = styled.p`
   color: ${({ theme }) => theme.text.secondary};
   margin: 0;
 `;
+
+// ==================== 캘린더 관련 스타일 (직원용) ====================
+export const CalendarSection = styled.section`
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+`;
+
+export const CalendarHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
+export const MonthTitle = styled.h2`
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+`;
+
+export const NavButtons = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+export const NavButton = styled.button`
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${({ theme }) => theme.background.input || '#f3f4f6'};
+  border: 1px solid ${({ theme }) => theme.border || '#e5e7eb'};
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: ${({ theme }) => theme.text.primary || '#111827'};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.primary || '#3b82f6'};
+    color: #ffffff;
+    border-color: ${({ theme }) => theme.colors.primary || '#3b82f6'};
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+`;
+
+export const CalendarGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+`;
+
+export const DayHeader = styled.div`
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${props => props.$isWeekend ? '#ef4444' : '#374151'};
+  background: #f9fafb;
+  border-radius: 8px;
+`;
+
+export const DayCell = styled.div`
+  position: relative;
+  min-height: 80px;
+  padding: 8px;
+  background: ${props => {
+    if (props.$isOtherMonth) return '#f9fafb';
+    if (props.$isSelected) return '#eff6ff';
+    if (props.$isToday) return '#fef3c7';
+    return '#ffffff';
+  }};
+  border: 2px solid ${props => {
+    if (props.$isSelected) return props.theme.colors?.primary || '#3b82f6';
+    if (props.$isToday) return '#fbbf24';
+    return '#e5e7eb';
+  }};
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: ${props => props.$isOtherMonth ? '#f3f4f6' : '#f0f9ff'};
+    border-color: ${props => props.theme.colors?.primary || '#3b82f6'};
+  }
+`;
+
+export const DayNumber = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+`;
+
+export const ScheduleDot = styled.div`
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: ${props => Math.min(props.$count * 6, 24)}px;
+  height: 6px;
+  background: ${props => props.$color || props.theme.colors?.primary || '#3b82f6'};
+  border-radius: 3px;
+`;
+
+export const Legend = styled.div`
+  display: flex;
+  gap: 24px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+`;
+
+export const LegendItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #6b7280;
+`;
+
+export const LegendDot = styled.div`
+  width: 12px;
+  height: 12px;
+  background: ${props => props.$color || props.theme.colors?.primary || '#3b82f6'};
+  border-radius: 50%;
+`;
+
+export const ScheduleListSection = styled.section`
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+`;
+
+export const ScheduleListTitle = styled.h3`
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 16px 0;
+`;
+
+export const ScheduleList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+export const ScheduleItem = styled.div`
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border-left: 4px solid ${props => props.theme.colors?.primary || '#3b82f6'};
+`;
+
+export const ScheduleItemHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+`;
+
+export const ScheduleItemTitle = styled.div`
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+`;
+
+export const ScheduleItemCode = styled.div`
+  font-size: 12px;
+  color: #6b7280;
+  background: #e5e7eb;
+  padding: 4px 8px;
+  border-radius: 4px;
+`;
+
+export const ScheduleItemTime = styled.div`
+  font-size: 14px;
+  color: #6b7280;
+`;
+
+export const EmptyMessage = styled.div`
+  padding: 40px;
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+`;
+
+export const LoadingContainer = styled.div`
+  padding: 60px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 16px;
+`;
+
+export const ErrorContainer = styled.div`
+  padding: 60px;
+  text-align: center;
+`;
+
+export const ErrorMessage = styled.div`
+  color: #ef4444;
+  font-size: 16px;
+  margin-bottom: 16px;
+`;
+
+export const RetryButton = styled.button`
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  background: ${props => props.theme.colors?.primary || '#3b82f6'};
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: ${props => props.theme.colors?.primaryHover || props.theme.colors?.primary || '#2563eb'};
+    transform: translateY(-2px);
+  }
+`;

@@ -1,11 +1,14 @@
 package com.kh.ct.domain.schedule.entity;
 
+import com.kh.ct.domain.schedule.entity.EmpFlySchedule;
 import com.kh.ct.global.common.CommonEnums;
 import com.kh.ct.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -16,16 +19,29 @@ import java.time.LocalDateTime;
 public class FlySchedule extends BaseTimeEntity {
 
     @Id
-    @Column(name = "fly_schedule_id")
+    @Column(name = "fly_schedule_id")  // ✅ 3단계: 명시적 컬럼 매핑 (Repository 쿼리 검증)
     private Long flyScheduleId;
 
     /**
      * ALL_SCHEDULE 과 1:1
-     * 같은 PK를 공유하지만 MapsId는 쓰지 않음
+     * @MapsId를 사용하여 flyScheduleId가 AllSchedule의 scheduleId를 참조
+     * PK를 공유하는 표준 JPA 방식
      */
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @MapsId
+    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "fly_schedule_id", referencedColumnName = "schedule_id")
     private AllSchedule schedule;
+    
+    /**
+     * AllSchedule과의 연관관계 편의 메서드
+     * FlySchedule 생성 시 AllSchedule을 함께 설정
+     */
+    public void setSchedule(AllSchedule schedule) {
+        this.schedule = schedule;
+        if (schedule != null && schedule.getScheduleId() != null) {
+            this.flyScheduleId = schedule.getScheduleId();
+        }
+    }
 
     @Column(name = "airline_id", nullable = true)
     private Long airlineId;
@@ -60,4 +76,13 @@ public class FlySchedule extends BaseTimeEntity {
 
     @Column(name = "seat_count")
     private Long seatCount;
+    
+    /**
+     * EMP_FLY_SCHEDULE과 1:N 관계
+     * 배정된 직원 목록을 가져올 수 있도록 양방향 연관관계 설정
+     * JSON 직렬화 시 순환 참조 방지를 위해 @JsonIgnore 추가
+     */
+    @OneToMany(mappedBy = "flySchedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
+    @com.fasterxml.jackson.annotation.JsonIgnore
+    private List<EmpFlySchedule> empFlySchedules = new ArrayList<>();
 }

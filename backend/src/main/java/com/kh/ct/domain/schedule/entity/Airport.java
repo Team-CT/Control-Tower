@@ -31,5 +31,6 @@ public class Airport extends BaseTimeEntity{
 
     @OneToMany(mappedBy = "airportId", fetch = FetchType.LAZY,
             cascade = CascadeType.ALL, orphanRemoval = true)
+    @com.fasterxml.jackson.annotation.JsonIgnore // JSON 직렬화 시 무한 루프 방지
     private List<AirlineAirport> airlineAirports = new ArrayList<>();
 }

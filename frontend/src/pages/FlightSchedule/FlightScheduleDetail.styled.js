@@ -420,6 +420,72 @@ export const AddCrewButton = styled.button`
   }
 `;
 
+export const EmptyCrewMessage = styled.div`
+  padding: 48px 24px;
+  text-align: center;
+  color: ${({ theme }) => theme.text.secondary};
+  font-size: 16px;
+  background: ${({ theme }) => theme.background.secondary};
+  border-radius: 8px;
+  border: 1px dashed ${({ theme }) => theme.border.light};
+`;
+
+// ==================== Crew Table ====================
+export const CrewTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  background: ${({ theme }) => theme.background.primary};
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+`;
+
+export const CrewTableHeader = styled.thead`
+  background: ${({ theme }) => theme.background.secondary};
+`;
+
+export const CrewTableRow = styled.tr`
+  &:hover {
+    background: ${({ theme }) => theme.background.hover};
+  }
+`;
+
+export const CrewTableHeaderCell = styled.th`
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  color: ${({ theme }) => theme.text.primary};
+  border-bottom: 2px solid ${({ theme }) => theme.border.light};
+`;
+
+export const CrewTableBody = styled.tbody`
+  ${CrewTableRow} {
+    border-bottom: 1px solid ${({ theme }) => theme.border.light};
+    
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+`;
+
+export const CrewTableCell = styled.td`
+  padding: 16px;
+  font-size: 14px;
+  color: ${({ theme }) => theme.text.primary};
+`;
+
+export const CrewNameLink = styled.span`
+  color: ${({ theme }) => theme.colors.primary || '#3b82f6'};
+  cursor: pointer;
+  font-weight: 500;
+  
+  &:hover {
+    text-decoration: underline;
+    color: ${({ theme }) => theme.colors.primaryHover || theme.colors.primary || '#2563eb'};
+  }
+`;
+
 export const DeleteCrewButton = styled.button`
   width: 32px;
   height: 32px;
