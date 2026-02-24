@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 public class AuthDto {
+
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
@@ -26,7 +27,16 @@ public class AuthDto {
     @AllArgsConstructor
     @Builder
     public static class LoginResponse {
-        private String token;
+        private String accessToken;
+        private Long accessTokenExpiresIn;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @Builder
+    public static class RefreshResponse {
+        private String accessToken;
+        private Long accessTokenExpiresIn;
     }
 
     @Getter
@@ -48,12 +58,12 @@ public class AuthDto {
     @AllArgsConstructor
     @Builder
     public static class BusinessCardOcrResponse {
-        private String empName; // 이름 (필수)
-        private String phone; // 전화번호 (숫자와 하이픈만 포함)
-        private String email; // 이메일 (없으면 null)
-        private String job; // 직급 또는 직책 (없으면 null)
-        private String company; // 회사명 또는 소속 (없으면 null)
-        private String address; // 주소 (없으면 null)
+        private String empName;   // 이름 (필수)
+        private String phone;     // 전화번호 (숫자와 하이픈만 포함)
+        private String email;     // 이메일 (없으면 null)
+        private String job;       // 직급 또는 직책 (없으면 null)
+        private String company;   // 회사명 또는 소속 (없으면 null)
+        private String address;   // 주소 (없으면 null)
     }
 
     /**
@@ -83,7 +93,7 @@ public class AuthDto {
 
         private String phone; // 전화번호
         private String email; // 이메일
-        private String job; // 직급/직책
+        private String job;   // 직급/직책
 
         @NotBlank(message = "사번은 필수입니다")
         private String empNo; // 사번 (unique)
