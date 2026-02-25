@@ -100,5 +100,32 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
             CommonEnums.EmpStatus empStatus,
             String empIdNot
     );
+
+    /**
+     * 항공사별 관리자 이메일 조회
+     * - 같은 airline_id 소속의 관리자 계정(AIRLINE_ADMIN, SUPER_ADMIN) 이메일 조회
+     * - 활성 상태(empStatus='Y')인 관리자만 조회
+     * - SUPER_ADMIN 우선, 그 다음 AIRLINE_ADMIN
+     * 
+     * @param airlineId 항공사 ID
+     * @return 관리자 이메일 목록 (첫 번째 사용)
+     */
+    @Query("SELECT e.email FROM Emp e " +
+           "WHERE e.airlineId.airlineId = :airlineId " +
+           "AND e.empStatus = :empStatus " +
+           "AND (e.role = :superAdminRole OR e.role = :airlineAdminRole) " +
+           "AND e.email IS NOT NULL " +
+           "AND e.email != '' " +
+           "ORDER BY " +
+           "  CASE WHEN e.role = :superAdminRole THEN 1 " +
+           "       WHEN e.role = :airlineAdminRole THEN 2 " +
+           "       ELSE 3 END, " +
+           "  e.createDate ASC")
+    List<String> findAdminEmailsByAirlineId(
+            @Param("airlineId") Long airlineId,
+            @Param("empStatus") CommonEnums.EmpStatus empStatus,
+            @Param("superAdminRole") CommonEnums.Role superAdminRole,
+            @Param("airlineAdminRole") CommonEnums.Role airlineAdminRole
+    );
 }
 
