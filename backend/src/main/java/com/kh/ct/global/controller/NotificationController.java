@@ -25,14 +25,19 @@ public class NotificationController {
     public ResponseEntity<Page<NotificationDto.NotificationListResponse>> getNotifications(
             @PageableDefault(size = 20, sort = "createDate", direction = Sort.Direction.DESC) Pageable pageable) {
         String empId = getCurrentEmpId();
+        log.info("알림 목록 조회 요청 - empId: {}, page: {}, size: {}", empId, pageable.getPageNumber(), pageable.getPageSize());
         Page<NotificationDto.NotificationListResponse> notifications = notificationService.getNotifications(empId, pageable);
+        log.info("알림 목록 조회 완료 - empId: {}, totalElements: {}, totalPages: {}", 
+                empId, notifications.getTotalElements(), notifications.getTotalPages());
         return ResponseEntity.ok(notifications);
     }
 
     @GetMapping("/unread-count")
     public ResponseEntity<NotificationDto.NotificationCountResponse> getUnreadCount() {
         String empId = getCurrentEmpId();
+        log.info("안읽음 알림 개수 조회 요청 - empId: {}", empId);
         long count = notificationService.getUnreadCount(empId);
+        log.info("안읽음 알림 개수 조회 완료 - empId: {}, unreadCount: {}", empId, count);
         return ResponseEntity.ok(NotificationDto.NotificationCountResponse.builder()
                 .unreadCount(count)
                 .build());

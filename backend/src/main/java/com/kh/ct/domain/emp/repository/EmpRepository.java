@@ -24,6 +24,11 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
     
     Optional<Emp> findByEmailAndRole(String email, CommonEnums.Role role);
 
+    /**
+     * 이메일로 직원 조회 (활성 상태)
+     */
+    Optional<Emp> findByEmailAndEmpStatus(String email, CommonEnums.EmpStatus empStatus);
+
     List<Emp> findByAirlineId_AirlineIdAndJob(Long airlineId, String job);
 
     Optional<Emp> findByEmpNameAndEmailAndEmpStatus(String empName, String email, CommonEnums.EmpStatus status);
@@ -122,6 +127,34 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
            "       ELSE 3 END, " +
            "  e.createDate ASC")
     List<String> findAdminEmailsByAirlineId(
+            @Param("airlineId") Long airlineId,
+            @Param("empStatus") CommonEnums.EmpStatus empStatus,
+            @Param("superAdminRole") CommonEnums.Role superAdminRole,
+            @Param("airlineAdminRole") CommonEnums.Role airlineAdminRole
+    );
+
+    /**
+     * 항공사별 관리자 empId 조회
+     * - 같은 airline_id 소속의 관리자 계정(AIRLINE_ADMIN, SUPER_ADMIN) empId 조회
+     * - 활성 상태(empStatus='Y')인 관리자만 조회
+     * - SUPER_ADMIN 우선, 그 다음 AIRLINE_ADMIN
+     *
+     * @param airlineId 항공사 ID
+     * @param empStatus 직원 상태 (활성)
+     * @param superAdminRole SUPER_ADMIN 역할
+     * @param airlineAdminRole AIRLINE_ADMIN 역할
+     * @return 관리자 empId 목록 (첫 번째 사용)
+     */
+    @Query("SELECT e.empId FROM Emp e " +
+           "WHERE e.airlineId.airlineId = :airlineId " +
+           "AND e.empStatus = :empStatus " +
+           "AND (e.role = :superAdminRole OR e.role = :airlineAdminRole) " +
+           "ORDER BY " +
+           "  CASE WHEN e.role = :superAdminRole THEN 1 " +
+           "       WHEN e.role = :airlineAdminRole THEN 2 " +
+           "       ELSE 3 END, " +
+           "  e.createDate ASC")
+    List<String> findAdminEmpIdsByAirlineId(
             @Param("airlineId") Long airlineId,
             @Param("empStatus") CommonEnums.EmpStatus empStatus,
             @Param("superAdminRole") CommonEnums.Role superAdminRole,
