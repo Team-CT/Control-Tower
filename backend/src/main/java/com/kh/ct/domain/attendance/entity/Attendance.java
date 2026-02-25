@@ -10,6 +10,13 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
+@Table(
+        name = "attendance",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_attendance_emp_date",
+                columnNames = {"emp_id", "attendance_date"}
+        )
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -33,22 +40,31 @@ public class Attendance extends BaseTimeEntity {
     private CommonEnums.AttendanceStatus attendanceStatus;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "emp_id")
+    @JoinColumn(name = "emp_id", nullable = false )
     private Emp empId;
 
-    /**
-     * 근태 정정 처리 (승인된 정정 신청 내용 반영)
-     * @param inTime 정정된 출근 시간
-     * @param outTime 정정된 퇴근 시간
-     * @param status 정정된 근태 상태
-     */
-    public void updateAttendance(LocalTime inTime, LocalTime outTime, CommonEnums.AttendanceStatus status) {
+    // ✅ 출근(멱등)
+    public void checkIn(LocalTime now, CommonEnums.AttendanceStatus status) {
+        if (this.inTime == null) this.inTime = now;
+        if (status != null) this.attendanceStatus = status; // 규칙에 따라 설정
+    }
+
+    // ✅ 퇴근(멱등)
+    public void checkOut(LocalTime now) {
+        if (this.outTime == null) this.outTime = now;
+    }
+
+    public void updateAttendance(LocalTime inTime, LocalTime outTime,
+                                 CommonEnums.AttendanceStatus status) {
+
         if (inTime != null) {
             this.inTime = inTime;
         }
+
         if (outTime != null) {
             this.outTime = outTime;
         }
+
         if (status != null) {
             this.attendanceStatus = status;
         }
