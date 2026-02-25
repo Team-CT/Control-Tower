@@ -54,6 +54,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/emps/checkId").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/emps/empNo/preview").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/emps/*/airline").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/emps/me/airline").permitAll() // 테마용: 인증 실패 시에도 기본 데이터 반환 (아래 me/** 보다 먼저 매칭)
+                        .requestMatchers("/api/emps/me/**").authenticated() // 내 정보 조회 등은 인증 필수
+                        .requestMatchers(HttpMethod.POST, "/api/passwordCode/**").permitAll()
 
                         // 기타 공개 API
                         .requestMatchers("/api/chat").permitAll()

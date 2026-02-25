@@ -132,10 +132,26 @@ public class EmpController {
     }
 
     /**
-     * 내 항공사 정보 조회 (보안 강화)
+     * 내 항공사 정보 조회 (테마용).
+     * GET /api/emps/me/airline 은 SecurityConfig에서 permitAll 처리되어, JWT 검증 실패 시에도 호출됨.
+     * 인증이 없거나 anonymous 이면 기본 항공사 데이터를 반환해 프론트 테마가 깨지지 않도록 함.
      */
     @GetMapping("/me/airline")
     public ResponseEntity<ApiResponse<AirlineDto.DetailResponse>> getMyAirline(Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            AirlineDto.DetailResponse defaultAirline = AirlineDto.DetailResponse.builder()
+                    .name("default airline")
+                    .icon("✈️")
+                    .primaryColor(null)
+                    .secondaryColor(null)
+                    .mainNumber("")
+                    .businessNumber("")
+                    .address("")
+                    .email("")
+                    .build();
+            return ResponseEntity.ok(ApiResponse.success("기본 항공사 정보", defaultAirline));
+        }
         String empId = authentication.getName();
         AirlineDto.DetailResponse airlineInfo = empService.getAirlineByEmpId(empId);
         return ResponseEntity.ok(ApiResponse.success("내 항공사 정보 조회 성공", airlineInfo));
