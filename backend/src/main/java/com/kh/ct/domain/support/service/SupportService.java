@@ -21,4 +21,11 @@ public interface SupportService {
      * - 본문에 보낸 사람 정보 포함
      */
     void sendEmail(Authentication authentication, SupportDto.SendEmailRequest request);
+
+    /**
+     * 관리자 이메일 답변 발송
+     * - 직원 이메일로 답변 내용 전송
+     * - 직원에게 알림 발행
+     */
+    void replyEmail(Authentication authentication, SupportDto.ReplyEmailRequest request);
 }
