@@ -32,6 +32,9 @@ import {
   ErrorContainer,
   ErrorMessage,
   RetryButton,
+  Pagination,
+  PaginationButton,
+  PageNumber,
 } from './StaffScheduleAssignment.styled';
 import { empScheduleService } from '../../api/empSchedule/services';
 import { empService } from '../../api/emp/services';
@@ -51,6 +54,12 @@ const StaffScheduleAssignment = () => {
   const [roleCounts, setRoleCounts] = useState({}); // 역할별 카운트
   const [generating, setGenerating] = useState(false); // 일정 배정 중 상태
   const [flightCount, setFlightCount] = useState(0); // 항공편 수
+  
+  // 페이징 관련 상태 (UI는 1-based, API는 0-based)
+  const [currentPage, setCurrentPage] = useState(1); // UI는 1부터 시작
+  const [totalPages, setTotalPages] = useState(1);
+  const pageSize = 15; // 페이지당 항목 수
+  const pagesPerGroup = 10; // 한 번에 표시할 페이지 번호 개수
 
   // UI 상태
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -112,27 +121,50 @@ const StaffScheduleAssignment = () => {
     }
   };
 
-  // 일정 조회 함수
-  const loadSchedules = async () => {
+  // 일정 조회 함수 (페이징 지원, UI는 1-based, API는 0-based)
+  const loadSchedules = async (uiPage = 1) => {
     setLoading(true);
     setError(null);
     try {
-      const params = {};
+      // UI 페이지(1-based)를 API 페이지(0-based)로 변환
+      const backendPage = uiPage - 1;
+      
+      const params = {
+        page: backendPage,
+        size: pageSize
+      };
       if (selectedRole) {
         params.role = selectedRole;
       }
       console.log('일정 조회 요청 - params:', params);
       const response = await empScheduleService.getEmpSchedules(params);
       console.log('일정 조회 응답:', response);
-      const schedules = response.data?.data || response.data || [];
-      console.log('일정 목록:', schedules);
-      console.log('일정 수:', schedules.length);
-      setScheduleList(schedules);
+      
+      // 백엔드가 Page 객체를 반환하는 경우
+      if (response.data?.content !== undefined) {
+        const { content, totalPages } = response.data;
+        setScheduleList(content || []);
+        setTotalPages(totalPages || 1);
+      } else {
+        // 백엔드가 배열을 반환하는 경우 (클라이언트 사이드 페이징)
+        const allSchedules = response.data?.data || response.data || [];
+        const startIndex = backendPage * pageSize;
+        const endIndex = startIndex + pageSize;
+        const paginatedSchedules = allSchedules.slice(startIndex, endIndex);
+        const calculatedTotalPages = Math.max(1, Math.ceil(allSchedules.length / pageSize));
+        
+        setScheduleList(paginatedSchedules);
+        setTotalPages(calculatedTotalPages);
+      }
+      
+      console.log('일정 목록:', scheduleList);
+      console.log('일정 수:', scheduleList.length);
     } catch (e) {
       console.error('일정 조회 실패:', e);
       console.error('에러 상세:', e.response?.data || e.message);
       setError('일정을 불러오는데 실패했습니다: ' + (e.response?.data?.message || e.message));
       setScheduleList([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -141,11 +173,18 @@ const StaffScheduleAssignment = () => {
   // 초기 로드 및 역할 변경 시 일정 조회 및 카운트 갱신
   useEffect(() => {
     if (isAdmin) {
+      setCurrentPage(1); // 필터 변경 시 첫 페이지로 리셋 (UI는 1-based)
       loadRoleCounts(); // 역할별 카운트 먼저 로드
-      loadSchedules();  // 선택된 역할의 일정 로드
       loadFlightCount(); // 항공편 수 조회
     }
   }, [isAdmin, selectedRole, currentDate]);
+  
+  // 페이지 변경 시 일정 조회 (필터 변경 시에도 currentPage가 1로 리셋되므로 여기서 처리)
+  useEffect(() => {
+    if (isAdmin) {
+      loadSchedules(currentPage);
+    }
+  }, [currentPage, isAdmin, selectedRole]);
 
   // 통계 계산
   const stats = [
@@ -170,8 +209,9 @@ const StaffScheduleAssignment = () => {
 
   // 새로고침 핸들러
   const handleRefresh = () => {
+    setCurrentPage(1); // 첫 페이지로 리셋 (UI는 1-based)
     loadRoleCounts();
-    loadSchedules();
+    loadSchedules(1);
     loadFlightCount();
   };
 
@@ -199,8 +239,9 @@ const StaffScheduleAssignment = () => {
       alert(`일정 배정이 완료되었습니다.\n총 ${count}건의 일정이 생성/수정되었습니다.`);
       
       // 일정 목록 새로고침
+      setCurrentPage(1); // 첫 페이지로 리셋 (UI는 1-based)
       await loadRoleCounts();
-      await loadSchedules();
+      await loadSchedules(1);
     } catch (e) {
       console.error('일정 배정 실패:', e);
       const errorMessage = e.response?.data?.message || e.message || '일정 배정에 실패했습니다.';
@@ -240,7 +281,7 @@ const StaffScheduleAssignment = () => {
       });
       alert('일정이 성공적으로 수정되었습니다.');
       loadRoleCounts(); // 카운트 새로고침
-      loadSchedules(); // 목록 새로고침
+      loadSchedules(currentPage); // 현재 페이지 목록 새로고침
     } catch (e) {
       console.error('일정 수정 실패:', e);
       alert('일정 수정에 실패했습니다: ' + (e.response?.data?.message || e.message));
@@ -326,7 +367,10 @@ const StaffScheduleAssignment = () => {
             <FilterTab
               key={role.value || 'all'}
               $active={selectedRole === role.value}
-              onClick={() => setSelectedRole(role.value)}
+              onClick={() => {
+                setSelectedRole(role.value);
+                setCurrentPage(1); // 필터 변경 시 첫 페이지로 리셋 (UI는 1-based)
+              }}
             >
               <TabLabel>{role.label}</TabLabel>
               <TabBadge $active={selectedRole === role.value}>
@@ -399,6 +443,48 @@ const StaffScheduleAssignment = () => {
           </ScheduleTable>
         )}
       </ScheduleTableWrapper>
+      
+      {/* 페이징 UI (페이지 그룹 단위, 최대 10개씩 표시) */}
+      {!loading && scheduleList.length > 0 && totalPages > 1 && (() => {
+        // 페이지 그룹 계산 (UI는 1-based)
+        const currentGroup = Math.floor((currentPage - 1) / pagesPerGroup);
+        const startPage = currentGroup * pagesPerGroup + 1;
+        const endPage = Math.min(startPage + pagesPerGroup - 1, totalPages);
+        
+        // 표시할 페이지 번호 배열 생성
+        const pageNumbers = [];
+        for (let p = startPage; p <= endPage; p++) {
+          pageNumbers.push(p);
+        }
+        
+        return (
+          <Pagination>
+            <PaginationButton
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              ‹
+            </PaginationButton>
+
+            {pageNumbers.map((pageNum) => (
+              <PageNumber
+                key={pageNum}
+                $active={currentPage === pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+              >
+                {pageNum}
+              </PageNumber>
+            ))}
+
+            <PaginationButton
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage >= totalPages}
+            >
+              ›
+            </PaginationButton>
+          </Pagination>
+        );
+      })()}
     </MainContentArea>
   );
 };

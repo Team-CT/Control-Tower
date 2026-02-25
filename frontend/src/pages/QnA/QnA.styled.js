@@ -40,6 +40,36 @@ export const PageTitle = styled.h1`
   gap: 12px;
 `;
 
+export const ButtonGroup = styled.div`
+  display: flex;
+  gap: 12px;
+  align-items: center;
+`;
+
+export const EmailButton = styled.button`
+  background: ${({ theme }) => theme.colors.secondary || theme.background.secondary};
+  color: ${({ theme }) => theme.text.primary};
+  border: 2px solid ${({ theme }) => theme.border};
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: ${({ theme }) => theme.shadowSm};
+
+  &:hover {
+    background: ${({ theme }) => theme.background.hover || theme.background.secondary};
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary};
+    transform: translateY(-2px);
+    box-shadow: ${({ theme }) => theme.shadow};
+  }
+`;
+
 export const CreateButton = styled.button`
   background: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.text.inverse || 'white'};
@@ -316,6 +346,17 @@ export const FormGroup = styled.div`
     font-size: 14px;
     &:focus { outline: none; border-color: ${({ theme }) => theme.colors.primary}; }
   }
+`;
+
+export const ReadOnlyInput = styled.input`
+  padding: 10px; 
+  border: 1px solid ${({ theme }) => theme.border}; 
+  background: ${({ theme }) => theme.background.secondary || theme.background.hover};
+  color: ${({ theme }) => theme.text.secondary};
+  border-radius: 6px; 
+  font-size: 14px;
+  cursor: not-allowed;
+  opacity: 0.7;
 `;
 
 export const ModalFooter = styled.div`

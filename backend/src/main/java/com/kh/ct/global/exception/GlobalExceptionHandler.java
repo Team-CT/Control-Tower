@@ -2,6 +2,7 @@ package com.kh.ct.global.exception;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -54,8 +56,27 @@ public class GlobalExceptionHandler {
     // BusinessException 처리 (비즈니스 로직 예외)
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException ex) {
+        log.warn("BusinessException 발생 - status: {}, message: {}", ex.getStatus(), ex.getMessage());
         return ResponseEntity.status(ex.getStatus())
                 .body(ErrorResponse.of(ex.getMessage()));
+    }
+    
+    // 메일 전송 관련 예외 처리
+    @ExceptionHandler(org.springframework.mail.MailException.class)
+    public ResponseEntity<ErrorResponse> handleMailException(org.springframework.mail.MailException ex) {
+        log.error("메일 전송 예외 발생", ex);
+        String message = "이메일 전송에 실패했습니다. 잠시 후 다시 시도해주세요.";
+        
+        // MailException의 원인 예외 확인
+        Throwable cause = ex.getCause();
+        if (cause instanceof jakarta.mail.AuthenticationFailedException) {
+            message = "이메일 서버 인증에 실패했습니다. 관리자에게 문의해주세요.";
+        } else if (cause instanceof jakarta.mail.MessagingException) {
+            message = "이메일 전송에 실패했습니다. 잠시 후 다시 시도해주세요.";
+        }
+        
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.of(message));
     }
 
     // AccessDeniedException 처리 (403)

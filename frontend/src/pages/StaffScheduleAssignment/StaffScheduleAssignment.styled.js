@@ -625,3 +625,53 @@ export const RetryButton = styled.button`
     transform: scale(0.98);
   }
 `;
+
+// ==================== 페이징 UI (Board/Q&A와 동일) ====================
+
+export const Pagination = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 48px;
+`;
+
+export const PaginationButton = styled.button`
+  width: 40px;
+  height: 40px;
+  border: 1px solid ${({ theme }) => theme.border};
+  background: ${({ theme }) => theme.background.paper};
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  color: ${({ theme }) => theme.text.secondary};
+  transition: all 0.2s;
+
+  &:hover:not(:disabled) {
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.primary};
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+`;
+
+export const PageNumber = styled.button`
+  width: 40px;
+  height: 40px;
+  border: 1px solid ${({ theme, $active }) => $active ? theme.colors.primary : theme.border};
+  background: ${({ theme, $active }) => $active ? theme.colors.primary : theme.background.paper};
+  color: ${({ theme, $active }) => $active ? (theme.text.inverse || 'white') : theme.text.secondary};
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: ${({ $active }) => $active ? '600' : '500'};
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme, $active }) => $active ? (theme.text.inverse || 'white') : theme.colors.primary};
+  }
+`;
