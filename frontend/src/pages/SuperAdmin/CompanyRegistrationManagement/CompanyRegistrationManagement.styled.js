@@ -378,6 +378,59 @@ export const InfoValue = styled.div`
   color: ${({ theme }) => theme.text.primary};
 `;
 
+export const AdminInput = styled.input`
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 15px;
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.background.input};
+  color: ${({ theme }) => theme.text.primary};
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+export const ActivationLinkWrapper = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`;
+
+export const ActivationInput = styled.input`
+  flex: 1;
+  padding: 12px 14px;
+  font-size: 14px;
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 8px;
+  background-color: ${({ theme }) => theme.background.input};
+  color: ${({ theme }) => theme.text.primary};
+`;
+
+export const CopyButton = styled.button`
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.text.inverse};
+  background-color: ${({ theme }) => theme.colors.primary};
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  &:hover {
+    opacity: 0.9;
+  }
+`;
+
+export const InfoMessage = styled.p`
+  font-size: 13px;
+  color: ${({ theme }) => theme.text.secondary};
+  margin: 0;
+  margin-top: ${({ $marginTop }) => $marginTop || '8px'};
+  line-height: 1.5;
+`;
+
 // Verification Box
 export const VerificationBox = styled.div`
   background-color: ${props => props.$error ? `${props.theme.status.error}10` : `${props.theme.colors.primary}10`};
@@ -579,4 +632,25 @@ export const EmptyMessage = styled.div`
   text-align: center;
   color: ${({ theme }) => theme.text.tertiary};
   font-size: 15px;
+`;
+
+export const ErrorText = styled.p`
+  color: ${({ theme }) => theme.status.error};
+  font-size: 14px;
+  margin: 0 0 16px 0;
+  text-align: center;
+`;
+
+export const RetryButton = styled.button`
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.text.inverse};
+  background-color: ${({ theme }) => theme.colors.primary};
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  &:hover {
+    opacity: 0.9;
+  }
 `;

@@ -43,6 +43,7 @@ import useAuthStore from '../../store/authStore';
 
 import { empService } from '../../api/emp/empService';
 import { fileService } from '../../api/emp/fileService';
+import { getApiBaseUrl } from '../../api/config';
 
 /**
  * ✅ 전제
@@ -258,7 +259,7 @@ const Settings = () => {
   };
 
   // ✅ 이미지 Preview URL (서버 저장된 이미지)
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8001';
+  const API_BASE = getApiBaseUrl() || '';
 
   const serverProfileUrl = useMemo(() => {
     return profile.profileImageId ? `${API_BASE}/api/file/preview/${profile.profileImageId}` : null;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import * as S from './Chatbot.styles'; // 스타일 파일 로드
+import * as S from './Chatbot.styles';
+import { getApiBaseUrl } from '../api/config';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +37,7 @@ const Chatbot = () => {
       }
 
       // 2. fetch 요청 시 headers에 토큰 추가
-      const response = await fetch('http://localhost:8001/api/chat', {
+      const response = await fetch(`${getApiBaseUrl()}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

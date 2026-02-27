@@ -1,16 +1,20 @@
 const { VITE_API_URL, VITE_API_TIMEOUT = 5000, VITE_API_VERSION = 'v1' } = import.meta.env;
 
+// 프로덕션 기본 API URL (빌드 시 VITE_API_URL 미설정 시 사용)
+const PRODUCTION_API_BASE = 'https://api.khair-controlltower.site';
+
 export const API_CONFIG = {
-  // 개발 환경: 빈 문자열 (Vite 프록시 사용)
-  // 프로덕션 환경: VITE_API_URL 환경변수에 백엔드 URL 설정 (예: http://localhost:8001)
-  // 개발 환경에서는 항상 프록시를 사용하도록 빈 문자열 강제 설정
-  BASE_URL: import.meta.env.DEV ? '' : (VITE_API_URL || ''),
+  // 개발: 빈 문자열(프록시) / 프로덕션: VITE_API_URL 또는 기본값
+  BASE_URL: import.meta.env.DEV ? '' : (VITE_API_URL || PRODUCTION_API_BASE),
   TIMEOUT: VITE_API_TIMEOUT,
   HEADERS: {
-    'Content-Type': 'application/json', //내가 서버로 보내는 데이터는 json이야
-    Accept: 'application/json', //json으로 응답해줘.
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
   },
 };
+
+/** API 절대 URL (fetch/SSE/href용). BASE_URL 없으면 상대경로 반환 */
+export const getApiBaseUrl = () => (API_CONFIG.BASE_URL ? API_CONFIG.BASE_URL.replace(/\/$/, '') : '');
 
 export const API_ENDPOINTS = {
  //필요한endpoint작성

@@ -7,6 +7,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -21,7 +22,23 @@ public class FileService {
 
     private final FileRepository fileRepository;
 
-    private final String uploadPath = "C:/ct_uploads/";
+    @Value("${app.upload.path:ct_uploads}")
+    private String uploadPath;
+
+    /** Linux/EC2에서 Windows 경로(C:/...)가 설정된 경우 사용할 기본값 */
+    private static final String FALLBACK_UPLOAD_DIR = "ct_uploads";
+
+    private Path getUploadDir() {
+        String pathToUse = uploadPath;
+        boolean isWindows = System.getProperty("os.name", "").toLowerCase().startsWith("win");
+        if (!isWindows && pathToUse != null && (pathToUse.contains(":") || pathToUse.startsWith("C") || pathToUse.startsWith("c"))) {
+            pathToUse = FALLBACK_UPLOAD_DIR;
+        }
+        if (pathToUse == null || pathToUse.isBlank()) {
+            pathToUse = FALLBACK_UPLOAD_DIR;
+        }
+        return Paths.get(pathToUse).toAbsolutePath().normalize();
+    }
 
     @Transactional
     public File saveFile(MultipartFile multipartFile) throws IOException {
@@ -35,8 +52,7 @@ public class FileService {
             throw new IllegalArgumentException("파일명이 올바르지 않습니다.");
         }
 
-        // ✅ 디렉토리 생성 (OS 안전)
-        Path dir = Paths.get(uploadPath);
+        Path dir = getUploadDir();
         Files.createDirectories(dir);
 
         // ✅ 저장 파일명 생성

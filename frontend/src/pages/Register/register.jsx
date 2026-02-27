@@ -9,6 +9,7 @@ import { fileService } from '../../api/emp/fileService';
 
 // ✅ 이메일 인증 백엔드 연결 서비스
 import { passwordCodeService } from '../../api/emp/passwordCodeService';
+import { getApiBaseUrl } from '../../api/config';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -214,7 +215,7 @@ const Register = () => {
       const formDataOcr = new FormData();
       formDataOcr.append('file', file);
 
-      const res = await fetch('/api/auth/ocr-business-card', {
+      const res = await fetch(`${getApiBaseUrl()}/api/auth/ocr-business-card`, {
         method: 'POST',
         body: formDataOcr,
       });

@@ -34,8 +34,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                         // =========================
-                        // 1) 인증 없이 허용(permitAll)
+                        // 1) 인증 없이 허용(permitAll) - 루트 및 정적 리소스 추가
                         // =========================
+                        .requestMatchers("/", "/index.html", "/favicon.ico", "/static/**", "/assets/**").permitAll()
+                        // 활성화 링크로 접속 시 프론트 라우트(/account-activation) 허용 (같은 호스트에서 SPA 제공 시)
+                        .requestMatchers("/account-activation", "/account-activation/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
 
@@ -48,15 +51,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/passwordCode/**").permitAll()
                         .requestMatchers("/api/account-activation/**").permitAll()
 
-                        // emp 관련 (가입/조회 일부)
+                        // emp 관련
                         .requestMatchers(HttpMethod.POST, "/api/emps").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/emps/findId").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/emps/checkId").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/emps/empNo/preview").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/emps/*/airline").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/emps/me/airline").permitAll() // 테마용: 인증 실패 시에도 기본 데이터 반환 (아래 me/** 보다 먼저 매칭)
-                        .requestMatchers("/api/emps/me/**").authenticated() // 내 정보 조회 등은 인증 필수
-                        .requestMatchers(HttpMethod.POST, "/api/passwordCode/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/emps/me/airline").permitAll()
 
                         // 기타 공개 API
                         .requestMatchers("/api/chat").permitAll()
@@ -68,62 +69,45 @@ public class SecurityConfig {
                         .requestMatchers("/api/airlines").permitAll()
                         .requestMatchers("/api/airports").permitAll()
 
-                        // 파일 (정책 재검토 필요: 지금은 전부 오픈)
+                        // 파일 및 항공편
                         .requestMatchers("/api/file/**").permitAll()
-                        .requestMatchers("/api/file/download/**").permitAll()
-
-                        // 항공편 API
                         .requestMatchers(HttpMethod.GET, "/api/flight-schedules/sync").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/flight-schedules").permitAll()
 
-                        // WebSocket 등
+                        // WebSocket 및 설정
                         .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/api/settings/**").permitAll()
-
-                        // =========================
-                        // 2) 인증 필요(authenticated)
-                        // =========================
-                        // 내 정보 (와일드카드보다 우선순위 높게)
-                        .requestMatchers("/api/emps/me/**").authenticated()
-
-                        // ✅ 직원 출/퇴근: 인증 필요
-                        .requestMatchers("/api/attendance/**").authenticated()
-
-                        // 알림: SSE는 permitAll, 나머지는 인증 필요
                         .requestMatchers("/api/notifications/stream").permitAll()
-                        .requestMatchers("/api/notifications/**").authenticated()
 
-                        // 이메일 문의
-                        .requestMatchers("/api/support/**").authenticated()
-
-                        // =========================
-                        // 3) 권한(Role) 기반
-                        // =========================
-                        .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
-
-                        // 항공편 수정/삭제는 관리자 권한
-                        .requestMatchers(HttpMethod.POST, "/api/flight-schedules/**")
-                        .hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/flight-schedules/**")
-                        .hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/flight-schedules/**")
-                        .hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/flight-schedules/**")
-                        .hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
-
-                        // 기타 인증 필요 경로
-                        .requestMatchers("/api/emp/**").authenticated()
-
-                        // 관리자 전용
-                        .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/members/search").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/members/**").hasRole("ADMIN")
+                        // 관리자 대시보드 일부 공개 (필요에 따라 수정)
                         .requestMatchers("/api/dashboard/admin/**").permitAll()
                         .requestMatchers("/api/admin/attendance/**").permitAll()
                         .requestMatchers("/api/health/admin/**").permitAll()
 
                         // =========================
-                        // 4) 나머지
+                        // 2) 인증 필요(authenticated)
+                        // =========================
+                        .requestMatchers("/api/emps/me/**").authenticated()
+                        .requestMatchers("/api/attendance/**").authenticated()
+                        .requestMatchers("/api/notifications/**").authenticated()
+                        .requestMatchers("/api/support/**").authenticated()
+                        .requestMatchers("/api/emp/**").authenticated()
+
+                        // =========================
+                        // 3) 권한(Role) 기반
+                        // =========================
+                        .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/members/search").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/members/**").hasRole("ADMIN")
+
+                        // =========================
+                        // 4) 나머지 모든 요청은 인증 필요
                         // =========================
                         .anyRequest().authenticated()
                 )
@@ -135,7 +119,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:5174"));
+        // ✅ 운영 서버 도메인 추가
+        corsConfiguration.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "https://khair-controlltower.site",
+                "http://khair-controlltower.site"
+        ));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(true);

@@ -52,7 +52,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     logger.warn("JWT 토큰 검증 실패 - path: " + request.getRequestURI());
                 }
             } else {
-                logger.warn("JWT 토큰 없음 - path: " + request.getRequestURI());
+                // /account-activation 등 JWT가 없는 것이 정상인 경로는 로그 생략
+                if (!isPathWithoutJwt(request.getRequestURI())) {
+                    logger.warn("JWT 토큰 없음 - path: " + request.getRequestURI());
+                }
             }
         } catch (Exception e) {
             logger.error("JWT인증 에러 - path: " + request.getRequestURI(), e);
@@ -65,17 +68,28 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getJwtFormRequest(HttpServletRequest request) {
         // 1. Authorization 헤더에서 토큰 추출
         String bearerToken = request.getHeader("Authorization");
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
 
-        // 2. 쿼리 파라미터에서 토큰 추출 (SSE용)
+        // 2. 쿼리 파라미터에서 토큰 추출 (SSE용). /account-activation의 token은 활성화 토큰이므로 JWT로 사용하지 않음
+        String path = request.getRequestURI();
+        if (path != null && (path.equals("/account-activation") || path.startsWith("/account-activation/"))) {
+            return null;
+        }
         String tokenParam = request.getParameter("token");
-        if(StringUtils.hasText(tokenParam)) {
-            logger.info("쿼리 파라미터에서 토큰 추출 - path: " + request.getRequestURI() + ", token length: " + tokenParam.length());
+        if (StringUtils.hasText(tokenParam)) {
+            logger.info("쿼리 파라미터에서 토큰 추출 - path: " + path + ", token length: " + tokenParam.length());
             return tokenParam;
         }
 
         return null;
+    }
+
+    /** JWT가 없는 것이 정상인 경로(로그 생략 대상) */
+    private boolean isPathWithoutJwt(String path) {
+        if (path == null) return true;
+        return path.equals("/account-activation") || path.startsWith("/account-activation/")
+                || path.equals("/favicon.ico") || path.equals("/") || path.equals("/index.html");
     }
 }
