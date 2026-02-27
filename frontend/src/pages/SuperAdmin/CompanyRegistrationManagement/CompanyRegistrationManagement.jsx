@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './CompanyRegistrationManagement.styled';
 import { airlineApplyService } from '../../../api/airline-apply/services';
+import { getApiBaseUrl } from '../../../api/config';
 
 const CompanyRegistrationManagement = () => {
   const [selectedApplication, setSelectedApplication] = useState(null);
@@ -374,7 +375,7 @@ const PendingModal = ({ application, onClose, onApprove, onReject }) => {
                     <S.DocumentIcon>📄</S.DocumentIcon>
                     <S.DocumentName>{doc.fileName}</S.DocumentName>
                     <S.DownloadLink
-                      href={`http://localhost:8001/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
+                      href={`${getApiBaseUrl()}/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -509,7 +510,7 @@ const ApprovedModal = ({ application, onClose }) => {
                     <S.DocumentIcon>📄</S.DocumentIcon>
                     <S.DocumentName>{doc.fileName}</S.DocumentName>
                     <S.DownloadLink
-                      href={`http://localhost:8001/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
+                      href={`${getApiBaseUrl()}/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -591,7 +592,7 @@ const RejectedModal = ({ application, onClose }) => {
                     <S.DocumentIcon>📄</S.DocumentIcon>
                     <S.DocumentName>{doc.fileName}</S.DocumentName>
                     <S.DownloadLink
-                      href={`http://localhost:8001/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
+                      href={`${getApiBaseUrl()}/api/file/download?path=${encodeURIComponent(doc.filePath)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >

@@ -11,6 +11,7 @@ import com.kh.ct.domain.emp.repository.AirlineRepository;
 import com.kh.ct.domain.emp.repository.EmpRepository;
 import com.kh.ct.global.common.CommonEnums;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,9 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
     private final EmpRepository empRepository;
     private final PasswordEncoder passwordEncoder;
     private final ActivationTokenRepository activationTokenRepository;
+
+    @Value("${app.frontend.base-url:https://api.khair-controlltower.site}")
+    private String frontendBaseUrl;
 
     @Override
     public List<AirlineApplyDto.ListResponse> getAllApplications() {
@@ -250,8 +254,9 @@ public class AirlineApplyServiceImpl implements AirlineApplyService {
                 .build();
         activationTokenRepository.save(activationToken);
         
-        // 8. 활성화 링크 생성 및 AirlineApply에 저장
-        String activationLink = "http://localhost:5173/account-activation?token=" + token;
+        // 8. 활성화 링크 생성 및 AirlineApply에 저장 (베이스 URL은 app.frontend.base-url 사용)
+        String base = (frontendBaseUrl != null && !frontendBaseUrl.isBlank()) ? frontendBaseUrl.replaceAll("/$", "") : "https://api.khair-controlltower.site";
+        String activationLink = base + "/account-activation?token=" + token;
         application.setActivationLink(activationLink);
         airlineApplyRepository.save(application);
         

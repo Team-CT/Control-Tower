@@ -3,6 +3,7 @@ import * as S from "./ChatRoom.styled";
 import healthService from "../api/Health/healthService";
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+import { getApiBaseUrl } from "../api/config";
 
 const ChatRoom = ({
   roomTitle = "채팅",
@@ -72,7 +73,7 @@ const ChatRoom = ({
 
     const client = new Client({
       // ✅ SockJS 사용
-      webSocketFactory: () => new SockJS("http://localhost:8001/ws"),
+      webSocketFactory: () => new SockJS(`${getApiBaseUrl() || window.location.origin}/ws`),
       reconnectDelay: 3000,
 
       // ✅ STOMP CONNECT 헤더에 JWT 전달 (서버 interceptor에서 읽음)

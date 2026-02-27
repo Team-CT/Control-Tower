@@ -1,6 +1,7 @@
 import axios from "axios";
+import { getApiBaseUrl } from "../../api/config";
 
-const BASE_URL = "http://localhost:8001/api/dashboard";
+const BASE_URL = `${getApiBaseUrl()}/api/dashboard`;
 
 export const getEmpIdFromStorage = () => {
     const authStorage = localStorage.getItem('auth-storage');

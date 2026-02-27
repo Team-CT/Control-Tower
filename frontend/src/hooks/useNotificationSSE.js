@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { getApiBaseUrl } from '../api/config';
 
 const useNotificationSSE = (token, onNotification) => {
   const [lastEventId, setLastEventId] = useState(null);
@@ -20,16 +21,10 @@ const useNotificationSSE = (token, onNotification) => {
 
       try {
         let url;
-        if (import.meta.env.DEV) {
-          url = `/api/notifications/stream?token=${encodeURIComponent(token)}`;
-          if (lastEventId) {
-            url += `&lastEventId=${encodeURIComponent(lastEventId)}`;
-          }
-        } else {
-          url = `http://localhost:8001/api/notifications/stream?token=${encodeURIComponent(token)}`;
-          if (lastEventId) {
-            url += `&lastEventId=${encodeURIComponent(lastEventId)}`;
-          }
+        const base = getApiBaseUrl();
+        url = `${base}/api/notifications/stream?token=${encodeURIComponent(token)}`;
+        if (lastEventId) {
+          url += `&lastEventId=${encodeURIComponent(lastEventId)}`;
         }
 
         const eventSource = new EventSource(url);

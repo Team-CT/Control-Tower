@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import * as S from './boardEdit.styled'; // 기존 Board 스타일 재사용
 import { Send, X, FileText } from 'lucide-react';
+import { getApiBaseUrl } from '../../api/config';
 
 const BoardEdit = () => {
   const { boardId } = useParams();
@@ -19,7 +20,7 @@ const BoardEdit = () => {
         const storageData = JSON.parse(localStorage.getItem('auth-storage'));
         const token = storageData?.state?.token;
 
-        const response = await fetch(`http://localhost:8001/api/board/detail/${boardId}`, {
+        const response = await fetch(`${getApiBaseUrl()}/api/board/detail/${boardId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const data = await response.json();
@@ -59,7 +60,7 @@ const BoardEdit = () => {
     newFiles.forEach(file => formDataObj.append('files', file));
 
     try {
-      const response = await fetch(`http://localhost:8001/api/board/update/${boardId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/board/update/${boardId}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formDataObj,

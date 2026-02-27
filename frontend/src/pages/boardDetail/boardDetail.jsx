@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './BoardDetail.styled';
 import { ArrowLeft, Calendar, Eye, User, Edit3, Trash2 } from 'lucide-react';
 import { Paperclip, Download } from 'lucide-react';
+import { getApiBaseUrl } from '../../api/config';
 
 const BoardDetail = () => {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const BoardDetail = () => {
   const isFetched = useRef(false);
 const handleDownload = (fileId, fileName) => {
     // 예시: 서버의 다운로드 API 호출
-    window.location.href = `http://localhost:8001/api/board/download/${fileId}`;
+    window.location.href = `${getApiBaseUrl()}/api/board/download/${fileId}`;
   };
   // --- [1] 데이터 로드 (API 호출) ---
   useEffect(() => {
@@ -26,7 +27,7 @@ const handleDownload = (fileId, fileName) => {
         const token = storageData?.state?.token;
 
         // 상세 조회 API 호출 (URL은 백엔드 엔드포인트에 맞게 조정하세요)
-        const response = await fetch(`http://localhost:8001/api/board/detail/${boardId}`, {
+        const response = await fetch(`${getApiBaseUrl()}/api/board/detail/${boardId}`, {
          
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -65,7 +66,7 @@ const handleDownload = (fileId, fileName) => {
       const storageData = JSON.parse(localStorage.getItem('auth-storage'));
       const token = storageData?.state?.token;
 
-      const response = await fetch(`http://localhost:8001/api/board/delete/${boardId}`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/board/delete/${boardId}`, {
         method: 'DELETE', // 보통 삭제는 DELETE 메소드를 사용합니다.
         headers: {
           'Authorization': `Bearer ${token}`
@@ -132,7 +133,7 @@ const handleDownload = (fileId, fileName) => {
                     {post.files.map((file, index) => (
                       <li key={index} style={{ marginBottom: '8px' }}>
                         <a 
-                          href={`http://localhost:8001/api/file/download/${file.fileId}`} // 백엔드 다운로드 경로 확인 필요
+                          href={`${getApiBaseUrl()}/api/file/download/${file.fileId}`}
                           style={{ 
                             display: 'flex', 
                             alignItems: 'center', 
