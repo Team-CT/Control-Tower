@@ -71,6 +71,13 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("아이디나 비밀번호가 일치하지 않습니다.");
         }
 
+        if (emp.getEmpStatus() == CommonEnums.EmpStatus.N) {
+            throw new IllegalArgumentException("비활성화된 계정입니다. 관리자에게 문의하세요.");
+        }
+        if (emp.getEmpStatus() == CommonEnums.EmpStatus.S) {
+            throw new IllegalArgumentException("정지된 계정입니다. 관리자에게 문의하세요.");
+        }
+
         // ✅ Access 발급
         String accessToken = jwtTokenProvider.generateToken(emp.getEmpId(), emp.getRole().name());
 
