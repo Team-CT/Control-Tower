@@ -2,7 +2,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './Board.styled';
 import { Search, MessageSquare, Eye, Send, X } from 'lucide-react';
-import { getApiBaseUrl } from '../../api/config';
 
 const Board = () => {
   const navigate = useNavigate();
@@ -35,7 +34,7 @@ const Board = () => {
       if (category !== '전체') params.append('category', category);
       if (keyword) params.append('keyword', keyword);
 
-      const response = await fetch(`${getApiBaseUrl()}/api/board/list?${params.toString()}`, {
+      const response = await fetch(`http://localhost:8001/api/board/list?${params.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -102,7 +101,7 @@ const Board = () => {
     });
 
     try {
-      const response = await fetch(`${getApiBaseUrl()}/api/board/write`, {
+      const response = await fetch('http://localhost:8001/api/board/write', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formDataObj, // 브라우저가 자동으로 multipart/form-data 설정
