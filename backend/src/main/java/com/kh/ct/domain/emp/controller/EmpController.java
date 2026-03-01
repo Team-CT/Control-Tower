@@ -8,10 +8,14 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import com.kh.ct.global.dto.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import com.kh.ct.domain.emp.dto.AirlineDto;
@@ -163,5 +167,19 @@ public class EmpController {
     ) {
         EmpDto.FindIdResponse result = empService.findEmpId(request);
         return ResponseEntity.ok(ApiResponse.success("아이디 찾기 성공", result));
+    }
+
+    @GetMapping("/management")
+    public ResponseEntity<ApiResponse<Page<EmpDto.EmployeeManagementRow>>> getEmployeesForManagement(
+            @RequestParam Long airlineId, // ✅ 필수
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) Long departmentId,
+            @RequestParam(required = false) String empStatus,
+            @PageableDefault(size = 10, sort = "empName", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        Page<EmpDto.EmployeeManagementRow> result =
+                empService.getEmployeesForManagement(airlineId, q, departmentId, empStatus, pageable);
+
+        return ResponseEntity.ok(ApiResponse.success("직원 관리 목록 조회 성공", result));
     }
 }

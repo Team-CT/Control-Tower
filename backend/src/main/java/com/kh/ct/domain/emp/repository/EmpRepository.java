@@ -1,5 +1,6 @@
 package com.kh.ct.domain.emp.repository;
 
+import com.kh.ct.domain.emp.dto.EmpDto;
 import com.kh.ct.domain.emp.entity.Emp;
 import com.kh.ct.domain.health.dto.HealthDto;
 import com.kh.ct.global.common.CommonEnums;
@@ -160,5 +161,67 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
             @Param("superAdminRole") CommonEnums.Role superAdminRole,
             @Param("airlineAdminRole") CommonEnums.Role airlineAdminRole
     );
+
+    @Query(
+            value = """
+                select new com.kh.ct.domain.emp.dto.EmpDto$EmployeeManagementRow(
+                    e.empId,
+                    e.empNo,
+                    e.empName,
+                    d.departmentName,
+                    e.role,
+                    e.job,
+                    e.phone,
+                    e.email,
+                    e.empStatus,
+                    e.startDate,
+                    p.fileId,
+                    a.airlineName
+                )
+                from Emp e
+                left join e.departmentId d
+                left join e.airlineId a
+                left join e.profileImage p
+                where a.airlineId = :airlineId
+                  and (:departmentId is null or d.departmentId = :departmentId)
+                  and (:empStatus is null or e.empStatus = :empStatus)
+                  and (
+                        :q is null or :q = '' or
+                        e.empName like concat('%', :q, '%') or
+                        e.empNo like concat('%', :q, '%') or
+                        e.empId like concat('%', :q, '%') or
+                        e.email like concat('%', :q, '%') or
+                        e.phone like concat('%', :q, '%') or
+                        d.departmentName like concat('%', :q, '%')
+                  )
+                order by e.empName asc
+            """,
+            countQuery = """
+                select count(e)
+                from Emp e
+                left join e.departmentId d
+                left join e.airlineId a
+                where a.airlineId = :airlineId
+                  and (:departmentId is null or d.departmentId = :departmentId)
+                  and (:empStatus is null or e.empStatus = :empStatus)
+                  and (
+                        :q is null or :q = '' or
+                        e.empName like concat('%', :q, '%') or
+                        e.empNo like concat('%', :q, '%') or
+                        e.empId like concat('%', :q, '%') or
+                        e.email like concat('%', :q, '%') or
+                        e.phone like concat('%', :q, '%') or
+                        d.departmentName like concat('%', :q, '%')
+                  )
+            """
+    )
+    Page<EmpDto.EmployeeManagementRow> findEmployeeManagementRowsByAirline(
+            @Param("airlineId") Long airlineId,
+            @Param("q") String q,
+            @Param("departmentId") Long departmentId,
+            @Param("empStatus") CommonEnums.EmpStatus empStatus,
+            Pageable pageable
+    );
+
 }
 

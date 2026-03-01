@@ -31,5 +31,8 @@ export const empService = {
   // { current_password, new_password }
   changeMyPassword: (payload) => api.put(API_ENDPOINTS.EMP.ME_PASSWORD, payload),
 
-    findEmpId: (payload) => api.post(API_ENDPOINTS.EMP.FIND_ID, payload),
+  findEmpId: (payload) => api.post(API_ENDPOINTS.EMP.FIND_ID, payload),
+
+  getEmployeesForManagement: (params) =>
+    api.get(API_ENDPOINTS.EMP.MANAGEMENT, { params }),
 };

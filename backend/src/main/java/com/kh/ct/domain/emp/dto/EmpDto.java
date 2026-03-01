@@ -2,6 +2,7 @@ package com.kh.ct.domain.emp.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.kh.ct.domain.emp.entity.Emp;
+import com.kh.ct.global.common.CommonEnums;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -412,6 +413,50 @@ public class EmpDto {
                     .message("비밀번호가 변경되었습니다.")
                     .build();
         }
+    }
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class EmployeeManagementRow {
+
+        @JsonProperty("emp_id")
+        private String empId;
+
+        @JsonProperty("emp_no")
+        private String empNo;
+
+        @JsonProperty("emp_name")
+        private String empName;
+
+        @JsonProperty("department_name")
+        private String departmentName;
+
+        // ✅ JPQL select new에서 enum을 그대로 받는게 제일 안정적
+        @JsonProperty("role")
+        private CommonEnums.Role role;
+
+        @JsonProperty("job")
+        private String job;
+
+        @JsonProperty("phone")
+        private String phone;
+
+        @JsonProperty("email")
+        private String email;
+
+        @JsonProperty("emp_status")
+        private CommonEnums.EmpStatus empStatus;
+
+        @JsonProperty("start_date")
+        private LocalDateTime startDate;
+
+        @JsonProperty("profile_image_id")
+        private Long profileImageId;
+
+        @JsonProperty("airline_name")
+        private String airlineName;
     }
 
 }
