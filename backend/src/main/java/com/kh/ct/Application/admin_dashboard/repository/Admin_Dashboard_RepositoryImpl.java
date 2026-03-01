@@ -190,7 +190,7 @@ public class Admin_Dashboard_RepositoryImpl implements Admin_Dashboard_Repositor
         public List<GroundSchedule> findGroundSchedulesByEmpId(String empId) {
                 return em.createQuery(
                                 "select g from GroundSchedule g where g.empId.empId = :empId " +
-                                                "order by g.scheduleStartDate asc",
+                                                "order by g.scheduleStartDateTime asc",
                                 GroundSchedule.class)
                                 .setParameter("empId", empId)
                                 .setMaxResults(3)

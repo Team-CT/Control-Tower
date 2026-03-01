@@ -65,6 +65,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/health/save").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/airline-applications").permitAll()
                         .requestMatchers("/api/questions/**").permitAll()
+                        .requestMatchers("/api/dashboard/**").permitAll()
+                        .requestMatchers("/api/dashboard/admin/**").hasRole("AIRLINE_ADMIN")
+                        .requestMatchers("/api/board/**").permitAll()
                         .requestMatchers("/api/common/codes/**").permitAll()
                         .requestMatchers("/api/airlines").permitAll()
                         .requestMatchers("/api/airports").permitAll()
@@ -123,8 +126,10 @@ public class SecurityConfig {
         corsConfiguration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "http://localhost:5174",
-                "https://khair-controlltower.site",
-                "http://khair-controlltower.site"
+                "https://wkdwlsdn.shop",
+                "http://wkdwlsdn.shop"
+              //  "https://api.wkdwlsdn.shop",
+               // "http://api.wkdwlsdn.shop"
         ));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         corsConfiguration.addAllowedHeader("*");

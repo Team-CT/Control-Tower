@@ -117,7 +117,7 @@ public class Dashboard_RepositoryImpl implements Dashboard_Repository {
     public List<GroundSchedule> findGroundSchedulesByEmpId(String empId) {
         return em.createQuery(
                         "select g from GroundSchedule g where g.empId.empId = :empId " +
-                                "order by g.scheduleStartDate asc", GroundSchedule.class)
+                                "order by g.scheduleStartDateTime asc", GroundSchedule.class)
                 .setParameter("empId", empId)
                 .setMaxResults(3)
                 .getResultList();

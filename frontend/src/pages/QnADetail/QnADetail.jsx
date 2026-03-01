@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../../api/axios';
 import * as S from "../QnA/QnA.styled"; // 기존 스타일 재활용
 import * as D from './QnADetail.styled'; // 상세 페이지 전용 스타일
 import {

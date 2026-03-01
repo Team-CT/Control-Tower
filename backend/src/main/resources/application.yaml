@@ -23,7 +23,7 @@ spring:
             enable: true
 
 server:
-  port: 8080
+  port: 8001
   servlet:
     encoding:
       charset: UTF-8
@@ -45,7 +45,7 @@ app:
   upload:
     path: ${FILE_UPLOAD_PATH:ct_uploads}
   frontend:
-    base-url: ${FRONTEND_BASE_URL:https://api.khair-controlltower.site}
+    base-url: ${FRONTEND_BASE_URL:https://wkdwlsdn.shop}
 
 # EC2/운영: 실행 전 export JWT_SECRET=실제비밀문자열 (선택: JWT_EXPIRATION=86400000)
 jwt:
@@ -66,6 +66,14 @@ spring:
     activate:
       on-profile: dev
 
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL 드라이버
+    # 2. 시크릿 파일에 있는 변수 값을 여기에 주입합니다.
+    url: ${DATASOURCE.URL}
+    username: ${DATASOURCE.USERNAME}
+    password: ${DATASOURCE.PASSWORD}
+
+  # JPA 설정 (MySQL용)
   jpa:
     hibernate:
       ddl-auto: update
