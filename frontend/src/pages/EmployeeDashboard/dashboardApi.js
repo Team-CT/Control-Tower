@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../../api/axios";
 import { getApiBaseUrl } from "../../api/config";
 
 const BASE_URL = `${getApiBaseUrl()}/api/dashboard`;
