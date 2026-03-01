@@ -16,6 +16,14 @@ export const empService = {
   updateEmpRoleAndJob: (empId, role, job) => {
     return api.patch(`/api/emps/${empId}/role-job`, { role, job });
   },
+  getDepartments: (params = {}) => {
+    return api.get(API_ENDPOINTS.DEPARTMENT.LIST, { params });
+  },
+
+  // 부서 상세 + 하위팀 목록 조회
+  getDepartmentDetail: (deptId) => {
+    return api.get(API_ENDPOINTS.DEPARTMENT.DETAIL(deptId));
+  },
   
 };
 

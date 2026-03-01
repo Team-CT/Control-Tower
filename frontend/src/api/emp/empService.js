@@ -35,4 +35,13 @@ export const empService = {
 
   getEmployeesForManagement: (params) =>
     api.get(API_ENDPOINTS.EMP.MANAGEMENT, { params }),
+
+  getDepartments: (params = {}) => {
+    return api.get(API_ENDPOINTS.DEPARTMENT.LIST, { params });
+  },
+
+  // 부서 상세 + 하위팀 목록 조회
+  getDepartmentDetail: (deptId) => {
+    return api.get(API_ENDPOINTS.DEPARTMENT.DETAIL(deptId));
+  },
 };

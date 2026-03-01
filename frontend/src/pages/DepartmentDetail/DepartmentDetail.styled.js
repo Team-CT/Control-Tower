@@ -1,270 +1,453 @@
 import styled from "styled-components";
 
-// --- Layout Containers ---
-export const MainContainer = styled.main`
+/**
+ * ✅ 이 페이지는 Layout(사이드바/탑바) 바깥을 책임지지 않음.
+ * ✅ MainLayout 내부에서 렌더링되는 "컨텐츠"만 스타일링.
+ * ✅ 상단 배너는 "단색" (그라데이션 제거)
+ */
+
+/* ==================== Layout ==================== */
+
+export const MainContainer = styled.div`
   width: 100%;
-  min-height: 100%;
-  background-color: ${({ theme }) => theme.background.secondary || theme.background.main};
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 `;
 
+/** 상단 바: 단색 + 얇은 그림자 (그라데이션 X) */
 export const BannerSection = styled.div`
   width: 100%;
-  height: 240px;
-  background: linear-gradient(90deg, ${({ theme }) => theme.colors.primary} 0%, ${({ theme }) => theme.colors.secondary} 100%);
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 0;
+  height: 64px; /* ✅ 과한 바 높이 제거 */
+  background-color: ${({ theme }) => theme.colors.primary};
+  border-radius: 14px;
+  box-shadow: ${({ theme }) => theme.shadow};
 `;
 
+/** 페이지 전체 컨테이너 (참고 코드 스타일) */
 export const ContentWrapper = styled.div`
   width: 100%;
-  max-width: 1440px;
-  padding: 0 40px;
-  margin-top: 60px;
-  position: relative;
-  z-index: 1;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 32px 48px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 20px;
+
+  @media (max-width: 1440px) {
+    padding: 24px 32px;
+  }
 
   @media (max-width: 1024px) {
-    padding: 0 24px;
+    padding: 20px 24px;
+  }
+
+  @media (max-width: 640px) {
+    padding: 16px 16px;
   }
 `;
 
+/* ==================== Header (Back Button) ==================== */
+
+/** 기존 JSX에서 BackButton을 상단에 두고 있으니, 참고 코드 톤으로 */
 export const BackButton = styled.button`
-  position: relative;
-  z-index: 2;
-  align-self: flex-start;
-  margin: 20px 0 0 40px;
-  background: none;
-  border: none;
-  color: white;
-  font-size: 14px;
+  width: fit-content;
+  height: 40px;
+  padding: 0 14px;
+  background-color: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 10px;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
   cursor: pointer;
-  opacity: 0.9;
-  
+  font-size: 14px;
+  font-weight: 800;
+  color: ${({ theme }) => theme.text.primary};
+  transition: all 0.2s;
+
   &:hover {
-    opacity: 1;
-    text-decoration: underline;
+    background-color: ${({ theme }) => theme.background.hover};
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+
+  &:active {
+    transform: translateY(1px);
   }
 `;
 
-// --- Info Card Section ---
+/* ==================== Info Card ==================== */
+
 export const InfoCard = styled.section`
-  background: ${({ theme }) => theme.background.paper};
-  border-radius: 16px;
+  background-color: ${({ theme }) => theme.background.paper};
+  border-radius: 14px;
+  padding: 28px;
   box-shadow: ${({ theme }) => theme.shadow};
-  padding: 40px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  margin-top: 40px;
+  gap: 18px;
+
+  @media (max-width: 1024px) {
+    padding: 22px;
+  }
 `;
 
 export const CardHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 16px;
+
+  @media (max-width: 1024px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
   .title-group {
     display: flex;
-    gap: 24px;
-    align-items: center;
+    align-items: flex-start;
+    gap: 16px;
+    min-width: 0;
 
     .dept-icon {
-      width: 80px;
-      height: 80px;
-      background-color: ${({ theme }) => `${theme.colors.primary}15`};
+      width: 44px;
+      height: 44px;
       border-radius: 12px;
+      background-color: ${({ theme }) => `${theme.colors.primary}15`};
+      border: 1px solid ${({ theme }) => theme.border};
+      flex-shrink: 0;
     }
 
     h1 {
-      font-size: 32px;
-      font-weight: 700;
+      font-size: 26px;
+      font-weight: 800;
       color: ${({ theme }) => theme.text.primary};
-      margin-bottom: 8px;
-    }
+      margin: 0;
+      line-height: 1.2;
 
-    .eng-name {
-      font-size: 16px;
-      color: ${({ theme }) => theme.text.secondary};
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      @media (max-width: 640px) {
+        font-size: 22px;
+      }
     }
   }
 `;
 
 export const ActionGroup = styled.div`
   display: flex;
-  gap: 12px;
+  align-items: center;
+  gap: 10px;
+
+  /* ✅ 버튼이 없으면 레이아웃 공간 자체 제거 */
+  &:empty {
+    display: none;
+  }
 
   button {
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 600;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 800;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s;
-    
+    border: 1px solid ${({ theme }) => theme.border};
+
     &.primary {
       background-color: ${({ theme }) => theme.colors.primary};
-      color: white;
-      border: none;
+      border-color: ${({ theme }) => theme.colors.primary};
+      color: ${({ theme }) => theme.text.inverse};
+
       &:hover {
-        filter: brightness(0.9);
+        filter: brightness(0.95);
       }
     }
-    
+
     &.secondary {
       background-color: ${({ theme }) => theme.background.paper};
       color: ${({ theme }) => theme.text.primary};
-      border: 1px solid ${({ theme }) => theme.border};
+
       &:hover {
-        background-color: ${({ theme }) => theme.background.secondary};
+        background-color: ${({ theme }) => theme.background.hover};
+        border-color: ${({ theme }) => theme.colors.primary};
       }
     }
   }
 `;
 
+/** 참고 코드의 “메타데이터” 느낌으로 2~4개까지 자연스럽게 */
 export const StatsGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  padding-top: 32px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  padding-top: 18px;
   border-top: 1px solid ${({ theme }) => theme.border};
 
   @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
   }
 `;
 
 export const StatItem = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
+
+  padding: 16px;
+  background-color: ${({ theme }) => theme.background.secondary};
+  border: 1px solid ${({ theme }) => theme.border};
+  border-radius: 12px;
 
   .label {
-    font-size: 13px;
+    font-size: 12px;
     color: ${({ theme }) => theme.text.secondary};
+    font-weight: 700;
   }
 
   .value {
     font-size: 18px;
     color: ${({ theme }) => theme.text.primary};
-    font-weight: 600;
+    font-weight: 800;
+    letter-spacing: -0.2px;
   }
 `;
 
-// --- Tab & Content ---
-export const TabNavigation = styled.nav`
+/* ==================== Tabs ==================== */
+
+export const TabNavigation = styled.div`
   display: flex;
-  gap: 32px;
-  border-bottom: 1px solid ${({ theme }) => theme.border};
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-top: 4px;
+  border-bottom: 2px solid ${({ theme }) => theme.border};
 `;
 
 export const TabItem = styled.button`
-  background: none;
+  padding: 12px 20px;
+  font-size: 15px;
+  font-weight: 800;
+  color: ${(props) =>
+    props.$isActive ? props.theme.colors.primary : props.theme.text.secondary};
+  background-color: transparent;
   border: none;
-  padding: 16px 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: ${props => props.$isActive ? props.theme.colors.primary : props.theme.text.secondary};
-  border-bottom: 2px solid ${props => props.$isActive ? props.theme.colors.primary : 'transparent'};
+  border-bottom: 2px solid
+    ${(props) => (props.$isActive ? props.theme.colors.primary : "transparent")};
+  margin-bottom: -2px;
   cursor: pointer;
-  transition: color 0.1s;
+  transition: all 0.2s;
 
   &:hover {
     color: ${({ theme }) => theme.colors.primary};
   }
+
+  @media (max-width: 640px) {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
 `;
 
+/* ==================== Table Section ==================== */
+
 export const TableSection = styled.section`
-  background: ${({ theme }) => theme.background.paper};
-  border-radius: 12px;
-  border: 1px solid ${({ theme }) => theme.border};
+  background-color: ${({ theme }) => theme.background.paper};
+  border-radius: 14px;
   padding: 24px;
-  min-height: 400px;
+  box-shadow: ${({ theme }) => theme.shadow};
+  border: 1px solid ${({ theme }) => theme.border};
+
+  @media (max-width: 1024px) {
+    padding: 18px;
+  }
 `;
 
 export const SectionHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  gap: 12px;
+  margin-bottom: 14px;
 
   h3 {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 900;
     color: ${({ theme }) => theme.text.primary};
+    margin: 0;
   }
 
   .add-btn {
+    padding: 8px 10px;
+    font-size: 13px;
+    font-weight: 800;
     color: ${({ theme }) => theme.colors.primary};
-    background: none;
+    background-color: transparent;
     border: none;
-    font-weight: 600;
     cursor: pointer;
-    font-size: 14px;
-    &:hover { text-decoration: underline; }
+    border-radius: 10px;
+
+    &:hover {
+      background-color: ${({ theme }) => theme.background.hover};
+    }
   }
 `;
 
-// --- Table Components ---
+/* ==================== Table Components ==================== */
+
+/** 전체 테이블 래퍼 */
 export const TeamTable = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
+  gap: 10px;
 `;
 
+/** 헤더/로우 공통 베이스 */
 const TableRowBase = styled.div`
   display: flex;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid ${({ theme }) => theme.background.secondary};
+  gap: 12px;
 
-  .col-id { width: 60px; text-align: center; color: ${({ theme }) => theme.text.tertiary}; }
-  .col-name { width: 200px; font-weight: 600; color: ${({ theme }) => theme.text.primary}; }
-  .col-leader { width: 150px; color: ${({ theme }) => theme.text.secondary}; }
-  .col-count { width: 100px; text-align: center; color: ${({ theme }) => theme.text.primary}; }
-  .col-task { flex: 1; color: ${({ theme }) => theme.text.secondary}; }
-  .col-action { width: 80px; text-align: right; }
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1px solid ${({ theme }) => theme.border};
+  background-color: ${({ theme }) => theme.background.paper};
+
+  .col-id {
+    width: 56px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 800;
+    color: ${({ theme }) => theme.text.tertiary};
+    flex-shrink: 0;
+  }
+
+  .col-name {
+    width: 220px;
+    font-size: 14px;
+    font-weight: 900;
+    color: ${({ theme }) => theme.text.primary};
+    flex-shrink: 0;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .col-leader {
+    width: 160px;
+    font-size: 14px;
+    font-weight: 700;
+    color: ${({ theme }) => theme.text.secondary};
+    flex-shrink: 0;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .col-count {
+    width: 110px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  .col-task {
+    flex: 1;
+    min-width: 180px;
+    font-size: 14px;
+    color: ${({ theme }) => theme.text.secondary};
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .col-action {
+    width: 72px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* ✅ 태블릿: task 숨기기 */
+  @media (max-width: 1024px) {
+    .col-task {
+      display: none;
+    }
+  }
+
+  /* ✅ 모바일: leader도 숨기고 name을 넓게 */
+  @media (max-width: 640px) {
+    padding: 12px 12px;
+    gap: 10px;
+
+    .col-id {
+      width: 44px;
+    }
+    .col-name {
+      width: auto;
+      flex: 1;
+    }
+    .col-leader {
+      display: none;
+    }
+    .col-count {
+      width: 84px;
+    }
+    .col-action {
+      width: 56px;
+    }
+  }
 `;
 
 export const TableHeader = styled(TableRowBase)`
   background-color: ${({ theme }) => theme.background.secondary};
-  border-radius: 8px;
-  font-size: 13px;
-  color: ${({ theme }) => theme.text.secondary};
-  font-weight: 500;
-  border-bottom: none;
+  border-color: ${({ theme }) => theme.border};
+
+  .col-id,
+  .col-name,
+  .col-leader,
+  .col-count,
+  .col-task,
+  .col-action {
+    font-size: 12px;
+    font-weight: 900;
+    color: ${({ theme }) => theme.text.secondary};
+  }
 `;
 
 export const TableRow = styled(TableRowBase)`
-  font-size: 15px;
-  transition: background-color 0.1s;
+  transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
 
   &:hover {
     background-color: ${({ theme }) => theme.background.hover};
-  }
-
-  .col-action .link {
-    color: ${({ theme }) => theme.colors.primary};
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
+    box-shadow: ${({ theme }) => theme.shadowHover || theme.shadow};
+    transform: translateY(-1px);
   }
 `;
 
+/** 인원수 뱃지: 참고 코드 Badge 톤 */
 export const StatusBadge = styled.span`
-  background-color: ${({ theme }) => `${theme.status.success}15`};
-  color: ${({ theme }) => theme.status.success};
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 900;
+
+  background-color: ${({ theme }) => `${theme.status.success}20`};
+  color: ${({ theme }) => theme.status.success};
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+/* ==================== Optional: 상태/에러 ==================== */
+/** (JSX에서 직접 스타일 준 부분이 있으면 이건 선택적으로 사용) */
+export const EmptyState = styled.div`
+  padding: 36px;
+  text-align: center;
+  color: ${({ theme }) => theme.text.secondary};
+`;
+
+export const ErrorState = styled.div`
+  padding: 36px;
+  text-align: center;
+  color: ${({ theme }) => theme.status.error};
 `;

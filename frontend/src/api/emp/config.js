@@ -28,4 +28,9 @@ export const API_ENDPOINTS = {
     UPLOAD: `/api/file/upload`,            // POST multipart/form-data
     DELETE: (fileId) => `/api/file/${fileId}`, // DELETE
   },
+
+  DEPARTMENT: {
+    LIST: `/api/departments`,                 // GET ?q=&page=&size=
+    DETAIL: (deptId) => `/api/departments/${deptId}`, // GET
+  },
 };
