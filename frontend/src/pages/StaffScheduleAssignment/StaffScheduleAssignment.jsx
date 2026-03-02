@@ -17,6 +17,7 @@ import {
   FilterTabs,
   FilterTab,
   TabLabel,
+  TabBadge,
   ScheduleTableWrapper,
   ScheduleTable,
   TableHeader,
@@ -36,6 +37,7 @@ import {
   PageNumber,
 } from './StaffScheduleAssignment.styled';
 import { empScheduleService } from '../../api/empSchedule/services';
+import { empService } from '../../api/emp/services';
 import useAuthStore from '../../store/authStore';
 
 const StaffScheduleAssignment = () => {
@@ -49,7 +51,9 @@ const StaffScheduleAssignment = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedRole, setSelectedRole] = useState(null); // null = 전체
+  const [roleCounts, setRoleCounts] = useState({}); // 역할별 카운트
   const [generating, setGenerating] = useState(false); // 일정 배정 중 상태
+  const [flightCount, setFlightCount] = useState(0); // 항공편 수
   
   // 페이징 관련 상태 (UI는 1-based, API는 0-based)
   const [currentPage, setCurrentPage] = useState(1); // UI는 1부터 시작
@@ -70,6 +74,52 @@ const StaffScheduleAssignment = () => {
     { value: 'MAINTENANCE', label: '정비사' },
   ];
 
+  // 역할별 직원 수 조회 함수
+  const loadRoleCounts = async () => {
+    try {
+      const counts = {};
+      for (const roleOption of roleOptions) {
+        if (roleOption.value) {
+          // 역할별 직원 수 조회
+          const params = { role: roleOption.value };
+          if (airlineId) {
+            params.airlineId = airlineId;
+          }
+          const response = await empService.getEmployees(params);
+          const employees = response.data?.data || [];
+          
+          // 중복 제거 (empId 기준) - null/undefined 제외
+          const uniqueEmpIds = new Set();
+          employees.forEach(emp => {
+            const empId = emp.empId || emp.emp_id;
+            if (empId) {
+              uniqueEmpIds.add(empId);
+            }
+          });
+          
+          // 직원 ID가 같으면 1명으로 카운트
+          counts[roleOption.value] = uniqueEmpIds.size;
+        }
+        // '전체'는 항공편 수로 설정 (loadFlightCount에서 설정됨)
+      }
+      setRoleCounts(counts);
+    } catch (e) {
+      console.error('역할별 직원 수 조회 실패:', e);
+    }
+  };
+
+  // 항공편 수 조회 함수
+  const loadFlightCount = async () => {
+    try {
+      const yearMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+      const response = await empScheduleService.getFlightCount(yearMonth);
+      const count = response.data?.data || 0;
+      setFlightCount(count);
+    } catch (e) {
+      console.error('항공편 수 조회 실패:', e);
+      setFlightCount(0);
+    }
+  };
 
   // 일정 조회 함수 (페이징 지원, UI는 1-based, API는 0-based)
   const loadSchedules = async (uiPage = 1) => {
@@ -120,10 +170,12 @@ const StaffScheduleAssignment = () => {
     }
   };
 
-  // 초기 로드 및 역할 변경 시 일정 조회
+  // 초기 로드 및 역할 변경 시 일정 조회 및 카운트 갱신
   useEffect(() => {
     if (isAdmin) {
       setCurrentPage(1); // 필터 변경 시 첫 페이지로 리셋 (UI는 1-based)
+      loadRoleCounts(); // 역할별 카운트 먼저 로드
+      loadFlightCount(); // 항공편 수 조회
     }
   }, [isAdmin, selectedRole, currentDate]);
   
@@ -136,8 +188,10 @@ const StaffScheduleAssignment = () => {
 
   // 통계 계산
   const stats = [
+    { label: '전체 일정', value: flightCount || 0, unit: '건', color: '#e0e7ff' },
     { label: '배정 완료', value: scheduleList.filter(s => s.scheduleCode).length, unit: '건', color: '#d1fae5' },
     { label: '수정 필요', value: scheduleList.filter(s => !s.scheduleCode).length, unit: '건', color: '#fef3c7' },
+    { label: '총 직원', value: new Set(scheduleList.map(s => s.empId)).size, unit: '명', color: '#e5e7eb' },
   ];
 
   // 월 변경 핸들러
@@ -156,7 +210,9 @@ const StaffScheduleAssignment = () => {
   // 새로고침 핸들러
   const handleRefresh = () => {
     setCurrentPage(1); // 첫 페이지로 리셋 (UI는 1-based)
+    loadRoleCounts();
     loadSchedules(1);
+    loadFlightCount();
   };
 
   // 일정 배정 핸들러
@@ -184,6 +240,7 @@ const StaffScheduleAssignment = () => {
       
       // 일정 목록 새로고침
       setCurrentPage(1); // 첫 페이지로 리셋 (UI는 1-based)
+      await loadRoleCounts();
       await loadSchedules(1);
     } catch (e) {
       console.error('일정 배정 실패:', e);
@@ -223,6 +280,7 @@ const StaffScheduleAssignment = () => {
         endDate: newEndDate.toISOString(),
       });
       alert('일정이 성공적으로 수정되었습니다.');
+      loadRoleCounts(); // 카운트 새로고침
       loadSchedules(currentPage); // 현재 페이지 목록 새로고침
     } catch (e) {
       console.error('일정 수정 실패:', e);
@@ -301,6 +359,10 @@ const StaffScheduleAssignment = () => {
       {/* 역할 필터 탭 */}
       <FilterTabs>
         {roleOptions.map((role) => {
+          // 전체는 항공편 수, 역할별은 직원 수
+          const count = role.value ? (roleCounts[role.value] || 0) : (flightCount || 0);
+          const unit = role.value ? '명' : '건';
+          
           return (
             <FilterTab
               key={role.value || 'all'}
@@ -311,6 +373,9 @@ const StaffScheduleAssignment = () => {
               }}
             >
               <TabLabel>{role.label}</TabLabel>
+              <TabBadge $active={selectedRole === role.value}>
+                ({count}{unit})
+              </TabBadge>
             </FilterTab>
           );
         })}

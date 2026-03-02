@@ -126,8 +126,10 @@ public class SecurityConfig {
         corsConfiguration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "http://localhost:5174",
-                "https://wonhee.cloud",
-                "http://api.wonhee.cloud"
+                "https://wkdwlsdn.shop",
+                "http://wkdwlsdn.shop"
+              //  "https://api.wkdwlsdn.shop",
+               // "http://api.wkdwlsdn.shop"
         ));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         corsConfiguration.addAllowedHeader("*");

@@ -21,7 +21,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'https://api.wonhee.cloud',
+        target: 'https://api.wkdwlsdn.shop',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path, // 경로를 그대로 유지
