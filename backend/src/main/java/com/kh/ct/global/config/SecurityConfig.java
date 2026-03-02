@@ -1,7 +1,9 @@
 package com.kh.ct.global.config;
 
 import com.kh.ct.global.security.JwtAuthenticationFilter;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,14 +19,24 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
+import java.util.List;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    /**
+     * ✅ 배포에서 이 로그가 안 뜨면:
+     * - 이 SecurityConfig가 로딩/적용되지 않은 상태(스캔/배포/JAR 반영/빈 생성 실패 등)
+     */
+    @PostConstruct
+    public void loaded() {
+        log.info("✅ SecurityConfig LOADED");
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -39,7 +51,7 @@ public class SecurityConfig {
                 // ✅ 세션 미사용 (JWT)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // ✅ 기본 인증/폼 로그인 비활성화 (API 서버에서 흔히 같이 끔)
+                // ✅ 기본 인증/폼 로그인/로그아웃 비활성화
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
@@ -63,18 +75,9 @@ public class SecurityConfig {
                         // =========================
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
-
-                        // ⚠️ (주의) valkey 관련 API를 외부에 공개하는 것은 보안 위험 가능
-                        // - 개발/테스트용이면 dev 프로필에서만 열거나
-                        // - 최소 ADMIN 이상 권한으로 제한 권장
-                        .requestMatchers(HttpMethod.POST, "/api/valkey/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/valkey/**").permitAll()
-
-                        // 회원가입/사전 단계
                         .requestMatchers(HttpMethod.POST, "/api/auth/ocr-business-card").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
 
-                        // 비밀번호/계정 관련
                         .requestMatchers(HttpMethod.POST, "/api/auth/password/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/passwordCode/**").permitAll()
                         .requestMatchers("/api/account-activation/**").permitAll()
@@ -85,6 +88,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/emps/checkId").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/emps/empNo/preview").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/emps/*/airline").permitAll()
+
+                        // 테마용: 인증 없어도 airline 반환 (의도적으로 공개)
                         .requestMatchers(HttpMethod.GET, "/api/emps/me/airline").permitAll()
 
                         // 공통/기초 데이터 (조회성)
@@ -101,7 +106,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/health/preview").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/health/save").permitAll()
 
-                        // flight schedules 조회는 공개
+                        // flight schedules 조회/싱크 공개
                         .requestMatchers(HttpMethod.GET, "/api/flight-schedules").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/flight-schedules/sync").permitAll()
 
@@ -110,10 +115,10 @@ public class SecurityConfig {
                         .requestMatchers("/api/settings/**").permitAll()
                         .requestMatchers("/api/notifications/stream").permitAll()
 
-                        // (주의) “관리자” 성격인데 공개로 열려있음 → 의도 맞을 때만 유지
-                        .requestMatchers("/api/dashboard/admin/**").permitAll()
-                        .requestMatchers("/api/admin/attendance/**").permitAll()
-                        .requestMatchers("/api/health/admin/**").permitAll()
+                        // =========================
+                        // (주의) 운영에서 공개 금지 권장: Valkey 관련
+                        // =========================
+                        .requestMatchers("/api/valkey/**").hasRole("SUPER_ADMIN")
 
                         // =========================
                         // 3) 파일: 다운로드만 공개, 나머지는 인증
@@ -137,10 +142,14 @@ public class SecurityConfig {
                         .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
 
                         // 항공편 "쓰기"는 관리자 권한
-                        .requestMatchers(HttpMethod.POST, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/flight-schedules/**").hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/flight-schedules/**")
+                        .hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/flight-schedules/**")
+                        .hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/flight-schedules/**")
+                        .hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/flight-schedules/**")
+                        .hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
 
                         // (기존 유지) 관리자 멤버 관리
                         .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")
@@ -159,24 +168,49 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * ✅ CORS 설정
+     * - 운영 프론트: https://yoojh.store, https://www.yoojh.store (혹은 실제 운영 도메인)
+     * - 개발 프론트: http://localhost:5173, http://localhost:5174
+     *
+     * ⚠️ allowCredentials(true)이므로 allowedOrigins에 "*" 사용 불가
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
+        CorsConfiguration config = new CorsConfiguration();
 
-        corsConfiguration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",
-                "http://localhost:5174",
+        // ✅ “프론트” 오리진만 넣어야 함 (api 도메인 넣는 게 아님)
+        config.setAllowedOrigins(List.of(
+                "https://yoojh.store",
+                "https://www.yoojh.store",
                 "https://khair-controlltower.site",
-                "http://khair-controlltower.site"
+                "http://khair-controlltower.site",
+                "http://localhost:5173",
+                "http://localhost:5174"
         ));
 
-        corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.setAllowCredentials(true);
-        corsConfiguration.setMaxAge(3600L);
+        // ✅ preflight 포함
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+        // ✅ 운영에서 너무 빡빡하면 프론트에서 헤더 추가될 때 CORS 에러가 나므로
+        //    일단 "*"로 열고, 안정화 후 필요한 헤더만 화이트리스트로 좁히는 전략도 가능
+        config.addAllowedHeader("*");
+
+        // ✅ 브라우저에서 접근 가능하게 노출할 헤더(다운로드/인증에 유용)
+        config.setExposedHeaders(List.of(
+                "Authorization",
+                "Set-Cookie",
+                "Content-Disposition"
+        ));
+
+        // ✅ 쿠키/인증정보 허용
+        config.setAllowCredentials(true);
+
+        // ✅ preflight 캐시
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration);
+        source.registerCorsConfiguration("/**", config);
         return source;
     }
 

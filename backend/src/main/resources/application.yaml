@@ -8,7 +8,6 @@ spring:
     active: dev
 
 server:
-  port: 8001
   servlet:
     encoding:
       charset: UTF-8
@@ -30,9 +29,9 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver # MySQL 드라이버
     # 2. 시크릿 파일에 있는 변수 값을 여기에 주입합니다.
-    url: ${DATASOURCE.URL}
-    username: ${DATASOURCE.USERNAME}
-    password: ${DATASOURCE.PASSWORD}
+    url: jdbc:mysql://yoojh-db.crm2cye6237a.ap-northeast-2.rds.amazonaws.com:3306/ct?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: ct_user
+    password: 1234
 
   # JPA 설정 (MySQL용)
   jpa:
