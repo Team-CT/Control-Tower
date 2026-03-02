@@ -50,7 +50,8 @@ public class AuthServiceImpl implements AuthService {
     private static final long REFRESH_MAX_AGE = 14 * 24 * 60 * 60L;     // 14일(초)
 
     // ⚠ 로컬(HTTP)에서는 secure=true면 쿠키가 안 심길 수 있음
-    private static final boolean COOKIE_SECURE = false; // 운영 HTTPS면 true 권장
+    // ✅ 운영(HTTPS)에서는 true 강력 권장
+    private static final boolean COOKIE_SECURE = false;
     private static final String COOKIE_SAMESITE = "Lax";
 
     // ──────────────────────────────────────────────
@@ -71,6 +72,8 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("아이디나 비밀번호가 일치하지 않습니다.");
         }
 
+        // ✅ (Upstream) 계정 상태 체크 로직 반영
+        // 프로젝트 enum 정의에 맞춰 값(Y/N/S 등) 조정하세요.
         if (emp.getEmpStatus() == CommonEnums.EmpStatus.N) {
             throw new IllegalArgumentException("비활성화된 계정입니다. 관리자에게 문의하세요.");
         }
@@ -145,7 +148,10 @@ public class AuthServiceImpl implements AuthService {
         try {
             byte[] fileBytes = file.getBytes();
             ByteArrayResource resource = new ByteArrayResource(fileBytes) {
-                @Override public String getFilename() { return file.getOriginalFilename(); }
+                @Override
+                public String getFilename() {
+                    return file.getOriginalFilename();
+                }
             };
 
             String promptText =

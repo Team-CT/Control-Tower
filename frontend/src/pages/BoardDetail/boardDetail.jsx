@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import * as S from './BoardDetail.styled';
 import { ArrowLeft, Calendar, Eye, User, Edit3, Trash2 } from 'lucide-react';
 import { Paperclip, Download } from 'lucide-react';
+import api from '../../api/axios.js';
 
 const BoardDetail = () => {
   const navigate = useNavigate();
@@ -22,31 +23,16 @@ const handleDownload = (fileId, fileName) => {
     const fetchPostDetail = async () => {
       try {
         setLoading(true);
-        const storageData = JSON.parse(localStorage.getItem('auth-storage'));
-        const token = storageData?.state?.token;
-
-        // 상세 조회 API 호출 (URL은 백엔드 엔드포인트에 맞게 조정하세요)
-        const response = await fetch(`http://localhost:8001/api/board/detail/${boardId}`, {
-         
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          console.log("게시글 상세 정보:", data);
-          setPost(data);
-          
-        } else {
-          isFetched.current = false;
-          alert("게시글을 불러올 수 없습니다.");
-          navigate('/board');
-        }
+        // ✅ api.get 사용 (토큰은 인터셉터가 자동으로 넣어줌)
+        const response = await api.get(`/api/board/detail/${boardId}`);
+        
+        // ✅ axios는 response.data에 결과가 담김
+        setPost(response.data);
+        isFetched.current = true;
       } catch (error) {
-        isFetched.current = false;
         console.error("상세 데이터 로드 실패:", error);
+        alert("게시글을 불러올 수 없습니다.");
+        navigate('/board');
       } finally {
         setLoading(false);
       }
@@ -61,25 +47,17 @@ const handleDownload = (fileId, fileName) => {
   const handleDelete = async () => {
     if (!window.confirm("정말로 이 게시글을 삭제하시겠습니까?")) return;
 
-    try {
-      const storageData = JSON.parse(localStorage.getItem('auth-storage'));
-      const token = storageData?.state?.token;
+try {
+      // ✅ api.delete 사용
+      const response = await api.delete(`/api/board/delete/${boardId}`);
 
-      const response = await fetch(`http://localhost:8001/api/board/delete/${boardId}`, {
-        method: 'DELETE', // 보통 삭제는 DELETE 메소드를 사용합니다.
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
+      if (response.status === 200 || response.status === 204) {
         alert("삭제되었습니다.");
         navigate('/board');
-      } else {
-        alert("삭제에 실패했습니다.");
       }
     } catch (error) {
       console.error("삭제 실패:", error);
+      alert("삭제 권한이 없거나 오류가 발생했습니다.");
     }
   };
 

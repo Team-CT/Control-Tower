@@ -113,7 +113,7 @@ const ThemedApp = () => {
             <Route path="/employee-list/detail" element={<EmployeeDetail />} />
             <Route path="/admin-attendance" element={<AdminAttendance />} />
             <Route path="/dept-manage" element={<DepartmentManagement />} />
-            <Route path="/dept-manage/detail" element={<DepartmentDetail />} />
+            <Route path="/dept-manage/detail/:deptId" element={<DepartmentDetail />} />
 
             {/* [일정 관리] */}
             <Route path="/flightschedule" element={<FlightSchedule />} />
