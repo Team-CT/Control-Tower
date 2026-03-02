@@ -10,7 +10,11 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-@Table(name = "emp_fly_schedule")
+@Table(name = "emp_fly_schedule",
+       uniqueConstraints = {
+           @UniqueConstraint(name = "uk_emp_fly_schedule_emp_fly", 
+                           columnNames = {"emp_id", "fly_schedule_id"})
+       })
 public class EmpFlySchedule extends BaseTimeEntity {
 
     @Id

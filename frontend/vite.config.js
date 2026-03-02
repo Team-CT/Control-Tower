@@ -1,48 +1,43 @@
-// vite.config.js
-import { defineConfig, loadEnv } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  // ✅ 추가: global 치환(런타임)
+  define: {
+    global: 'globalThis',
+  },
 
-  const devApiTarget = env.VITE_DEV_API_TARGET || 'http://localhost:8001';
-
-  return {
-    plugins: [react()],
-
-    define: {
-      global: 'globalThis',
-    },
-
-    optimizeDeps: {
-      esbuildOptions: {
-        define: {
-          global: 'globalThis',
-        },
+  // ✅ 추가: global 치환(사전 번들링 단계)
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
       },
     },
-
-    server: {
-      port: 5173,
-      proxy: {
-        '/api': {
-          target: devApiTarget,
-          changeOrigin: true,
-          secure: false,
-          rewrite: (path) => path,
-          configure: (proxy) => {
-            proxy.on('error', (err) => {
-              console.log('프록시 에러:', err);
-            });
-            proxy.on('proxyReq', (_proxyReq, req) => {
-              console.log('프록시 요청:', req.method, req.url);
-              if (req.url && req.url.includes('token=')) {
-                console.log('토큰 포함된 요청:', req.url);
-              }
-            });
-          },
+  },
+  server: {
+    port: 5173,
+    proxy: {
+      '/api': {
+        target: 'https://api.wonhee.cloud',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path, // 경로를 그대로 유지
+        configure: (proxy, _options) => {
+          proxy.on('error', (err, _req, _res) => {
+            console.log('프록시 에러:', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, _res) => {
+            console.log('프록시 요청:', req.method, req.url);
+            // 쿼리 파라미터가 제대로 전달되는지 확인
+            if (req.url.includes('token=')) {
+              console.log('토큰 포함된 요청:', req.url);
+            }
+          });
         },
-      },
-    },
-  };
-});
+      }
+    }
+  }
+})

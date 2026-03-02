@@ -389,9 +389,9 @@ public class FlightSyncServiceImpl implements FlightSyncService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime apiTime = LocalDateTime.parse(data.getDate() + " " + data.getTime(), formatter);
 
-        int randomDay = ThreadLocalRandom.current().nextInt(1, 29);
-        LocalDateTime targetStartTime = apiTime.withYear(2026).withMonth(2).withDayOfMonth(randomDay);
-        LocalDateTime targetEndTime = targetStartTime.plusHours(2);
+        int randomDay = ThreadLocalRandom.current().nextInt(1, 31);
+        LocalDateTime targetStartTime = apiTime.withYear(2026).withMonth(3).withDayOfMonth(randomDay);
+        LocalDateTime targetEndTime = targetStartTime.plusHours(3);
 
         log.info("[날짜 확인] 목표 설정 시간: {}", targetStartTime);
 
@@ -402,24 +402,26 @@ public class FlightSyncServiceImpl implements FlightSyncService {
                 .endDate(targetEndTime)
                 .build();
 
-        // saveAndFlush를 사용하여 ID를 즉시 발급받고 영속 상태로 만듭니다.
+        // ✅ A안: 부모 먼저 저장 (saveAndFlush로 ID 즉시 발급)
         AllSchedule savedAll = allScheduleRepository.saveAndFlush(allSchedule);
         log.info("[부모 저장 완료] ID: {}, 시작시간: {}", savedAll.getScheduleId(), savedAll.getStartDate());
 
-        // 3. FlySchedule 저장 (자식)
+        // ✅ FlySchedule 생성: flyScheduleId 직접 세팅 제거, schedule(savedAll) 세팅 필수
         FlySchedule flySchedule = FlySchedule.builder()
-                .flyScheduleId(savedAll.getScheduleId()) // ID 직접 할당
+                // .flyScheduleId(savedAll.getScheduleId()) // ❌ 제거: @MapsId는 schedule에서 자동 설정됨
+                .schedule(savedAll) // ✅ 추가: 연관관계 세팅 필수 (@MapsId가 flyScheduleId 자동 설정)
                 .flightNumber(data.getFlightNumber())
                 .departure(data.getDeparture())
                 .destination(data.getDestination())
-                .flyStartTime(targetStartTime)          // 2026-02-xx 주입
+                .flyStartTime(targetStartTime)
                 .flyEndTime(targetEndTime)
                 .airlineId(extractAirlineId(data.getFlightNumber()))
                 .flightStatus(CommonEnums.flightStatus.ASSIGNING)
                 .build();
 
-        // 여기서 다시 한번 saveAndFlush
+        // ✅ 자식 저장 (부모는 이미 저장되어 있으므로 INSERT 발생)
         FlySchedule savedFly = flyScheduleRepository.saveAndFlush(flySchedule);
+        log.info("[자식 저장 완료] flyScheduleId: {}, flightNumber: {}", savedFly.getFlyScheduleId(), savedFly.getFlightNumber());
 
         log.info("✅ [최종 확인] DB 저장된 flyStartTime: {}", savedFly.getFlyStartTime());
     }

@@ -3,7 +3,7 @@ import axios from '../../api/axios';
 import * as S from './QnA.styled';
 import { useTheme } from 'styled-components'; // Import useTheme
 import {
-  Search, MessageSquare, Eye, MessageCircle, Heart, CheckCircle2, // 이거 추가
+  Search, MessageSquare, CheckCircle2,
   Clock, Mail
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -29,14 +29,15 @@ const QnA = () => {
   const [selectedFilter, setSelectedFilter] = useState('최신순');
   const [qnaList, setQnaList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
-  const [newPost, setNewPost] = useState({ title: '', content: '' });
-  const [emailForm, setEmailForm] = useState({ 
-    adminEmail: '', 
-    myEmail: '', 
-    subject: '', 
-    content: '' 
+  
+  // ✅ 통합 모달: modalType으로 제어
+  const [modalType, setModalType] = useState(null); // 'QUESTION' | 'EMAIL' | null
+  
+  // ✅ 통합 폼 상태: modalType에 따라 title/subject 필드명만 다르게 사용
+  const [formData, setFormData] = useState({ 
+    title: '',  // QUESTION용
+    subject: '', // EMAIL용
+    content: ''  // 공통
   });
   const [currentPage, setCurrentPage] = useState(0); // 백엔드는 0번부터 시작
   const [totalPages, setTotalPages] = useState(1);
@@ -87,34 +88,46 @@ const QnA = () => {
     // 실제 필터링은 위에서 실시간(filteredList)으로 일어납니다.
   };
 
+  // ✅ 토큰 가져오기 공통 함수
+  const getAuthToken = () => {
+    const storageData = localStorage.getItem('auth-storage');
+    if (!storageData) {
+      alert("로그인 정보가 없습니다. 다시 로그인 해주세요.");
+      return null;
+    }
+
+    const parsedData = JSON.parse(storageData);
+    const token = parsedData.state?.token;
+
+    if (!token) {
+      alert("유효한 토큰이 없습니다. 다시 로그인해주세요.");
+      return null;
+    }
+
+    return token;
+  };
+
+  // ✅ 질문하기 등록
   const handleCreatePost = async (e) => {
     e.preventDefault();
 
+    if (!formData.title.trim()) {
+      alert("제목을 입력해주세요.");
+      return;
+    }
+
+    if (!formData.content.trim()) {
+      alert("내용을 입력해주세요.");
+      return;
+    }
+
+    const token = getAuthToken();
+    if (!token) return;
+
     try {
-      // 1. 변수명을 storageData로 통일
-      const storageData = localStorage.getItem('auth-storage');
-
-      // 콘솔에 찍어서 데이터가 잘 나오는지 확인 (개발용)
-      console.log("로컬스토리지 데이터:", storageData);
-
-      if (!storageData) {
-        alert("로그인 정보가 없습니다. 다시 로그인 해주세요.");
-        return;
-      }
-
-      // 2. 파싱 로직
-      const parsedData = JSON.parse(storageData);
-      const token = parsedData.state?.token;
-
-      if (!token) {
-        alert("유효한 토큰이 없습니다. 다시 로그인해주세요.");
-        return;
-      }
-
-      // 3. API 요청
       const response = await axios.post('/api/questions', {
-        title: newPost.title,
-        content: newPost.content
+        title: formData.title,
+        content: formData.content
       }, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -123,111 +136,45 @@ const QnA = () => {
       });
 
       alert("글이 성공적으로 등록되었습니다.");
-      setIsModalOpen(false);
-      setNewPost({ title: '', content: '' });
-      fetchQuestions(); // 리스트 새로고침
-      console.log("6. ✅ 서버 응답 결과:", response.data);
+      setModalType(null);
+      setFormData({ title: '', subject: '', content: '' });
+      fetchQuestions();
     } catch (error) {
       console.error("등록 실패 상세:", error);
-      alert("등록 중 오류가 발생했습니다.");
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          "등록 중 오류가 발생했습니다.";
+      alert(errorMessage);
     }
   };
 
-  // 이메일 문의 모달 열기 및 사전 입력 정보 조회
-  const handleOpenEmailModal = async () => {
-    try {
-      const storageData = localStorage.getItem('auth-storage');
-      if (!storageData) {
-        alert("로그인 정보가 없습니다. 다시 로그인 해주세요.");
-        return;
-      }
-
-      const parsedData = JSON.parse(storageData);
-      const token = parsedData.state?.token;
-
-      if (!token) {
-        alert("유효한 토큰이 없습니다. 다시 로그인해주세요.");
-        return;
-      }
-
-      // 사전 입력 정보 조회
-      const response = await axios.get('/api/support/email/prefill', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      });
-
-      if (response.data.success && response.data.data) {
-        setEmailForm({
-          adminEmail: response.data.data.adminEmail || '',
-          myEmail: response.data.data.myEmail || '',
-          subject: '',
-          content: ''
-        });
-        setIsEmailModalOpen(true);
-      } else {
-        alert("이메일 정보를 불러오는데 실패했습니다.");
-      }
-    } catch (error) {
-      console.error("이메일 정보 조회 실패:", error);
-      console.error("에러 상세:", {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        message: error.message
-      });
-      
-      // 403 Forbidden 에러 처리
-      if (error.response?.status === 403) {
-        alert("접근 권한이 없습니다. 로그인 상태를 확인해주세요.");
-      } else if (error.response?.status === 401) {
-        alert("인증이 필요합니다. 다시 로그인해주세요.");
-      } else if (error.response?.status === 500) {
-        const errorMessage = error.response?.data?.message || 
-                            "서버 오류가 발생했습니다. 관리자에게 문의해주세요.";
-        alert(errorMessage);
-      } else {
-        const errorMessage = error.response?.data?.message || 
-                            error.message ||
-                            "이메일 정보를 불러오는데 실패했습니다.";
-        alert(errorMessage);
-      }
-    }
+  // ✅ 이메일 문의 모달 열기 (prefill API 호출 제거)
+  const handleOpenEmailModal = () => {
+    setFormData({ title: '', subject: '', content: '' });
+    setModalType('EMAIL');
   };
 
-  // 이메일 문의 발송
+  // ✅ 이메일 문의 발송
   const handleSendEmail = async (e) => {
     e.preventDefault();
 
-    if (!emailForm.subject.trim()) {
+    if (!formData.subject.trim()) {
       alert("제목을 입력해주세요.");
       return;
     }
 
-    if (!emailForm.content.trim()) {
+    if (!formData.content.trim()) {
       alert("내용을 입력해주세요.");
       return;
     }
 
+    const token = getAuthToken();
+    if (!token) return;
+
     try {
-      const storageData = localStorage.getItem('auth-storage');
-      if (!storageData) {
-        alert("로그인 정보가 없습니다. 다시 로그인 해주세요.");
-        return;
-      }
-
-      const parsedData = JSON.parse(storageData);
-      const token = parsedData.state?.token;
-
-      if (!token) {
-        alert("유효한 토큰이 없습니다. 다시 로그인해주세요.");
-        return;
-      }
-
       const response = await axios.post('/api/support/email/send', {
-        subject: emailForm.subject,
-        content: emailForm.content
+        subject: formData.subject,
+        content: formData.content
       }, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -237,21 +184,14 @@ const QnA = () => {
 
       if (response.data.success) {
         alert("이메일이 성공적으로 발송되었습니다.");
-        setIsEmailModalOpen(false);
-        setEmailForm({ 
-          adminEmail: '', 
-          myEmail: '', 
-          subject: '', 
-          content: '' 
-        });
+        setModalType(null);
+        setFormData({ title: '', subject: '', content: '' });
       } else {
         const errorMessage = response.data.message || "이메일 발송에 실패했습니다.";
         alert(errorMessage);
       }
     } catch (error) {
       console.error("이메일 발송 실패:", error);
-      // ErrorResponse 형식: { success: false, message: "...", errors: {...} }
-      // ApiResponse 형식: { success: false, message: "...", data: null }
       const errorMessage = error.response?.data?.message || 
                           error.message || 
                           "이메일 발송 중 오류가 발생했습니다.";
@@ -275,94 +215,53 @@ const QnA = () => {
                   이메일 문의
                 </S.EmailButton>
               )}
-              <S.CreateButton onClick={() => setIsModalOpen(true)}>+ 글쓰기</S.CreateButton>
+              <S.CreateButton onClick={() => {
+                setFormData({ title: '', subject: '', content: '' });
+                setModalType('QUESTION');
+              }}>+ 글쓰기</S.CreateButton>
             </S.ButtonGroup>
           </S.PageHeader>
 
-          {/* 2. 글쓰기 모달 영역 */}
-          {isModalOpen && (
-            <S.ModalOverlay onClick={() => setIsModalOpen(false)}>
+          {/* ✅ 통합 모달: modalType에 따라 제목/필드/핸들러 변경 */}
+          {modalType && (
+            <S.ModalOverlay onClick={() => setModalType(null)}>
               <S.ModalContainer onClick={(e) => e.stopPropagation()}>
                 <S.ModalHeader>
-                  <h3>질문하기</h3>
-                  <button onClick={() => setIsModalOpen(false)}>×</button>
+                  <h3>{modalType === 'QUESTION' ? '질문하기' : '이메일 문의'}</h3>
+                  <button onClick={() => setModalType(null)}>×</button>
                 </S.ModalHeader>
-                <S.ModalBody onSubmit={handleCreatePost}>
+                <S.ModalBody onSubmit={modalType === 'QUESTION' ? handleCreatePost : handleSendEmail}>
                   <S.FormGroup>
                     <label>제목</label>
                     <input
                       type="text"
-                      placeholder="제목을 입력하세요"
-                      value={newPost.title}
-                      onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
+                      placeholder={modalType === 'QUESTION' ? '제목을 입력하세요' : '문의 제목을 입력하세요'}
+                      value={modalType === 'QUESTION' ? formData.title : formData.subject}
+                      onChange={(e) => {
+                        if (modalType === 'QUESTION') {
+                          setFormData({ ...formData, title: e.target.value });
+                        } else {
+                          setFormData({ ...formData, subject: e.target.value });
+                        }
+                      }}
+                      maxLength={modalType === 'EMAIL' ? 200 : undefined}
                     />
                   </S.FormGroup>
                   <S.FormGroup>
                     <label>내용</label>
                     <textarea
-                      placeholder="내용을 상세히 입력해주세요"
+                      placeholder={modalType === 'QUESTION' ? '내용을 상세히 입력해주세요' : '문의 내용을 상세히 입력해주세요'}
                       rows="10"
-                      value={newPost.content}
-                      onChange={(e) => setNewPost({ ...newPost, content: e.target.value })}
+                      value={formData.content}
+                      onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                      maxLength={modalType === 'EMAIL' ? 5000 : undefined}
                     />
                   </S.FormGroup>
                   <S.ModalFooter>
-                    <S.CancelButton type="button" onClick={() => setIsModalOpen(false)}>취소</S.CancelButton>
-                    <S.SubmitButton type="submit">등록하기</S.SubmitButton>
-                  </S.ModalFooter>
-                </S.ModalBody>
-              </S.ModalContainer>
-            </S.ModalOverlay>
-          )}
-
-          {/* 3. 이메일 문의 모달 영역 */}
-          {isEmailModalOpen && (
-            <S.ModalOverlay onClick={() => setIsEmailModalOpen(false)}>
-              <S.ModalContainer onClick={(e) => e.stopPropagation()}>
-                <S.ModalHeader>
-                  <h3>이메일 문의</h3>
-                  <button onClick={() => setIsEmailModalOpen(false)}>×</button>
-                </S.ModalHeader>
-                <S.ModalBody onSubmit={handleSendEmail}>
-                  <S.FormGroup>
-                    <label>관리자 이메일</label>
-                    <S.ReadOnlyInput
-                      type="text"
-                      value={emailForm.adminEmail}
-                      readOnly
-                    />
-                  </S.FormGroup>
-                  <S.FormGroup>
-                    <label>내 이메일</label>
-                    <S.ReadOnlyInput
-                      type="text"
-                      value={emailForm.myEmail}
-                      readOnly
-                    />
-                  </S.FormGroup>
-                  <S.FormGroup>
-                    <label>제목</label>
-                    <input
-                      type="text"
-                      placeholder="문의 제목을 입력하세요"
-                      value={emailForm.subject}
-                      onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })}
-                      maxLength={200}
-                    />
-                  </S.FormGroup>
-                  <S.FormGroup>
-                    <label>내용</label>
-                    <textarea
-                      placeholder="문의 내용을 상세히 입력해주세요"
-                      rows="10"
-                      value={emailForm.content}
-                      onChange={(e) => setEmailForm({ ...emailForm, content: e.target.value })}
-                      maxLength={5000}
-                    />
-                  </S.FormGroup>
-                  <S.ModalFooter>
-                    <S.CancelButton type="button" onClick={() => setIsEmailModalOpen(false)}>취소</S.CancelButton>
-                    <S.SubmitButton type="submit">발송하기</S.SubmitButton>
+                    <S.CancelButton type="button" onClick={() => setModalType(null)}>취소</S.CancelButton>
+                    <S.SubmitButton type="submit">
+                      {modalType === 'QUESTION' ? '등록하기' : '발송하기'}
+                    </S.SubmitButton>
                   </S.ModalFooter>
                 </S.ModalBody>
               </S.ModalContainer>

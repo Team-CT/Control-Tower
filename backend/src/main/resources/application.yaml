@@ -2,19 +2,14 @@ spring:
   application:
     name: ct
 
+  profiles:
+    active: dev
+
   config:
-    # 시크릿 파일 불러오기 (로컬/서버 모두 가능)
     import: optional:classpath:application_secret.yaml
 
-  profiles:
-    # 로컬 기본값만 dev로 두고, 실행 시 prod로 바꾸는 방식 권장
-    default: dev
-
-  # ============================================================
-  # ✅ 메일 (Gmail)
-  # - EC2에서는 SPRING_MAIL_USERNAME, SPRING_MAIL_PASSWORD 환경변수로 설정 권장
-  # - Gmail은 '앱 비밀번호' 사용 필요
-  # ============================================================
+  # 메일 (Gmail): EC2에서는 SPRING_MAIL_USERNAME, SPRING_MAIL_PASSWORD 환경변수로 설정 권장.
+  # Gmail은 '앱 비밀번호' 사용 필요 (Google 계정 → 보안 → 2단계 인증 → 앱 비밀번호).
   mail:
     host: ${SPRING_MAIL_HOST:smtp.gmail.com}
     port: ${SPRING_MAIL_PORT:465}
@@ -27,75 +22,49 @@ spring:
           ssl:
             enable: true
 
-  # ============================================================
-  # ✅ OpenAI (Spring AI)
-  # - 반드시 환경변수 APIKEY가 있어야 함 (없으면 실패 가능)
-  # ============================================================
-  ai:
-    openai:
-      api-key: ${APIKEY}
-      chat:
-        options:
-          model: gpt-4o-mini
-
-  # 공통: 멀티파트 업로드 제한
-  servlet:
-    multipart:
-      max-file-size: 20MB
-      max-request-size: 100MB
-
 server:
+  port: 8001
   servlet:
     encoding:
       charset: UTF-8
       enabled: true
       force: true
 
-# ============================================================
-# 공통(프로필 공통) 커스텀 설정
-# ============================================================
-DATA_API:
-  SERVICE_KEY: ${DATA_API_SERVICE_KEY:I%2BLq678BJU%2B547TEKBXQDCAIGMBKm3RIzTDUSUNuC8VyNSc30c%2FcbH8fMY40AutRcx6IKR1McOUXc1xb9kjXRA%3D%3D}
-  BASE_URL: ${DATA_API_BASE_URL:http://api.odcloud.kr/api/15003087/v1/uddi:89fab983-66d8-40ad-901a-d535f8699d29}
-
-api:
-  flight:
-    service-key: ${FLIGHT_API_SERVICE_KEY:${DATA_API.SERVICE_KEY}}
-    base-url: ${FLIGHT_API_BASE_URL:${DATA_API.BASE_URL}}
-
+# 파일 업로드 경로: 로컬(Windows) C:/ct_uploads, EC2는 기본 ct_uploads(현재 작업 디렉토리 기준) 또는 FILE_UPLOAD_PATH 환경변수
+# account-activation 링크 베이스 URL (운영: https://api.khair-controlltower.site, 로컬: FRONTEND_BASE_URL=http://localhost:5173)
 app:
   upload:
     path: ${FILE_UPLOAD_PATH:ct_uploads}
   frontend:
-    base-url: ${FRONTEND_BASE_URL:https://yoojh.store}
+    base-url: ${FRONTEND_BASE_URL:https://wonhee.cloud}
 
+# EC2/운영: 실행 전 export JWT_SECRET=실제비밀문자열 (선택: JWT_EXPIRATION=86400000)
 jwt:
   secret: ${JWT_SECRET:your-default-dev-secret-change-in-prod}
   expiration: ${JWT_EXPIRATION:86400000}
 
-# ============================================================
-# [dev] 개발 환경
-# ============================================================
+---
+# 테스트 시 application_secret 미로드 (H2 사용)
+spring:
+  config:
+    activate:
+      on-profile: test
+    import: []
+
 ---
 spring:
   config:
     activate:
       on-profile: dev
 
-  data:
-    redis:
-      host: ${VALKEY_HOST:localhost}
-      port: ${VALKEY_PORT:6379}
-      ssl:
-        enabled: false
-      timeout: 3s
-
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DATASOURCE_URL:jdbc:mysql://localhost:3306/ct?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true}
-    username: ${DATASOURCE_USERNAME:ct}
-    password: ${DATASOURCE_PASSWORD:1234}
+    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL 드라이버
+    # 2. 시크릿 파일에 있는 변수 값을 여기에 주입합니다.
+    url: ${DATASOURCE.URL}
+    username: ${DATASOURCE.USERNAME}
+    password: ${DATASOURCE.PASSWORD}
 
+  # JPA 설정 (MySQL용)
   jpa:
     hibernate:
       ddl-auto: update
@@ -107,68 +76,14 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
 
-server:
-  port: ${SERVER_PORT:8001}
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
 
-ct:
-  redis:
-    key-prefix: ${KEY_PREFIX:dev:ct}
-
-# ============================================================
-# [prod] 운영 환경
-# ============================================================
----
-spring:
-  config:
-    activate:
-      on-profile: prod
-
-  data:
-    redis:
-      host: ${VALKEY_HOST:master.ct-valkey.d9kiqb.apn2.cache.amazonaws.com}
-      port: ${VALKEY_PORT:6379}
-      ssl:
-        enabled: true
-      timeout: 3s
-
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DATASOURCE_URL:jdbc:mysql://yoojh-db.crm2cye6237a.ap-northeast-2.rds.amazonaws.com:3306/ct?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
-    username: ${DATASOURCE_USERNAME:ct_user}
-    password: ${DATASOURCE_PASSWORD:change-me}
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
-    show-sql: false
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: false
-
-server:
-  port: ${SERVER_PORT:8001}
-
-ct:
-  redis:
-    key-prefix: ${KEY_PREFIX:prod:ct}
-
-# ============================================================
-# [test] 테스트 환경
-# ============================================================
----
-spring:
-  config:
-    activate:
-      on-profile: test
-    import: []
-
-  data:
-    redis:
-      host: ${VALKEY_HOST:localhost}
-      port: ${VALKEY_PORT:6379}
-      ssl:
-        enabled: false
-      timeout: 3s
+  ai:
+    openai:
+      api-key: ${APIKEY}
+      chat:
+        options:
+          model: gpt-4o-mini

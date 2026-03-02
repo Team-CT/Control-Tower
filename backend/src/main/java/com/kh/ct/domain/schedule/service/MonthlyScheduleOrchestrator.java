@@ -12,6 +12,7 @@ import com.kh.ct.domain.schedule.repository.AllScheduleRepository;
 import com.kh.ct.domain.schedule.repository.EmpFlyScheduleRepository;
 import com.kh.ct.domain.schedule.repository.EmpScheduleRepository;
 import com.kh.ct.domain.schedule.repository.FlyScheduleRepository;
+import com.kh.ct.domain.schedule.util.ScheduleCodeValidator;
 import com.kh.ct.global.common.CommonEnums;
 import com.kh.ct.global.exception.BusinessException;
 import jakarta.persistence.EntityManager;
@@ -616,7 +617,14 @@ public class MonthlyScheduleOrchestrator {
             
             FlySchedule flySchedule = flyScheduleOpt.get();
             
-            // 중복 체크
+            // AllSchedule 조회 (FlySchedule의 schedule 필드)
+            AllSchedule allSchedule = flySchedule.getSchedule();
+            if (allSchedule == null) {
+                log.warn("FlySchedule의 AllSchedule이 null입니다 - flyScheduleId: {}", result.getFlyScheduleId());
+                continue;
+            }
+            
+            // 중복 체크 (EmpFlySchedule)
             List<EmpFlySchedule> existing = empFlyScheduleRepository.findByFlyScheduleIdAndEmpId(
                     result.getFlyScheduleId(), emp.getEmpId()
             );
@@ -628,6 +636,9 @@ public class MonthlyScheduleOrchestrator {
                 continue;
             }
             
+            // ✅ FLIGHT 일정은 EmpFlySchedule에만 저장 (Single Source of Truth)
+            // EmpSchedule에는 저장하지 않음
+            
             // EmpFlySchedule 생성
             EmpFlySchedule empFlySchedule = EmpFlySchedule.builder()
                     .emp(emp)
@@ -638,15 +649,17 @@ public class MonthlyScheduleOrchestrator {
         }
         
         log.info("========================================");
-        log.info("✅ [FLIGHT 일정] EmpFlySchedule 저장 준비 완료");
+        log.info("✅ [FLIGHT 일정] EmpSchedule + EmpFlySchedule 저장 준비 완료");
         log.info("  - FLIGHT 일정 수: {}건", flightResults.size());
         log.info("  - flyScheduleId가 null인 경우: {}건", nullFlyScheduleIdCount);
         log.info("  - FlySchedule을 찾지 못한 경우: {}건", notFoundFlyScheduleCount);
         log.info("  - Emp를 찾지 못한 경우: {}건", notFoundEmpCount);
         log.info("  - 이미 존재하는 경우: {}건", alreadyExistsCount);
-        log.info("  - 저장 대상: {}건", empFlySchedulesToSave.size());
+        log.info("  - EmpFlySchedule 저장 대상: {}건 (EmpSchedule 저장 제거 - Single Source of Truth)", empFlySchedulesToSave.size());
         log.info("========================================");
         
+        // ✅ FLIGHT 일정은 EmpFlySchedule에만 저장 (EmpSchedule 저장 제거)
+        // EmpFlySchedule 저장
         if (!empFlySchedulesToSave.isEmpty()) {
             try {
                 List<EmpFlySchedule> savedEmpFlySchedules = saveEmpFlySchedulesBatch(empFlySchedulesToSave);
@@ -731,10 +744,14 @@ public class MonthlyScheduleOrchestrator {
             Emp emp = empRepository.findById(result.getEmpId())
                     .orElseThrow(() -> BusinessException.notFound("직원을 찾을 수 없습니다: " + result.getEmpId()));
             
+            // 직군별 scheduleCode 검증 및 강제
+            String validatedScheduleCode = ScheduleCodeValidator.validateAndEnforce(
+                    emp.getRole(), result.getScheduleCode());
+            
             EmpSchedule empSchedule = EmpSchedule.builder()
                     .scheduleId(savedSchedule)
                     .empId(emp)
-                    .scheduleCode(result.getScheduleCode())
+                    .scheduleCode(validatedScheduleCode)
                     .build();
             
             empSchedulesToSave.add(empSchedule);
