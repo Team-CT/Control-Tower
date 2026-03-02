@@ -1,7 +1,7 @@
 const { VITE_API_URL, VITE_API_TIMEOUT = 5000, VITE_API_VERSION = 'v1' } = import.meta.env;
 
 // 프로덕션 기본 API URL (빌드 시 VITE_API_URL 미설정 시 사용)
-const PRODUCTION_API_BASE = 'https://api.wkdwlsdn.shop';
+const PRODUCTION_API_BASE = 'https://api.wonhee.cloud';
 
 export const API_CONFIG = {
   // 개발: 빈 문자열(프록시) / 프로덕션: VITE_API_URL 또는 기본값

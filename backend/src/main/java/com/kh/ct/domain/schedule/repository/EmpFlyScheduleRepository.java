@@ -2,8 +2,10 @@ package com.kh.ct.domain.schedule.repository;
 
 import com.kh.ct.domain.schedule.entity.EmpFlySchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -64,4 +66,27 @@ public interface EmpFlyScheduleRepository extends JpaRepository<EmpFlySchedule, 
            "LEFT JOIN FETCH fs.schedule s " +
            "WHERE fs.flyScheduleId IN :flyScheduleIds")
     List<EmpFlySchedule> findByFlyScheduleIdIn(@Param("flyScheduleIds") List<Long> flyScheduleIds);
+    
+    // ✅ (emp_id, fly_schedule_id) 중복 배정 확인
+    @Query("SELECT COUNT(efs) > 0 FROM EmpFlySchedule efs " +
+           "WHERE efs.emp.empId = :empId AND efs.flySchedule.flyScheduleId = :flyScheduleId")
+    boolean existsByEmp_EmpIdAndFlySchedule_FlyScheduleId(
+            @Param("empId") String empId,
+            @Param("flyScheduleId") Long flyScheduleId
+    );
+    
+    // ✅ fly_schedule_id로 배정된 직원 수 조회 (crew_count 정원 체크용)
+    @Query("SELECT COUNT(efs) FROM EmpFlySchedule efs " +
+           "WHERE efs.flySchedule.flyScheduleId = :flyScheduleId")
+    long countByFlySchedule_FlyScheduleId(@Param("flyScheduleId") Long flyScheduleId);
+    
+    // ✅ (emp_id, fly_schedule_id)로 배정 삭제
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM EmpFlySchedule efs " +
+           "WHERE efs.emp.empId = :empId AND efs.flySchedule.flyScheduleId = :flyScheduleId")
+    void deleteByEmp_EmpIdAndFlySchedule_FlyScheduleId(
+            @Param("empId") String empId,
+            @Param("flyScheduleId") Long flyScheduleId
+    );
 }

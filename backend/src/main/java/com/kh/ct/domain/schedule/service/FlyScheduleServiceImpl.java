@@ -6,6 +6,7 @@ import com.kh.ct.domain.emp.repository.AirlineRepository;
 import com.kh.ct.domain.emp.repository.EmpRepository;
 import com.kh.ct.domain.schedule.dto.FlyScheduleDto;
 import com.kh.ct.domain.schedule.entity.Airport;
+import com.kh.ct.domain.schedule.entity.AllSchedule;
 import com.kh.ct.domain.schedule.entity.EmpFlySchedule;
 import com.kh.ct.domain.schedule.entity.EmpSchedule;
 import com.kh.ct.domain.schedule.entity.FlySchedule;
@@ -14,6 +15,7 @@ import com.kh.ct.domain.schedule.repository.AllScheduleRepository;
 import com.kh.ct.domain.schedule.repository.EmpFlyScheduleRepository;
 import com.kh.ct.domain.schedule.repository.EmpScheduleRepository;
 import com.kh.ct.domain.schedule.repository.FlyScheduleRepository;
+import com.kh.ct.domain.schedule.util.ScheduleCodeValidator;
 import com.kh.ct.global.common.CommonEnums;
 import com.kh.ct.global.exception.BusinessException;
 import com.kh.ct.global.util.SecurityUtil;
@@ -822,27 +824,78 @@ public class FlyScheduleServiceImpl implements FlyScheduleService {
     @Override
     @Transactional
     public void addCrewMember(Long flyScheduleId, String empId) {
-        // 비행편 존재 확인 (BoardService 스타일)
+        log.info("========================================");
+        log.info("=== 승무원 배정 시작 ===");
+        log.info("  - flyScheduleId: {}, empId: {}", flyScheduleId, empId);
+        log.info("========================================");
+        
+        // 1) FlySchedule 조회
         FlySchedule flySchedule = flyScheduleRepository.findByFlyScheduleId(flyScheduleId)
                 .orElseThrow(() -> BusinessException.notFound("해당 비행편이 존재하지 않습니다. flyScheduleId=" + flyScheduleId));
 
-        // 직원 존재 확인
+        // 2) crewCount 확인 및 기본값 처리
+        Long crewCount = flySchedule.getCrewCount();
+        if (crewCount == null || crewCount <= 0) {
+            log.warn("⚠️ crewCount가 null이거나 0입니다 - flyScheduleId: {}, 기본값 5 적용", flyScheduleId);
+            crewCount = 5L; // 기본값 적용
+        }
+        log.info("  - crewCount: {}", crewCount);
+
+        // 3) 현재 배정된 인원 수 조회
+        long assignedCount = empFlyScheduleRepository.countByFlySchedule_FlyScheduleId(flyScheduleId);
+        long remaining = crewCount - assignedCount;
+        
+        log.info("  - assignedCount (before): {}, remaining: {}", assignedCount, remaining);
+        
+        // 4) 정원 체크
+        if (remaining <= 0) {
+            log.warn("⚠️ 이미 정원 도달 - flyScheduleId: {}, crewCount: {}, assignedCount: {}", 
+                    flyScheduleId, crewCount, assignedCount);
+            throw BusinessException.badRequest(
+                String.format("이미 정원이 찼습니다. crewCount: %d, 배정된 인원: %d", crewCount, assignedCount));
+        }
+
+        // 5) 직원 존재 확인
         Emp emp = empRepository.findById(empId)
                 .orElseThrow(() -> BusinessException.notFound("존재하지 않는 직원입니다. empId=" + empId));
 
-        // 이미 배정되어 있는지 확인
-        List<EmpFlySchedule> existing = empFlyScheduleRepository.findByFlyScheduleIdAndEmpId(flyScheduleId, empId);
-        if (!existing.isEmpty()) {
+        // 6) role 기반 scheduleCode 검증 (항공편 배정이므로 FLIGHT로 고정)
+        CommonEnums.Role role = emp.getRole();
+        String scheduleCode = "FLIGHT"; // 항공편 배정은 항상 FLIGHT
+        ScheduleCodeValidator.validateAndEnforce(role, scheduleCode);
+        log.info("  - role: {}, decidedScheduleCode: {}", role, scheduleCode);
+
+        // 7) 중복 배정 체크
+        boolean alreadyExists = empFlyScheduleRepository.existsByEmp_EmpIdAndFlySchedule_FlyScheduleId(empId, flyScheduleId);
+        if (alreadyExists) {
+            log.warn("⚠️ 이미 배정된 직원 - flyScheduleId: {}, empId: {}", flyScheduleId, empId);
             throw BusinessException.conflict("이미 해당 비행편에 배정된 직원입니다.");
         }
         
-        // 승무원 배정 생성
+        // 8) EmpFlySchedule 생성 및 저장 (Single Source of Truth)
         EmpFlySchedule empFlySchedule = EmpFlySchedule.builder()
                 .emp(emp)
                 .flySchedule(flySchedule)
                 .build();
         
         empFlyScheduleRepository.save(empFlySchedule);
+        
+        // 9) 배정 후 인원 수 재확인
+        long assignedCountAfter = empFlyScheduleRepository.countByFlySchedule_FlyScheduleId(flyScheduleId);
+        long remainingAfter = crewCount - assignedCountAfter;
+        
+        log.info("========================================");
+        log.info("✅ 승무원 배정 완료");
+        log.info("  - flyScheduleId: {}", flyScheduleId);
+        log.info("  - empId: {}, empName: {}, role: {}", empId, emp.getEmpName(), role);
+        log.info("  - decidedScheduleCode: {}", scheduleCode);
+        log.info("  - crewCount: {}, assignedBefore: {}, assignedAfter: {}, added: 1, remainingFinal: {}", 
+                crewCount, assignedCount, assignedCountAfter, remainingAfter);
+        log.info("========================================");
+        
+        // 10) flush로 즉시 DB 반영 확인
+        empFlyScheduleRepository.flush();
+        log.info("✅ EmpFlySchedule INSERT 완료 (flush 확인) - empId: {}, flyScheduleId: {}", empId, flyScheduleId);
     }
     
     @Override
@@ -857,15 +910,29 @@ public class FlyScheduleServiceImpl implements FlyScheduleService {
     @Override
     @Transactional
     public void removeCrewMember(Long flyScheduleId, String empId) {
-        // 배정 정보 조회
+        log.info("========================================");
+        log.info("=== 승무원 배정 해제 시작 ===");
+        log.info("  - flyScheduleId: {}, empId: {}", flyScheduleId, empId);
+        log.info("========================================");
+        
+        // 배정 정보 조회 (EmpFlySchedule - Single Source of Truth)
         List<EmpFlySchedule> empFlySchedules = empFlyScheduleRepository.findByFlyScheduleIdAndEmpId(flyScheduleId, empId);
         
         if (empFlySchedules.isEmpty()) {
             throw BusinessException.notFound("해당 비행편에 배정된 직원을 찾을 수 없습니다. flyScheduleId=" + flyScheduleId + ", empId=" + empId);
         }
         
-        // 배정 정보 삭제
+        // EmpFlySchedule 삭제 (Single Source of Truth)
         empFlyScheduleRepository.deleteAll(empFlySchedules);
+        log.info("✅ EmpFlySchedule 삭제 완료 - {}건", empFlySchedules.size());
+        
+        // ✅ FLIGHT 일정은 EmpFlySchedule에서만 관리하므로 EmpSchedule 삭제 로직 제거
+        // EmpSchedule에는 FLIGHT 관련 일정이 저장되지 않음
+        
+        log.info("========================================");
+        log.info("✅ 승무원 배정 해제 완료");
+        log.info("  - flyScheduleId: {}, empId: {}", flyScheduleId, empId);
+        log.info("========================================");
     }
 
     /**
