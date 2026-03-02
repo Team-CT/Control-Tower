@@ -1,11 +1,17 @@
 spring:
   application:
     name: ct
+
   config:
-    # 1. 시크릿 파일(application_secret.properties)을 여기서 불러옵니다.
+    # 시크릿 파일 불러오기 (로컬/서버 모두 가능)
     import: optional:classpath:application_secret.yaml
+
+  # ✅ 중요:
+  # - 여기서 active를 dev로 고정하지 말고,
+  #   로컬/EC2 실행 시 환경변수나 실행옵션으로 지정하는 방식이 안전함.
+  # - 로컬 기본값만 dev로 두고 싶으면 default 사용
   profiles:
-    active: dev
+    default: dev
 
 server:
   servlet:
@@ -14,26 +20,32 @@ server:
       enabled: true
       force: true
 
----
+# ------------------------------------------------------------
 # [개발 환경 설정: dev]
+# ------------------------------------------------------------
+---
 spring:
-  data:
-    redis:
-      host: ${VALKEY_HOST:localhost}
-      port: ${VALKEY_PORT:6379}
-
   config:
     activate:
       on-profile: dev
 
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver # MySQL 드라이버
-    # 2. 시크릿 파일에 있는 변수 값을 여기에 주입합니다.
-    url: jdbc:mysql://yoojh-db.crm2cye6237a.ap-northeast-2.rds.amazonaws.com:3306/ct?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: ct_user
-    password: 1234
+  data:
+    redis:
+      host: ${VALKEY_HOST:localhost}
+      port: ${VALKEY_PORT:6379}
+      # 로컬 Redis/Valkey는 보통 TLS OFF
+      ssl:
+        enabled: false
+      timeout: 3s
 
-  # JPA 설정 (MySQL용)
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # ✅ 개발에서 RDS를 쓰는 게 나쁘진 않지만, 보통은 secret/env로 빼는 게 안전
+    # 네가 올린 값 유지가 필요하면 아래처럼 직접 박아도 됨
+    url: ${DATASOURCE_URL:jdbc:mysql://yoojh-db.crm2cye6237a.ap-northeast-2.rds.amazonaws.com:3306/ct?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    username: ${DATASOURCE_USERNAME:ct_user}
+    password: ${DATASOURCE_PASSWORD:1234}
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -45,38 +57,93 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
 
-  # 파일 업로드 설정
   servlet:
     multipart:
       max-file-size: 20MB
       max-request-size: 100MB
 
-  # ⭐ 중요: ai 설정은 spring 하위에 있어야 합니다!
   ai:
     openai:
-      api-key: ${APIKEY}
+      api-key: ${APIKEY:}
       chat:
         options:
           model: gpt-4o-mini
 
 server:
-  port: 8001
-  servlet:
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
+  port: ${SERVER_PORT:8001}
+
 DATA_API:
-  SERVICE_KEY: "I%2BLq678BJU%2B547TEKBXQDCAIGMBKm3RIzTDUSUNuC8VyNSc30c%2FcbH8fMY40AutRcx6IKR1McOUXc1xb9kjXRA%3D%3D"
-  BASE_URL: "http://api.odcloud.kr/api/15003087/v1/uddi:89fab983-66d8-40ad-901a-d535f8699d29"
+  SERVICE_KEY: ${DATA_API_SERVICE_KEY:I%2BLq678BJU%2B547TEKBXQDCAIGMBKm3RIzTDUSUNuC8VyNSc30c%2FcbH8fMY40AutRcx6IKR1McOUXc1xb9kjXRA%3D%3D}
+  BASE_URL: ${DATA_API_BASE_URL:http://api.odcloud.kr/api/15003087/v1/uddi:89fab983-66d8-40ad-901a-d535f8699d29}
 
 api:
   flight:
-    service-key: "I%2BLq678BJU%2B547TEKBXQDCAIGMBKm3RIzTDUSUNuC8VyNSc30c%2FcbH8fMY40AutRcx6IKR1McOUXc1xb9kjXRA%3D%3D"
-    base-url: "http://api.odcloud.kr/api/15003087/v1/uddi:89fab983-66d8-40ad-901a-d535f8699d29"
-
-
+    service-key: ${FLIGHT_API_SERVICE_KEY:I%2BLq678BJU%2B547TEKBXQDCAIGMBKm3RIzTDUSUNuC8VyNSc30c%2FcbH8fMY40AutRcx6IKR1McOUXc1xb9kjXRA%3D%3D}
+    base-url: ${FLIGHT_API_BASE_URL:http://api.odcloud.kr/api/15003087/v1/uddi:89fab983-66d8-40ad-901a-d535f8699d29}
 
 ct:
   redis:
     key-prefix: ${KEY_PREFIX:dev:ct}
+
+# ------------------------------------------------------------
+# [운영 환경 설정: prod]
+# - EC2 + ElastiCache Valkey(TLS ON) 기준
+# ------------------------------------------------------------
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  data:
+    redis:
+      # ✅ 너의 Valkey 엔드포인트 (스크린샷 기준 master)
+      host: ${VALKEY_HOST:master.ct-valkey.d9kiqb.apn2.cache.amazonaws.com}
+      port: ${VALKEY_PORT:6379}
+
+      # ✅ 매우 중요: 전송 중 암호화(TLS) ON 이므로 Spring도 SSL을 켜야 함
+      ssl:
+        enabled: true
+
+      timeout: 3s
+
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    # 운영 로그 폭발 방지
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        format_sql: false
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
+
+  ai:
+    openai:
+      api-key: ${APIKEY:}
+      chat:
+        options:
+          model: gpt-4o-mini
+
+server:
+  port: ${SERVER_PORT:8001}
+
+DATA_API:
+  SERVICE_KEY: ${DATA_API_SERVICE_KEY}
+  BASE_URL: ${DATA_API_BASE_URL:http://api.odcloud.kr/api/15003087/v1/uddi:89fab983-66d8-40ad-901a-d535f8699d29}
+
+api:
+  flight:
+    service-key: ${FLIGHT_API_SERVICE_KEY}
+    base-url: ${FLIGHT_API_BASE_URL:http://api.odcloud.kr/api/15003087/v1/uddi:89fab983-66d8-40ad-901a-d535f8699d29}
+
+ct:
+  redis:
+    key-prefix: ${KEY_PREFIX:prod:ct}

@@ -44,40 +44,47 @@ if (import.meta.env.DEV) {
 /**
  * ============================================================
  * 공개 엔드포인트(Authorization 스킵)
- * - baseURL이 이미 /api/v1이므로 path는 "/auth/login" 처럼만 작성
+ * ✅ 변경 포인트:
+ * - 백엔드(SecurityConfig) 기준으로 /api/auth/* 로 통일
+ * - 원래 match 전략(exact/prefix) 유지
  * ============================================================
  */
 const AUTH_EXCLUDE = [
-  { method: 'post', path: '/auth/login', match: 'exact' },
-  { method: 'post', path: '/auth/refresh', match: 'exact' },
-  { method: 'post', path: '/auth/logout', match: 'exact' },
+  // ✅ Auth
+  { method: 'post', path: '/api/auth/login', match: 'exact' },
+  { method: 'post', path: '/api/auth/refresh', match: 'exact' },
+  { method: 'post', path: '/api/auth/logout', match: 'exact' },
 
   // 공개 회원가입/사전검증
-  { method: 'post', path: '/emps', match: 'exact' },
-  { method: 'get', path: '/emps/checkId', match: 'exact' },
-  { method: 'get', path: '/emps/empNo/preview', match: 'exact' },
+  { method: 'post', path: '/api/emps', match: 'exact' },
+  { method: 'get', path: '/api/emps/checkId', match: 'exact' },
+  { method: 'get', path: '/api/emps/empNo/preview', match: 'exact' },
 
   // 비밀번호 코드(라우트 맞게 조정 필요)
-  { method: 'post', path: '/passwordCode', match: 'exact' },
+  // ❗ 기존 코드의 오타: '/api//api/passwordCode' → '/api/passwordCode'
+  { method: 'post', path: '/api/passwordCode', match: 'exact' },
 
   // 파일(회원가입 전 공개라면)
-  { method: 'post', path: '/file/upload', match: 'exact' },
-  { method: 'delete', path: '/file/', match: 'prefix' },
+  { method: 'post', path: '/api/file/upload', match: 'exact' },
+  { method: 'delete', path: '/api/file/', match: 'prefix' },
 
   // 기타 공개 엔드포인트
-  { method: 'post', path: '/airline-applications', match: 'exact' },
-  { method: 'get', path: '/account-activation', match: 'exact' },
-  { method: 'post', path: '/account-activation', match: 'exact' },
+  { method: 'post', path: '/api/airline-applications', match: 'exact' },
+  { method: 'get', path: '/api/account-activation', match: 'exact' },
+  { method: 'post', path: '/api/account-activation', match: 'exact' },
 ];
 
 function normalizePath(url) {
   try {
+    if (!url) return '';
     if (url.startsWith('http://') || url.startsWith('https://')) {
       return new URL(url).pathname;
     }
-    return url;
+    // querystring 제거(방어)
+    const qIdx = url.indexOf('?');
+    return qIdx >= 0 ? url.slice(0, qIdx) : url;
   } catch {
-    return url;
+    return url || '';
   }
 }
 
@@ -120,8 +127,13 @@ function clearStoreAuth() {
   if (typeof state.logout === 'function') state.logout();
 }
 
+/**
+ * ✅ Refresh 호출 경로 통일: /api/auth/refresh
+ * - refreshToken은 HttpOnly 쿠키이므로 withCredentials가 핵심
+ * - Authorization은 굳이 붙일 필요 없으니 방어적으로 제거
+ */
 async function requestRefresh() {
-  const res = await refreshApi.post('/auth/refresh', null, {
+  const res = await refreshApi.post('/api/auth/refresh', null, {
     headers: { Authorization: undefined },
   });
 
@@ -178,8 +190,13 @@ const applyInterceptors = (instance) => {
       const originalConfig = error.config;
 
       const url = normalizePath(originalConfig?.url || '');
+
+      /**
+       * ✅ Auth endpoint 판정도 /api/auth/* 로 통일
+       * - 원래 코드의 구조 유지(단, 경로만 수정)
+       */
       const isAuthEndpoint =
-        url === '/auth/login' || url === '/auth/refresh' || url === '/auth/logout';
+        url === '/api/auth/login' || url === '/api/auth/refresh' || url === '/api/auth/logout';
 
       // 401(Access 만료) 처리
       if (status === 401 && !isAuthEndpoint && !originalConfig._retry) {
