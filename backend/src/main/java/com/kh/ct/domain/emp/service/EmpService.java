@@ -3,6 +3,8 @@ package com.kh.ct.domain.emp.service;
 import com.kh.ct.domain.emp.dto.AirlineDto;
 import com.kh.ct.domain.emp.dto.EmpDto;
 import com.kh.ct.domain.emp.entity.Emp;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -27,4 +29,12 @@ public interface EmpService {
     AirlineDto.DetailResponse getAirlineByEmpId(String empId);
 
     EmpDto.FindIdResponse findEmpId(EmpDto.FindIdRequest request);
+
+    Page<EmpDto.EmployeeManagementRow> getEmployeesForManagement(
+            Long airlineId,
+            String q,
+            Long departmentId,
+            String empStatus,
+            Pageable pageable
+    );
 }

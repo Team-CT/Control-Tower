@@ -136,5 +136,7 @@ public class Emp extends BaseTimeEntity {
         }
         this.leaveCount = Math.round((this.leaveCount - days) * 10.0) / 10.0;
     }
-
+    public void changeDepartment(Department department) {
+        this.departmentId = department;
+    }
 }
