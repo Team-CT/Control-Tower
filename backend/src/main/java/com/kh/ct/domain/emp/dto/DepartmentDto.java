@@ -50,20 +50,19 @@ public class DepartmentDto {
         private Long id;
         private String name;
 
-        private String description; // ✅ 추가
-        private ManagerInfo manager; // ✅ 추가 (프론트 형태에 맞춤)
+        private String description;
+        private ManagerInfo manager;
 
-        // 카드 하단 통계
-        private Integer totalMembers; // empCount
-        private Integer totalTeams;   // children.size() 또는 집계
+        private Integer totalMembers; // ✅ Emp COUNT 결과
+        private Integer totalTeams;   // ✅ 하위 Department COUNT 결과
 
         @Getter
         @AllArgsConstructor
         @NoArgsConstructor
         @Builder
         public static class ManagerInfo {
-            private String name; // Emp name
-            private String role; // Emp 직책/직급(프로젝트 필드에 맞게 서비스에서 세팅)
+            private String name;
+            private String role;
         }
     }
 
@@ -84,20 +83,16 @@ public class DepartmentDto {
         @NoArgsConstructor
         @Builder
         public static class DeptInfo {
-
             private Long id;
             private String name;
 
-            // 확장 대비 필드
-            private String engName;
+            private String engName; // 확장 대비
+            private String manager;
+            private Integer totalMembers; // ✅ Emp COUNT 결과
 
-            // ✅ manager/description을 DB에서 내려주기
-            private String manager;     // 화면 상단 표시용 문자열
-            private Integer totalMembers;
-            private String location;
-            private String phone;
-
-            private String description; // ✅ 추가
+            private String location; // 확장 대비
+            private String phone;    // 확장 대비
+            private String description;
         }
 
         @Getter
@@ -105,13 +100,12 @@ public class DepartmentDto {
         @NoArgsConstructor
         @Builder
         public static class SubTeam {
-
             private Long id;
             private String name;
 
-            private String leader;   // child.manager 기반으로 세팅 가능
-            private Integer count;   // empCount
-            private String task;     // 확장 대비
+            private String leader;
+            private Integer count; // ✅ Emp COUNT 결과
+            private String task;   // 확장 대비
         }
     }
 
@@ -123,26 +117,65 @@ public class DepartmentDto {
     @NoArgsConstructor
     @Builder
     public static class CreateRequest {
-
         private String departmentName;
-        private Long parentDepartmentId; // null이면 최상위
-        private String managerEmpId;     // ✅ 추가(부서장 지정)
-        private String description;      // ✅ 추가
+        private Long parentDepartmentId;
+        private String managerEmpId;
+        private String description;
     }
 
     /* =========================================================
-     * 5️⃣ 부서 수정 요청
+     * 5️⃣ 부서 수정 요청 (empCount 제거)
      * ========================================================= */
     @Getter
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
     public static class UpdateRequest {
+        private String departmentName;
+        private String managerEmpId;
+        private String description;
+    }
+
+    /* =========================================================
+     * ✅ 6️⃣ 하위 조직 생성 요청
+     * ========================================================= */
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class CreateChildRequest {
+        private String departmentName;
+        private String managerEmpId;
+        private String description;
+    }
+
+    /* =========================================================
+     * ✅ 7️⃣ 구성원 DTO
+     * ========================================================= */
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class MemberItem {
+        private String empId;
+        private String empNo;
+        private String empName;
 
         private String departmentName;
-        private Integer empCount;
 
-        private String managerEmpId; // ✅ 추가
-        private String description;  // ✅ 추가
+        private String role;
+        private String job;
+        private String phone;
+        private String email;
+
+        private String empStatus;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class MemberAddRequest {
+        private String empId;
     }
 }

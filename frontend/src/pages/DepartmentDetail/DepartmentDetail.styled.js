@@ -1,42 +1,40 @@
 import styled from "styled-components";
 
 /**
- * ✅ 이 페이지는 Layout(사이드바/탑바) 바깥을 책임지지 않음.
- * ✅ MainLayout 내부에서 렌더링되는 "컨텐츠"만 스타일링.
- * ✅ 상단 배너는 "단색" (그라데이션 제거)
+ * DepartmentDetail.styled.js
+ * - JSX에서 사용하는 export 이름을 유지하면서
+ * - "일반적인 관리자 UI" 톤(절제된 카드/탭/리스트)을 목표로 정리
+ *
+ * 전제:
+ * - Layout(사이드바/탑바)은 상위(MainLayout)가 담당
+ * - 여기서는 "컨텐츠 영역"만 스타일링
  */
 
 /* ==================== Layout ==================== */
 
 export const MainContainer = styled.div`
   width: 100%;
-`;
-
-/** 상단 바: 단색 + 얇은 그림자 (그라데이션 X) */
-export const BannerSection = styled.div`
-  width: 100%;
-  height: 64px; /* ✅ 과한 바 높이 제거 */
-  background-color: ${({ theme }) => theme.colors.primary};
-  border-radius: 14px;
-  box-shadow: ${({ theme }) => theme.shadow};
-`;
-
-/** 페이지 전체 컨테이너 (참고 코드 스타일) */
-export const ContentWrapper = styled.div`
-  width: 100%;
   max-width: 1600px;
   margin: 0 auto;
-  padding: 32px 48px;
+
+  /* 일반적인 admin 컨텐츠 여백 */
+  padding: 32px 40px;
+
+  /* 카드들이 잘 보이도록 약한 배경 */
+  background-color: ${({ theme }) =>
+    theme.background?.secondary || theme.background?.main || "transparent"};
+
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 
   @media (max-width: 1440px) {
-    padding: 24px 32px;
+    padding: 28px 32px;
   }
 
   @media (max-width: 1024px) {
-    padding: 20px 24px;
+    padding: 22px 24px;
   }
 
   @media (max-width: 640px) {
@@ -44,16 +42,24 @@ export const ContentWrapper = styled.div`
   }
 `;
 
-/* ==================== Header (Back Button) ==================== */
+/** 컨텐츠 wrapper: 섹션 사이 간격만 관리 */
+export const ContentWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+`;
 
-/** 기존 JSX에서 BackButton을 상단에 두고 있으니, 참고 코드 톤으로 */
+/* ==================== Header ==================== */
+
 export const BackButton = styled.button`
   width: fit-content;
   height: 40px;
   padding: 0 14px;
-  background-color: ${({ theme }) => theme.background.paper};
-  border: 1px solid ${({ theme }) => theme.border};
   border-radius: 10px;
+
+  background-color: ${({ theme }) => theme.background?.paper || "#fff"};
+  border: 1px solid ${({ theme }) => theme.border || "rgba(0,0,0,0.12)"};
 
   display: inline-flex;
   align-items: center;
@@ -62,12 +68,13 @@ export const BackButton = styled.button`
   cursor: pointer;
   font-size: 14px;
   font-weight: 800;
-  color: ${({ theme }) => theme.text.primary};
-  transition: all 0.2s;
+  color: ${({ theme }) => theme.text?.primary || "rgba(0,0,0,0.85)"};
+
+  transition: background-color 0.15s, border-color 0.15s, transform 0.12s;
 
   &:hover {
-    background-color: ${({ theme }) => theme.background.hover};
-    border-color: ${({ theme }) => theme.colors.primary};
+    background-color: ${({ theme }) => theme.background?.hover || "rgba(0,0,0,0.03)"};
+    border-color: ${({ theme }) => theme.colors?.primary || "rgba(0,0,0,0.25)"};
   }
 
   &:active {
@@ -78,16 +85,22 @@ export const BackButton = styled.button`
 /* ==================== Info Card ==================== */
 
 export const InfoCard = styled.section`
-  background-color: ${({ theme }) => theme.background.paper};
-  border-radius: 14px;
+  background-color: ${({ theme }) => theme.background?.paper || "#fff"};
+  border-radius: 16px;
   padding: 28px;
-  box-shadow: ${({ theme }) => theme.shadow};
+  box-shadow: ${({ theme }) => theme.shadow || "0 10px 30px rgba(0,0,0,0.06)"};
+  border: 1px solid ${({ theme }) => theme.border || "rgba(0,0,0,0.10)"};
+
   display: flex;
   flex-direction: column;
   gap: 18px;
 
   @media (max-width: 1024px) {
     padding: 22px;
+  }
+
+  @media (max-width: 640px) {
+    padding: 18px;
   }
 `;
 
@@ -105,23 +118,23 @@ export const CardHeader = styled.div`
   .title-group {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: 14px;
     min-width: 0;
 
     .dept-icon {
       width: 44px;
       height: 44px;
       border-radius: 12px;
-      background-color: ${({ theme }) => `${theme.colors.primary}15`};
-      border: 1px solid ${({ theme }) => theme.border};
+      background-color: ${({ theme }) => `${theme.colors?.primary || "#3b82f6"}12`};
+      border: 1px solid ${({ theme }) => theme.border || "rgba(0,0,0,0.10)"};
       flex-shrink: 0;
     }
 
     h1 {
-      font-size: 26px;
-      font-weight: 800;
-      color: ${({ theme }) => theme.text.primary};
       margin: 0;
+      font-size: 24px;
+      font-weight: 900;
+      color: ${({ theme }) => theme.text?.primary || "rgba(0,0,0,0.85)"};
       line-height: 1.2;
 
       white-space: nowrap;
@@ -129,35 +142,38 @@ export const CardHeader = styled.div`
       text-overflow: ellipsis;
 
       @media (max-width: 640px) {
-        font-size: 22px;
+        font-size: 20px;
       }
     }
   }
 `;
 
+/** 우측 액션 버튼 영역 (없으면 display:none 처리) */
 export const ActionGroup = styled.div`
   display: flex;
   align-items: center;
   gap: 10px;
 
-  /* ✅ 버튼이 없으면 레이아웃 공간 자체 제거 */
   &:empty {
     display: none;
   }
 
   button {
-    padding: 10px 18px;
+    padding: 10px 16px;
     font-size: 14px;
     font-weight: 800;
     border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s;
-    border: 1px solid ${({ theme }) => theme.border};
+    transition: all 0.15s;
+
+    border: 1px solid ${({ theme }) => theme.border || "rgba(0,0,0,0.12)"};
+    background-color: ${({ theme }) => theme.background?.paper || "#fff"};
+    color: ${({ theme }) => theme.text?.primary || "rgba(0,0,0,0.85)"};
 
     &.primary {
-      background-color: ${({ theme }) => theme.colors.primary};
-      border-color: ${({ theme }) => theme.colors.primary};
-      color: ${({ theme }) => theme.text.inverse};
+      background-color: ${({ theme }) => theme.colors?.primary || "#111827"};
+      border-color: ${({ theme }) => theme.colors?.primary || "#111827"};
+      color: ${({ theme }) => theme.text?.inverse || "#fff"};
 
       &:hover {
         filter: brightness(0.95);
@@ -165,24 +181,21 @@ export const ActionGroup = styled.div`
     }
 
     &.secondary {
-      background-color: ${({ theme }) => theme.background.paper};
-      color: ${({ theme }) => theme.text.primary};
-
       &:hover {
-        background-color: ${({ theme }) => theme.background.hover};
-        border-color: ${({ theme }) => theme.colors.primary};
+        background-color: ${({ theme }) => theme.background?.hover || "rgba(0,0,0,0.03)"};
+        border-color: ${({ theme }) => theme.colors?.primary || "rgba(0,0,0,0.25)"};
       }
     }
   }
 `;
 
-/** 참고 코드의 “메타데이터” 느낌으로 2~4개까지 자연스럽게 */
+/** 요약 정보: 일반적으로 2~4개가 가장 보기 좋음 */
 export const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  padding-top: 18px;
-  border-top: 1px solid ${({ theme }) => theme.border};
+  gap: 14px;
+  padding-top: 16px;
+  border-top: 1px solid ${({ theme }) => theme.border || "rgba(0,0,0,0.10)"};
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
@@ -190,25 +203,27 @@ export const StatsGrid = styled.div`
 `;
 
 export const StatItem = styled.div`
+  padding: 14px 16px;
+  border-radius: 14px;
+
+  background-color: ${({ theme }) =>
+    theme.background?.secondary || "rgba(0,0,0,0.02)"};
+  border: 1px solid ${({ theme }) => theme.border || "rgba(0,0,0,0.10)"};
+
   display: flex;
   flex-direction: column;
   gap: 6px;
 
-  padding: 16px;
-  background-color: ${({ theme }) => theme.background.secondary};
-  border: 1px solid ${({ theme }) => theme.border};
-  border-radius: 12px;
-
   .label {
     font-size: 12px;
-    color: ${({ theme }) => theme.text.secondary};
     font-weight: 700;
+    color: ${({ theme }) => theme.text?.secondary || "rgba(0,0,0,0.55)"};
   }
 
   .value {
     font-size: 18px;
-    color: ${({ theme }) => theme.text.primary};
-    font-weight: 800;
+    font-weight: 900;
+    color: ${({ theme }) => theme.text?.primary || "rgba(0,0,0,0.85)"};
     letter-spacing: -0.2px;
   }
 `;
@@ -217,46 +232,61 @@ export const StatItem = styled.div`
 
 export const TabNavigation = styled.div`
   display: flex;
-  gap: 8px;
-  margin-top: 4px;
-  border-bottom: 2px solid ${({ theme }) => theme.border};
+  gap: 10px;
+  border-bottom: 1px solid ${({ theme }) => theme.border || "rgba(0,0,0,0.10)"};
 `;
 
 export const TabItem = styled.button`
-  padding: 12px 20px;
+  padding: 12px 6px;
   font-size: 15px;
   font-weight: 800;
-  color: ${(props) =>
-    props.$isActive ? props.theme.colors.primary : props.theme.text.secondary};
-  background-color: transparent;
+
+  background: none;
   border: none;
-  border-bottom: 2px solid
-    ${(props) => (props.$isActive ? props.theme.colors.primary : "transparent")};
-  margin-bottom: -2px;
   cursor: pointer;
-  transition: all 0.2s;
+  position: relative;
+
+  color: ${(props) =>
+    props.$isActive ? props.theme.colors?.primary || "#111827" : props.theme.text?.secondary || "rgba(0,0,0,0.55)"};
+
+  transition: color 0.12s;
 
   &:hover {
-    color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors?.primary || "#111827"};
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 100%;
+    height: 2px;
+    background-color: ${(props) =>
+      props.$isActive ? props.theme.colors?.primary || "#111827" : "transparent"};
   }
 
   @media (max-width: 640px) {
-    padding: 12px 14px;
     font-size: 14px;
+    padding: 12px 4px;
   }
 `;
 
 /* ==================== Table Section ==================== */
 
 export const TableSection = styled.section`
-  background-color: ${({ theme }) => theme.background.paper};
-  border-radius: 14px;
-  padding: 24px;
-  box-shadow: ${({ theme }) => theme.shadow};
-  border: 1px solid ${({ theme }) => theme.border};
+  background-color: ${({ theme }) => theme.background?.paper || "#fff"};
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: ${({ theme }) => theme.shadow || "0 10px 30px rgba(0,0,0,0.06)"};
+  border: 1px solid ${({ theme }) => theme.border || "rgba(0,0,0,0.10)"};
 
   @media (max-width: 1024px) {
     padding: 18px;
+  }
+
+  @media (max-width: 640px) {
+    padding: 14px;
   }
 `;
 
@@ -265,34 +295,34 @@ export const SectionHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 
   h3 {
+    margin: 0;
     font-size: 16px;
     font-weight: 900;
-    color: ${({ theme }) => theme.text.primary};
-    margin: 0;
+    color: ${({ theme }) => theme.text?.primary || "rgba(0,0,0,0.85)"};
   }
 
+  /* 필요 시 +추가 버튼(작은 텍스트 버튼)을 쓰려면 .add-btn 사용 */
   .add-btn {
     padding: 8px 10px;
     font-size: 13px;
-    font-weight: 800;
-    color: ${({ theme }) => theme.colors.primary};
-    background-color: transparent;
+    font-weight: 900;
+    color: ${({ theme }) => theme.colors?.primary || "#111827"};
+    background: none;
     border: none;
     cursor: pointer;
     border-radius: 10px;
 
     &:hover {
-      background-color: ${({ theme }) => theme.background.hover};
+      background-color: ${({ theme }) => theme.background?.hover || "rgba(0,0,0,0.03)"};
     }
   }
 `;
 
 /* ==================== Table Components ==================== */
 
-/** 전체 테이블 래퍼 */
 export const TeamTable = styled.div`
   display: flex;
   flex-direction: column;
@@ -300,30 +330,30 @@ export const TeamTable = styled.div`
 `;
 
 /** 헤더/로우 공통 베이스 */
-const TableRowBase = styled.div`
+const RowBase = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
 
   padding: 14px 16px;
   border-radius: 14px;
-  border: 1px solid ${({ theme }) => theme.border};
-  background-color: ${({ theme }) => theme.background.paper};
+  border: 1px solid ${({ theme }) => theme.border || "rgba(0,0,0,0.10)"};
+  background-color: ${({ theme }) => theme.background?.paper || "#fff"};
 
   .col-id {
     width: 56px;
     text-align: center;
     font-size: 13px;
-    font-weight: 800;
-    color: ${({ theme }) => theme.text.tertiary};
+    font-weight: 900;
+    color: ${({ theme }) => theme.text?.tertiary || "rgba(0,0,0,0.45)"};
     flex-shrink: 0;
   }
 
   .col-name {
-    width: 220px;
+    width: 240px;
     font-size: 14px;
     font-weight: 900;
-    color: ${({ theme }) => theme.text.primary};
+    color: ${({ theme }) => theme.text?.primary || "rgba(0,0,0,0.85)"};
     flex-shrink: 0;
 
     white-space: nowrap;
@@ -332,10 +362,10 @@ const TableRowBase = styled.div`
   }
 
   .col-leader {
-    width: 160px;
+    width: 180px;
     font-size: 14px;
     font-weight: 700;
-    color: ${({ theme }) => theme.text.secondary};
+    color: ${({ theme }) => theme.text?.secondary || "rgba(0,0,0,0.55)"};
     flex-shrink: 0;
 
     white-space: nowrap;
@@ -344,16 +374,17 @@ const TableRowBase = styled.div`
   }
 
   .col-count {
-    width: 110px;
+    width: 120px;
     text-align: center;
     flex-shrink: 0;
   }
 
+  /* (옵션) task 컬럼을 쓰고 싶으면 JSX에서 .col-task를 넣으면 됨 */
   .col-task {
     flex: 1;
     min-width: 180px;
     font-size: 14px;
-    color: ${({ theme }) => theme.text.secondary};
+    color: ${({ theme }) => theme.text?.secondary || "rgba(0,0,0,0.55)"};
 
     white-space: nowrap;
     overflow: hidden;
@@ -361,19 +392,19 @@ const TableRowBase = styled.div`
   }
 
   .col-action {
-    width: 72px;
+    width: 120px; /* 편집/삭제 버튼 2개 정도를 담기 좋은 폭 */
     text-align: right;
     flex-shrink: 0;
   }
 
-  /* ✅ 태블릿: task 숨기기 */
+  /* 태블릿: task 숨기기 */
   @media (max-width: 1024px) {
     .col-task {
       display: none;
     }
   }
 
-  /* ✅ 모바일: leader도 숨기고 name을 넓게 */
+  /* 모바일: leader도 숨기고 name을 넓게 */
   @media (max-width: 640px) {
     padding: 12px 12px;
     gap: 10px;
@@ -381,25 +412,29 @@ const TableRowBase = styled.div`
     .col-id {
       width: 44px;
     }
+
     .col-name {
       width: auto;
       flex: 1;
     }
+
     .col-leader {
       display: none;
     }
+
     .col-count {
       width: 84px;
     }
+
     .col-action {
-      width: 56px;
+      width: 90px;
     }
   }
 `;
 
-export const TableHeader = styled(TableRowBase)`
-  background-color: ${({ theme }) => theme.background.secondary};
-  border-color: ${({ theme }) => theme.border};
+export const TableHeader = styled(RowBase)`
+  background-color: ${({ theme }) =>
+    theme.background?.secondary || "rgba(0,0,0,0.02)"};
 
   .col-id,
   .col-name,
@@ -409,29 +444,29 @@ export const TableHeader = styled(TableRowBase)`
   .col-action {
     font-size: 12px;
     font-weight: 900;
-    color: ${({ theme }) => theme.text.secondary};
+    color: ${({ theme }) => theme.text?.secondary || "rgba(0,0,0,0.55)"};
   }
 `;
 
-export const TableRow = styled(TableRowBase)`
-  transition: transform 0.15s, box-shadow 0.15s, background-color 0.15s;
+export const TableRow = styled(RowBase)`
+  transition: transform 0.12s, box-shadow 0.12s, background-color 0.12s;
 
   &:hover {
-    background-color: ${({ theme }) => theme.background.hover};
-    box-shadow: ${({ theme }) => theme.shadowHover || theme.shadow};
+    background-color: ${({ theme }) => theme.background?.hover || "rgba(0,0,0,0.03)"};
+    box-shadow: ${({ theme }) => theme.shadowHover || theme.shadow || "0 10px 30px rgba(0,0,0,0.06)"};
     transform: translateY(-1px);
   }
 `;
 
-/** 인원수 뱃지: 참고 코드 Badge 톤 */
+/** 인원수 Badge */
 export const StatusBadge = styled.span`
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 13px;
   font-weight: 900;
 
-  background-color: ${({ theme }) => `${theme.status.success}20`};
-  color: ${({ theme }) => theme.status.success};
+  background-color: ${({ theme }) => `${theme.status?.success || "#16a34a"}18`};
+  color: ${({ theme }) => theme.status?.success || "#16a34a"};
 
   display: inline-flex;
   align-items: center;
@@ -439,15 +474,15 @@ export const StatusBadge = styled.span`
 `;
 
 /* ==================== Optional: 상태/에러 ==================== */
-/** (JSX에서 직접 스타일 준 부분이 있으면 이건 선택적으로 사용) */
+
 export const EmptyState = styled.div`
-  padding: 36px;
+  padding: 32px 12px;
   text-align: center;
-  color: ${({ theme }) => theme.text.secondary};
+  color: ${({ theme }) => theme.text?.secondary || "rgba(0,0,0,0.55)"};
 `;
 
 export const ErrorState = styled.div`
-  padding: 36px;
+  padding: 32px 12px;
   text-align: center;
-  color: ${({ theme }) => theme.status.error};
+  color: ${({ theme }) => theme.status?.error || "#b42318"};
 `;

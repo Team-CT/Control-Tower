@@ -7,6 +7,7 @@ import com.kh.ct.global.common.CommonEnums;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -20,14 +21,11 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
     List<Emp> findByEmpNameContainingAndEmpStatus(String keyword, CommonEnums.EmpStatus status);
 
     Optional<Emp> findByEmpIdAndEmpStatus(String empId, CommonEnums.EmpStatus status);
-    
+
     Optional<Emp> findByAirlineIdAndRole(com.kh.ct.domain.emp.entity.Airline airline, CommonEnums.Role role);
-    
+
     Optional<Emp> findByEmailAndRole(String email, CommonEnums.Role role);
 
-    /**
-     * 이메일로 직원 조회 (활성 상태)
-     */
     Optional<Emp> findByEmailAndEmpStatus(String email, CommonEnums.EmpStatus empStatus);
 
     List<Emp> findByAirlineId_AirlineIdAndJob(Long airlineId, String job);
@@ -36,11 +34,10 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
 
     Optional<Emp> findByEmpIdAndEmailAndEmpStatus(String empId, String email, CommonEnums.EmpStatus status);
 
-    // 직원 상세 정보 조회 (JOIN FETCH로 LAZY 직렬화 문제 방지)
     @Query("SELECT e FROM Emp e " +
-           "LEFT JOIN FETCH e.departmentId dept " +
-           "LEFT JOIN FETCH e.airlineId airline " +
-           "WHERE e.empId = :empId")
+            "LEFT JOIN FETCH e.departmentId dept " +
+            "LEFT JOIN FETCH e.airlineId airline " +
+            "WHERE e.empId = :empId")
     Optional<Emp> findByIdWithDetails(@Param("empId") String empId);
 
     boolean existsByEmpNo(String empNo);
@@ -84,7 +81,6 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
     )
     Page<HealthDto.AdminEmpHealthRow> findAdminEmpHealthRows(@Param("empName") String empName, Pageable pageable);
 
-    // 역할별 직원 조회 (JOIN FETCH로 LAZY 직렬화 문제 방지)
     @Query("""
         SELECT DISTINCT e
         FROM Emp e
@@ -99,7 +95,6 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
             @Param("airlineId") Long airlineId
     );
 
-
     List<Emp> findByAirlineId_AirlineIdAndDepartmentId_DepartmentIdAndEmpStatusAndEmpIdNot(
             Long airlineId,
             Long departmentId,
@@ -107,26 +102,17 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
             String empIdNot
     );
 
-    /**
-     * 항공사별 관리자 이메일 조회
-     * - 같은 airline_id 소속의 관리자 계정(AIRLINE_ADMIN, SUPER_ADMIN) 이메일 조회
-     * - 활성 상태(empStatus='Y')인 관리자만 조회
-     * - SUPER_ADMIN 우선, 그 다음 AIRLINE_ADMIN
-     * 
-     * @param airlineId 항공사 ID
-     * @return 관리자 이메일 목록 (첫 번째 사용)
-     */
     @Query("SELECT e.email FROM Emp e " +
-           "WHERE e.airlineId.airlineId = :airlineId " +
-           "AND e.empStatus = :empStatus " +
-           "AND (e.role = :superAdminRole OR e.role = :airlineAdminRole) " +
-           "AND e.email IS NOT NULL " +
-           "AND e.email != '' " +
-           "ORDER BY " +
-           "  CASE WHEN e.role = :superAdminRole THEN 1 " +
-           "       WHEN e.role = :airlineAdminRole THEN 2 " +
-           "       ELSE 3 END, " +
-           "  e.createDate ASC")
+            "WHERE e.airlineId.airlineId = :airlineId " +
+            "AND e.empStatus = :empStatus " +
+            "AND (e.role = :superAdminRole OR e.role = :airlineAdminRole) " +
+            "AND e.email IS NOT NULL " +
+            "AND e.email != '' " +
+            "ORDER BY " +
+            "  CASE WHEN e.role = :superAdminRole THEN 1 " +
+            "       WHEN e.role = :airlineAdminRole THEN 2 " +
+            "       ELSE 3 END, " +
+            "  e.createDate ASC")
     List<String> findAdminEmailsByAirlineId(
             @Param("airlineId") Long airlineId,
             @Param("empStatus") CommonEnums.EmpStatus empStatus,
@@ -134,27 +120,15 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
             @Param("airlineAdminRole") CommonEnums.Role airlineAdminRole
     );
 
-    /**
-     * 항공사별 관리자 empId 조회
-     * - 같은 airline_id 소속의 관리자 계정(AIRLINE_ADMIN, SUPER_ADMIN) empId 조회
-     * - 활성 상태(empStatus='Y')인 관리자만 조회
-     * - SUPER_ADMIN 우선, 그 다음 AIRLINE_ADMIN
-     *
-     * @param airlineId 항공사 ID
-     * @param empStatus 직원 상태 (활성)
-     * @param superAdminRole SUPER_ADMIN 역할
-     * @param airlineAdminRole AIRLINE_ADMIN 역할
-     * @return 관리자 empId 목록 (첫 번째 사용)
-     */
     @Query("SELECT e.empId FROM Emp e " +
-           "WHERE e.airlineId.airlineId = :airlineId " +
-           "AND e.empStatus = :empStatus " +
-           "AND (e.role = :superAdminRole OR e.role = :airlineAdminRole) " +
-           "ORDER BY " +
-           "  CASE WHEN e.role = :superAdminRole THEN 1 " +
-           "       WHEN e.role = :airlineAdminRole THEN 2 " +
-           "       ELSE 3 END, " +
-           "  e.createDate ASC")
+            "WHERE e.airlineId.airlineId = :airlineId " +
+            "AND e.empStatus = :empStatus " +
+            "AND (e.role = :superAdminRole OR e.role = :airlineAdminRole) " +
+            "ORDER BY " +
+            "  CASE WHEN e.role = :superAdminRole THEN 1 " +
+            "       WHEN e.role = :airlineAdminRole THEN 2 " +
+            "       ELSE 3 END, " +
+            "  e.createDate ASC")
     List<String> findAdminEmpIdsByAirlineId(
             @Param("airlineId") Long airlineId,
             @Param("empStatus") CommonEnums.EmpStatus empStatus,
@@ -223,5 +197,36 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
             Pageable pageable
     );
 
-}
+    boolean existsByDepartmentId_DepartmentIdAndEmpStatus(Long departmentId, CommonEnums.EmpStatus empStatus);
 
+    // ✅ ✅ 추가: 부서/팀 구성원 목록 조회 (members API의 핵심)
+    List<Emp> findByDepartmentId_DepartmentId(Long departmentId);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        update Emp e
+           set e.departmentId = null
+         where e.departmentId.departmentId in :deptIds
+    """)
+    int bulkDetachDepartment(@Param("deptIds") List<Long> deptIds);
+
+    interface DeptEmpCountView {
+        Long getDepartmentId();
+        Long getCnt();
+    }
+
+    @Query("""
+        select e.departmentId.departmentId as departmentId,
+               count(e) as cnt
+        from Emp e
+        where e.empStatus = :empStatus
+          and e.departmentId.departmentId in :deptIds
+        group by e.departmentId.departmentId
+    """)
+    List<DeptEmpCountView> countEmployeesByDepartmentIds(
+            @Param("deptIds") List<Long> deptIds,
+            @Param("empStatus") CommonEnums.EmpStatus empStatus
+    );
+
+    long countByDepartmentId_DepartmentIdAndEmpStatus(Long departmentId, CommonEnums.EmpStatus empStatus);
+}

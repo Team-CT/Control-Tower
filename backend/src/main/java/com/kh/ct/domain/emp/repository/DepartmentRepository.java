@@ -5,7 +5,6 @@ import com.kh.ct.global.common.CommonEnums;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
-
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -18,11 +17,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
             CommonEnums.CommonStatus departmentStatus
     );
 
-    /**
-     * ✅ 최상위 부서 목록(검색+페이징)
-     * - manager는 EntityGraph로 같이 로딩(N+1 방지)
-     * - children은 size() 접근 시 N+1 가능(필요하면 최적화 버전 제공 가능)
-     */
     @EntityGraph(attributePaths = {"manager"})
     @Query("""
         select d
@@ -37,10 +31,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
             Pageable pageable
     );
 
-    /**
-     * ✅ 하위 조직(팀) 목록
-     * - 팀의 leader를 child.manager에서 꺼내기 위해 manager도 같이 로딩
-     */
     @EntityGraph(attributePaths = {"manager"})
     @Query("""
         select d
@@ -54,9 +44,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
             @Param("status") CommonEnums.CommonStatus status
     );
 
-    /**
-     * ✅ 상세 조회에서 manager까지 함께 로딩
-     */
     @EntityGraph(attributePaths = {"manager"})
     @Query("""
         select d
@@ -64,4 +51,47 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
         where d.departmentId = :deptId
         """)
     Optional<Department> findByIdWithManager(@Param("deptId") Long deptId);
+
+    boolean existsByParentDepartment_DepartmentId(Long parentId);
+
+    @Query("""
+        select d
+        from Department d
+        where d.parentDepartment.departmentId = :parentId
+        order by d.departmentId asc
+    """)
+    List<Department> findChildrenAll(@Param("parentId") Long parentId);
+
+    // ✅ empCount 리셋 제거: 상태만 비활성화
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("""
+        update Department d
+           set d.departmentStatus = :status
+         where d.departmentId in :ids
+    """)
+    int bulkDeactivate(
+            @Param("ids") List<Long> ids,
+            @Param("status") CommonEnums.CommonStatus status
+    );
+
+    /* =========================================================
+     * ✅ 자식(팀) 수를 parentIds 단위로 한번에 집계 (N+1 방지)
+     * ========================================================= */
+    interface ChildCountView {
+        Long getParentId();
+        Long getCnt();
+    }
+
+    @Query("""
+        select d.parentDepartment.departmentId as parentId,
+               count(d) as cnt
+        from Department d
+        where d.departmentStatus = :status
+          and d.parentDepartment.departmentId in :parentIds
+        group by d.parentDepartment.departmentId
+    """)
+    List<ChildCountView> countChildrenByParentIds(
+            @Param("parentIds") List<Long> parentIds,
+            @Param("status") CommonEnums.CommonStatus status
+    );
 }
