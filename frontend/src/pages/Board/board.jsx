@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './Board.styled';
 import { Search, MessageSquare, Eye, Send, X } from 'lucide-react';
+import api, { uploadApi } from '../../api/axios.js';
 
 const Board = () => {
   const navigate = useNavigate();
@@ -34,14 +35,14 @@ const Board = () => {
       if (category !== '전체') params.append('category', category);
       if (keyword) params.append('keyword', keyword);
 
-      const response = await fetch(`http://localhost:8001/api/board/list?${params.toString()}`, {
+      const response = await api.get(`/api/board/list?${params.toString()}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
 
-      const data = await response.json();
+      const data = response.data;
       setBoardList(data.content || []);
       setTotalPages(data.totalPages || 0);
       setCurrentPage(data.number || 0);
@@ -101,17 +102,13 @@ const Board = () => {
     });
 
     try {
-      const response = await fetch('http://localhost:8001/api/board/write', {
-        method: 'POST',
-        headers: { 'Authorization': `Bearer ${token}` },
-        body: formDataObj, // 브라우저가 자동으로 multipart/form-data 설정
-      });
+      const response = await uploadApi.post('/api/board/write', formDataObj);
 
-      if (response.ok) {
-        alert("등록되었습니다.");
-        handleCloseModal();
-        fetchPosts(activeTab, 0);
-      }
+    if (response.status === 200 || response.status === 201) {
+      alert("등록되었습니다.");
+      handleCloseModal();
+      fetchPosts(activeTab, 0);
+    }
     } catch (error) {
       console.error("글쓰기 실패:", error);
     }

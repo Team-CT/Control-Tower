@@ -1,84 +1,102 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ useNavigate 추가
-import * as S from './EmployeeManagement.styled';
-import { Search, Plus, MoreHorizontal, Phone } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import * as S from "./EmployeeManagement.styled";
+import { Search, Plus, MoreHorizontal, Phone } from "lucide-react";
+import { empService } from "../../api/emp/empService"; // ✅ 네 서비스 경로에 맞춰
 
 const EmployeeManagement = () => {
-  const navigate = useNavigate(); // ✅ 훅 사용
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedDept, setSelectedDept] = useState('전체');
+  const navigate = useNavigate();
 
-  // 부서 목록
-  const departments = ['전체', '인사팀', '운항팀', '객실승무팀', '정비팀', 'IT지원팀'];
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDept, setSelectedDept] = useState("전체");
 
-  // 직원 목록 데이터 (임시)
-  const employees = [
-    {
-      id: '2024001',
-      name: '김민수',
-      position: '대리',
-      department: '인사팀',
-      email: 'ms.kim@skyhr.com',
-      phone: '010-1234-5678',
-      status: '재직',
-      joinDate: '2024-01-15',
-      profileColor: '#4A90E2'
-    },
-    {
-      id: '2023045',
-      name: '이영희',
-      position: '과장',
-      department: '객실승무팀',
-      email: 'yh.lee@skyhr.com',
-      phone: '010-2345-6789',
-      status: '휴직',
-      joinDate: '2023-03-01',
-      profileColor: '#F57C00'
-    },
-    {
-      id: '2022102',
-      name: '박상수',
-      position: '사원',
-      department: '운항팀',
-      email: 'ss.park@skyhr.com',
-      phone: '010-3456-7890',
-      status: '재직',
-      joinDate: '2022-11-20',
-      profileColor: '#27AE60'
-    },
-    {
-      id: '2021056',
-      name: '최지영',
-      position: '팀장',
-      department: 'IT지원팀',
-      email: 'jy.choi@skyhr.com',
-      phone: '010-4567-8901',
-      status: '재직',
-      joinDate: '2021-05-10',
-      profileColor: '#8E44AD'
-    },
-    {
-      id: '2024022',
-      name: '정우성',
-      position: '사원',
-      department: '정비팀',
-      email: 'ws.jung@skyhr.com',
-      phone: '010-5678-9012',
-      status: '퇴직',
-      joinDate: '2024-02-01',
-      profileColor: '#E74C3C'
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const departments = ["전체", "인사팀", "운항팀", "객실승무팀", "정비팀", "IT지원팀"];
+
+  // ✅ 로그인 유저의 airlineId로 교체 권장
+  const airlineId = 1;
+
+  const extractArray = (res) => {
+    const root = res?.data;
+    const payload = root?.data ?? root;
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.content)) return payload.content;
+    return [];
+  };
+
+  const normalizeEmp = (emp) => ({
+    // ✅ crewId는 상세 페이지로 넘길 핵심 값
+    crewId: emp?.empId ?? emp?.emp_id, // 보통 empId(문자열 PK) 기반일 가능성 높음
+    empNo: emp?.empNo ?? emp?.emp_no,
+    empName: emp?.empName ?? emp?.emp_name,
+    departmentName: emp?.departmentName ?? emp?.department_name,
+    job: emp?.job ?? emp?.emp_job ?? emp?.position,
+    phone: emp?.phone ?? emp?.emp_phone,
+    email: emp?.email ?? emp?.emp_email,
+    empStatus: emp?.empStatus ?? emp?.emp_status,
+    startDate: emp?.startDate ?? emp?.start_date,
+  });
+
+  const fetchEmployees = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = {
+        airlineId,
+        q: null,
+        departmentId: null,
+        empStatus: null,
+        page: 0,
+        size: 1000,
+        sort: "empName,asc",
+      };
+
+      const res = await empService.getEmployeesForManagement(params);
+      const rawList = extractArray(res);
+      setEmployees(rawList.map(normalizeEmp));
+    } catch (e) {
+      console.error("직원 목록 조회 실패:", e);
+      setError(e);
+      setEmployees([]);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchEmployees();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [airlineId]);
+
+  const filteredEmployees = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+
+    return employees.filter((emp) => {
+      const deptOk =
+        selectedDept === "전체" ||
+        (emp.departmentName ?? "").trim() === selectedDept.trim();
+
+      const searchOk =
+        q.length === 0 ||
+        (emp.empName ?? "").toLowerCase().includes(q) ||
+        String(emp.empNo ?? "").toLowerCase().includes(q) ||
+        (emp.departmentName ?? "").toLowerCase().includes(q);
+
+      return deptOk && searchOk;
+    });
+  }, [employees, selectedDept, searchQuery]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    console.log('Search:', searchQuery);
   };
 
-  // ✅ 직원 클릭 시 상세 페이지로 이동
-  const handleRowClick = (id) => {
-    navigate('/employee-list/detail');
-    // 실제로는 navigate(`/employee-list/detail/${id}`) 처럼 ID를 함께 넘겨야 합니다.
+  // ✅ 여기만 바꾸면 라우터와 100% 일치
+  const handleRowClick = (crewId) => {
+    if (!crewId) return;
+    navigate(`/crew/${crewId}`);
   };
 
   return (
@@ -87,7 +105,7 @@ const EmployeeManagement = () => {
         <S.PageHeader>
           <S.HeaderLeft>
             <S.PageTitle>직원 관리</S.PageTitle>
-            <S.EmployeeCount>총 {employees.length}명</S.EmployeeCount>
+            <S.EmployeeCount>총 {filteredEmployees.length}명</S.EmployeeCount>
           </S.HeaderLeft>
           <S.AddButton>
             <Plus size={20} />
@@ -95,7 +113,6 @@ const EmployeeManagement = () => {
           </S.AddButton>
         </S.PageHeader>
 
-        {/* 검색 및 필터 영역 */}
         <S.FilterSection>
           <S.SearchForm onSubmit={handleSearch}>
             <Search size={20} color="#999" />
@@ -107,7 +124,7 @@ const EmployeeManagement = () => {
           </S.SearchForm>
 
           <S.FilterGroup>
-            {departments.map(dept => (
+            {departments.map((dept) => (
               <S.FilterButton
                 key={dept}
                 $active={selectedDept === dept}
@@ -119,7 +136,12 @@ const EmployeeManagement = () => {
           </S.FilterGroup>
         </S.FilterSection>
 
-        {/* 직원 목록 테이블 */}
+        {error && (
+          <div style={{ padding: 12, color: "crimson" }}>
+            에러 발생: {String(error?.message ?? error)}
+          </div>
+        )}
+
         <S.TableContainer>
           <S.Table>
             <thead>
@@ -135,59 +157,75 @@ const EmployeeManagement = () => {
                 <S.Th width="50px"></S.Th>
               </tr>
             </thead>
+
             <tbody>
-              {employees.map((emp) => (
-                <S.Tr
-                  key={emp.id}
-                  onClick={() => handleRowClick(emp.id)} // ✅ 클릭 이벤트 추가
-                  style={{ cursor: 'pointer' }} // 커서 모양 변경
-                >
-                  <S.Td>
-                    <S.ProfileImage color={emp.profileColor}>
-                      {emp.name.charAt(0)}
-                    </S.ProfileImage>
-                  </S.Td>
-                  <S.Td>{emp.id}</S.Td>
-                  <S.Td>
-                    <S.NameInfo>
-                      <S.Name>{emp.name}</S.Name>
-                      <S.Email>{emp.email}</S.Email>
-                    </S.NameInfo>
-                  </S.Td>
-                  <S.Td>
-                    <S.DepartmentBadge>{emp.department}</S.DepartmentBadge>
-                  </S.Td>
-                  <S.Td>{emp.position}</S.Td>
-                  <S.Td>
-                    <S.ContactInfo>
-                      <Phone size={14} /> {emp.phone}
-                    </S.ContactInfo>
-                  </S.Td>
-                  <S.Td>
-                    <S.StatusBadge $status={emp.status}>
-                      {emp.status}
-                    </S.StatusBadge>
-                  </S.Td>
-                  <S.Td>{emp.joinDate}</S.Td>
-                  <S.Td>
-                    <S.MoreButton onClick={(e) => e.stopPropagation()}>
-                      <MoreHorizontal size={20} />
-                    </S.MoreButton>
-                  </S.Td>
-                </S.Tr>
-              ))}
+              {loading ? (
+                <tr>
+                  <td colSpan={9} style={{ padding: 20 }}>
+                    로딩중...
+                  </td>
+                </tr>
+              ) : filteredEmployees.length === 0 ? (
+                <tr>
+                  <td colSpan={9} style={{ padding: 20 }}>
+                    결과가 없습니다.
+                  </td>
+                </tr>
+              ) : (
+                filteredEmployees.map((emp) => (
+                  <S.Tr
+                    key={emp.crewId ?? `${emp.empNo}-${emp.empName}`}
+                    onClick={() => handleRowClick(emp.crewId)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <S.Td>
+                      <S.ProfileImage color="#4A90E2">
+                        {(emp.empName || "?").charAt(0)}
+                      </S.ProfileImage>
+                    </S.Td>
+
+                    <S.Td>{emp.empNo ?? "-"}</S.Td>
+
+                    <S.Td>
+                      <S.NameInfo>
+                        <S.Name>{emp.empName ?? "-"}</S.Name>
+                        {emp.email ? <S.Email>{emp.email}</S.Email> : null}
+                      </S.NameInfo>
+                    </S.Td>
+
+                    <S.Td>
+                      <S.DepartmentBadge>{emp.departmentName ?? "-"}</S.DepartmentBadge>
+                    </S.Td>
+
+                    <S.Td>{emp.job ?? "-"}</S.Td>
+
+                    <S.Td>
+                      <S.ContactInfo>
+                        <Phone size={14} /> {emp.phone ?? "-"}
+                      </S.ContactInfo>
+                    </S.Td>
+
+                    <S.Td>
+                      <S.StatusBadge $status={emp.empStatus}>
+                        {emp.empStatus ?? "-"}
+                      </S.StatusBadge>
+                    </S.Td>
+
+                    <S.Td>
+                      {emp.startDate ? String(emp.startDate).slice(0, 10) : "-"}
+                    </S.Td>
+
+                    <S.Td>
+                      <S.MoreButton onClick={(e) => e.stopPropagation()}>
+                        <MoreHorizontal size={20} />
+                      </S.MoreButton>
+                    </S.Td>
+                  </S.Tr>
+                ))
+              )}
             </tbody>
           </S.Table>
         </S.TableContainer>
-
-        <S.Pagination>
-          <S.PaginationButton disabled>‹</S.PaginationButton>
-          <S.PageNumber $active={true}>1</S.PageNumber>
-          <S.PageNumber>2</S.PageNumber>
-          <S.PageNumber>3</S.PageNumber>
-          <S.PaginationButton>›</S.PaginationButton>
-        </S.Pagination>
-
       </S.ContentWrapper>
     </S.PageContainer>
   );
