@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   MainContainer,
   ContentWrapper,
@@ -31,15 +31,9 @@ import {
   PasswordInputGroup,
   PasswordInput,
   ChangePasswordButton,
-  LanguageSelect,
-  ToggleSwitch,
-  ToggleSlider,
   SmallButton,
   InputRow,
 } from './Settings.styled';
-
-import { useAirlineTheme } from '../../context/AirlineThemeContext';
-import useAuthStore from '../../store/authStore';
 
 import { empService } from '../../api/emp/empService';
 import { fileService } from '../../api/emp/fileService';
@@ -51,16 +45,57 @@ import { getApiBaseUrl } from '../../api/config';
  * <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
  */
 
+// ===== 주소 조립/분해 유틸(컴포넌트 밖으로 이동해 의존성 안정화) =====
+const ADDRESS_DELIMITER = ' | ';
+
+const buildAddress = (road, detail) => {
+  const r = (road || '').trim();
+  const d = (detail || '').trim();
+  if (!r) return '';
+  if (!d) return r;
+  return `${r}${ADDRESS_DELIMITER}${d}`;
+};
+
+const splitAddress = (address) => {
+  const raw = (address || '').trim();
+  if (!raw) return { roadAddress: '', detailAddress: '' };
+
+  // 권장 구분자
+  if (raw.includes(ADDRESS_DELIMITER)) {
+    const [road, ...rest] = raw.split(ADDRESS_DELIMITER);
+    return { roadAddress: (road || '').trim(), detailAddress: rest.join(ADDRESS_DELIMITER).trim() };
+  }
+
+  // 혹시 과거 데이터가 | 만 쓰는 경우
+  if (raw.includes('|')) {
+    const [road, ...rest] = raw.split('|');
+    return { roadAddress: (road || '').trim(), detailAddress: rest.join('|').trim() };
+  }
+
+  // 마지막 토큰이 상세로 보이는 경우(보조 규칙)
+  const tokens = raw.split(/\s+/);
+  if (tokens.length <= 1) return { roadAddress: raw, detailAddress: '' };
+
+  const last = tokens[tokens.length - 1];
+  const looksLikeDetail =
+    /(호|층|동|관|번지|unit|room|#)$/i.test(last) ||
+    /^\d{1,4}호$/.test(last) ||
+    /^\d{1,2}층$/.test(last);
+
+  if (!looksLikeDetail) return { roadAddress: raw, detailAddress: '' };
+
+  return {
+    roadAddress: tokens.slice(0, -1).join(' ').trim(),
+    detailAddress: last.trim(),
+  };
+};
+
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('profile');
-  const [selectedLanguage, setSelectedLanguage] = useState('ko');
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
-
-  const { isDarkMode, toggleDarkMode, currentAirline, changeAirline } = useAirlineTheme();
-  const { updateRole } = useAuthStore();
 
   const [profileImage, setProfileImage] = useState(null);
   const [profilePreview, setProfilePreview] = useState(null);
@@ -75,49 +110,6 @@ const Settings = () => {
   const [pwSaving, setPwSaving] = useState(false);
   const [pwError, setPwError] = useState(null);
   const [pwSuccess, setPwSuccess] = useState(null);
-
-  // ✅ 주소 조립/분해 유틸
-  const ADDRESS_DELIMITER = ' | ';
-
-  const buildAddress = (road, detail) => {
-    const r = (road || '').trim();
-    const d = (detail || '').trim();
-    if (!r) return '';
-    if (!d) return r;
-    return `${r}${ADDRESS_DELIMITER}${d}`;
-  };
-
-  const splitAddress = (address) => {
-    const raw = (address || '').trim();
-    if (!raw) return { roadAddress: '', detailAddress: '' };
-
-    if (raw.includes(ADDRESS_DELIMITER)) {
-      const [road, ...rest] = raw.split(ADDRESS_DELIMITER);
-      return { roadAddress: (road || '').trim(), detailAddress: rest.join(ADDRESS_DELIMITER).trim() };
-    }
-    if (raw.includes('|')) {
-      const [road, ...rest] = raw.split('|');
-      return { roadAddress: (road || '').trim(), detailAddress: rest.join('|').trim() };
-    }
-
-    const tokens = raw.split(/\s+/);
-    if (tokens.length <= 1) return { roadAddress: raw, detailAddress: '' };
-
-    const last = tokens[tokens.length - 1];
-    const looksLikeDetail =
-      /(호|층|동|관|번지|unit|room|#)$/i.test(last) ||
-      /^\d{1,4}호$/.test(last) ||
-      /^\d{1,2}층$/.test(last);
-
-    if (!looksLikeDetail) {
-      return { roadAddress: raw, detailAddress: '' };
-    }
-
-    return {
-      roadAddress: tokens.slice(0, -1).join(' ').trim(),
-      detailAddress: last.trim(),
-    };
-  };
 
   const [profile, setProfile] = useState({
     empId: '',
@@ -137,19 +129,33 @@ const Settings = () => {
     profileImageId: null,
   });
 
-  // ✅ 내 프로필 로드 (/me)
-  useEffect(() => {
-    loadMyProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  /**
+   * ✅ 브라우저 직접 호출(이미지 src 등)용 ORIGIN
+   * - getApiBaseUrl() (배포에서 보통 https://api...)를 우선 사용
+   * - 없으면 VITE_API_ORIGIN
+   * - 그것도 없으면 localhost fallback
+   *
+   * 왜 ORIGIN이 필요하냐?
+   * - <img src="..."> 는 axios BASE_URL / 프록시 개념이 아니라 브라우저가 직접 요청함
+   */
+  const API_ORIGIN = useMemo(() => {
+    const byConfig = (getApiBaseUrl() || '').trim();
+    const byEnv = (import.meta.env.VITE_API_ORIGIN || '').trim();
+
+    // 백엔드 로컬 포트가 8001이 아니라면 여기만 바꾸면 됨
+    const fallback = 'http://localhost:8001';
+
+    return (byConfig || byEnv || fallback).replace(/\/$/, '');
   }, []);
 
-  const loadMyProfile = async () => {
+  // ✅ 내 프로필 로드 (/me)
+  const loadMyProfile = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
       const res = await empService.getMyProfile();
-      const data = res.data?.data || res.data;
+      const data = res?.data?.data || res?.data || {};
 
       const serverAddress = data.address ?? '';
       const fromSplit = splitAddress(serverAddress);
@@ -187,10 +193,14 @@ const Settings = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadMyProfile();
+  }, [loadMyProfile]);
 
   const formatPhoneKR = (value) => {
-    const digits = String(value || '').replace(/\D/g, ''); // 숫자만
+    const digits = String(value || '').replace(/\D/g, '');
     if (digits.length <= 3) return digits;
     if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`;
     return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
@@ -201,13 +211,8 @@ const Settings = () => {
   };
 
   const handlePhoneChange = (e) => {
-    const raw = e.target.value;
-    const formatted = formatPhoneKR(raw);
-
-    setProfile((prev) => ({
-      ...prev,
-      phone: formatted,
-    }));
+    const formatted = formatPhoneKR(e.target.value);
+    setProfile((prev) => ({ ...prev, phone: formatted }));
   };
 
   const handleChangeAge = (e) => {
@@ -258,12 +263,10 @@ const Settings = () => {
     }));
   };
 
-  // ✅ 이미지 Preview URL (서버 저장된 이미지)
-  const API_BASE = getApiBaseUrl() || '';
-
+  // ✅ 서버 저장 이미지 URL (브라우저가 직접 호출)
   const serverProfileUrl = useMemo(() => {
-    return profile.profileImageId ? `${API_BASE}/api/file/preview/${profile.profileImageId}` : null;
-  }, [API_BASE, profile.profileImageId]);
+    return profile.profileImageId ? `${API_ORIGIN}/api/file/preview/${profile.profileImageId}` : null;
+  }, [API_ORIGIN, profile.profileImageId]);
 
   useEffect(() => {
     setImageLoadError(false);
@@ -280,7 +283,7 @@ const Settings = () => {
     reader.readAsDataURL(file);
   };
 
-  // ✅ 저장(이미지+텍스트 통합)
+  // ✅ 저장(이미지 + 텍스트 통합)
   const handleSaveAll = async () => {
     try {
       setSaving(true);
@@ -293,13 +296,13 @@ const Settings = () => {
 
       if (profileImage) {
         const uploadRes = await fileService.upload(profileImage);
-        const fileId = uploadRes.data?.fileId;
+        const fileId = uploadRes?.data?.fileId || uploadRes?.data?.data?.fileId;
 
         if (!fileId) throw new Error('업로드 응답에 fileId가 없습니다.');
         nextProfileImageId = fileId;
       }
 
-      // 2) 내 프로필 업데이트 (snake_case로 보내기)
+      // 2) 내 프로필 업데이트 (snake_case)
       await empService.updateMyProfile({
         emp_name: profile.empName,
         age: profile.age,
@@ -311,7 +314,6 @@ const Settings = () => {
 
       alert('변경사항이 저장되었습니다.');
 
-      // 로컬 상태 정리 + 재조회
       setProfileImage(null);
       setProfilePreview(null);
 
@@ -330,11 +332,8 @@ const Settings = () => {
 
   // ✅ 비밀번호 변경 입력 핸들러
   const handlePwChange = (key) => (e) => {
-    const v = e.target.value;
-    setPwForm((prev) => ({ ...prev, [key]: v }));
+    setPwForm((prev) => ({ ...prev, [key]: e.target.value }));
   };
-
-
 
   // ✅ 비밀번호 변경 API 호출
   const handleChangePassword = async () => {
@@ -343,22 +342,12 @@ const Settings = () => {
       setPwError(null);
       setPwSuccess(null);
 
-      if (!pwForm.currentPassword) {
-        setPwError('현재 비밀번호를 입력해주세요.');
-        return;
-      }
-      if (!pwForm.newPassword) {
-        setPwError('새 비밀번호를 입력해주세요.');
-        return;
-      }
-      if (pwForm.newPassword !== pwForm.confirmPassword) {
-        setPwError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
-        return;
-      }
-      if (pwForm.currentPassword === pwForm.newPassword) {
-        setPwError('현재 비밀번호와 다른 비밀번호를 사용해주세요.');
-        return;
-      }
+      if (!pwForm.currentPassword) return setPwError('현재 비밀번호를 입력해주세요.');
+      if (!pwForm.newPassword) return setPwError('새 비밀번호를 입력해주세요.');
+      if (pwForm.newPassword !== pwForm.confirmPassword)
+        return setPwError('새 비밀번호와 확인 비밀번호가 일치하지 않습니다.');
+      if (pwForm.currentPassword === pwForm.newPassword)
+        return setPwError('현재 비밀번호와 다른 비밀번호를 사용해주세요.');
 
       await empService.changeMyPassword({
         current_password: pwForm.currentPassword,
@@ -414,14 +403,15 @@ const Settings = () => {
                       src={serverProfileUrl}
                       alt="프로필"
                       style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
-                      onError={(e) => {
-                        console.warn('프로필 이미지 로드 실패 (ID:', profile.profileImageId, '):', serverProfileUrl);
+                      onError={() => {
+                        console.warn('프로필 이미지 로드 실패:', serverProfileUrl);
                         setImageLoadError(true);
                       }}
                     />
                   ) : (
                     <AvatarInitial>{profile.empName ? profile.empName.charAt(0) : '🙂'}</AvatarInitial>
                   )}
+
                   <CameraIcon>📷</CameraIcon>
 
                   <input
@@ -562,8 +552,8 @@ const Settings = () => {
                 </SecurityCardHeader>
 
                 <SecurityCardBody>
-                  {pwError && <div style={{ padding: '10px 0', color: theme?.status?.error || '#dc2626' }}>{pwError}</div>}
-                  {pwSuccess && <div style={{ padding: '10px 0', color: theme?.status?.success || '#16a34a' }}>{pwSuccess}</div>}
+                  {pwError && <div style={{ padding: '10px 0', color: '#dc2626' }}>{pwError}</div>}
+                  {pwSuccess && <div style={{ padding: '10px 0', color: '#16a34a' }}>{pwSuccess}</div>}
 
                   <SecurityItem>
                     <SecurityItemLeft>
@@ -626,10 +616,6 @@ const Settings = () => {
                   </ActionButtons>
                 </SecurityCardBody>
               </SecurityCard>
-              <ActionButtons>
-                <CancelButton>취소</CancelButton>
-                <SaveButton>변경사항 저장</SaveButton>
-              </ActionButtons>
             </SecuritySection>
           </TabContent>
         )}
