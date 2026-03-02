@@ -137,4 +137,19 @@ public class Emp extends BaseTimeEntity {
         this.leaveCount = Math.round((this.leaveCount - days) * 10.0) / 10.0;
     }
 
+    /**
+     * 휴가 반려 시 연차 복원
+     * 
+     * @param days 복원할 일수
+     */
+    public void restoreLeaveCount(Double days) {
+        if (this.leaveCount == null) {
+            this.leaveCount = 0.0;
+        }
+        this.leaveCount = Math.round((this.leaveCount + days) * 10.0) / 10.0;
+    }
+
+    public void changeDepartment(Department department) {
+        this.departmentId = department;
+    }
 }
