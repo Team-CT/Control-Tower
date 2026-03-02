@@ -13,6 +13,8 @@ import com.kh.ct.global.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -390,5 +392,35 @@ public class EmpServiceImpl implements EmpService {
                 .email(airline.getEmail() != null ? airline.getEmail() : "")
                 .build();
     }
+    @Override
+    public Page<EmpDto.EmployeeManagementRow> getEmployeesForManagement(
+            Long airlineId,
+            String q,
+            Long departmentId,
+            String empStatus,
+            Pageable pageable
+    ) {
+        if (airlineId == null) {
+            throw new BusinessException(HttpStatus.BAD_REQUEST, "airlineId는 필수입니다.");
+        }
 
+        CommonEnums.EmpStatus statusEnum = null;
+        if (empStatus != null && !empStatus.isBlank()) {
+            try {
+                statusEnum = CommonEnums.EmpStatus.valueOf(empStatus.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new BusinessException(HttpStatus.BAD_REQUEST, "유효하지 않은 empStatus 입니다: " + empStatus);
+            }
+        }
+
+        String keyword = (q != null && !q.isBlank()) ? q.trim() : null;
+
+        return empRepository.findEmployeeManagementRowsByAirline(
+                airlineId,
+                keyword,
+                departmentId,
+                statusEnum,
+                pageable
+        );
+    }
 }

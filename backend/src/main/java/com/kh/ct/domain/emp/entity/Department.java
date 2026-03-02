@@ -18,21 +18,79 @@ public class Department {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long departmentId;
 
-    @Column(length = 100)
+    @Column(nullable = false, length = 100)
     private String departmentName;
-
-    private Integer empCount;
 
     @JoinColumn(name = "parent_department")
     @ManyToOne(fetch = FetchType.LAZY, optional = true)
     private Department parentDepartment;
 
-
     @Column(nullable = false, length = 1)
     @Enumerated(EnumType.STRING)
     private CommonEnums.CommonStatus departmentStatus;
-  
+
+    // 🔹 부서 담당자 (부서장)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manager_emp_id")
+    private Emp manager;
+
+    // 🔹 부서 설명
+    @Column(length = 1000)
+    private String description;
 
     @OneToMany(mappedBy = "parentDepartment", fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Department> children = new ArrayList<>();
+
+    /* =========================================================
+     * ✅ 생명주기 훅: 기본값 보정(Null Safety)
+     * ========================================================= */
+    @PrePersist
+    public void prePersist() {
+        if (this.departmentStatus == null) this.departmentStatus = CommonEnums.CommonStatus.Y;
+        if (this.children == null) this.children = new ArrayList<>();
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        if (this.children == null) this.children = new ArrayList<>();
+    }
+
+    /* =========================================================
+     * ✅ 도메인 메서드
+     * ========================================================= */
+    public void changeName(String name) {
+        this.departmentName = name;
+    }
+
+    public void changeParent(Department parent) {
+        this.parentDepartment = parent;
+    }
+
+    public void changeManager(Emp manager) {
+        this.manager = manager;
+    }
+
+    public void changeDescription(String description) {
+        this.description = description;
+    }
+
+    public void changeStatus(CommonEnums.CommonStatus status) {
+        this.departmentStatus = status;
+    }
+
+    /* =========================================================
+     * (선택) 양방향 정합성 유틸
+     * ========================================================= */
+    public void addChild(Department child) {
+        if (child == null) return;
+        this.children.add(child);
+        child.changeParent(this);
+    }
+
+    public void removeChild(Department child) {
+        if (child == null) return;
+        this.children.remove(child);
+        child.changeParent(null);
+    }
 }
