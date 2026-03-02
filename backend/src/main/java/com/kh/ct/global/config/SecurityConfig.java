@@ -44,7 +44,6 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
 
-
                 // ✅ 권한 규칙
                 .authorizeHttpRequests(auth -> auth
 
@@ -64,6 +63,14 @@ public class SecurityConfig {
                         // =========================
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/refresh").permitAll()
+
+                        // ⚠️ (주의) valkey 관련 API를 외부에 공개하는 것은 보안 위험 가능
+                        // - 개발/테스트용이면 dev 프로필에서만 열거나
+                        // - 최소 ADMIN 이상 권한으로 제한 권장
+                        .requestMatchers(HttpMethod.POST, "/api/valkey/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/valkey/**").permitAll()
+
+                        // 회원가입/사전 단계
                         .requestMatchers(HttpMethod.POST, "/api/auth/ocr-business-card").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/signup").permitAll()
 
@@ -118,10 +125,7 @@ public class SecurityConfig {
                         // =========================
                         // 4) 인증 필요(민감/개인/업무)
                         // =========================
-                        // ✅ 이 라인은 permitAll 와일드카드보다 아래에 두면 뚫릴 수 있음
-                        //    지금은 permitAll 쪽에 /api/emps/me/**를 넣지 않았으니 안전
                         .requestMatchers("/api/emps/me/**").authenticated()
-
                         .requestMatchers("/api/attendance/**").authenticated()
                         .requestMatchers("/api/notifications/**").authenticated()
                         .requestMatchers("/api/support/**").authenticated()
@@ -159,7 +163,6 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        // ✅ 운영 서버 도메인 추가
         corsConfiguration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:5173",
                 "http://localhost:5174",
