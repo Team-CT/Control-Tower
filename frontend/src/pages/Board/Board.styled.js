@@ -3,7 +3,7 @@ import styled from 'styled-components';
 export const PageContainer = styled.div`
   display: flex;
   min-height: 100vh;
-  background: transparent;
+  background: ${({ theme }) => theme.background.secondary};
   width: 100%;
 `;
 
@@ -42,7 +42,7 @@ export const PageTitle = styled.h1`
 
 export const CreateButton = styled.button`
   background: ${({ theme }) => theme.colors.primary};
-  color: white;
+  color: ${({ theme }) => theme.text.inverse || 'white'};
   border: none;
   padding: 12px 28px;
   border-radius: 8px;
@@ -53,35 +53,32 @@ export const CreateButton = styled.button`
   box-shadow: ${({ theme }) => theme.shadow};
 
   &:hover {
-    filter: brightness(0.9);
+    background: ${({ theme }) => theme.colors.primaryHover || theme.colors.primary};
     transform: translateY(-2px);
-    box-shadow: ${({ theme }) => theme.shadowHover};
+    box-shadow: ${({ theme }) => theme.shadowLg};
   }
 `;
 
 export const TabSection = styled.div`
   display: flex;
   gap: 8px;
-  margin-bottom: 32px;
-  border-bottom: 2px solid ${({ theme }) => theme.border};
-  padding-bottom: 0;
+  margin-bottom: 24px;
 `;
 
 export const Tab = styled.button`
-  background: none;
-  border: none;
-  padding: 14px 28px;
-  font-size: 15px;
+  padding: 10px 20px;
+  border: 2px solid ${({ theme, $active }) => $active ? theme.colors.primary : theme.border};
+  background: ${({ theme, $active }) => $active ? theme.colors.primary : theme.background.paper};
+  color: ${({ theme, $active }) => $active ? (theme.text.inverse || 'white') : theme.text.secondary};
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 600;
-  color: ${props => props.$active ? props.theme.colors.primary : props.theme.text.secondary};
   cursor: pointer;
-  position: relative;
   transition: all 0.2s;
-  border-bottom: 3px solid ${props => props.$active ? props.theme.colors.primary : 'transparent'};
-  margin-bottom: -2px;
 
   &:hover {
-    color: ${props => props.$active ? props.theme.colors.primary : props.theme.text.primary};
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme, $active }) => $active ? (theme.text.inverse || 'white') : theme.colors.primary};
   }
 `;
 
@@ -106,22 +103,22 @@ export const SearchInput = styled.input`
   border-radius: 8px 0 0 8px;
   font-size: 15px;
   outline: none;
-  background: ${({ theme }) => theme.background.input};
-  color: ${({ theme }) => theme.text.primary};
   transition: border-color 0.2s;
+  background: ${({ theme }) => theme.background.paper};
+  color: ${({ theme }) => theme.text.primary};
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.primary};
   }
 
   &::placeholder {
-    color: ${({ theme }) => theme.text.disabled};
+    color: ${({ theme }) => theme.text.disabled || theme.text.tertiary};
   }
 `;
 
 export const SearchButton = styled.button`
   background: ${({ theme }) => theme.colors.primary};
-  color: white;
+  color: ${({ theme }) => theme.text.inverse || 'white'};
   border: none;
   padding: 14px 24px;
   border-radius: 0 8px 8px 0;
@@ -132,15 +129,15 @@ export const SearchButton = styled.button`
   transition: background 0.2s;
 
   &:hover {
-    filter: brightness(0.9);
+    background: ${({ theme }) => theme.colors.primaryHover || theme.colors.primary};
   }
 `;
 
 export const FilterButton = styled.button`
   padding: 12px 24px;
-  border: 2px solid ${props => props.active ? props.theme.colors.primary : props.theme.border};
-  background: ${props => props.active ? props.theme.colors.primary : props.theme.background.paper};
-  color: ${props => props.active ? 'white' : props.theme.text.secondary};
+  border: 2px solid ${({ theme, $active }) => $active ? theme.colors.primary : theme.border};
+  background: ${({ theme, $active }) => $active ? theme.colors.primary : theme.background.paper};
+  color: ${({ theme, $active }) => $active ? (theme.text.inverse || 'white') : theme.text.secondary};
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
@@ -148,8 +145,8 @@ export const FilterButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    border-color: ${props => props.active ? props.theme.colors.primary : props.theme.text.secondary};
-    color: ${props => props.active ? 'white' : props.theme.text.primary};
+    border-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme, $active }) => $active ? (theme.text.inverse || 'white') : theme.colors.primary};
   }
 `;
 
@@ -166,32 +163,27 @@ export const BoardItem = styled.div`
   padding: 24px 28px;
   display: flex;
   gap: 20px;
-  align-items: flex-start;
-  box-shadow: ${({ theme }) => theme.shadow};
+  align-items: center;
+  box-shadow: ${({ theme }) => theme.shadowSm};
   transition: all 0.2s;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 1px solid ${({ theme }) => theme.border};
 
   &:hover {
-    box-shadow: ${({ theme }) => theme.shadowHover};
+    box-shadow: ${({ theme }) => theme.shadow};
     transform: translateY(-2px);
-    border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
 export const CategoryBadge = styled.div`
-  background: ${props => props.bgColor || `${props.theme.colors.primary}15`};
-  color: ${props => {
-    if (props.bgColor === '#FFE5E5') return props.theme.status.error;
-    if (props.bgColor === '#FFF9E5') return props.theme.status.warning;
-    return props.theme.colors.primary;
-  }};
-  padding: 8px 16px;
+  background: ${({ theme }) => `${theme.colors.primary}15`};
+  color: ${({ theme }) => theme.colors.primary};
+  padding: 6px 12px;
   border-radius: 6px;
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
-  min-width: 70px;
+  min-width: 80px;
   text-align: center;
 `;
 
@@ -199,7 +191,7 @@ export const BoardContent = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 `;
 
 export const BoardTitle = styled.h3`
@@ -218,7 +210,7 @@ export const BoardMetaRow = styled.div`
 
 export const BoardMeta = styled.div`
   display: flex;
-  gap: 20px;
+  gap: 16px;
   align-items: center;
 `;
 
@@ -228,25 +220,6 @@ export const MetaItem = styled.div`
   gap: 6px;
   font-size: 13px;
   color: ${({ theme }) => theme.text.secondary};
-`;
-
-export const MetaIcon = styled.span`
-  font-size: 14px;
-`;
-
-export const BoardStats = styled.div`
-  display: flex;
-  gap: 16px;
-  align-items: center;
-`;
-
-export const StatItem = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.text.secondary};
-  font-weight: 500;
 `;
 
 export const Pagination = styled.div`
@@ -282,57 +255,50 @@ export const PaginationButton = styled.button`
 export const PageNumber = styled.button`
   width: 40px;
   height: 40px;
-  border: 1px solid ${props => props.active ? props.theme.colors.primary : props.theme.border};
-  background: ${props => props.active ? props.theme.colors.primary : props.theme.background.paper};
-  color: ${props => props.active ? 'white' : props.theme.text.secondary};
+  border: 1px solid ${({ theme, $active }) => $active ? theme.colors.primary : theme.border};
+  background: ${({ theme, $active }) => $active ? theme.colors.primary : theme.background.paper};
+  color: ${({ theme, $active }) => $active ? (theme.text.inverse || 'white') : theme.text.secondary};
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
-  font-weight: ${props => props.active ? '600' : '500'};
+  font-weight: ${({ $active }) => $active ? '600' : '500'};
   transition: all 0.2s;
 
   &:hover {
     border-color: ${({ theme }) => theme.colors.primary};
-    color: ${props => props.active ? 'white' : props.theme.colors.primary};
+    color: ${({ theme, $active }) => $active ? (theme.text.inverse || 'white') : theme.colors.primary};
   }
 `;
 
 export const ModalOverlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: flex; align-items: center; justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
 `;
 
 export const ModalContainer = styled.div`
   background: ${({ theme }) => theme.background.paper};
-  width: 600px;
-  border-radius: 12px;
-  box-shadow: ${({ theme }) => theme.shadow};
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  width: 560px;
   max-height: 90vh;
+  overflow-y: auto;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: ${({ theme }) => theme.shadowLg};
+  border: 1px solid ${({ theme }) => theme.border};
 `;
 
 export const ModalHeader = styled.div`
-  padding: 20px 24px;
-  border-bottom: 1px solid ${({ theme }) => theme.border};
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: ${({ theme }) => theme.background.secondary};
+  margin-bottom: 24px;
 `;
 
-export const ModalTitle = styled.h2`
-  font-size: 18px;
+export const ModalTitle = styled.h3`
+  margin: 0;
+  font-size: 20px;
   font-weight: 700;
   color: ${({ theme }) => theme.text.primary};
   display: flex;
@@ -343,24 +309,32 @@ export const ModalTitle = styled.h2`
 export const CloseButton = styled.button`
   background: none;
   border: none;
+  font-size: 24px;
   cursor: pointer;
   color: ${({ theme }) => theme.text.secondary};
-  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 6px;
+  transition: all 0.2s;
 
   &:hover {
+    background: ${({ theme }) => theme.background.hover};
     color: ${({ theme }) => theme.text.primary};
   }
 `;
 
 export const ModalBody = styled.div`
-  padding: 24px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 `;
 
 export const PostForm = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 `;
 
 export const FormGroup = styled.div`
@@ -370,52 +344,57 @@ export const FormGroup = styled.div`
 `;
 
 export const FormLabel = styled.label`
-  font-size: 14px;
   font-weight: 600;
+  font-size: 14px;
   color: ${({ theme }) => theme.text.primary};
 `;
 
-export const FormInput = styled.input`
-  padding: 12px;
+export const FormSelect = styled.select`
+  padding: 10px 14px;
   border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
-  font-size: 15px;
-  outline: none;
-  background: ${({ theme }) => theme.background.input};
+  font-size: 14px;
+  background: ${({ theme }) => theme.background.paper};
   color: ${({ theme }) => theme.text.primary};
-  transition: border-color 0.2s;
+  outline: none;
+  cursor: pointer;
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.primary};
   }
 `;
 
-export const FormSelect = styled.select`
-  padding: 12px;
+export const FormInput = styled.input`
+  padding: 10px 14px;
   border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
-  font-size: 15px;
-  outline: none;
-  background: ${({ theme }) => theme.background.input};
+  font-size: 14px;
+  background: ${({ theme }) => theme.background.paper};
   color: ${({ theme }) => theme.text.primary};
+  outline: none;
   transition: border-color 0.2s;
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.primary};
+  }
+
+  &[type="file"] {
+    padding: 8px;
+    cursor: pointer;
   }
 `;
 
 export const FormTextarea = styled.textarea`
-  padding: 12px;
+  padding: 10px 14px;
   border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
-  font-size: 15px;
-  resize: vertical;
-  outline: none;
-  transition: border-color 0.2s;
-  font-family: inherit;
-  background: ${({ theme }) => theme.background.input};
+  font-size: 14px;
+  background: ${({ theme }) => theme.background.paper};
   color: ${({ theme }) => theme.text.primary};
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 0.2s;
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.primary};
@@ -425,39 +404,38 @@ export const FormTextarea = styled.textarea`
 export const ModalFooter = styled.div`
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 10px;
+  margin-top: 8px;
 `;
 
 export const CancelButton = styled.button`
-  padding: 12px 24px;
-  background: ${({ theme }) => theme.background.paper};
+  padding: 10px 20px;
+  background: ${({ theme }) => theme.background.secondary};
+  color: ${({ theme }) => theme.text.secondary};
   border: 1px solid ${({ theme }) => theme.border};
   border-radius: 8px;
+  cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  color: ${({ theme }) => theme.text.secondary};
-  cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    background: ${({ theme }) => theme.background.secondary};
-    border-color: ${({ theme }) => theme.text.disabled};
+    background: ${({ theme }) => theme.background.hover};
   }
 `;
 
 export const SubmitButton = styled.button`
-  padding: 12px 24px;
+  padding: 10px 20px;
   background: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.text.inverse || 'white'};
   border: none;
   border-radius: 8px;
+  cursor: pointer;
   font-size: 14px;
   font-weight: 600;
-  color: white;
-  cursor: pointer;
   transition: all 0.2s;
 
   &:hover {
-    filter: brightness(0.9);
+    background: ${({ theme }) => theme.colors.primaryHover || theme.colors.primary};
   }
 `;

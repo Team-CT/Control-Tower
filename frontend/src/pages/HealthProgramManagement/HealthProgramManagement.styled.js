@@ -421,8 +421,7 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalContainer = styled.div`
-  background: ${({ theme }) =>
-    theme.mode === 'dark' ? theme.background.paper : '#ffffff'};
+  background: ${({ theme }) => theme.background.paper};
   border-radius: 12px;
   width: 100%;
   max-width: 600px;
