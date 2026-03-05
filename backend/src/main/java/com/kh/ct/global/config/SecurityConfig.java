@@ -30,10 +30,6 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    /**
-     * ✅ 배포에서 이 로그가 안 뜨면:
-     * - 이 SecurityConfig가 로딩/적용되지 않은 상태(스캔/배포/JAR 반영/빈 생성 실패 등)
-     */
     @PostConstruct
     public void loaded() {
         log.info("✅ SecurityConfig LOADED");
@@ -57,7 +53,6 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
 
-                // ✅ 권한 규칙
                 .authorizeHttpRequests(auth -> auth
 
                         // =========================
@@ -134,11 +129,6 @@ public class SecurityConfig {
                         .requestMatchers("/api/notifications/stream").permitAll()
 
                         // =========================
-                        // (주의) 운영에서 공개 금지 권장: Valkey 관련
-                        // =========================
-                        .requestMatchers("/api/valkey/**").hasRole("SUPER_ADMIN")
-
-                        // =========================
                         // 3) 파일: 다운로드만 공개, 나머지는 인증
                         //    (중요) 더 구체적인 다운로드 패턴을 먼저 둬야 함
                         // =========================
@@ -146,7 +136,22 @@ public class SecurityConfig {
                         .requestMatchers("/api/file/**").authenticated()
 
                         // =========================
-                        // 4) 인증 필요(민감/개인/업무)
+                        // 4) 대시보드/보드 등 (머지 충돌 구간 정리)
+                        //    ⚠️ "구체 경로"가 "와일드카드"보다 위로
+                        // =========================
+                        .requestMatchers("/api/dashboard/admin/**").hasRole("AIRLINE_ADMIN")
+                        .requestMatchers("/api/dashboard/**").authenticated()
+
+                        // 보드: 공개로 둘 거면 permitAll, 아니면 authenticated로 바꾸세요.
+                        .requestMatchers("/api/board/**").permitAll()
+
+                        // =========================
+                        // 5) Valkey 관련 (운영 공개 금지 권장)
+                        // =========================
+                        .requestMatchers("/api/valkey/**").hasRole("SUPER_ADMIN")
+
+                        // =========================
+                        // 6) 인증 필요(민감/개인/업무)
                         // =========================
                         // 내 정보 (와일드카드보다 우선순위 높게)
                         .requestMatchers("/api/emps/me/**").authenticated()
@@ -163,7 +168,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/emp/**").authenticated()
 
                         // =========================
-                        // 5) Role 기반
+                        // 7) Role 기반
                         // =========================
                         .requestMatchers("/api/super-admin/**").hasRole("SUPER_ADMIN")
 
@@ -191,7 +196,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/attendance/**").permitAll()
                         .requestMatchers("/api/health/admin/**").permitAll()
                         // =========================
-                        // 6) 그 외 전부 인증
+                        // 8) 그 외 전부 인증
                         // =========================
                         .anyRequest().authenticated()
                 )
@@ -204,7 +209,7 @@ public class SecurityConfig {
 
     /**
      * ✅ CORS 설정
-     * - 운영 프론트: https://yoojh.store, https://www.yoojh.store (혹은 실제 운영 도메인)
+     * - 운영 프론트: https://yoojh.store, https://www.yoojh.store (또는 실제 운영 도메인)
      * - 개발 프론트: http://localhost:5173, http://localhost:5174
      *
      * ⚠️ allowCredentials(true)이므로 allowedOrigins에 "*" 사용 불가
@@ -230,8 +235,7 @@ public class SecurityConfig {
         // ✅ preflight 포함
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
-        // ✅ 운영에서 너무 빡빡하면 프론트에서 헤더 추가될 때 CORS 에러가 나므로
-        //    일단 "*"로 열고, 안정화 후 필요한 헤더만 화이트리스트로 좁히는 전략도 가능
+        // ✅ 헤더 허용
         config.addAllowedHeader("*");
 
         // ✅ 브라우저에서 접근 가능하게 노출할 헤더(다운로드/인증에 유용)
