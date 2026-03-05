@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -134,7 +135,23 @@ public class BoardService {
 
         // 2. 관련 파일 매핑 데이터 삭제 (BoardFile)
         // 만약 Board 엔티티에서 BoardFile을 CascadeType.REMOVE로 설정했다면 이 과정은 자동 생략 가능합니다.
+
+        List<BoardFile> boardFiles = boardFileRepository.findByBoardId(board);
+
+        // ✅ 먼저 파일 PK들만 뽑아서 보관
+        List<Long> fileIds = boardFiles.stream()
+                .map(BoardFile::getFileId)
+                .filter(Objects::nonNull)
+                .map(File::getFileId)   // bf.getFileId().getFileId() 와 동일
+                .toList();
+
+        // ✅ FK 때문에 매핑 먼저 삭제
         boardFileRepository.deleteByBoardId(board);
+
+        // ✅ 그 다음 실제 파일(S3 + FILE 메타) 삭제
+        for (Long fileId : fileIds) {
+            fileService.deleteFile(fileId);
+        }
 
         // 3. 게시글 삭제
         boardRepository.delete(board);

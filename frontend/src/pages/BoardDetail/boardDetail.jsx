@@ -14,7 +14,7 @@ const BoardDetail = () => {
   const isFetched = useRef(false);
 const handleDownload = (fileId, fileName) => {
     // 예시: 서버의 다운로드 API 호출
-    window.location.href = `http://localhost:8001/api/board/download/${fileId}`;
+    window.location.href = `https://api.ct1.shop/api/board/download/${fileId}`;
   };
   // --- [1] 데이터 로드 (API 호출) ---
   useEffect(() => {
@@ -110,7 +110,7 @@ try {
                     {post.files.map((file, index) => (
                       <li key={index} style={{ marginBottom: '8px' }}>
                         <a 
-                          href={`http://localhost:8001/api/file/download/${file.fileId}`} // 백엔드 다운로드 경로 확인 필요
+                          href={`https://api.ct1.shop/api/file/download/${file.fileId}`} // 백엔드 다운로드 경로 확인 필요
                           style={{ 
                             display: 'flex', 
                             alignItems: 'center', 

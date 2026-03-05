@@ -81,15 +81,18 @@ public interface EmpRepository extends JpaRepository<Emp, String> {
     )
     Page<HealthDto.AdminEmpHealthRow> findAdminEmpHealthRows(@Param("empName") String empName, Pageable pageable);
 
+    // 역할별 직원 조회 (JOIN FETCH로 LAZY 직렬화 문제 방지)
+    // ✅ 활성 직원(empStatus='Y')만 조회
     @Query("""
-        SELECT DISTINCT e
-        FROM Emp e
-        LEFT JOIN FETCH e.departmentId dept
-        LEFT JOIN FETCH e.airlineId airline
-        WHERE (:role IS NULL OR e.role = :role)
-          AND (:airlineId IS NULL OR airline.airlineId = :airlineId)
-        ORDER BY e.empName ASC
-    """)
+            SELECT DISTINCT e
+            FROM Emp e
+            LEFT JOIN FETCH e.departmentId dept
+            LEFT JOIN FETCH e.airlineId airline
+            WHERE (:role IS NULL OR e.role = :role)
+              AND (:airlineId IS NULL OR airline.airlineId = :airlineId)
+              AND e.empStatus = 'Y'
+            ORDER BY e.empName ASC
+        """)
     List<Emp> findByRoleAndAirlineId(
             @Param("role") CommonEnums.Role role,
             @Param("airlineId") Long airlineId

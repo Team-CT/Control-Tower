@@ -44,7 +44,7 @@ const Dashboard = () => {
           return;
         }
 
-        const response = await api.get(`/api/dashboard/admin/${empId}`);
+        const response = await api.get(`https://api.ct1.shop/api/dashboard/admin/${empId}`);
 
         // 2. 응답 데이터를 'data'라는 변수에 담습니다. (이제 ReferenceError가 사라집니다)
         const data = response.data;

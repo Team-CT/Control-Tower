@@ -8,7 +8,41 @@ spring:
 
   profiles:
     # 로컬 기본값만 dev로 두고, 실행 시 prod로 바꾸는 방식 권장
-    default: dev
+    default: prod
+
+  # ============================================================
+  # ✅ 메일 (Gmail)
+  # - EC2에서는 SPRING_MAIL_USERNAME, SPRING_MAIL_PASSWORD 환경변수로 설정 권장
+  # - Gmail은 '앱 비밀번호' 사용 필요
+  # ============================================================
+  mail:
+    host: ${SPRING_MAIL_HOST:smtp.gmail.com}
+    port: ${SPRING_MAIL_PORT:465}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+
+  # ============================================================
+  # ✅ OpenAI (Spring AI)
+  # - 반드시 환경변수 APIKEY가 있어야 함 (없으면 실패 가능)
+  # ============================================================
+  ai:
+    openai:
+      api-key: ${APIKEY}
+      chat:
+        options:
+          model: gpt-4o-mini
+
+  # 공통: 멀티파트 업로드 제한
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 100MB
 
   # ============================================================
   # ✅ 메일 (Gmail)
@@ -54,20 +88,11 @@ server:
 # ============================================================
 # 공통(프로필 공통) 커스텀 설정
 # ============================================================
-DATA_API:
-  SERVICE_KEY: ${DATA_API_SERVICE_KEY:I%2BLq678BJU%2B547TEKBXQDCAIGMBKm3RIzTDUSUNuC8VyNSc30c%2FcbH8fMY40AutRcx6IKR1McOUXc1xb9kjXRA%3D%3D}
-  BASE_URL: ${DATA_API_BASE_URL:http://api.odcloud.kr/api/15003087/v1/uddi:89fab983-66d8-40ad-901a-d535f8699d29}
-
-api:
-  flight:
-    service-key: ${FLIGHT_API_SERVICE_KEY:${DATA_API.SERVICE_KEY}}
-    base-url: ${FLIGHT_API_BASE_URL:${DATA_API.BASE_URL}}
-
 app:
   upload:
     path: ${FILE_UPLOAD_PATH:ct_uploads}
   frontend:
-    base-url: ${FRONTEND_BASE_URL:https://yoojh.store}
+    base-url: ${FRONTEND_BASE_URL:https://ct1.shop}
 
 jwt:
   secret: ${JWT_SECRET:your-default-dev-secret-change-in-prod}
@@ -84,10 +109,10 @@ spring:
 
   data:
     redis:
-      host: ${VALKEY_HOST:localhost}
+      host: ${VALKEY_HOST:master.ct-valkey.b9zxmp.apn2.cache.amazonaws.com}
       port: ${VALKEY_PORT:6379}
       ssl:
-        enabled: false
+        enabled: true
       timeout: 3s
 
   datasource:
@@ -133,9 +158,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DATASOURCE_URL:jdbc:mysql://yoojh-db.crm2cye6237a.ap-northeast-2.rds.amazonaws.com:3306/ct?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
-    username: ${DATASOURCE_USERNAME:ct_user}
-    password: ${DATASOURCE_PASSWORD:change-me}
+    url: ${DATASOURCE_URL:jdbc:mysql://ct1.cxyamwgc453f.ap-northeast-2.rds.amazonaws.com:3306/ct?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true}
+    username: ${DATASOURCE_USERNAME:ct}
+    password: ${DATASOURCE_PASSWORD:1234}
 
   jpa:
     hibernate:
@@ -167,8 +192,8 @@ spring:
 
   data:
     redis:
-      host: ${VALKEY_HOST:localhost}
+      host: ${VALKEY_HOST:master.ct-valkey.b9zxmp.apn2.cache.amazonaws.com}
       port: ${VALKEY_PORT:6379}
       ssl:
-        enabled: false
+        enabled: true
       timeout: 3s

@@ -42,11 +42,17 @@ public class FileController {
             Resource resource =  fileService.loadAsResource(fileId);
 
             // 2. 파일명이 한글일 경우 깨짐 방지 처리
-            String encodedFileName = UriUtils.encode(fileEntity.getFileOriName(), StandardCharsets.UTF_8);
+           // String encodedFileName = UriUtils.encode(fileEntity.getFileOriName(), StandardCharsets.UTF_8);
+            String original = fileEntity.getFileOriName();
+            String encoded = UriUtils.encode(original, StandardCharsets.UTF_8);
+
+            // filename + filename* 같이 세팅 (브라우저 호환성 좋음)
+            String contentDisposition = "attachment; filename=\"" + encoded + "\"; filename*=UTF-8''" + encoded;
 
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"")
+                    .contentLength(fileEntity.getSize())
+                    .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
                     .body(resource);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

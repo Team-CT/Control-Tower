@@ -35,7 +35,7 @@ import {
   EmptyText,
   CardTitleGroup
 } from './HealthSubmissionHistory.styled';
-import { empPhysicalTestService } from '../../api/Health/healthService';
+import healthService, { empPhysicalTestService } from '../../api/Health/healthService';
 import useAuthStore from '../../store/authStore';
 import { PageNumber, Pagination, PaginationButton } from '../../styles/GlobalStyle';
 
@@ -104,9 +104,41 @@ const HealthSubmissionHistory = () => {
     });
   }, [items, currentPage]);
 
-  const handleDownload = (file_id) => {
+  const handleDownload = async (file_id) => {
     console.log(file_id)
     if (!file_id) return;
+    try {
+    const res = await healthService.fileDownload(file_id);
+
+    const disposition = res.headers?.['content-disposition'] || '';
+    let filename = 'download.pdf';
+
+    // filename*=UTF-8''... 우선 처리
+    const matchStar = disposition.match(/filename\*\=UTF-8''([^;]+)/i);
+    if (matchStar?.[1]) {
+      filename = decodeURIComponent(matchStar[1]);
+    } else {
+      // filename="..."
+      const match = disposition.match(/filename="([^"]+)"/i);
+      if (match?.[1]) filename = decodeURIComponent(match[1]);
+    }
+
+    const blob = new Blob([res.data], { type: res.headers?.['content-type'] || 'application/octet-stream' });
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (e) {
+    console.error(e);
+    alert('다운로드 실패');
+  }
+
+
     //window.location.href = `${import.meta.env.VITE_API_BASE_URL}/api/file/download/${fileId}`;
   };
 

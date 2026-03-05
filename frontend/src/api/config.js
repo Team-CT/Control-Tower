@@ -5,7 +5,8 @@ const {
 } = import.meta.env;
 
 // 프로덕션 기본 API URL (빌드 시 VITE_API_URL 미설정 시 사용)
-const PRODUCTION_API_BASE = 'https://api.yoojh.store';
+const PRODUCTION_API_BASE = 'https://api.ct1.shop';
+
 
 export const API_CONFIG = {
   /**

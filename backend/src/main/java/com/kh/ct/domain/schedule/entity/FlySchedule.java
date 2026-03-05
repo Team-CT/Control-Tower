@@ -26,21 +26,24 @@ public class FlySchedule extends BaseTimeEntity {
      * ALL_SCHEDULE 과 1:1
      * @MapsId를 사용하여 flyScheduleId가 AllSchedule의 scheduleId를 참조
      * PK를 공유하는 표준 JPA 방식
+     *
+     * ⚠️ 중요: cascade 제거 - 부모(AllSchedule)는 별도로 저장하므로 cascade 불필요
+     * ⚠️ 중요: @MapsId가 자동으로 schedule.getScheduleId()를 flyScheduleId에 매핑하므로
+     *          setSchedule()에서 flyScheduleId를 직접 세팅하면 안 됨 (merge로 인식됨)
      */
     @MapsId
-    @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "fly_schedule_id", referencedColumnName = "schedule_id")
     private AllSchedule schedule;
-    
+
     /**
      * AllSchedule과의 연관관계 편의 메서드
-     * FlySchedule 생성 시 AllSchedule을 함께 설정
+     * ⚠️ flyScheduleId는 직접 세팅하지 않음 - @MapsId가 자동으로 처리
      */
     public void setSchedule(AllSchedule schedule) {
         this.schedule = schedule;
-        if (schedule != null && schedule.getScheduleId() != null) {
-            this.flyScheduleId = schedule.getScheduleId();
-        }
+        // ❌ 제거: flyScheduleId 직접 세팅하면 save() 시 merge로 인식되어 OptimisticLock 예외 발생
+        // @MapsId가 schedule.getScheduleId()를 자동으로 flyScheduleId에 매핑함
     }
 
     @Column(name = "airline_id", nullable = true)
@@ -76,7 +79,7 @@ public class FlySchedule extends BaseTimeEntity {
 
     @Column(name = "seat_count")
     private Long seatCount;
-    
+
     /**
      * EMP_FLY_SCHEDULE과 1:N 관계
      * 배정된 직원 목록을 가져올 수 있도록 양방향 연관관계 설정
@@ -84,5 +87,6 @@ public class FlySchedule extends BaseTimeEntity {
      */
     @OneToMany(mappedBy = "flySchedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
     @com.fasterxml.jackson.annotation.JsonIgnore
+    @Builder.Default
     private List<EmpFlySchedule> empFlySchedules = new ArrayList<>();
 }

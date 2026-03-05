@@ -12,6 +12,7 @@ import com.kh.ct.domain.schedule.repository.AllScheduleRepository;
 import com.kh.ct.domain.schedule.repository.EmpFlyScheduleRepository;
 import com.kh.ct.domain.schedule.repository.EmpScheduleRepository;
 import com.kh.ct.domain.schedule.repository.FlyScheduleRepository;
+import com.kh.ct.domain.schedule.util.ScheduleCodeValidator;
 import com.kh.ct.global.common.CommonEnums;
 import com.kh.ct.global.exception.BusinessException;
 import jakarta.persistence.EntityManager;
@@ -299,14 +300,14 @@ public class ScheduleGenerationService {
         List<ScheduleAssignmentResult> flightResults = results.stream()
                 .filter(r -> "FLIGHT".equals(r.getScheduleCode()))
                 .collect(Collectors.toList());
-        
+
         List<ScheduleAssignmentResult> otherResults = results.stream()
                 .filter(r -> !"FLIGHT".equals(r.getScheduleCode()))
                 .collect(Collectors.toList());
-        
-        log.info("일정 분류 - FLIGHT: {}건, 기타(STANDBY/OFF/SHIFT): {}건", 
+
+        log.info("일정 분류 - FLIGHT: {}건, 기타(STANDBY/OFF/SHIFT): {}건",
                 flightResults.size(), otherResults.size());
-        
+
         // ✅ 기타 일정만 AllSchedule 처리 (FLIGHT는 AllSchedule 불필요)
         Map<String, AllSchedule> allScheduleMap = new HashMap<>();
         Map<Long, AllSchedule> allScheduleByIdMap = new HashMap<>();
@@ -348,7 +349,7 @@ public class ScheduleGenerationService {
                 }
             }
         }
-        
+
         // ✅ FLIGHT 일정은 EmpSchedule 저장에서 제외 (EmpFlySchedule에만 저장)
         // 기타 일정만 EmpSchedule에 저장
         List<EmpSchedule> empSchedulesToSave = new ArrayList<>();
@@ -406,11 +407,15 @@ public class ScheduleGenerationService {
                 continue;
             }
 
+            // 직군별 scheduleCode 검증 및 강제
+            String validatedScheduleCode = ScheduleCodeValidator.validateAndEnforce(
+                    emp.getRole(), result.getScheduleCode());
+
             EmpSchedule empSchedule = EmpSchedule.builder()
                     .empScheduleId(null)
                     .scheduleId(savedAllSchedule)
                     .empId(emp)
-                    .scheduleCode(result.getScheduleCode())
+                    .scheduleCode(validatedScheduleCode)
                     .build();
 
             boolean isDuplicateInList = empSchedulesToSave.stream()
@@ -458,7 +463,7 @@ public class ScheduleGenerationService {
         log.info("✅ [FLIGHT 일정] EmpFlySchedule 저장 시작");
         log.info("  - FLIGHT 일정 수: {}건", flightResults.size());
         log.info("========================================");
-        
+
         List<EmpFlySchedule> empFlySchedulesToSave = new ArrayList<>();
         int nullFlyScheduleIdCount = 0;
         int notFoundFlyScheduleCount = 0;
@@ -471,12 +476,12 @@ public class ScheduleGenerationService {
                 log.warn("FLIGHT 일정에 flyScheduleId가 null입니다 - empId: {}", result.getEmpId());
                 continue;
             }
-            
+
             if (result.getEmpId() == null) {
                 log.warn("FLIGHT 일정에 empId가 null입니다 - flyScheduleId: {}", result.getFlyScheduleId());
                 continue;
             }
-            
+
             // Emp 찾기
             Emp emp = empMap.get(result.getEmpId());
             if (emp == null) {
@@ -488,46 +493,58 @@ public class ScheduleGenerationService {
             // FlySchedule 찾기
             Long flyScheduleId = result.getFlyScheduleId();
             Optional<FlySchedule> flyScheduleOpt = flyScheduleRepository.findById(flyScheduleId);
-            
+
             if (!flyScheduleOpt.isPresent()) {
                 notFoundFlyScheduleCount++;
                 log.warn("FlySchedule을 찾을 수 없습니다 - flyScheduleId: {}", flyScheduleId);
                 continue;
             }
-            
+
             FlySchedule flySchedule = flyScheduleOpt.get();
-            
-            // 중복 체크
+
+            // AllSchedule 조회 (FlySchedule의 schedule 필드)
+            AllSchedule allSchedule = flySchedule.getSchedule();
+            if (allSchedule == null) {
+                log.warn("FlySchedule의 AllSchedule이 null입니다 - flyScheduleId: {}", flyScheduleId);
+                continue;
+            }
+
+            // 중복 체크 (EmpFlySchedule)
             List<EmpFlySchedule> existing = empFlyScheduleRepository.findByFlyScheduleIdAndEmpId(
                     flyScheduleId, emp.getEmpId()
             );
-            
+
             if (!existing.isEmpty()) {
                 alreadyExistsCount++;
                 log.debug("이미 EmpFlySchedule이 존재합니다 - flyScheduleId: {}, empId: {}",
                         flyScheduleId, emp.getEmpId());
                 continue;
             }
-            
+
+            // ✅ FLIGHT 일정은 EmpFlySchedule에만 저장 (Single Source of Truth)
+            // EmpSchedule에는 저장하지 않음
+
             // EmpFlySchedule 생성
             EmpFlySchedule empFlySchedule = EmpFlySchedule.builder()
                     .emp(emp)
                     .flySchedule(flySchedule)
                     .build();
-            
+
             empFlySchedulesToSave.add(empFlySchedule);
         }
 
         log.info("========================================");
-        log.info("✅ [FLIGHT 일정] EmpFlySchedule 저장 준비 완료");
+        log.info("✅ [FLIGHT 일정] EmpSchedule + EmpFlySchedule 저장 준비 완료");
         log.info("  - FLIGHT 일정 수: {}건", flightResults.size());
         log.info("  - flyScheduleId가 null인 경우: {}건", nullFlyScheduleIdCount);
         log.info("  - FlySchedule을 찾지 못한 경우: {}건", notFoundFlyScheduleCount);
         log.info("  - Emp를 찾지 못한 경우: {}건", notFoundEmpCount);
         log.info("  - 이미 존재하는 경우: {}건", alreadyExistsCount);
-        log.info("  - 저장 대상: {}건", empFlySchedulesToSave.size());
+        log.info("  - EmpFlySchedule 저장 대상: {}건 (EmpSchedule 저장 제거 - Single Source of Truth)", empFlySchedulesToSave.size());
         log.info("========================================");
-        
+
+        // ✅ FLIGHT 일정은 EmpFlySchedule에만 저장 (EmpSchedule 저장 제거)
+        // EmpFlySchedule 저장
         if (!empFlySchedulesToSave.isEmpty()) {
             try {
                 List<EmpFlySchedule> savedEmpFlySchedules = saveEmpFlySchedulesBatch(empFlySchedulesToSave);
@@ -539,7 +556,7 @@ public class ScheduleGenerationService {
         } else {
             log.warn("⚠️ 저장할 EmpFlySchedule이 없습니다!");
         }
-        
+
         log.info("일정 배치 저장 완료 - 새 AllSchedule: {}건, EmpSchedule(기타 일정): {}건, EmpFlySchedule(FLIGHT): {}건, PENDING_APPROVAL: {}건",
                 newAllSchedules.size(), savedEmpSchedules.size(), empFlySchedulesToSave.size(), pendingApprovalCount);
     }
@@ -573,18 +590,18 @@ public class ScheduleGenerationService {
         List<FlySchedule> flightsInMonth = flyScheduleRepository.findByDateRange(
                 airlineId, startDate, endDate
         );
-        
+
         int deletedEmpFlyScheduleCount = 0;
         if (!flightsInMonth.isEmpty()) {
             List<Long> flyScheduleIds = flightsInMonth.stream()
                     .map(FlySchedule::getFlyScheduleId)
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
-            
+
             if (!flyScheduleIds.isEmpty()) {
                 // 해당 월의 모든 EmpFlySchedule 조회 및 삭제
                 List<EmpFlySchedule> existingEmpFlySchedules = empFlyScheduleRepository.findByFlyScheduleIdIn(flyScheduleIds);
-                
+
                 if (!existingEmpFlySchedules.isEmpty()) {
                     log.info("기존 EmpFlySchedule {}건 삭제 시작", existingEmpFlySchedules.size());
                     empFlyScheduleRepository.deleteAll(existingEmpFlySchedules);
@@ -601,7 +618,7 @@ public class ScheduleGenerationService {
         entityManager.flush();
         entityManager.clear();
 
-        log.info("기존 일정 삭제 완료 - EmpSchedule: {}건, EmpFlySchedule: {}건", 
+        log.info("기존 일정 삭제 완료 - EmpSchedule: {}건, EmpFlySchedule: {}건",
                 existingSchedules.size(), deletedEmpFlyScheduleCount);
     }
 

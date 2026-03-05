@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -63,6 +64,7 @@ public class SecurityConfig {
                         // 1) 정적/루트 (같은 서버에서 SPA 서빙 시)
                         // =========================
                         .requestMatchers("/", "/index.html", "/favicon.ico", "/static/**", "/assets/**").permitAll()
+                        // 활성화 링크로 접속 시 프론트 라우트(/account-activation) 허용 (같은 호스트에서 SPA 제공 시)
                         .requestMatchers("/account-activation", "/account-activation/**").permitAll()
 
                         // =========================
@@ -75,6 +77,7 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/api/auth/password/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/passwordCode/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/passwordCode/**").permitAll()
                         .requestMatchers("/api/account-activation/**").permitAll()
 
                         // emp 공개 API (가입 전/조회성)
@@ -101,9 +104,24 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/health/preview").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/health/save").permitAll()
 
+                        .requestMatchers(HttpMethod.POST, "/api/airline-applications").permitAll()
+                        .requestMatchers("/api/questions/**").permitAll()
+                        .requestMatchers("/api/dashboard/**").permitAll()
+                        .requestMatchers("/api/dashboard/admin/**").hasRole("AIRLINE_ADMIN")
+                        .requestMatchers("/api/board/**").permitAll()
+                        .requestMatchers("/api/common/codes/**").permitAll()
+                        .requestMatchers("/api/airlines").permitAll()
+                        .requestMatchers("/api/airports").permitAll()
+
+
                         // flight schedules 조회/싱크 공개
-                        .requestMatchers(HttpMethod.GET, "/api/flight-schedules").permitAll()
+                        // 파일 및 항공편
+                        .requestMatchers("/api/file/**").permitAll()
+                        .requestMatchers("/api/file/download/**").permitAll()
+
+                        // 항공편 API
                         .requestMatchers(HttpMethod.GET, "/api/flight-schedules/sync").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/flight-schedules").permitAll()
 
                         // WebSocket / 설정 / SSE
                         .requestMatchers("/ws/**").permitAll()
@@ -135,9 +153,17 @@ public class SecurityConfig {
                         // =========================
                         // 6) 인증 필요(민감/개인/업무)
                         // =========================
+                        // 내 정보 (와일드카드보다 우선순위 높게)
                         .requestMatchers("/api/emps/me/**").authenticated()
+
+                        // ✅ 직원 출/퇴근: 인증 필요
                         .requestMatchers("/api/attendance/**").authenticated()
+
+                        // 알림: SSE는 permitAll, 나머지는 인증 필요
+                        .requestMatchers("/api/notifications/stream").permitAll()
                         .requestMatchers("/api/notifications/**").authenticated()
+
+                        // 이메일 문의
                         .requestMatchers("/api/support/**").authenticated()
                         .requestMatchers("/api/emp/**").authenticated()
 
@@ -156,11 +182,19 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/flight-schedules/**")
                         .hasAnyRole("AIRLINE_ADMIN", "SUPER_ADMIN")
 
+
+                        // 기타 인증 필요 경로
+                        .requestMatchers("/api/emp/**").authenticated()
+
+
+
                         // (기존 유지) 관리자 멤버 관리
                         .requestMatchers(HttpMethod.GET, "/api/members").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/members/search").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/members/**").hasRole("ADMIN")
-
+                        .requestMatchers("/api/dashboard/admin/**").permitAll()
+                        .requestMatchers("/api/admin/attendance/**").permitAll()
+                        .requestMatchers("/api/health/admin/**").permitAll()
                         // =========================
                         // 8) 그 외 전부 인증
                         // =========================
@@ -182,18 +216,21 @@ public class SecurityConfig {
      */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
+        //CorsConfiguration corsConfiguration = new CorsConfiguration();
+        // ✅ 운영 서버 도메인 추가
+
         CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(Arrays.asList(
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "https://ct1.shop",
+                "http://ct1.shop"
+                //  "https://api.wkdwlsdn.shop",
+                // "http://api.wkdwlsdn.shop"
+        ));
 
         // ✅ “프론트” 오리진만 넣어야 함 (api 도메인 넣는 게 아님)
-        config.setAllowedOrigins(List.of(
-                "https://yoojh.store",
-                "https://www.yoojh.store",
-                "https://khair-controlltower.site",
-                "http://khair-controlltower.site",
-                "http://localhost:5173",
-                "http://localhost:5174"
-                // 필요하면 여기에 프론트 도메인 추가
-        ));
 
         // ✅ preflight 포함
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
