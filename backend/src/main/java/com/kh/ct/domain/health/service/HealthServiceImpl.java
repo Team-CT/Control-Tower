@@ -19,6 +19,7 @@ import com.kh.ct.global.common.CommonEnums;
 import com.kh.ct.global.entity.File;
 import com.kh.ct.global.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -61,6 +65,10 @@ public class HealthServiceImpl implements HealthService {
     private final AttendanceRepository attendanceRepository;
     private final PdfRenderService pdfRenderService;
 
+    private final S3Client s3Client;
+    @Value("${aws.s3.bucket}")
+    private String bucket;
+
     private final Path baseDir = Paths.get("uploads", "pdf").toAbsolutePath().normalize();
 
     @Transactional(readOnly = true)
@@ -95,25 +103,55 @@ public class HealthServiceImpl implements HealthService {
         String ext = getExt(originalName);
         String storedName = UUID.randomUUID().toString().replace("-", "") + ext;
 
-        Path dir = baseDir;
-        Path target = dir.resolve(storedName);
+//        Path dir = baseDir;
+//        Path target = dir.resolve(storedName);
+//
+//        try {
+//            Files.createDirectories(dir);
+//            try (InputStream is = pdfFile.getInputStream()) {
+//                Files.copy(is, target);
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException("파일 저장 실패", e);
+//        }
+//
+//        File savedFile = fileRepository.save(
+//                File.builder()
+//                        .fileOriName(originalName)
+//                        .fileName(storedName)
+//                        .path(target.toString())
+//                        .size(size)
+//                        .build());
 
-        try {
-            Files.createDirectories(dir);
-            try (InputStream is = pdfFile.getInputStream()) {
-                Files.copy(is, target);
-            }
+        // ✅ S3 Key (폴더처럼 사용)
+        String key = "uploads/pdf/" + storedName;
+
+        // ✅ S3 업로드 (로컬 저장 제거)
+        try (InputStream is = pdfFile.getInputStream()) {
+            PutObjectRequest req = PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .contentType(Optional.ofNullable(pdfFile.getContentType()).orElse("application/pdf"))
+                    .contentLength(size)
+                    .build();
+
+            s3Client.putObject(req, RequestBody.fromInputStream(is, size));
         } catch (IOException e) {
-            throw new RuntimeException("파일 저장 실패", e);
+            throw new RuntimeException("S3 업로드 실패", e);
         }
 
+        // ✅ DB에는 로컬경로 대신 S3 key 저장
         File savedFile = fileRepository.save(
                 File.builder()
                         .fileOriName(originalName)
                         .fileName(storedName)
-                        .path(target.toString())
+                        .path(key)   // 여기만 바뀜
                         .size(size)
-                        .build());
+                        .build()
+        );
+
+
+
 
         HealthDto.PhysicalTestRequest req = HealthDto.PhysicalTestRequest.builder()
                 .empId(emp)

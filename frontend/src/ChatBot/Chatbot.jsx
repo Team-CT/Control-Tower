@@ -37,7 +37,8 @@ const Chatbot = () => {
       }
 
       // 2. fetch 요청 시 headers에 토큰 추가
-      const response = await fetch(`${getApiBaseUrl()}/api/chat`, {
+      const response = await fetch('https://api.ct1.shop/api/chat', {
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

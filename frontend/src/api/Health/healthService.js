@@ -219,7 +219,12 @@ const healthService = {
             },
             }
         );
-        }
+        },
+    fileDownload: (fileId) => {
+        return axios.get(`/api/file/download/${fileId}`, {
+            responseType: 'blob', // ✅ 필수
+        });
+    }
 };
 
 // 하위 호환성을 위해 alias export 추가 (혹은 다른 파일에서 named import를 사용하는 경우 대비)
